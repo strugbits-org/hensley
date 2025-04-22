@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #F0DEA2;
+  --primary-alt: #F4F1EC;
+  --secondary: #57442D;
+  --secondary-alt: #2C2216;
+  --muted: #E0D6CA;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--primary-alt);
+}
