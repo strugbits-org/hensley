@@ -3,12 +3,14 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 // import { pageLoadEnd, pageLoadStart } from "@/Utils/AnimationFunctions";
 
-export const CustomLink = ({ to, children, className, target, attributes, onProductRedirect }) => {
+export const CustomLink = ({ to, children, className, target, attributes, onClick }) => {
   const router = useRouter();
   const pathname = usePathname();
 
   const delayedRedirect = (e) => {
     e.preventDefault();
+    if (onClick) onClick();
+
     if (to === undefined || !to || to === "") return;
 
     if (pathname === to) {
@@ -19,8 +21,6 @@ export const CustomLink = ({ to, children, className, target, attributes, onProd
 
     if (target === undefined || !target || target === "") {
     //   pageLoadStart();
-      if (onProductRedirect) onProductRedirect();
-
       setTimeout(() => {
         router.push(to);
         router.refresh();
