@@ -13,9 +13,11 @@ module.exports = {
       colors: {
         "primary": "var(--primary)",
         "primary-alt": "var(--primary-alt)",
+        "primary-glass": "var(--primary-glass)",
         "secondary": "var(--secondary)",
         "secondary-alt": "var(--secondary-alt)",
-        "muted": "var(--muted)",
+        "secondary-glass": "var(--secondary-glass)",
+        "primary-border": "var(--primary-border)",
       },
       fontFamily: {
         haasRegular: ['var(--font-neue-haas-display-regular)', ...fontFamily.sans],
