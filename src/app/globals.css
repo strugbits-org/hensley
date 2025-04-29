@@ -5,11 +5,13 @@
 :root {
   --primary: #F0DEA2;
   --primary-alt: #F4F1EC;
-  --primary-glass:rgba(240,222,162,0.65);
+  --primary-glass: rgba(240, 222, 162, 0.65);
   --secondary: #57442D;
   --secondary-alt: #2C2216;
-  --secondary-glass:rgba(244,241,236,0.20);
+  --secondary-glass: rgba(244, 241, 236, 0.20);
   --primary-border: #E0D6CA;
+  --glass-white: #ffffffa2;
+  /* --glass-white: rgba(255, 255, 255, 0.20); */
 }
 
 body {
@@ -18,8 +20,10 @@ body {
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {

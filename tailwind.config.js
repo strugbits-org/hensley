@@ -18,6 +18,7 @@ module.exports = {
         "secondary-alt": "var(--secondary-alt)",
         "secondary-glass": "var(--secondary-glass)",
         "primary-border": "var(--primary-border)",
+        "glass-white": "var(--glass-white)",
       },
       fontFamily: {
         haasRegular: ['var(--font-neue-haas-display-regular)', ...fontFamily.sans],
