@@ -202,8 +202,16 @@ export const Header = () => {
 
     const handleClickUserMenu = (item) => {
         if (item.type === 'search') {
-            setSelectedMenu(false);
-            setSearchModal(prev => !prev);
+            setSearchModal(prev => {
+                console.log(prev);
+
+                if (prev) {
+                    setSelectedMenu("RENTALS");
+                } else {
+                    setSelectedMenu(false);
+                }
+                return !prev;
+            });
         }
     }
 
@@ -213,6 +221,7 @@ export const Header = () => {
         if (item.type === 'submenu') {
             setActiveMenu(item.name);
         } else if (item.type === 'categoriesModal') {
+            setActiveMenu(item.name);
             setSelectedMenu(item);
         }
     }
@@ -230,6 +239,8 @@ export const Header = () => {
     }
 
     const toggleMobileMenu = () => {
+        setSearchModal(false);
+        setSelectedMenu(false);
         document.body.classList.toggle('overflow-hidden');
         setIsMobileMenuOpen(prev => !prev);
     }
@@ -416,7 +427,16 @@ export const Header = () => {
                         searchModal={searchModal}
                         setSearchModal={setSearchModal}
                         isMobileMenuOpen={isMobileMenuOpen}
-                        setIsMobileMenuOpen={setIsMobileMenuOpen} />
+                        activeMenu={activeMenu}
+                        setActiveMenu={setActiveMenu}
+                        subNavigation={subNavigation}
+                        setSubNavigation={setSubNavigation}
+                        selectedMenu={selectedMenu}
+                        setSelectedMenu={setSelectedMenu}
+                        handleMainMenuClick={handleMainMenuClick}
+                        handleSubMenuClick={handleSubMenuClick}
+                        setIsMobileMenuOpen={setIsMobileMenuOpen}
+                    />
                 </div>
 
             </header>

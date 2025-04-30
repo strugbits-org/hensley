@@ -28,6 +28,7 @@ export const MarketTentModal = ({ data, closeModal }) => {
                                 )}
                                 <div className="hidden lg:block relative grow mt-8">
                                     <Image
+                                        alt=""
                                         src={arrowIconLg}
                                         className="absolute fill-primary-alt left-0 bottom-0 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-full group-hover:h-full"
                                     />
