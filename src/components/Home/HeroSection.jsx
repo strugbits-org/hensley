@@ -9,7 +9,7 @@ export const HeroSection = () => {
                 <div className="text-primary-alt text-base font-haasRegular">
                     SOCIAL, CORPORATE & <br /> NONPROFIT EVENTS
                 </div>
-                <h1 className="mt-28 text-[2.8rem] lg:text-[7.5rem] text-primary-alt font-recklessLight leading-[0.9]">
+                <h1 className="mt-28 text-[2.8rem] lg:text-[6rem] 2xl:text-[7.5rem] text-primary-alt font-recklessLight leading-[0.9]">
                     CREATING UNFORGETTABLE MOMENTS, TOGETHER
                 </h1>
                 <div className="mt-16">
