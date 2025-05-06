@@ -7,6 +7,7 @@ import "./style.css";
 import Image from "next/image";
 import heroImage from "@/assets/Atrium 5-X2.png";
 import leftArrow from "@/assets/icons/leftArrow.svg";
+import arrow from "@/assets/icons/arrow.svg"
 import rightArrow from "../../assets/icons/rightArrow.svg";
 
 function cartSlider() {
@@ -14,6 +15,7 @@ function cartSlider() {
   const sliderInstance = useRef(null);
 
   const isMobile = window.innerWidth <= 768;
+  const isTablet = window.innerWidth > 640 && window.innerWidth <= 1024 
 
   const [sliderRef] = useKeenSlider(
     {
@@ -21,7 +23,7 @@ function cartSlider() {
       mode: "free-snap",
       slides: {
         origin: "center",
-        perView: isMobile ? 1 : 2.5,
+        perView: isMobile ? 1.3 : (isTablet ? 1.5 : 2.5),
         spacing: 15,
       },
       created(slider) {
@@ -72,23 +74,36 @@ function cartSlider() {
           <div
             key={index}
             className={`keen-slider__slide border border-white flex flex-col p-[20px]  ${
-              isActive ? "h-min" : "h-min"
+              isActive ? (isMobile ? "min-h-[750px]" : (isTablet ? "min-h-[750px]":"h-min")) : (isMobile ? "min-h-[750px]" :  (isTablet ? "min-h-[750px]":"h-min"))
             }`}
           >
-            <div className="lg:min-h-[425px]">
+            <div className="h-[425px] relative">
               <Image
                 className="h-full w-full object-cover"
                 src={dt.image}
                 alt={dt.heading}
               />
+              <Image src={arrow} className="md:hidden sm:block hidden absolute bottom-3 left-2"/>
             </div>
             <div>
-              <h3 className="text-[#2C2216] min-w-[313px] text-[70px] md:text-5xl font-recklessLight leading-[60px] mt-[20px] mb-[20px]">
+              <h3 className="text-[#2C2216] min-w-[313px] 
+              text-[25px]
+              leading-[22px] 
+              lg:text-[70px]
+              lg:leading-[60px]
+              md:text-5xl font-recklessLight  
+              mt-[20px] mb-[20px]">
                 {dt.heading}
               </h3>
               {isActive ? (
                 <>
-                  <p className="text-[#2C2216] max-w-[600px] text-[16px] md:text-sm font-haasRegular leading-[20px]">
+                  <p className="text-[#2C2216] max-w-[600px]
+                   text-[14px]
+                   leading-[18px]
+                   lg:text-[16px]
+                   lg:leading-[20px]
+                   md:text-sm font-haasRegular 
+                  ">
                     {dt.para}
                   </p>
                 </>
@@ -103,17 +118,18 @@ function cartSlider() {
       })}
       <button
         onClick={() => sliderInstance.current?.prev()}
-        className="absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
+        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
       >
         <Image src={leftArrow} alt="Left Arrow" width={20} height={20} />
       </button>
 
       <button
         onClick={() => sliderInstance.current?.next()}
-        className="absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
+        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
       >
         <Image src={rightArrow} alt="Right Arrow" width={20} height={20} />
       </button>
+     
     </div>
   );
 }

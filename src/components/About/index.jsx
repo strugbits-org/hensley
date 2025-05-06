@@ -5,6 +5,9 @@ import HeroSection from "./HeroSection"
 import Section2 from "./Section2"
 import Section3 from "./Section3"
 import Section4 from "./Section4"
+import ProfileCards from "./ProfileCards"
+import WhatWeOffer from "./WhatWeOffer"
+import StayConnected from "../common/StayConnected"
 
 export const About = () => {
     return (
@@ -13,6 +16,9 @@ export const About = () => {
        <Section2 />
        <Section3 />
        <Section4 />
+       <ProfileCards />
+       <WhatWeOffer />
+       <StayConnected />
         </>
     )
 }
