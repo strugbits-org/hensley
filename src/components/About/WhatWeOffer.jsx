@@ -34,7 +34,7 @@ function WhatWeOffer() {
    
     <>
      <SectionTitle text="meet the family" classes={"pt-[40px] pb-[40px] "}/>
-     <div className='w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 md:gap-10 md:px-8 px-4 pt-10 pb-10'>
+     <div className='w-full grid grid-cols-1 lg:grid-cols-3 lg:gap-10 lg:px-8 px-2 pt-10 pb-10'>
         <Cards />
         <Cards />
         <Cards />

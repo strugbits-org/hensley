@@ -15,7 +15,6 @@ function AboutSection() {
         <h1 className="text-[#2C2216] font-recklessRegular text-2xl
          md:text-[25px] 
          lg:text-5xl 
-        text-[35px]
         leading-[30px]
          md:leading-[23px] 
          mt-4 mb-6 max-w-4xl text-center sm:text-left lg:text-left">

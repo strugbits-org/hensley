@@ -10,7 +10,7 @@ import leftArrow from "@/assets/icons/leftArrow.svg";
 import arrow from "@/assets/icons/arrow.svg"
 import rightArrow from "../../assets/icons/rightArrow.svg";
 
-function cartSlider() {
+function PortfolioSlider() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderInstance = useRef(null);
 
@@ -82,7 +82,7 @@ function cartSlider() {
                 src={dt.image}
                 alt={dt.heading}
               />
-              <Image src={arrow} className="lg:hidden md:block hidden absolute bottom-3 left-2" />
+              <Image src={arrow} className="lg:hidden md:block sm:block hidden absolute bottom-3 left-2" />
             </div>
             <div>
               <h3 className="text-[#2C2216] min-w-[313px] 
@@ -134,4 +134,4 @@ function cartSlider() {
   );
 }
 
-export default cartSlider;
+export default PortfolioSlider;

@@ -1,6 +1,6 @@
 import HeroSection from "./HeroSection"
 import AboutSection from "./AboutSection"
-import CartDetailSection from "./CartDetails"
+import PortfolioSection from "./PortfolioSection"
 import SliderSection from "./SliderSection"
 import ProfileCards from "./ProfileCards"
 import WhatWeOffer from "./WhatWeOffer"
@@ -11,7 +11,7 @@ export const About = () => {
         <>
             <HeroSection />
             <AboutSection />
-            <CartDetailSection />
+            <PortfolioSection />
             <SliderSection />
             <ProfileCards />
             <WhatWeOffer />
