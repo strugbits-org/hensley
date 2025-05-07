@@ -47,7 +47,7 @@ export default function SliderComponent() {
   });
 
   return (
-    <div ref={sliderRef} className="relative keen-slider h-screen">
+    <div ref={sliderRef} className="relative keen-slider h-screen pb-[150px] lg:pb-[0px]">
       {data.map((dt, idx) => (
         <div
           key={idx}
@@ -59,13 +59,12 @@ export default function SliderComponent() {
         >
           <Image src={dt.image.src} className="w-full h-full object-cover" width={200} height={200}/>
 
-          {/* Centered Content */}
           <div className="absolute top-1/2 left-[20%] transform -translate-y-1/2 z-10">
             <h2 className="text-[32px] md:text-[60px] sm:text-[35px] max-w-[340px] md:max-w-[600px] leading-tight text-white font-recklessLight mb-8">
-              {/* EACH PROJECT IS UNIQUE, EACH WEDDING IS UNIQUE. */}
-              {dt.heading + console.log(dt.image)}
+              
+              {dt.heading}
             </h2>
-            <PrimaryButton className="border border-white text-white hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+            <PrimaryButton className="border border-white text-white hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
               {dt.btnText}
             </PrimaryButton>
           </div>

@@ -1,10 +1,7 @@
-// import { HeroSection } from "./HeroSection"
-
-
 import HeroSection from "./HeroSection"
-import Section2 from "./Section2"
-import Section3 from "./Section3"
-import Section4 from "./Section4"
+import AboutSection from "./AboutSection"
+import CartDetailSection from "./CartDetails"
+import SliderSection from "./SliderSection"
 import ProfileCards from "./ProfileCards"
 import WhatWeOffer from "./WhatWeOffer"
 import StayConnected from "../common/StayConnected"
@@ -12,13 +9,13 @@ import StayConnected from "../common/StayConnected"
 export const About = () => {
     return (
         <>
-       <HeroSection />
-       <Section2 />
-       <Section3 />
-       <Section4 />
-       <ProfileCards />
-       <WhatWeOffer />
-       <StayConnected />
+            <HeroSection />
+            <AboutSection />
+            <CartDetailSection />
+            <SliderSection />
+            <ProfileCards />
+            <WhatWeOffer />
+            <StayConnected />
         </>
     )
 }

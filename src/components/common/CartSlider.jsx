@@ -15,14 +15,14 @@ function cartSlider() {
   const sliderInstance = useRef(null);
 
   const isMobile = window.innerWidth <= 768;
-  const isTablet = window.innerWidth > 640 && window.innerWidth <= 1024 
+  const isTablet = window.innerWidth > 640 && window.innerWidth <= 1024
 
   const [sliderRef] = useKeenSlider(
     {
       loop: true,
       mode: "free-snap",
       slides: {
-        origin: "center",
+        origin: !isTablet && 'center',
         perView: isMobile ? 1.3 : (isTablet ? 1.5 : 2.5),
         spacing: 15,
       },
@@ -66,16 +66,15 @@ function cartSlider() {
   ];
 
   return (
-    <div ref={sliderRef} className="keen-slider mt-[20px] min-h-[750px]">
+    <div ref={sliderRef} className="keen-slider mt-[30px] md:min-h-[750px] pb-[70px] ">
       {data.map((dt, index) => {
         const isActive = index === currentSlide;
 
         return (
           <div
             key={index}
-            className={`keen-slider__slide border border-white flex flex-col p-[20px]  ${
-              isActive ? (isMobile ? "min-h-[750px]" : (isTablet ? "min-h-[750px]":"h-min")) : (isMobile ? "min-h-[750px]" :  (isTablet ? "min-h-[750px]":"h-min"))
-            }`}
+            className={`keen-slider__slide border border-white flex flex-col p-[20px]  ${isActive ? (isMobile ? "min-h-[680px]" : (isTablet ? "min-h-[680px]" : "h-min")) : (isMobile ? "min-h-[680px]" : (isTablet ? "min-h-[680px]" : "h-min"))
+              }`}
           >
             <div className="h-[425px] relative">
               <Image
@@ -83,7 +82,7 @@ function cartSlider() {
                 src={dt.image}
                 alt={dt.heading}
               />
-              <Image src={arrow} className="md:hidden sm:block hidden absolute bottom-3 left-2"/>
+              <Image src={arrow} className="lg:hidden md:block hidden absolute bottom-3 left-2" />
             </div>
             <div>
               <h3 className="text-[#2C2216] min-w-[313px] 
@@ -91,7 +90,8 @@ function cartSlider() {
               leading-[22px] 
               lg:text-[70px]
               lg:leading-[60px]
-              md:text-5xl font-recklessLight  
+              lg:w-[139px]
+              md:text-5xl font-recklessRegular  
               mt-[20px] mb-[20px]">
                 {dt.heading}
               </h3>
@@ -129,7 +129,7 @@ function cartSlider() {
       >
         <Image src={rightArrow} alt="Right Arrow" width={20} height={20} />
       </button>
-     
+
     </div>
   );
 }

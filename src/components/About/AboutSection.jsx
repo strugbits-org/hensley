@@ -1,13 +1,15 @@
 import React from "react";
 
-function Section2() {
+function AboutSection() {
   return (
-    <div className="flex justify-center items-center px-4 lg:min-h-screen">
-      <div className="w-full lg:max-w-[1556px] 
-      md:max-w-[492px]
+    <div className="flex justify-center items-center px-4 lg:min-h-screen lg:py-0 py-[60px] border">
+      <div className="lg:w-full lg:max-w-[1556px] w-[492px] 
       ">
-        <p className="uppercase font-haasRegular text-sm md:text-base mb-2 lg:text-left text-center">
+        <p className="hidden sm:hidden lg:block uppercase font-haasRegular text-sm md:text-base mb-2 lg:text-left sm:text-left text-center">
           wedding
+        </p>
+        <p className="sm:hidden block uppercase font-haasRegular text-sm md:text-base mb-2 lg:text-left sm:text-left text-center">
+          Social
         </p>
 
         <h1 className="text-[#2C2216] font-recklessRegular text-2xl
@@ -16,7 +18,7 @@ function Section2() {
         text-[35px]
         leading-[30px]
          md:leading-[23px] 
-         mt-4 mb-6 max-w-4xl text-center lg:text-left">
+         mt-4 mb-6 max-w-4xl text-center sm:text-left lg:text-left">
           EVENTS ARE CRUCIAL FOR ENHANCING BRAND AWARENESS, OFFERING EXCLUSIVE
           CHANCES TO SHOWCASE IDEAS, PRODUCTS, AND SERVICES INTIMATELY.
         </h1>
@@ -26,7 +28,7 @@ function Section2() {
          lg:text-[16px] lg:leading-[20px] 
          md:text-[14px] md:leading-[18px] 
          text-[14px] leading-[18px]
-         max-w-3xl text-center lg:text-left
+         max-w-3xl text-center lg:text-left sm:text-left
         
         ">
           ALIQUAM SIT AMET TELLUS FERMENTUM, SEMPER ORCI FINIBUS, ULTRICES ORCI.
@@ -47,4 +49,4 @@ function Section2() {
   );
 }
 
-export default Section2;
+export default AboutSection;

@@ -42,7 +42,7 @@ function StayConnected() {
       mode: "free-snap",
       slides: {
         origin: "center",
-        perView: isMobile ? 2.3 : (isTablet ? 2.3 : 4),
+        perView: isMobile ? 1.3 : (isTablet ? 2.3 : 4),
         spacing: isMobile ? 5 : (isTablet ? 8 : 10),
       },
       created(slider) {
@@ -58,16 +58,16 @@ function StayConnected() {
 
   return (
     <>
-      <SectionTitle text="let's get social" classes={"pt-[40px] pb-[40px] hidden md:flex bg-white"} />
+      <SectionTitle text="let's get social" classes={"pt-[40px] pb-[40px] hidden lg:flex bg-white"} />
       <div className="w-full flex flex-col items-center bg-white p-4">
         <div className="flex flex-col w-[95%] border ">
-          <div className="flex md:flex-row md:justify-between flex-col justify-center w-full items-center min-h-[130px] border px-8 pt-[20px] pb-[20px]">
-            <h3 className="md:hidden block text-[#2C2216] md:text-[35px] text-[55px] w-[274px] font-recklessRegular leading-[50px] text-center">LET’S GET SOCIAL</h3>
-            <div className="flex md:flex-row sm:justify-center items-center md:mt-0 md:mb-0 mt-[20px] mb-[40px] ">
-              <Image src={instaIcon} className="mr-2 h-[17px] w-[17px]" />
-              <h3 className="text-[#2C2216] md:text-[35px] sm:text-[18px] ">STAY CONNECTED FEED</h3>
+          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border px-8 lg:pt-[30px] pb-[20px] pt-[80px] ">
+            <h3 className="lg:hidden block text-[#2C2216] lg:text-[35px] text-[55px] w-[274px] font-recklessRegular leading-[50px] text-center">LET’S GET SOCIAL</h3>
+            <div className="flex lg:flex-row lg:justify-center items-center md:mt-0 md:mb-0 mt-[20px] mb-[40px] ">
+              <Image src={instaIcon} className="mr-2 h-[17px] w-[17px] lg:h-[29px] lg:w-[29px]" />
+              <h3 className="text-[#2C2216] lg:text-[35px] md:text-[18px] font-recklessRegular">STAY CONNECTED FEED</h3>
             </div>
-            <PrimaryButton className="border border-[#2C2216] text-[#2C2216] hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+            <PrimaryButton className="border border-[#2C2216] text-[#2C2216] hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px] lg:mt-[0px] md:mt-[20px]">
               learn more
             </PrimaryButton>
           </div>
