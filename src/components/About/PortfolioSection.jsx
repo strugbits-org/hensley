@@ -8,7 +8,7 @@ function Section3() {
       <SectionTitle
         text="How we do it"
         classes={
-          "md:bg-[#F0DEA2] lg:bg-[#F4F1EC] bg-[#F0DEA2] pt-[40px] pb-[40px] hidden lg:flex"
+          "md:bg-[#F0DEA2] lg:bg-[#F4F1EC] bg-[#F0DEA2] pt-[36px] pb-[44px] hidden lg:flex"
         }
       />
       <div className="flex flex-col ">

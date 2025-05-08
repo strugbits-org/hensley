@@ -85,9 +85,10 @@ TURPIS EGESTAS.`,
 
         <h1
           className="text-[#2C2216] font-recklessRegular text-2xl
-          sm:text-[25px] 
-          lg:text-5xl 
-          md:leading-[23px] 
+          lg:text-[60px]
+          lg:leading-[55px]
+          sm:text-[25px]
+          sm:leading-[33px]
           text-[35px]
           leading-[30px]
           mt-4 mb-6 max-w-4xl text-center sm:text-left lg:text-left"
@@ -99,6 +100,8 @@ TURPIS EGESTAS.`,
           className="text-[#2C2216] font-haasRegular text-sm 
           md:text-base 
           lg:text-[16px] lg:leading-[20px] 
+          sm:mt-[40px]
+          mt-[10px]
           text-[14px] leading-[18px]
           max-w-3xl text-center lg:text-left sm:text-left"
         >

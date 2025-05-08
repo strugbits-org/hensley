@@ -3,7 +3,7 @@ import React from "react";
 function SectionTitle({ text, classes }) {
   return (
     <div
-      className={`w-full flex items-center justify-center lg:pt-30px lg:pb-30px border ${classes}`}
+      className={`w-full flex items-center justify-center lg:pt-30px lg:pb-30px sm:border ${classes}`}
     >
       <h1
         className="w-[286px] uppercase text-[#2C2216] font-recklessRegular text-4xl 

@@ -173,15 +173,15 @@ function StayConnected() {
     <>
       <SectionTitle
         text="let's get social"
-        classes={"pt-[40px] pb-[40px] hidden lg:flex bg-white"}
+        classes={"pt-[40px] pb-[40px] hidden lg:flex bg-white "}
       />
       <div className="w-full flex flex-col items-center bg-white p-4">
         <div className="flex flex-col lg:w-[95%] w-full border ">
-          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border px-8 lg:pt-[30px] pb-[20px] pt-[131px] ">
-            <h3 className="lg:hidden block text-[#2C2216] lg:text-[35px] text-[55px] w-[274px] font-recklessRegular leading-[50px] text-center">
+          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border px-8 lg:pt-[30px] pb-[40px] pt-[131px] ">
+            <h3 className="lg:hidden block text-[#2C2216] lg:text-[35px] text-[55px] w-[274px] font-recklessRegular leading-[50px] text-center lg:mb-[0px]">
               LET’S GET SOCIAL
             </h3>
-            <div className="flex lg:flex-row lg:justify-center items-center md:mt-0 md:mb-0 mt-[20px] mb-[40px] ">
+            <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-[7px] mb-[40px] ">
               <Image
                 src={instaIcon}
                 className="mr-2 h-[17px] w-[17px] lg:h-[29px] lg:w-[29px]"
@@ -191,7 +191,7 @@ function StayConnected() {
               </h3>
             </div>
             <PrimaryButton className="border border-[#2C2216] text-[#2C2216] hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px] lg:mt-[0px] md:mt-[20px]">
-              learn more
+              FOLLOW US
             </PrimaryButton>
           </div>
           <div>

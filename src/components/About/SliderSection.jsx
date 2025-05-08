@@ -1,7 +1,7 @@
 import React from "react";
 import Slider from "../common/Slider";
 
-function Section4() {
+function ProjectSlider() {
   return (
     <div className="h-screen lg:mt-[100px] lg:pl-[15px] lg:pr-[15px] border">
       <Slider />
@@ -9,4 +9,4 @@ function Section4() {
   );
 }
 
-export default Section4;
+export default ProjectSlider;
