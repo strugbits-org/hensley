@@ -251,7 +251,7 @@ function PortfolioSlider() {
                   {dt.heading}
                 </h3>
                 {isActive ? (
-                  <p className="text-[#2C2216] max-w-[600px] text-[14px] leading-[18px] lg:text-[16px] lg:leading-[20px] md:text-sm font-haasRegular">
+                  <p className="text-[#2C2216] max-w-[600px] text-[14px] leading-[18px] lg:text-[16px] lg:leading-[20px] md:text-sm font-haasRegular lg:mt-[24px]">
                     {dt.para}
                   </p>
                 ) : (

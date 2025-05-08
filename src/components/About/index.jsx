@@ -2,8 +2,8 @@ import HeroSection from "./HeroSection"
 import AboutSection from "./AboutSection"
 import PortfolioSection from "./PortfolioSection"
 import SliderSection from "./SliderSection"
-import ProfileCards from "./ProfileCards"
-import WhatWeOffer from "./WhatWeOffer"
+import DreamTeam from "./DreamTeam"
+import MeetFamily from "./MeetFamily"
 import StayConnected from "../common/StayConnected"
 
 export const About = () => {
@@ -13,8 +13,8 @@ export const About = () => {
             <AboutSection />
             <PortfolioSection />
             <SliderSection />
-            <ProfileCards />
-            <WhatWeOffer />
+            <DreamTeam />
+            <MeetFamily />
             <StayConnected />
         </>
     )

@@ -90,7 +90,7 @@ function HeroSection() {
           <PrimaryButton
             className="border border-black text-[#2C2216] hover:bg-[#F0DEA2] hover:border-[#2C2216] 
               max-h-[60px] max-w-[280px]
-              p-0 mt-[60px] hover:[letter-spacing:4px]"
+              p-0 lg:mt-[60px] sm:mt-[59px] mt-[40px] hover:[letter-spacing:4px]"
           >
             {data.buttonLabel}
           </PrimaryButton>

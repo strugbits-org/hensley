@@ -31,12 +31,12 @@ const data = [
     },
 ]
 
-function ProfileCards() {
+function DreamTeam() {
   return (
 
     <>
     <SectionTitle text="dream team" classes={"pt-[40px] pb-[40px] "} />
-    <div className='min-h-screen flex flex-col items-center justify-center pb-11 border'>
+    <div className='min-h-screen flex flex-col items-center justify-center lg:pb-[130px] sm:pb-[140px] pb-[131px] border'>
         <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 mb-[30px] sm:w-full'>
        
        {
@@ -59,14 +59,14 @@ function ProfileCards() {
                md:text-[12px]
                lg:text-[16px]
                text-[12px]
-               leading-[20px] text-[#2C2216] md:mt-[8px] mt-[2px]'>{dt?.status || ''}</p>
+               leading-[20px] text-[#2C2216] lg:mt-[6px] mt-[3px]'>{dt?.status || ''}</p>
            </div>
        </div>
                </>
            ))
        }
    </div>
-  <PrimaryButton className="border border-[#2C2216] text-[#2C2216] hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+  <PrimaryButton className="border border-[#2C2216] text-[#2C2216] hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px] lg:mt-[83px] sm:mt-[42px] mt-[44px]">
                 load more
               </PrimaryButton>
     </div>
@@ -74,4 +74,4 @@ function ProfileCards() {
   )
 }
 
-export default ProfileCards
+export default DreamTeam
