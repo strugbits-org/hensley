@@ -36,14 +36,14 @@ function ProfileCards() {
 
     <>
     <SectionTitle text="dream team" classes={"pt-[40px] pb-[40px] "} />
-    <div className='min-h-screen flex flex-col items-center justify-center pb-11'>
-        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 mb-[30px]'>
+    <div className='min-h-screen flex flex-col items-center justify-center pb-11 border'>
+        <div className='grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 mb-[30px] sm:w-full'>
        
        {
            data.map((dt)=>(
                <>
-                <div className='md:max-w-[450px] sm-w-[366px] mt-8'>
-           <div className='md:max-h-[500px] sm:max-h-[366px] border border-black'>
+                <div className='lg:max-w-[450px] sm:w-auto mt-8 '>
+           <div className='lg:max-h-[500px] sm:h-auto border '>
                <Image src={dt.image} className='w-full h-full'/>
            </div>
            <div>
