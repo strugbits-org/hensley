@@ -13,6 +13,7 @@ import { SubCategoriesModal } from '../Modals/SubCategoriesModal';
 import { MarketTentModal } from '../Modals/MarketTentModal';
 import { SearchModal } from '../Modals/SearchModal';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
+import { sortByOrderNumber } from '@/utils';
 
 const userMenu = [
     { icon: searchIcon, slug: '#', type: 'search' },
@@ -93,6 +94,8 @@ Push pole -Bail ring -Sail cloth`,
                     { name: 'BANQUETTES', slug: '#' },
                     { name: 'BENCHES', slug: '#' },
                     { name: 'CUSHIONS', slug: '#' },
+                    { name: 'DINING TABLES', slug: '#' },
+                    { name: 'DINING TABLES', slug: '#' },
                     { name: 'DINING TABLES', slug: '#' },
                     { name: 'BANQUET TABLES', slug: '#' },
                     { name: 'KIOSK TABLES', slug: '#' },
@@ -192,19 +195,19 @@ Push pole -Bail ring -Sail cloth`,
     },
 ];
 
-export const Header = () => {
-    const [activeMenu, setActiveMenu] = useState(navigation[0].name);
-    const [subNavigation, setSubNavigation] = useState(navigation[0].subMenu);
+export const Header = ({ data, marketsData, tentsData }) => {
+    const [activeMenu, setActiveMenu] = useState("RENTALS");
+    const [subNavigation, setSubNavigation] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState(false);
     const [searchModal, setSearchModal] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
 
+    const { header, headerSubMenu, headerMegaMenu } = data;
+
     const handleClickUserMenu = (item) => {
         if (item.type === 'search') {
             setSearchModal(prev => {
-                console.log(prev);
-
                 if (prev) {
                     setSelectedMenu("RENTALS");
                 } else {
@@ -219,22 +222,31 @@ export const Header = () => {
         setSelectedMenu(false);
         setSearchModal(false);
         if (item.type === 'submenu') {
-            setActiveMenu(item.name);
-        } else if (item.type === 'categoriesModal') {
-            setActiveMenu(item.name);
+            setActiveMenu(item.title);
+        } else if (item.type === 'markets') {
+            setActiveMenu(item.title);
             setSelectedMenu(item);
         }
     }
 
     const handleSubMenuClick = (item) => {
         setSearchModal(false);
+
+        const currentSubMenu = headerMegaMenu.filter(x => x.HeaderSubMenu_categories.some(y => y._id === item._id));
+
+        const newMenu = {
+            name: item.title,
+            type: item.type,
+            data: item.type !== 'tents' ? sortByOrderNumber(currentSubMenu) : 
+        };
+
         if (selectedMenu) {
             setSelectedMenu(false);
             setTimeout(() => {
-                setSelectedMenu(item);
+                setSelectedMenu(newMenu);
             }, 50);
         } else {
-            setSelectedMenu(item);
+            setSelectedMenu(newMenu);
         }
     }
 
@@ -246,9 +258,28 @@ export const Header = () => {
     }
 
     useEffect(() => {
-        const currentMenu = navigation.find(item => item.name === activeMenu);
-        if (currentMenu) setSubNavigation(currentMenu.subMenu || []);
+        if (activeMenu === 'MARKETS') {
+            const marketsNavigation = marketsData.map(item => ({
+                ...item,
+                slug: `/market${item.slug}`,
+                type: 'slug'
+            }));
+            setSubNavigation(sortByOrderNumber(marketsNavigation) || []);
+            setSelectedMenu({
+                name: 'MARKETS',
+                type: 'markets',
+                data: sortByOrderNumber(marketsData)
+            });
+        } else {
+            const currentMenu = header.find(item => item.title === activeMenu);
+            const currentSubMenu = headerSubMenu.filter(item => item.Header_menuItems.some(subItem => subItem._id === currentMenu._id));
+            if (currentMenu) setSubNavigation(sortByOrderNumber(currentSubMenu) || []);
+        }
     }, [activeMenu]);
+
+    useEffect(() => {
+        console.log("data", { header, headerSubMenu, headerMegaMenu });
+    }, []);
 
     return (
         <>
@@ -267,17 +298,17 @@ export const Header = () => {
 
                             {/* Main Navigation */}
                             <ul className="flex h-full grow items-center justify-center gap-x-24">
-                                {navigation.map((item) => {
-                                    const { name } = item;
-                                    const isActive = activeMenu === name;
+                                {header.map((item) => {
+                                    const { title } = item;
+                                    const isActive = activeMenu === title;
 
                                     return (
-                                        <li className="h-full w-1/3 flex justify-center items-center relative group max-w-[288px]" key={name}>
+                                        <li key={title} className="h-full w-1/3 flex justify-center items-center relative group max-w-[288px]">
                                             <button
                                                 onClick={() => handleMainMenuClick(item)}
-                                                className={`h-full w-full text-secondary-alt text-xs font-haasBold tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out ${isActive ? "" : "hover:tracking-[4px]"}`}
+                                                className={`uppercase h-full w-full text-secondary-alt text-xs font-haasBold tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out ${isActive ? "" : "hover:tracking-[4px]"}`}
                                             >
-                                                {name}
+                                                {title}
                                             </button>
                                             <span
                                                 className={`absolute bottom-[0.5px] left-0 h-0.5 bg-secondary-alt transition-all duration-300 ease-in-out ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}
@@ -318,37 +349,37 @@ export const Header = () => {
                             style={{ gridTemplateColumns: `repeat(${subNavigation.length || 1}, minmax(0, 1fr))` }}
                         >
                             {subNavigation.map((item) => {
-                                const { name, slug, type } = item;
+                                const { title, slug, type } = item;
 
-                                return type !== "url" ? (
+                                return type !== "slug" ? (
                                     <button
-                                        key={name}
-                                        className="text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                        key={title}
+                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
                                         onClick={() => handleSubMenuClick(item)}
                                     >
-                                        {name}
+                                        {title}
                                     </button>
                                 ) : (
                                     <CustomLink
-                                        key={name}
-                                        to={`/subCategory/${slug}`}
-                                        className="text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                        key={title}
+                                        to={slug}
+                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
                                     >
-                                        {name}
+                                        {title}
                                     </CustomLink>
                                 )
                             })}
                         </nav>
                     </div>
                     {/* Modal Area */}
-                    {selectedMenu && selectedMenu.type === "subCategoriesModal" && selectedMenu.subCategories?.length ? (
+                    {selectedMenu && selectedMenu.type === "submenu" ? (
                         <SubCategoriesModal
                             closeModal={() => setSelectedMenu(false)}
-                            data={selectedMenu.subCategories}
+                            selectedMenu={selectedMenu}
                         />
-                    ) : selectedMenu && selectedMenu.type === "categoriesModal" ? (
+                    ) : selectedMenu && (selectedMenu.type === "markets" || selectedMenu.type === "tents") ? (
                         <MarketTentModal
-                            data={selectedMenu.subCategories || selectedMenu.subMenu || []}
+                            selectedMenu={selectedMenu}
                             closeModal={() => setSelectedMenu(false)}
                         />
                     ) : null}

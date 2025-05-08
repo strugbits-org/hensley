@@ -2,6 +2,7 @@ import { Header } from "@/components/layout/Header";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import localFont from 'next/font/local';
+import { fetchHeaderData, fetchMarketsData, fetchTentsData } from "@/services";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -47,11 +48,22 @@ export const metadata = {
   title: "RENTALS | Hensley Event Resources",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+
+  const [
+    headerData,
+    marketsData,
+    tentsData
+  ] = await Promise.all([
+    fetchHeaderData(),
+    fetchMarketsData(),
+    fetchTentsData()
+  ]);
+
   return (
     <html lang="en" className={`${neueHaasDisplayRegular.variable} ${neueHaasDisplayLight.variable} ${neueHaasDisplayMedium.variable} ${neueHaasDisplayBold.variable} ${recklessNeueRegular.variable} ${recklessNeueBold.variable} ${recklessNeueLight.variable} ${recklessNeueMedium.variable}`}>
       <body className={`antialiased`} >
-        <Header />
+        <Header data={headerData} marketsData={marketsData} tentsData={tentsData} />
         <main>
           {children}
         </main>

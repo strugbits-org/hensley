@@ -42,12 +42,10 @@ export const HeaderMobileMenu = ({
     const [menuItems, setMenuItems] = useState([]);
 
     useEffect(() => {
-        // Sort items once when data changes
         const sortedMenuItems = [...data].sort((a, b) => a.orderMobile - b.orderMobile);
         setMenuItems(sortedMenuItems);
     }, [data]);
 
-    // Optimized transition class computation
     const transitionClass = isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full';
 
     return (

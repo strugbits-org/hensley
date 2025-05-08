@@ -1,5 +1,5 @@
 import { Category } from "@/components/Category";
-import { logError } from "@/components/utils";
+import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
 export default async function Page() {

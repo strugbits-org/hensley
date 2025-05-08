@@ -39,12 +39,12 @@ export const Footer = () => {
   return (
     <footer className='relative footer bg-secondary-alt min-h-screen z-50 flex flex-col justify-between p-6 pt-12'>
       <div className='footer-content flex flex-wrap justify-between gap-y-6 lg:grow-0 grow'>
-        <div className='w-full lg:w-3/12'>
+        <div className='order-1 w-full lg:w-1/2 xl:w-3/12'>
           <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'>NewsLetter:</h2>
           <p className='text-sm font-haasRegular uppercase text-primary mb-5'>REGISTER YOUR EMAIL AND STAY UP TO DATE WITH EVERYTHING BEFORE ANYONE ELSE.</p>
           <NewsLetter />
         </div>
-        <div className='lg:w-4/12 flex justify-between mb-20'>
+        <div className='order-4 xl:order-2 lg:w-4/12 flex justify-between mb-20'>
           {addresses.map((address, index) => (
             <div className='w-2/5 lg:w-1/3' key={index}>
               <h2 className='text-sm font-haasMedium uppercase text-primary mb-1'>{address.name}</h2>
@@ -52,7 +52,7 @@ export const Footer = () => {
             </div>
           ))}
         </div>
-        <div className='w-1/2 lg:w-2/12'>
+        <div className='order-3 w-1/2 lg:w-2/12'>
           {companyLinks.map((link, index) => (
             <CustomLink to={link.slug} key={index}>
               <p className='text-sm font-haasRegular uppercase text-primary mb-1'>{link.name}</p>
@@ -66,7 +66,10 @@ export const Footer = () => {
             ))}
           </div>
         </div>
-        <div className='w-1/2 lg:w-2/12 flex flex-col items-end max-w-[132px]'>
+        <div className='order-2 xl:order-4 w-1/2 xl:w-2/12 flex flex-col items-end'>
+        <div className='max-w-[132px]'>
+
+        </div>
           <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'> EVENT RESOURCES EST. 1980 </h2>
           <p className='text-sm font-haasRegular uppercase text-primary mb-5'>©2023 HENSLEY EVENT RESOURCES</p>
           <div className='hidden lg:flex social-links w-full gap-3 justify-between'>
@@ -78,7 +81,7 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-      <Image className='mt-20 lg:mt-0' src={logo} alt="logo" />
+      <Image className='mt-20 lg:mt-0 mx-auto w-full' src={logo} alt="logo" />
     </footer>
   )
 }

@@ -8,6 +8,33 @@ export const logError = (...args) => {
     if (isDebugMode) console.error(...args);
 };
 
+export const sortByOrderNumber = (array, options = {}) => {
+    const {
+        ascending = true,
+        nullsLast = true,
+        key = "orderNumber",
+        fallbackSort = null
+    } = options;
+
+    return [...array].sort((a, b) => {
+        const orderA = a[key];
+        const orderB = b[key];
+
+        const aHasOrder = orderA !== undefined && orderA !== null;
+        const bHasOrder = orderB !== undefined && orderB !== null;
+
+        if (!aHasOrder && !bHasOrder) {
+            return fallbackSort ? fallbackSort(a, b) : 0;
+        }
+
+        if (!aHasOrder) return nullsLast ? 1 : -1;
+        if (!bHasOrder) return nullsLast ? -1 : 1;
+
+        const compareValue = orderA - orderB;
+        return ascending ? compareValue : -compareValue;
+    });
+}
+
 export const createWixClient = async () => {
     try {
         const wixClient = createClient({

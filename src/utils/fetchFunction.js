@@ -51,7 +51,7 @@ const queryCollection = async (payload) => {
     } = payload;
 
     // Create Wix client
-    const client = await createWixClientOAuth();
+    const client = await createWixClient();
 
     // Initialize query with collection ID
     let dataQuery = client.items.query(dataCollectionId);
