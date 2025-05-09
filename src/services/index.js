@@ -79,3 +79,34 @@ export const fetchTentsData = async () => {
     logError(`Error fetching tents data: ${error.message}`, error);
   }
 };
+
+export const fetchFooterData = async () => {
+  try {
+    const [
+      footerData,
+      socialLinks,
+      footerNaviationData,
+      branches
+    ] = await Promise.all([
+      queryCollection({ dataCollectionId: "FooterCollection" }),
+      queryCollection({ dataCollectionId: "SocialLinks" }),
+      queryCollection({ dataCollectionId: "FooterNavigation"}),
+      queryCollection({ dataCollectionId: "Branches"}),
+    ]);
+
+    if (!Array.isArray(footerData.items) || !Array.isArray(footerNaviationData.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    const response = {
+      footerData: footerData.items[0],
+      socialLinks: sortByOrderNumber(socialLinks.items),
+      footerNaviationData: sortByOrderNumber(footerNaviationData.items),
+      branches: sortByOrderNumber(branches.items),
+    };
+
+    return response;
+  } catch (error) {
+    logError(`Error fetching footer data: ${error.message}`, error);
+  }
+};

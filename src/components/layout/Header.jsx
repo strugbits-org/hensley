@@ -291,7 +291,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
             </header>
 
             {/* Spacer for non-homepage content */}
-            {pathname !== "/" && <div className='h-24'></div>}
+            {pathname !== "/" && <div className='h-[90px]'></div>}
         </>
     );
 };

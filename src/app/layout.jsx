@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import localFont from 'next/font/local';
-import { fetchHeaderData, fetchMarketsData, fetchTentsData } from "@/services";
+import { fetchFooterData, fetchHeaderData, fetchMarketsData, fetchTentsData } from "@/services";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -53,11 +53,13 @@ export default async function RootLayout({ children }) {
   const [
     headerData,
     marketsData,
-    tentsData
+    tentsData,
+    footerData
   ] = await Promise.all([
     fetchHeaderData(),
     fetchMarketsData(),
-    fetchTentsData()
+    fetchTentsData(),
+    fetchFooterData(),
   ]);
 
   return (
@@ -67,7 +69,7 @@ export default async function RootLayout({ children }) {
         <main>
           {children}
         </main>
-        <Footer />
+        <Footer data={footerData} />
       </body>
     </html>
   );

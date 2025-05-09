@@ -69,3 +69,7 @@ export const sortByOrderNumber = (array, options = {}) => {
         return ascending ? compareValue : -compareValue;
     });
 }
+
+export const sleep = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
