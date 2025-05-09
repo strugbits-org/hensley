@@ -21,180 +21,6 @@ const userMenu = [
     { icon: cartIcon, slug: '#', count: 1, type: 'cart' },
 ];
 
-const navigation = [
-    {
-        name: 'RENTALS',
-        type: 'submenu',
-        subMenu: [
-            {
-                name: 'TENTS',
-                slug: '#',
-                type: 'categoriesModal',
-                subCategories: [
-                    {
-                        name: 'STRUCTURES',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_8285d7e25f64490d875c3ef3eabb7c7c~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2019_Corinne_David_1077-topaz-upscale-2x.jpg",
-                        description: `"Clear span" -Kedered beams
-                        Curved beam or A-frame style
-                        50', 60', 70', 80', 100' & 120' widths
-                        
-                        STRUCTURES – ATRIUM
-                        Currently 50' (30' middles & 10' wings)
-                        Rental companies outside CA can purchase`
-                    },
-                    {
-                        name: 'FRAME TENTS',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_36662d5195014c1cb66b83fcda6539b0~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/option%201%20(1).jpg",
-                        description: `Fabric tension
-Push pole -Bail ring -Sail cloth`,
-                    },
-                    {
-                        name: 'SAIL CLOTH TENTS',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_472b7a68fef34c418ba181a6a00ea1e1~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/17-LauraGordon%C2%A9_brianaandtripwed.jpg",
-                        description: `Pipe supported canopy
-                        2" or Jumbo track framework
-                        Festival style`
-                    }
-                ]
-            },
-            {
-                name: 'TABLETOP',
-                slug: '#',
-                type: 'subCategoriesModal',
-                subCategories: [
-                    {
-                        name: 'PREMIUM COLLECTION',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_af2fdc208ef040ba8f3979fc7f75a21d~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/premium-v2.jpg"
-                    },
-                    {
-                        name: 'CHINA', slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_7ea4412ce6cd439e8eaa105e49f5ec38~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/china-v3.jpg"
-                    },
-                    { name: 'CHARGERS', slug: '#', imageSrc: "https://static.wixstatic.com/media/626075_84ef0ffebac14c9eaf806d12f4a86c6b~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/chargers-v2.jpg" },
-                    { name: 'FLATWARE', slug: '#', imageSrc: "https://static.wixstatic.com/media/626075_fa9c482889f24cf3857d0ee812066d8e~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/fraltware-v2.jpg" },
-                    { name: 'STEMWARE', slug: '#', imageSrc: "https://static.wixstatic.com/media/626075_cbadf59363f64aa7bfc69034fab5f16d~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/stemware-v2.jpg" },
-                    { name: 'BARWARE', slug: '#' },
-                    { name: 'TABLE ACCESSORIES', slug: '#' },
-                    { name: 'NAPKINS', slug: '#' },
-                    { name: 'TABLE RUNNERS', slug: '#' },
-                    { name: 'LINENS', slug: '#' }
-                ]
-            },
-            {
-                name: 'FURNISHINGS',
-                type: 'subCategoriesModal',
-                slug: '#',
-                subCategories: [
-                    { name: 'CHAIRS', slug: '#' },
-                    { name: 'BARSTOOLS', slug: '#' },
-                    { name: 'BANQUETTES', slug: '#' },
-                    { name: 'BENCHES', slug: '#' },
-                    { name: 'CUSHIONS', slug: '#' },
-                    { name: 'DINING TABLES', slug: '#' },
-                    { name: 'DINING TABLES', slug: '#' },
-                    { name: 'DINING TABLES', slug: '#' },
-                    { name: 'BANQUET TABLES', slug: '#' },
-                    { name: 'KIOSK TABLES', slug: '#' },
-                    { name: 'BARS & BACKBARS', slug: '#' },
-                    { name: 'SOFA & LOVESEATS', slug: '#' },
-                    { name: 'LOUNGE CHAIRS', slug: '#' },
-                    { name: 'COFFEE & END TABLES', slug: '#' },
-                    { name: 'OTTOMANS & PILLOWS', slug: '#' },
-                    { name: 'KIDS', slug: '#' },
-                    { name: 'OUTDOOR', slug: '#' }
-                ]
-            },
-            {
-                name: 'CATERING',
-                type: 'subCategoriesModal',
-                slug: '#',
-                subCategories: [
-                    { name: 'BEVERAGE SERVICES', slug: '#' },
-                    { name: 'SERVING PIECES', slug: '#' },
-                    { name: 'COOKING EQUIPMENT', slug: '#' }
-                ]
-            },
-            {
-                name: 'PAVILIONS',
-                slug: 'pavillions',
-                type: 'url',
-            },
-            {
-                name: 'ADDITIONAL PRODUCTS',
-                slug: '#',
-                type: 'subCategoriesModal',
-                subCategories: [
-                    { name: 'SCREENS', slug: '#' },
-                    { name: 'DANCE FLOORS & STAGE', slug: '#' },
-                    { name: 'PIPE & DRAPE', slug: '#' },
-                    { name: 'HEATERS', slug: '#' },
-                    { name: 'MISCELLANEOUS', slug: '#' },
-                    { name: 'ESCORT BOARDS', slug: '#' },
-                    { name: 'LIGHTING', slug: '#' },
-                    { name: 'POOL COVER', slug: '#' }
-                ]
-            },
-        ],
-        order: 1,
-        orderMobile: 1
-    },
-    {
-        name: 'MARKETS',
-        type: 'categoriesModal',
-        subMenu: [
-            {
-                name: 'SOCIAL',
-                slug: '#',
-                type: 'url',
-                imageSrc: "https://static.wixstatic.com/media/626075_8285d7e25f64490d875c3ef3eabb7c7c~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2019_Corinne_David_1077-topaz-upscale-2x.jpg",
-                description: `"Clear span" -Kedered beams
-                Curved beam or A-frame style
-                50', 60', 70', 80', 100' & 120' widths
-                
-                STRUCTURES – ATRIUM
-                Currently 50' (30' middles & 10' wings)
-                Rental companies outside CA can purchase`
-            },
-            {
-                name: 'NONPROFIT',
-                slug: '#',
-                type: 'url',
-                imageSrc: "https://static.wixstatic.com/media/626075_36662d5195014c1cb66b83fcda6539b0~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/option%201%20(1).jpg",
-                description: `Fabric tension
-Push pole -Bail ring -Sail cloth`,
-            },
-            {
-                name: 'CORPORATE',
-                slug: '#',
-                type: 'url',
-                imageSrc: "https://static.wixstatic.com/media/626075_472b7a68fef34c418ba181a6a00ea1e1~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/17-LauraGordon%C2%A9_brianaandtripwed.jpg",
-                description: `Pipe supported canopy
-                2" or Jumbo track framework
-                Festival style`
-            }
-        ],
-        order: 2,
-        orderMobile: 3
-    },
-    {
-        name: 'ABOUT',
-        type: 'submenu',
-        subMenu: [
-            { name: 'ABOUT US', slug: '#' },
-            { name: 'PROJECTS', slug: '#' },
-            { name: 'BLOG', slug: '#' },
-            { name: 'CONTACT', slug: '#' },
-            { name: 'CAREERS', slug: '#' },
-        ],
-        order: 3,
-        orderMobile: 2
-    },
-];
-
 export const Header = ({ data, marketsData, tentsData }) => {
     const [activeMenu, setActiveMenu] = useState("RENTALS");
     const [subNavigation, setSubNavigation] = useState([]);
@@ -208,9 +34,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
     const handleClickUserMenu = (item) => {
         if (item.type === 'search') {
             setSearchModal(prev => {
-                if (prev) {
-                    setSelectedMenu("RENTALS");
-                } else {
+                if (!prev) {
                     setSelectedMenu(false);
                 }
                 return !prev;
@@ -221,12 +45,10 @@ export const Header = ({ data, marketsData, tentsData }) => {
     const handleMainMenuClick = (item) => {
         setSelectedMenu(false);
         setSearchModal(false);
-        if (item.type === 'submenu') {
+        setActiveMenu(false);
+        setTimeout(() => {
             setActiveMenu(item.title);
-        } else if (item.type === 'markets') {
-            setActiveMenu(item.title);
-            setSelectedMenu(item);
-        }
+        }, 50);
     }
 
     const handleSubMenuClick = (item) => {
@@ -235,9 +57,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
         const currentSubMenu = headerMegaMenu.filter(x => x.HeaderSubMenu_categories.some(y => y._id === item._id));
 
         const newMenu = {
-            name: item.title,
+            title: item.title,
             type: item.type,
-            data: item.type !== 'tents' ? sortByOrderNumber(currentSubMenu) : 
+            data: item.type !== 'tents' ? sortByOrderNumber(currentSubMenu) : sortByOrderNumber(tentsData)
         };
 
         if (selectedMenu) {
@@ -266,20 +88,16 @@ export const Header = ({ data, marketsData, tentsData }) => {
             }));
             setSubNavigation(sortByOrderNumber(marketsNavigation) || []);
             setSelectedMenu({
-                name: 'MARKETS',
+                title: 'MARKETS',
                 type: 'markets',
                 data: sortByOrderNumber(marketsData)
             });
         } else {
             const currentMenu = header.find(item => item.title === activeMenu);
-            const currentSubMenu = headerSubMenu.filter(item => item.Header_menuItems.some(subItem => subItem._id === currentMenu._id));
-            if (currentMenu) setSubNavigation(sortByOrderNumber(currentSubMenu) || []);
+            const currentSubMenu = headerSubMenu.filter(item => item.Header_menuItems.some(subItem => subItem._id === currentMenu?._id));
+            if (currentMenu) setSubNavigation(sortByOrderNumber(currentSubMenu));
         }
     }, [activeMenu]);
-
-    useEffect(() => {
-        console.log("data", { header, headerSubMenu, headerMegaMenu });
-    }, []);
 
     return (
         <>
@@ -453,15 +271,15 @@ export const Header = ({ data, marketsData, tentsData }) => {
                         </div>
                     </div>
 
+                    {/* Mobile Menu */}
                     <HeaderMobileMenu
-                        data={navigation}
+                        menuItems={sortByOrderNumber(header, { key: 'orderMobile' })}
                         searchModal={searchModal}
                         setSearchModal={setSearchModal}
                         isMobileMenuOpen={isMobileMenuOpen}
                         activeMenu={activeMenu}
                         setActiveMenu={setActiveMenu}
                         subNavigation={subNavigation}
-                        setSubNavigation={setSubNavigation}
                         selectedMenu={selectedMenu}
                         setSelectedMenu={setSelectedMenu}
                         handleMainMenuClick={handleMainMenuClick}

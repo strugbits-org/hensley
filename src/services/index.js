@@ -68,7 +68,7 @@ export const fetchMarketsData = async () => {
 
 export const fetchTentsData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "TentsCollection" });
+    const response = await queryCollection({ dataCollectionId: "TentsCollection", includeReferencedItems: ["tent"] });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);

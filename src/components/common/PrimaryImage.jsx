@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { generateImageURL } from "@/utils/GenerateImageURL";
+import { generateImageURL } from "@/utils/generateImageURL";
 import { debounce } from 'lodash';
 import Image from 'next/image';
 
