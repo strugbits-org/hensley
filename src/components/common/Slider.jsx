@@ -12,7 +12,7 @@ import image1 from "@/assets/DSC07729-X3.png";
 const data = [
   {
     image: image1,
-    heading: "EACH PROJECT IS UNIQUE, EACH WEDDING IS UNIQUE.",
+    heading: "EACH PROJECT IS UNIQUE, EACH WEDDING IS UNIQUE..",
     btnText: "WE CREATE DREAM",
   },
   {
