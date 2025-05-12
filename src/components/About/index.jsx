@@ -4,7 +4,7 @@ import PortfolioSection from "./PortfolioSection"
 import SliderSection from "./SliderSection"
 import DreamTeam from "./DreamTeam"
 import MeetFamily from "./MeetFamily"
-import StayConnected from "../common/StayConnected"
+import InstaFeedback from "../common/InstaFeedback"
 
 export const About = () => {
     return (
@@ -15,7 +15,7 @@ export const About = () => {
             <SliderSection />
             <DreamTeam />
             <MeetFamily />
-            <StayConnected />
+            <InstaFeedback />
         </>
     )
 }

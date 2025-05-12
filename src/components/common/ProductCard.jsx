@@ -46,20 +46,19 @@ function ProductCard({ imageSrc, title, code, dimensions, onAddToCart }) {
                 </div>
             </div>
 
-            <div className="group/cart absolute right-[24px] top-[23px] border border-black rounded-full py-[18px] px-[18px]">
+            <div className="group/cart absolute right-[24px] top-[23px] border border-black rounded-full w-[56px] h-[56px] flex items-center justify-center shrink-0 cursor-pointer">
                 <Image
                     src={cartIcon}
                     alt="Cart Icon"
                     className="block group-hover/cart:hidden"
                 />
-
-                {/* Fill icon (hidden by default, shown on hover) */}
                 <Image
                     src={cartIconFill}
                     alt="Cart Icon Filled"
                     className="hidden group-hover/cart:block"
                 />
             </div>
+
         </div>
     );
 }

@@ -10,7 +10,7 @@ import leftArrow from "@/assets/icons/leftArrow.svg";
 import arrow from "@/assets/icons/arrow.svg";
 import rightArrow from "../../assets/icons/rightArrow.svg";
 import SectionTitle from "./SectionTitle";
-import { useMediaQuery } from "@uidotdev/usehooks"; // ✅ Add this import
+import { useMediaQuery } from "@uidotdev/usehooks";
 import "keen-slider/keen-slider.min.css";
 import "./style.css";
 
@@ -22,7 +22,7 @@ const data = [
   { image: heroImage },
 ];
 
-function StayConnected() {
+function InstaFeedback() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderInstance = useRef(null);
 
@@ -83,9 +83,8 @@ function StayConnected() {
                 return (
                   <div
                     key={index}
-                    className={`keen-slider__slide  flex flex-col md:p-[10px]  ${
-                      isActive ? "min-h" : "min-h"
-                    }`}
+                    className={`keen-slider__slide  flex flex-col md:p-[10px]  ${isActive ? "min-h" : "min-h"
+                      }`}
                   >
                     <div className="h-[425px] relative">
                       <Image
@@ -127,4 +126,4 @@ function StayConnected() {
   );
 }
 
-export default StayConnected;
+export default InstaFeedback;

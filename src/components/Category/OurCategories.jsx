@@ -26,15 +26,15 @@ const categories = [
   },
 ]
 
-function OurCategory() {
+function OurCategories({ slug }) {
   return (
     <>
       <div className='w-full lg:border-none sm:px-0 px-[12px]'>
-      <SectionTitle text="our categories" classes="text-[35px] pt-[40px] pb-[40px] border-t border-b" />
+        <SectionTitle text="our categories" classes="text-[35px] pt-[40px] pb-[40px] border-t border-b" />
       </div>
-      <ProductCard2 data={categories}/>
+      <ProductCard2 data={categories} />
     </>
   )
 }
 
-export default OurCategory
+export default OurCategories
