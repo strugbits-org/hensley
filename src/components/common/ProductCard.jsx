@@ -7,7 +7,7 @@ import cartIconFill from '@/assets/icons/saveCartFill.svg'
 
 function ProductCard({ imageSrc, title, code, dimensions, onAddToCart }) {
     return (
-        <div className="group transition-all duration-300 ease-in-out max-w-[450px] border flex flex-col px-[7px] pt-[7px] relative">
+        <div className="group transition-all duration-300 ease-in-out max-w-[450px] border flex flex-col pt-[7px] relative">
             <div className="overflow-hidden h-full w-full">
                 <Image
                     src={imageSrc}
