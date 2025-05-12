@@ -7,7 +7,7 @@ export const Footer = ({ data }) => {
   const { footerData, socialLinks, footerNaviationData, branches } = data;
 
   return (
-    <footer className='relative footer bg-secondary-alt min-h-screen z-50 flex flex-col justify-between p-6 pt-12'>
+    <footer className='relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12'>
       <div className='footer-content flex justify-between flex-wrap lg:flex-nowrap lg:gap-x-10 gap-y-20 md:gap-y-14 lg:gap-y-6 grow md:grow-0 items-stretch md:items-start'>
         <div className='order-1 w-full md:w-1/2 lg:w-2/6'>
           <NewsLetter data={footerData} />
