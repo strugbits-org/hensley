@@ -216,7 +216,7 @@ function PortfolioSlider() {
       </h3>
       <div
         ref={sliderRef}
-        className="keen-slider mt-[30px] md:min-h-[750px] pb-[70px]"
+        className="keen-slider mt-[30px] md:min-h-[850px] pb-[70px]"
       >
         {data.map((dt, index) => {
           const isActive = index === currentSlide;
