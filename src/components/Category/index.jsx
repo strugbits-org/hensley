@@ -1,14 +1,14 @@
 import React from 'react'
 import Listing from './Listing'
-import OurCategory from './OurCategory'
-import StayConnected from '../common/StayConnected'
+import OurCategories from './OurCategories'
+import InstaFeedback from '../common/InstaFeedback'
 
-export const Category = () => {
+export const Categories = ({slug}) => {
   return (
     <>
-    <Listing />
-    <OurCategory />
-    <StayConnected />
+    <Listing slug={slug}/>
+    <OurCategories slug={slug} />
+    <InstaFeedback />
     </>
   )
 }
