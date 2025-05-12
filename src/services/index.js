@@ -90,8 +90,8 @@ export const fetchFooterData = async () => {
     ] = await Promise.all([
       queryCollection({ dataCollectionId: "FooterCollection" }),
       queryCollection({ dataCollectionId: "SocialLinks" }),
-      queryCollection({ dataCollectionId: "FooterNavigation"}),
-      queryCollection({ dataCollectionId: "Branches"}),
+      queryCollection({ dataCollectionId: "FooterNavigation" }),
+      queryCollection({ dataCollectionId: "Branches" }),
     ]);
 
     if (!Array.isArray(footerData.items) || !Array.isArray(footerNaviationData.items)) {
@@ -110,3 +110,17 @@ export const fetchFooterData = async () => {
     logError(`Error fetching footer data: ${error.message}`, error);
   }
 };
+
+export const fetchOurCategoriesData = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "OurCategories" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching our categories data: ${error.message}`, error);
+  }
+}

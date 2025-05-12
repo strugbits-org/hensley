@@ -1,9 +1,12 @@
+import OurCategories from "../common/OurCategories";
 import { HeroSection } from "./HeroSection"
 
-export const HomePage = () => {
+export const HomePage = ({ data }) => {
+    const { heroSectionData, categoriesData } = data;
     return (
         <>
-            <HeroSection />
+            <HeroSection data={heroSectionData} />
+            <OurCategories data={categoriesData} />
         </>
     )
 }
