@@ -17,7 +17,8 @@ function OurCategories({ data }) {
           return (
             <div
               key={category._id}
-              className={`cursor-pointer group border flex hover:bg-[#F0DEA2] transition-all duration-300 ease-in-out lg:flex-row flex-col lg:h-[474px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
+              className={`cursor-pointer group border flex hover:bg-[#F0DEA2] transition-all duration-300 ease-in-out lg:flex-row ${item.rtl && 'lg:flex-row-reverse'
+                } lg:h-[474px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
             >
               {/* Image */}
               <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] sm:py-[13px] sm:px-[12px] lg:h-auto h-[382px] ">
@@ -29,7 +30,7 @@ function OurCategories({ data }) {
               {/* Content */}
               <div className="lg:w-1/2 flex flex-col justify-between lg:px-[24px] lg:py-[24px]">
                 {/* Desktop Title */}
-                <h3 className="font-recklessRegular xl:text-[90px] xl:leading-[70px] lg:text-[70px] lg:leading-[50px] uppercase hidden lg:block transition-all duration-300 ease-in-out group-hover:tracking-widest">
+                <h3 className="w-[326px] break-words font-recklessRegular xl:text-[90px] xl:leading-[70px] lg:text-[70px] lg:leading-[50px] uppercase hidden lg:block transition-all duration-300 ease-in-out group-hover:tracking-widest">
                   {category.name}
                 </h3>
 

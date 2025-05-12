@@ -24,6 +24,7 @@ export const Categories = ({ slug }) => {
     orderNumber: 2,
     _id: 'fc5962ca-1e5f-41c8-b6eb-60649a1fd358',
     _owner: '8ba81b0f-1e45-4f83-95ba-814143aee907',
+    rtl:true,
     categories: {
       name: 'TABLETOP',
       mainMedia: 'wix:image://v1/626075_a0c9929c708a4855988454b61892c5e7~mv2.jpg/file.jpg#originWidth=5000&originHeight=5000',
