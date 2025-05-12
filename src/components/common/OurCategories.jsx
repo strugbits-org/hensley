@@ -56,10 +56,10 @@ function OurCategories({ data }) {
                       className="font-recklessRegular xl:text-[90px] xl:leading-[70px] lg:text-[70px] lg:leading-[50px] uppercase
                         sm:text-[30px] sm:leading-[45px] text-[35px] leading-[45px]"
                     >
-                      {category.title}
+                      {category.name}
                     </h3>
                     <span className="lg:text-[14px] font-haasRegular">
-                      {category.description}
+                      {title}
                     </span>
                   </div>
                   <Image
