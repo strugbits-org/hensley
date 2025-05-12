@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { generateImageURL } from "@/utils/generateImageURL";
+import { generateImageURL, generateSVGURL } from "@/utils/generateImageURL";
 import { debounce } from 'lodash';
 import Image from 'next/image';
 
@@ -36,6 +36,8 @@ export const PrimaryImage = ({
         switch (type) {
             case "default":
                 return generateImageURL({ wix_url: url, w: width, h: height, original, fit, q });
+            case "svg":
+                return generateSVGURL(url);
             case "product":
                 return `${url}/v1/${fit}/w_${width},h_${height},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
             case "insta":

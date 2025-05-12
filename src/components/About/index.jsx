@@ -4,7 +4,6 @@ import PortfolioSection from "./PortfolioSection"
 import SliderSection from "./SliderSection"
 import DreamTeam from "./DreamTeam"
 import MeetFamily from "./MeetFamily"
-import InstaFeedback from "../common/InstaFeedback"
 
 export const About = () => {
     return (
@@ -15,7 +14,6 @@ export const About = () => {
             <SliderSection />
             <DreamTeam />
             <MeetFamily />
-            <InstaFeedback />
         </>
     )
 }

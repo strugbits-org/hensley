@@ -4,8 +4,6 @@ import Image from 'next/image'
 import { PrimaryImage } from './PrimaryImage'
 
 function OurCategories({ data }) {
-  console.log('data', data);
-  
 
   return (
     <>

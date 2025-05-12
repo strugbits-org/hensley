@@ -124,3 +124,31 @@ export const fetchOurCategoriesData = async () => {
     logError(`Error fetching our categories data: ${error.message}`, error);
   }
 }
+
+export const fetchInstagramFeed = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "InstagramFeed" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching instagram feed data: ${error.message}`, error);
+  }
+};
+
+export const fetchHomePageDetails = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "HomePageDetails" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items[0];
+  } catch (error) {
+    logError(`Error fetching home page data: ${error.message}`, error);
+  }
+};

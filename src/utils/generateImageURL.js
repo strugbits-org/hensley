@@ -59,3 +59,15 @@ export const generateVideoURL = (videoSRC) => {
         return videoSRC;
     }
 }
+
+export const generateSVGURL = (wix_url) => {
+
+    if (!wix_url.startsWith("wix:vector://v1/")) {
+        return wix_url
+    }
+    let wixImageURL = "";
+    wixImageURL = "https://static.wixstatic.com/shapes/";
+    let splitUrl = wix_url.split("/")
+    return wixImageURL + splitUrl[splitUrl.length -2];
+
+}

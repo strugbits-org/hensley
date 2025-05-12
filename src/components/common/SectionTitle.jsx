@@ -7,14 +7,13 @@ function SectionTitle({ text, classes }) {
     >
       <h1
         className=" uppercase text-[#2C2216] font-recklessRegular text-4xl 
-    md:text-[65px]
-    md:leading-[50px] 
-    lg:text-[200px]
-    lg:leading-[160px]
-     lg:text-left
-     sm:w-max
-     text-center
-      leading-tight tracking-wide "
+          md:text-[65px]
+          md:leading-[50px] 
+          lg:text-[200px]
+          lg:leading-[180px]
+          sm:w-max
+          text-center
+          leading-tight tracking-wide "
       >
         {text}
       </h1>
