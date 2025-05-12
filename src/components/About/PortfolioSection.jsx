@@ -12,7 +12,7 @@ function Section3() {
         }
       />
       <div className="flex flex-col ">
-        <div className="bg-[#F0DEA2] pb-11">
+        <div className="bg-[#F0DEA2] pb-11 min-h-screen relative">
           <PortfolioSlider />
         </div>
       </div>
