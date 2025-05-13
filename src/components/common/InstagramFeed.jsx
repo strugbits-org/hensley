@@ -1,10 +1,8 @@
 "use client";
-
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import { PrimaryButton } from "./PrimaryButton";
 import SectionTitle from "./SectionTitle";
-import { useMediaQuery } from "@uidotdev/usehooks";
 import "keen-slider/keen-slider.min.css";
 import "./style.css";
 import { PrimaryImage } from "./PrimaryImage";
@@ -14,11 +12,7 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 function InstagramFeed({ data, details }) {
   const { instaFeedHeading, instaFeedTitle, instaFeedIcon, instaFeedButtonLabel, instaFeedButtonAction } = details;
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const sliderInstance = useRef(null);
-
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)");
+  const sliderInstance = useRef();
 
   const [sliderRef] = useKeenSlider(
     {
@@ -26,15 +20,19 @@ function InstagramFeed({ data, details }) {
       mode: "free-snap",
       slides: {
         origin: "center",
-        perView: isMobile ? 1.3 : isTablet ? 2.3 : 4,
-        spacing: isMobile ? 5 : isTablet ? 8 : 10,
+        perView: 4,
+        spacing: 4,
       },
-      created(slider) {
-        sliderInstance.current = slider;
-        setCurrentSlide(slider.track.details.rel);
-      },
-      detailsChanged(slider) {
-        setCurrentSlide(slider.track.details.rel);
+      breakpoints: {
+        "(max-width: 768px)": {
+          slides: { perView: 1.5, spacing: 5, origin: "center" },
+        },
+        "(min-width: 768px) and (max-width: 1024px)": {
+          slides: { perView: 3, spacing: 4, origin: "center" },
+        },
+        "(min-width: 1025px) and (max-width: 1280px)": {
+          slides: { perView: 3.5, spacing: 4, origin: "center" },
+        },
       },
     },
     []
@@ -67,16 +65,13 @@ function InstagramFeed({ data, details }) {
           <div>
             <div ref={sliderRef} className="keen-slider mt-[20px] ">
               {data.map((dt, index) => {
-                const isActive = index === currentSlide;
-
                 return (
                   <CustomLink
                     to={"/"}
                     key={index}
-                    className={`keen-slider__slide  flex flex-col md:p-[10px]  ${isActive ? "min-h" : "min-h"
-                      }`}
+                    className={`keen-slider__slide  flex flex-col md:p-[10px]`}
                   >
-                    <div className="h-[425px] relative">
+                    <div className="h-[325px] lg:h-[448px] relative">
                       <PrimaryImage type="insta" url={dt.image} customClasses={"h-full w-full object-cover"} />
                     </div>
                   </CustomLink>

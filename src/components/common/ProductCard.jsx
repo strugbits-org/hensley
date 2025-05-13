@@ -4,16 +4,14 @@ import copyIcon from '@/assets/icons/copy.png';
 import arrowIcon from '@/assets/icons/darkrightArrow.svg';
 import cartIcon from '@/assets/icons/saveCart.svg';
 import cartIconFill from '@/assets/icons/saveCartFill.svg'
+import { PrimaryImage } from './PrimaryImage';
 
 function ProductCard({ imageSrc, title, code, dimensions, onAddToCart }) {
     return (
         <div className="group transition-all duration-300 ease-in-out max-w-[450px] border flex flex-col px-[7px] pt-[7px] relative">
             <div className="overflow-hidden h-full w-full">
-                <Image
-                    src={imageSrc}
-                    alt={title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+                <PrimaryImage fit='fit' alt={title} url={imageSrc} customClasses={"h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"} />
+
             </div>
 
             <div className="lg:pt-[23px] lg:pb-[8px] lg:pl-[23px]">

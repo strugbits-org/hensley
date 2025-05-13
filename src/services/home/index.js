@@ -1,28 +1,38 @@
 "use server";
 
-import { logError, sortByOrderNumber } from "@/utils";
+import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
+import { fetchBestSellers, fetchHomePageDetails, fetchOurCategoriesData, fetchPortfolioData } from "..";
 
 export const fetchHomePageData = async () => {
   try {
     const [
-      homePageDetails,
+      bannerData,
       heroSectionData,
+      homePageDetails,
       categoriesData,
+      portfolioData,
+      bestSellers
     ] = await Promise.all([
-      queryCollection({ dataCollectionId: "HomePageDetails" }),
+      queryCollection({ dataCollectionId: "BannerHomePage" }),
       queryCollection({ dataCollectionId: "HeroSectionDataHome" }),
-      queryCollection({ dataCollectionId: "OurCategories", includeReferencedItems: ["categories"] }),
+      fetchHomePageDetails(),
+      fetchOurCategoriesData(),
+      fetchPortfolioData(),
+      fetchBestSellers(),
     ]);
 
-    if (!Array.isArray(homePageDetails.items) || !Array.isArray(heroSectionData.items) || !Array.isArray(categoriesData.items)) {
+    if (!Array.isArray(heroSectionData.items) || !homePageDetails || !categoriesData || !portfolioData || !bestSellers) {
       throw new Error(`Response does not contain items array`);
     }
 
     const response = {
-      homePageDetails: homePageDetails.items[0],
+      bannerData: bannerData.items[0],
       heroSectionData: heroSectionData.items[0],
-      categoriesData: sortByOrderNumber(categoriesData.items),
+      homePageDetails,
+      categoriesData,
+      portfolioData,
+      bestSellers
     };
 
     return response;

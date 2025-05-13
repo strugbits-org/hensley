@@ -2,7 +2,7 @@ import React from "react";
 import PortfolioSlider from "../common/PortfolioSlider";
 import SectionTitle from "../common/SectionTitle";
 
-function Section3() {
+function HowWeDoITSection() {
   return (
     <>
       <SectionTitle
@@ -20,4 +20,4 @@ function Section3() {
   );
 }
 
-export default Section3;
+export default HowWeDoITSection;
