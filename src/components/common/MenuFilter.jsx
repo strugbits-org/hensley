@@ -4,7 +4,7 @@ import { useState } from 'react';
 const Checkbox = ({ label }) => (
     <label className="flex items-center cursor-pointer">
         <input type="checkbox" className="peer hidden" />
-        <div className="w-4 h-4 border-[1.5px] border-black lg:bg-[#F4F1EC] sm:bg-white peer-checked:bg-black peer-checked:p-[2px]">
+        <div className="w-4 h-4 border-[1.5px] border-black lg:bg-primary-alt sm:bg-white peer-checked:bg-black peer-checked:p-[2px]">
             <div className="w-full h-full" />
         </div>
         <span className="lg:text-[18px] font-haasLight sm:text-[14px] ml-[8px] text-[#2B2218] uppercase">{label}</span>

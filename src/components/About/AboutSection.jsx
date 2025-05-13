@@ -25,7 +25,7 @@ TURPIS EGESTAS.`,
         {/* <p className="...">...</p> */}
 
         <h1
-          className="text-[#2C2216] font-recklessRegular text-2xl
+          className="text-secondary-alt font-recklessRegular text-2xl
           lg:text-[60px]
           lg:leading-[55px]
           sm:text-[25px]
@@ -38,7 +38,7 @@ TURPIS EGESTAS.`,
         </h1>
 
         <p
-          className="text-[#2C2216] font-haasRegular text-sm 
+          className="text-secondary-alt font-haasRegular text-sm 
           md:text-base 
           lg:text-[16px] lg:leading-[20px] 
           sm:mt-[40px]

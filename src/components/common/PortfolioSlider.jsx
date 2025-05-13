@@ -85,7 +85,7 @@
 //               <Image src={arrow} className="lg:hidden md:block sm:block hidden absolute bottom-3 left-2" />
 //             </div>
 //             <div>
-//               <h3 className="text-[#2C2216] min-w-[313px]
+//               <h3 className="text-secondary-alt min-w-[313px]
 //               text-[25px]
 //               leading-[22px]
 //               lg:text-[70px]
@@ -97,7 +97,7 @@
 //               </h3>
 //               {isActive ? (
 //                 <>
-//                   <p className="text-[#2C2216] max-w-[600px]
+//                   <p className="text-secondary-alt max-w-[600px]
 //                    text-[14px]
 //                    leading-[18px]
 //                    lg:text-[16px]
@@ -108,7 +108,7 @@
 //                   </p>
 //                 </>
 //               ) : (
-//                 <p className="text-[#2C2216] text-[16px] font-haasRegular w-[600px] leading-[20px]">
+//                 <p className="text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
 //                   +SEE MORE
 //                 </p>
 //               )}
@@ -247,15 +247,15 @@ function PortfolioSlider() {
                 />
               </div>
               <div>
-                <h3 className="text-[#2C2216] text-[25px] leading-[22px] lg:text-[50px] lg:leading-[40px] xl:text-[70px] xl:leading-[60px] lg:max-w-[139px] md:text-5xl font-recklessRegular mt-[20px] mb-[20px]">
+                <h3 className="text-secondary-alt text-[25px] leading-[22px] lg:text-[50px] lg:leading-[40px] xl:text-[70px] xl:leading-[60px] lg:max-w-[139px] md:text-5xl font-recklessRegular mt-[20px] mb-[20px]">
                   {dt.heading}
                 </h3>
                 {isActive ? (
-                  <p className="text-[#2C2216] max-w-[600px] text-[14px] leading-[18px] lg:text-[16px] lg:leading-[20px] md:text-sm font-haasRegular lg:mt-[24px]">
+                  <p className="text-secondary-alt max-w-[600px] text-[14px] leading-[18px] lg:text-[16px] lg:leading-[20px] md:text-sm font-haasRegular lg:mt-[24px]">
                     {dt.para}
                   </p>
                 ) : (
-                  <p className="text-[#2C2216] text-[16px] font-haasRegular w-[600px] leading-[20px]">
+                  <p className="text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
                     {isTablet || isMobile ? dt.para : "+SEE MORE"}
                   </p>
                 )}

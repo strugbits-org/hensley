@@ -99,7 +99,7 @@ export default function SliderComponent() {
                 >
                   {dt.heading}
                 </h2>
-                <PrimaryButton className="border border-white text-white hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
+                <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
                   {dt.btnText}
                 </PrimaryButton>
               </div>

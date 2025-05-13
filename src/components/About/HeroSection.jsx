@@ -23,7 +23,7 @@ function HeroSection() {
             className="font-recklessRegular 
               text-[55px] lg:text-[114px] xl:text-[140px] lg:leading-[120px] 
               leading-[50px] 
-              text-[#2C2216]  
+              text-secondary-alt  
               lg:pt-0 pt-[60px]"
           >
             {data.title.split(" ").slice(0, 2).join(" ")} <br />{" "}
@@ -33,7 +33,7 @@ function HeroSection() {
             {data.tagline}
           </p>
           <PrimaryButton
-            className="border border-black text-[#2C2216] hover:bg-[#F0DEA2] hover:border-[#2C2216] 
+            className="border border-black text-secondary-alt hover:bg-primary hover:border-secondary-alt 
               max-h-[60px] max-w-[280px]
               p-0 lg:mt-[60px] sm:mt-[59px] mt-[40px] hover:[letter-spacing:4px]"
           >

@@ -3,7 +3,6 @@
 import React, { useState, useRef } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import { PrimaryButton } from "./PrimaryButton";
-import heroImage from "@/assets/Atrium 5-X2.png";
 import SectionTitle from "./SectionTitle";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import "keen-slider/keen-slider.min.css";
@@ -12,21 +11,12 @@ import { PrimaryImage } from "./PrimaryImage";
 import { CustomLink } from "./CustomLink";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 
-const data = [
-  { image: heroImage },
-  { image: heroImage },
-  { image: heroImage },
-  { image: heroImage },
-  { image: heroImage },
-];
-
 function InstagramFeed({ data, details }) {
   const { instaFeedHeading, instaFeedTitle, instaFeedIcon, instaFeedButtonLabel, instaFeedButtonAction } = details;
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderInstance = useRef(null);
 
-  // ✅ Use useMediaQuery to replace window.innerWidth checks
   const isMobile = useMediaQuery("(max-width: 768px)");
   const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)");
 
@@ -51,25 +41,25 @@ function InstagramFeed({ data, details }) {
   );
 
   return (
-    <>
+    <div className="instagram-feed bg-white">
       <SectionTitle
         text={instaFeedHeading}
-        classes={"pt-[40px] pb-[40px] hidden lg:flex bg-white "}
+        classes={"py-[40px] hidden lg:block"}
       />
-      <div className="w-full flex flex-col items-center bg-white p-4">
-        <div className="flex flex-col lg:w-[95%] w-full border ">
+      <div className="p-6">
+        <div className="flex flex-col w-full border">
           <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border px-8 lg:pt-[30px] pb-[40px] pt-[131px] ">
-            <h3 className="lg:hidden block text-[#2C2216] lg:text-[35px] text-[55px] w-[274px] font-recklessRegular leading-[50px] text-center lg:mb-[0px] uppercase">
+            <h3 className="lg:hidden block text-secondary-alt text-[55px] max-w-[280px] font-recklessRegular leading-[50px] text-center uppercase">
               {instaFeedHeading}
             </h3>
-            <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-[7px] mb-[40px] ">
-              <PrimaryImage type="svg" url={instaFeedIcon} customClasses={"mr-4 w-[40px] h-[40px]"} />
-              <h3 className="text-[#2C2216] lg:text-[35px] md:text-[18px] font-recklessRegular">
+            <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-3 mb-10 gap-2 lg:gap-4">
+              <PrimaryImage type="svg" url={instaFeedIcon} customClasses={"size-[18px] lg:size-[30px]"} />
+              <h3 className="text-secondary-alt text-[18px] lg:text-[35px] font-recklessRegular">
                 {instaFeedTitle}
               </h3>
             </div>
             <CustomLink to={instaFeedButtonAction}>
-              <PrimaryButton className="border border-[#2C2216] text-[#2C2216] hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px] lg:mt-[0px] md:mt-[20px]">
+              <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
                 {instaFeedButtonLabel}
               </PrimaryButton>
             </CustomLink>
@@ -109,7 +99,7 @@ function InstagramFeed({ data, details }) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

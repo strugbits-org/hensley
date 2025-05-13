@@ -6,7 +6,7 @@ export const HomePage = ({ data }) => {
     return (
         <>
             <HeroSection data={heroSectionData} />
-            <OurCategories data={categoriesData} />
+            <OurCategories data={categoriesData} pageDetils={homePageDetails} />
         </>
     )
 }

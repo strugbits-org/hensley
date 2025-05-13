@@ -8,11 +8,11 @@ function Section3() {
       <SectionTitle
         text="How we do it"
         classes={
-          "md:bg-[#F0DEA2] lg:bg-[#F4F1EC] bg-[#F0DEA2] pt-[36px] pb-[44px] hidden lg:flex"
+          "md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:flex"
         }
       />
       <div className="flex flex-col ">
-        <div className="bg-[#F0DEA2] pb-11 min-h-screen relative">
+        <div className="bg-primary pb-11 min-h-screen relative">
           <PortfolioSlider />
         </div>
       </div>

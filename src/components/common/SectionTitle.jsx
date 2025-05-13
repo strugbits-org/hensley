@@ -2,22 +2,18 @@ import React from "react";
 
 function SectionTitle({ text, classes }) {
   return (
-    <div
-      className={`w-full flex items-center justify-center lg:pt-30px lg:pb-30px sm:border ${classes}`}
-    >
-      <h1
-        className=" uppercase text-[#2C2216] font-recklessRegular text-4xl 
+    <h1
+      className={`uppercase text-secondary-alt font-recklessRegular text-4xl 
           md:text-[65px]
+          lg:text-[160px]
+          xl:text-[200px]
           md:leading-[50px] 
-          lg:text-[200px]
-          lg:leading-[180px]
-          sm:w-max
+          lg:leading-[160px]
           text-center
-          leading-tight tracking-wide "
-      >
-        {text}
-      </h1>
-    </div>
+          tracking-wide lg:pt-[30px] lg:pb-[30px] sm:border ${classes}`}
+    >
+      {text}
+    </h1>
   );
 }
 

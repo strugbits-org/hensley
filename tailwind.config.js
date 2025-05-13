@@ -10,6 +10,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      screens: {
+        'xs': '420px',
+      },
       colors: {
         "primary": "var(--primary)",
         "primary-alt": "var(--primary-alt)",
@@ -19,7 +22,6 @@ module.exports = {
         "secondary-glass": "var(--secondary-glass)",
         "primary-border": "var(--primary-border)",
         "glass-white": "var(--glass-white)",
-        "button-border":"#2C2216"
       },
       fontFamily: {
         haasRegular: ['var(--font-neue-haas-display-regular)', ...fontFamily.sans],

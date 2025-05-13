@@ -39,7 +39,7 @@ export const Listing = () => {
     return (
         <>
             <div className='relative flex'>
-                <h4 className='uppercase color-[#2C2216] font-recklessRegular 
+                <h4 className='uppercase color-secondary-alt font-recklessRegular 
         lg:text-[35px]
         lg:leading-[160px]
 

@@ -15,7 +15,7 @@ const Cards = ({ logo, paragraph1, paragraph2, buttonLabel }) => {
         <p className="max-w-[417px] text-center text-[#FFFFFF] font-haasRegular md:text-[18px] leading-[30px] sm:text-[14px] sm:leading-[18px] lg:mt-11 mt-10 lg:mb-[48px] mb-[44px]">
           {paragraph2}
         </p>
-        <PrimaryButton className="border border-white text-white hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+        <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
           {buttonLabel}
         </PrimaryButton>
       </div>

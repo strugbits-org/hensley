@@ -47,7 +47,7 @@ function DreamTeam() {
                <Image src={dt.image} className='w-full h-full'/>
            </div>
            <div>
-               <h3 className='uppercase font-recklessLight text-[#2C2216]
+               <h3 className='uppercase font-recklessLight text-secondary-alt
                md:text-[25px]
                lg:text-[35px]
                lg:leading-[35px]
@@ -59,14 +59,14 @@ function DreamTeam() {
                md:text-[12px]
                lg:text-[16px]
                text-[12px]
-               leading-[20px] text-[#2C2216] lg:mt-[6px] mt-[3px]'>{dt?.status || ''}</p>
+               leading-[20px] text-secondary-alt lg:mt-[6px] mt-[3px]'>{dt?.status || ''}</p>
            </div>
        </div>
                </>
            ))
        }
    </div>
-  <PrimaryButton className="border border-[#2C2216] text-[#2C2216] hover:bg-[#F0DEA2] hover:text-[#2C2216] max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px] lg:mt-[83px] sm:mt-[42px] mt-[44px]">
+  <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px] lg:mt-[83px] sm:mt-[42px] mt-[44px]">
                 load more
               </PrimaryButton>
     </div>
