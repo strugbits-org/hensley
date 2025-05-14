@@ -8,6 +8,7 @@ import FilterMenu from '../common/MenuFilter'
 import ProductCard from '../common/ProductCard'
 import { Banner } from '../common/Banner'
 import BannerImg from '@/assets/banner.png'
+import { LoadMoreButton } from '../common/LoadMoreButton'
 
 const filterData = [
     {
@@ -73,7 +74,7 @@ export const Listing = () => {
                 </div>
             </div>
 
-            <div className='w-full grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2
+            <div className='w-full max-w-[1886px] grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2
             '>
                 <ProductCard
                     imageSrc={chairImage}
@@ -132,14 +133,8 @@ export const Listing = () => {
                 />
             </div>
             <Banner img={BannerImg} />
+            <LoadMoreButton text="load more chairs"/>
 
-
-
-            <button className='w-full h-[150px] font-haasRegular uppercase text-[25px] leading-[30px] bg-[#F0DEA2] *:
-            lg:mt-[22px]
-            '>
-                load more chair
-            </button>
         </div>
     )
 }
