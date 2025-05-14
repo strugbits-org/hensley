@@ -2,7 +2,8 @@ import { Header } from "@/components/layout/Header";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import localFont from 'next/font/local';
-import { fetchFooterData, fetchHeaderData, fetchMarketsData, fetchTentsData } from "@/services";
+import { fetchFooterData, fetchHeaderData, fetchHomePageDetails, fetchInstagramFeed, fetchMarketsData, fetchTentsData } from "@/services";
+import InstagramFeed from "@/components/common/InstagramFeed";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -54,12 +55,16 @@ export default async function RootLayout({ children }) {
     headerData,
     marketsData,
     tentsData,
-    footerData
+    footerData,
+    instagramFeed,
+    homePageDetails
   ] = await Promise.all([
     fetchHeaderData(),
     fetchMarketsData(),
     fetchTentsData(),
     fetchFooterData(),
+    fetchInstagramFeed(),
+    fetchHomePageDetails()
   ]);
 
   return (
@@ -69,6 +74,7 @@ export default async function RootLayout({ children }) {
         <main>
           {children}
         </main>
+        <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
       </body>
     </html>

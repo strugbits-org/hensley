@@ -12,7 +12,7 @@ export const HeroSection = ({ data }) => {
                 <div className="text-primary-alt text-[16px] font-haasRegular max-w-[250px] mx-auto">
                     {subTitle}
                 </div>
-                <h1 className="mt-28 text-[45px] md:text-[60px] lg:text-[100px] xl:text-[120px] leading-[45px] lg:leading-[90px] xl:leading-[100px] text-primary-alt font-recklessLight">
+                <h1 className="mt-28 text-[24px] xs:text-[45px] md:text-[60px] lg:text-[100px] xl:text-[120px] leading-[24px] xs:leading-[45px] lg:leading-[90px] xl:leading-[100px] text-primary-alt font-recklessLight">
                     {title}
                 </h1>
                 <div className="mt-16">

@@ -1,21 +1,19 @@
 import HeroSection from "./HeroSection"
 import AboutSection from "./AboutSection"
-import PortfolioSection from "./PortfolioSection"
 import SliderSection from "./SliderSection"
 import DreamTeam from "./DreamTeam"
 import MeetFamily from "./MeetFamily"
-import InstaFeedback from "../common/InstaFeedback"
+import HowWeDoITSection from "./HowWeDoITSection"
 
 export const About = () => {
     return (
         <>
             <HeroSection />
             <AboutSection />
-            <PortfolioSection />
+            <HowWeDoITSection />
             <SliderSection />
             <DreamTeam />
             <MeetFamily />
-            <InstaFeedback />
         </>
     )
 }

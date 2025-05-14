@@ -113,7 +113,24 @@ export const fetchFooterData = async () => {
 
 export const fetchOurCategoriesData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "OurCategories" });
+    const response = await queryCollection({
+      dataCollectionId: "OurCategories",
+      includeReferencedItems: ["categories"]
+    });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return sortByOrderNumber(response.items);
+  } catch (error) {
+    logError(`Error fetching our categories data: ${error.message}`, error);
+  }
+}
+
+export const fetchInstagramFeed = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "InstagramFeed" });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
@@ -121,6 +138,68 @@ export const fetchOurCategoriesData = async () => {
 
     return response.items;
   } catch (error) {
-    logError(`Error fetching our categories data: ${error.message}`, error);
+    logError(`Error fetching instagram feed data: ${error.message}`, error);
   }
-}
+};
+
+export const fetchHomePageDetails = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "HomePageDetails" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items[0];
+  } catch (error) {
+    logError(`Error fetching home page data: ${error.message}`, error);
+  }
+};
+
+export const fetchPortfolioData = async () => {
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "PortfolioCollection",
+      includeReferencedItems: ["portfolioRef"],
+      ne: [
+        {
+          key: "isHidden",
+          value: true
+        }
+      ],
+      sortKey: "order"
+    });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching portfolio data: ${error.message}`, error);
+  }
+};
+
+export const fetchBestSellers = async (slug = '/') => {
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "BestSellers",
+      includeReferencedItems: ["product"],
+      eq: [
+        {
+          key: "slug",
+          value: slug
+        }
+      ],
+      sortKey: "orderNumber"
+    });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching best sellers data: ${error.message}`, error);
+  }
+};

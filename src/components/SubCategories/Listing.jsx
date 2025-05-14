@@ -3,13 +3,14 @@ import React, { useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import catTab from '@/assets/icons/cat-tab.svg'
 import Image from 'next/image'
-import chairImage from '@/assets/chair.png'
+// import chairImage from '@/assets/chair.png'
 import FilterMenu from '../common/MenuFilter'
 import ProductCard from '../common/ProductCard'
-import { Banner } from '../common/Banner'
 import BannerImg from '@/assets/banner.png'
 import { LoadMoreButton } from '../common/LoadMoreButton'
+import { ProductBanner } from '../common/ProductBanner'
 
+const chairImage = "wix:image://v1/339f77_1bf80cddc0bd48d78d7c221389c03cc9~mv2.jpg/file.jpg#originWidth=3089&originHeight=4633";
 const filterData = [
     {
         title: "Tents",
@@ -43,7 +44,7 @@ export const Listing = () => {
     return (
         <div className='lg:px-[24px]'>
             <div className='relative flex flex-col justify-center'>
-                <h4 className='uppercase color-[#2C2216] font-recklessRegular 
+                <h4 className='uppercase color-secondary-alt font-recklessRegular 
         lg:text-[35px]
         text-center
 
@@ -132,7 +133,7 @@ export const Listing = () => {
                     onAddToCart={() => console.log('Added to cart')}
                 />
             </div>
-            <Banner img={BannerImg} />
+            <ProductBanner img={BannerImg}/>
             <LoadMoreButton text="load more chairs"/>
 
         </div>

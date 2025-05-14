@@ -30,6 +30,26 @@ export const generateImageURL = ({
     : `${baseURL}${resourceId}/v1/${fit}/w_${w},h_${h},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
 };
 
+export const generateImageURLAlternate = ({
+  wix_url,
+  original = false,
+  fit = "fill",
+  q = "90",
+  h = "1080",
+  w = "1920",
+}) => {
+  if (!wix_url) return "";
+  if (!wix_url.startsWith("wix:image://v1/")) return wix_url;
+
+  const baseURL = "https://static.wixstatic.com/media/";
+  const urlParts = wix_url.split('/');
+  const imageId = urlParts[urlParts.length - 1].split('?')[0];
+
+  return original
+    ? baseURL + imageId
+    : `${baseURL}${imageId}/v1/${fit}/w_${w},h_${h},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
+};
+
 export const formatProductImageURL = (url) => {
   if (!url) return "";
 
@@ -52,10 +72,22 @@ export const formatProductImageURL = (url) => {
 };
 
 export const generateVideoURL = (videoSRC) => {
-    if (videoSRC && videoSRC.startsWith("wix:video://v1/")) {
-        const videoID = videoSRC.replace('wix:video://v1/', '').split('/')[0];
-        return `https://video.wixstatic.com/video/${videoID}/file`;
-    } else {
-        return videoSRC;
-    }
+  if (videoSRC && videoSRC.startsWith("wix:video://v1/")) {
+    const videoID = videoSRC.replace('wix:video://v1/', '').split('/')[0];
+    return `https://video.wixstatic.com/video/${videoID}/file`;
+  } else {
+    return videoSRC;
+  }
+}
+
+export const generateSVGURL = (wix_url) => {
+
+  if (!wix_url.startsWith("wix:vector://v1/")) {
+    return wix_url
+  }
+  let wixImageURL = "";
+  wixImageURL = "https://static.wixstatic.com/shapes/";
+  let splitUrl = wix_url.split("/")
+  return wixImageURL + splitUrl[splitUrl.length - 2];
+
 }

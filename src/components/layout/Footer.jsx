@@ -7,7 +7,7 @@ export const Footer = ({ data }) => {
   const { footerData, socialLinks, footerNaviationData, branches } = data;
 
   return (
-    <footer className='relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12'>
+    <footer className='relative footer bg-secondary-alt min-h-[1099px] flex flex-col justify-between p-6 pt-12'>
       <div className='footer-content flex justify-between flex-wrap lg:flex-nowrap lg:gap-x-10 gap-y-20 md:gap-y-14 lg:gap-y-6 grow md:grow-0 items-stretch md:items-start'>
         <div className='order-1 w-full md:w-1/2 lg:w-2/6'>
           <NewsLetter data={footerData} />
@@ -15,7 +15,7 @@ export const Footer = ({ data }) => {
         <div className='order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-80 md:mt-0'>
           {branches.map((address, index) => (
             <div className='w-2/5 lg:w-1/3' key={index}>
-              <h2 className='text-sm font-haasMedium uppercase text-primary mb-1'>{address.title}</h2>
+              <h2 className='text-sm font-haasMedium uppercase text-primary mb-1 break-words'>{address.title}</h2>
               <p className='text-sm font-haasRegular uppercase text-primary'>{address.description}</p>
             </div>
           ))}

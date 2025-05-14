@@ -1,6 +1,6 @@
 import React from 'react'
 import Listing from './Listing'
-import InstaFeedback from '../common/InstaFeedback'
+import InstaFeedback from '../common/InstagramFeed'
 import OurCategories from '../common/OurCategories'
 
 export const Categories = ({ slug }) => {

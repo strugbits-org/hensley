@@ -1,6 +1,7 @@
 import { ApiKeyStrategy, createClient, OAuthStrategy } from "@wix/sdk";
 import { collections, items } from "@wix/data";
 import { submissions } from "@wix/forms";
+import parse from 'html-react-parser';
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
 
@@ -73,3 +74,11 @@ export const sortByOrderNumber = (array, options = {}) => {
 export const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
+
+export const insertBreaks = (str, interval, onlyFirst = false) => {
+  if (onlyFirst) {
+    return parse(str.substring(0, interval) + '<br/>' + str.substring(interval));
+  } else {
+    return parse(str.replace(new RegExp(`(.{${interval}})`, 'g'), '$1<br/>'));
+  }
+}

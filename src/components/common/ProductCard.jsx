@@ -4,35 +4,33 @@ import copyIcon from '@/assets/icons/copy.png';
 import arrowIcon from '@/assets/icons/darkrightArrow.svg';
 import cartIcon from '@/assets/icons/saveCart.svg';
 import cartIconFill from '@/assets/icons/saveCartFill.svg'
+import { PrimaryImage } from './PrimaryImage';
 
 function ProductCard({ imageSrc, title, code, dimensions, onAddToCart }) {
     return (
         <div className="group transition-all duration-300 ease-in-out max-w-[450px] border flex flex-col pt-[7px] relative">
             <div className="overflow-hidden h-full w-full">
-                <Image
-                    src={imageSrc}
-                    alt={title}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
+                <PrimaryImage fit='fit' alt={title} url={imageSrc} customClasses={"h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"} />
+
             </div>
 
             <div className="lg:pt-[23px] lg:pb-[8px] lg:pl-[23px]">
                 <div className="pl-[18px] pt-[15px] pb-[11px] lg:p-0">
-                    <span className="uppercase lg:text-[18px] lg:leading-[20px] text-[#2C2216] text-center font-haasRegular">
+                    <span className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt text-center font-haasRegular">
                         {title}
                     </span>
                 </div>
 
                 <div className="w-full flex justify-between items-center flex-wrap gap-y-4">
                     <div className="lg:flex justify-center items-center hidden">
-                        <span className="text-[12px] text-[#2C2216] mr-[8px]">{code}</span>
+                        <span className="text-[12px] text-secondary-alt mr-[8px]">{code}</span>
                         <Image src={copyIcon} className="h-[12px] w-[10px]" alt="Copy Icon" />
                     </div>
 
-                    <span className="text-[12px] text-[#2C2216] lg:block hidden">{dimensions}</span>
+                    <span className="text-[12px] text-secondary-alt lg:block hidden">{dimensions}</span>
 
                     <button
-                        className="bg-[#F0DEA2] flex items-center lg:justify-evenly gap-2 lg:w-[151px] lg:h-[42px] w-full h-[32px] justify-between
+                        className="bg-primary flex items-center lg:justify-evenly gap-2 lg:w-[151px] lg:h-[42px] w-full h-[32px] justify-between
               pl-[25px] pr-[13px] lg:pl-0 lg:pr-0 group/button"
                         onClick={onAddToCart}
                     >

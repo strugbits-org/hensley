@@ -1,62 +1,21 @@
 import React from 'react'
-import Image from 'next/image'
+import { PrimaryImage } from './PrimaryImage';
+import { PrimaryButton } from './PrimaryButton';
 
-export const Banner = ({ img }) => {
+export const Banner = ({ data }) => {
+    console.log("Banner Data: ", data);
+    const { backgroundImage, title, subtitle, buttonLabel } = data;
+
     return (
-        <div
-            className="w-full h-[425px] border bg-cover bg-center flex justify-end  items-center
-            lg:my-[24px]
-            "
-            style={{ backgroundImage: `url(${img.src})` }}
-        >
-          <div className='lg:flex hidden  items-start gap-x-[24px]'>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 132.853 132.854"
-                className="lg:h-[132px] lg:w-[132px] sm:h-[25px] sm:w-[25px] mr-2"
-            >
-                <g transform="translate(0.702 0.379)">
-                    <g transform="translate(-0.377 0.121)">
-                        <path
-                            d="M.353.5H131.881V132.028"
-                            transform="translate(0.147 -0.501)"
-                            fill="none"
-                            stroke="#f4f1ec"
-                            strokeMiterlimit="10"
-                            strokeWidth="1"
-                        />
-                        <line
-                            x1="132"
-                            y2="132"
-                            transform="translate(0.028 0)"
-                            fill="none"
-                            stroke="#f4f1ec"
-                            strokeMiterlimit="10"
-                            strokeWidth="1"
-                        />
-                        <line
-                            x1="132"
-                            y2="132"
-                            transform="translate(0.028 0)"
-                            fill="none"
-                            stroke="#f4f1ec"
-                            strokeMiterlimit="10"
-                            strokeWidth="1"
-                        />
-                    </g>
-                </g>
-            </svg>
-
-            <h3 className="text-white font-haasRegular 
-            lg:w-[199px] 
-            lg:leading-[30px]
-            lg:mr-[239px]
-            ">
-                Intimate wedding with a breathtaking view.
-            </h3>
-          </div>
+        <div className='relative banner h-screen p-6'>
+            <PrimaryImage timeout={0} url={backgroundImage} alt={title} customClasses="border border-primary-border h-full w-full object-cover" />
+            <div className="absolute inset-6 lg:px-44 py-40 lg:py-20 flex justify-center lg:block">
+                <div className='flex flex-col max-w-xs lg:max-w-sm gap-4 lg:gap-6 items-center lg:items-start'>
+                    <span className="text-center lg:text-start block text-[14px] lg:text-[24px] leading-4 lg:leading-10 font-haasRegular text-primary-alt">{subtitle}</span>
+                    <h2 className="text-center lg:text-start text-[55px] lg:text-[120px] xl:text-[140px] leading-[55px] lg:leading-[140px] font-recklessRegular text-primary-alt">{title}</h2>
+                    <PrimaryButton className="font-haasRegular border border-primary-alt text-primary-alt hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">{buttonLabel}</PrimaryButton>
+                </div>
+            </div>
         </div>
-
-
     )
 }

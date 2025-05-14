@@ -2,17 +2,17 @@ import React from "react";
 import PortfolioSlider from "../common/PortfolioSlider";
 import SectionTitle from "../common/SectionTitle";
 
-function Section3() {
+function HowWeDoITSection() {
   return (
     <>
       <SectionTitle
         text="How we do it"
         classes={
-          "md:bg-[#F0DEA2] lg:bg-[#F4F1EC] bg-[#F0DEA2] pt-[36px] pb-[44px] hidden lg:flex"
+          "md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:flex"
         }
       />
       <div className="flex flex-col ">
-        <div className="bg-[#F0DEA2] pb-11 min-h-screen relative">
+        <div className="bg-primary pb-11 min-h-screen relative">
           <PortfolioSlider />
         </div>
       </div>
@@ -20,4 +20,4 @@ function Section3() {
   );
 }
 
-export default Section3;
+export default HowWeDoITSection;
