@@ -4,13 +4,13 @@ import Image from 'next/image'
 import { PrimaryImage } from './PrimaryImage'
 import { insertBreaks } from '@/utils';
 
-function OurCategories({ data, pageDetils }) {
+function OurCategories({ data, pageDetils, classes }) {
   const { ourCategoriesTitle } = pageDetils;
 
   return (
-    <>
+    <div className={classes}>
       <div className='w-full sm:px-0 px-[12px]'>
-        <SectionTitle text={ourCategoriesTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
+        <SectionTitle text={ourCategoriesTitle} classes="py-[40px] md:mt-6 lg:mt-0 border-t border-b" />
       </div>
       <div className="w-full lg:px-[24px] px-[12px] grid sm:grid-cols-2 grid-cols-1 lg:gap-4 lg:py-[24px] sm:gap-y-[12px] sm:gap-x-[12px] gap-y-[30px] lg:mt-0 mt-[12px]">
         {data.map((item, index) => {
@@ -65,7 +65,7 @@ function OurCategories({ data, pageDetils }) {
           )
         })}
       </div>
-    </>
+      </div>
   )
 }
 

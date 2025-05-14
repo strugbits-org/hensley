@@ -33,7 +33,7 @@ const filterData = [
   },
 ];
 
-function Listing({ slug }) {
+function Listing({ slug, chairImage }) {
   const [isOpen, setIsOpen] = useState(false);
   const toggleList = () => {
     setIsOpen(!isOpen);

@@ -10,7 +10,7 @@ const SubCategories = () => {
   return (
     <>
       <div className='flex justify-center items-center pb-[18px]'>
-        <div className='lg:w-[924px] sm:w-[681px] w-[344px] bg-white py-[25px] sm:px-[71px] px-[21px] flex flex-col justify-between items-center'>
+        <div className='lg:w-[924px] sm:w-[681px] w-[344px] bg-white py-[25px] sm:px-[71px] px-[21px] flex flex-col justify-between items-center cursor-pointer'>
           <div className='flex flex-row w-full justify-between items-center' onClick={toggleList}>
             <h3 className='lg:text-[45px] text-[25px] font-recklessRegular uppercase text-secondary-alt'>all categories</h3>
             <Image src={arrowDown} className='w-[16px] h-[16px] lg:h-[24px] lg:w-[24px]' />

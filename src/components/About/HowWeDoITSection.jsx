@@ -8,7 +8,7 @@ function HowWeDoITSection() {
       <SectionTitle
         text="How we do it"
         classes={
-          "md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:flex"
+          "md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:block"
         }
       />
       <div className="flex flex-col ">

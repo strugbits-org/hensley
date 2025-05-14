@@ -10,7 +10,9 @@ function SectionTitle({ text, classes }) {
           md:leading-[50px] 
           lg:leading-[160px]
           text-center
-          tracking-wide lg:pt-[30px] lg:pb-[30px] sm:border ${classes}`}
+          leading-[50px]
+          tracking-wide sm:border 
+          ${classes}`}
     >
       {text}
     </h1>

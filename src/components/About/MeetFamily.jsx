@@ -53,7 +53,9 @@ function MeetFamily() {
 
   return (
     <>
-      <SectionTitle text="meet the family" classes=" text-[55px] w-[286px] sm:pt-[40px] sm:pb-[40px]" />
+     <div className="w-full">
+       <SectionTitle text="meet the family" classes=" text-[55px] sm:pt-[40px] sm:pb-[40px]" />
+     </div>
       <div className="w-full grid grid-cols-1 lg:grid-cols-3 xl:gap-10 lg:gap-3 lg:px-8 px-2 pt-10 pb-10 gap-0">
         {cardsData.map((card, idx) => (
           <Cards key={idx} {...card} />
