@@ -3,9 +3,10 @@ import OurCategories from "../common/OurCategories";
 import { BestSellers } from "./BestSellers";
 import { HeroSection } from "./HeroSection"
 import OurProjects from "./OurProjects";
+import { Testimonials } from "./Testimonials";
 
 export const HomePage = ({ data }) => {
-    const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers } = data;
+    const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers, testimonials } = data;
     return (
         <>
             {/* <HeroSection data={heroSectionData} />
@@ -13,6 +14,7 @@ export const HomePage = ({ data }) => {
             <OurProjects data={portfolioData} pageDetils={homePageDetails} />
             <Banner data={bannerData} /> */}
             <BestSellers data={bestSellers} pageDetils={homePageDetails} />
+            <Testimonials data={testimonials} pageDetils={homePageDetails} />
         </>
     )
 }

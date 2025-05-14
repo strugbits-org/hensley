@@ -2,7 +2,7 @@
 
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
-import { fetchBestSellers, fetchHomePageDetails, fetchOurCategoriesData, fetchPortfolioData } from "..";
+import { fetchBestSellers, fetchHomePageDetails, fetchOurCategoriesData, fetchPortfolioData, fetchTestimonials } from "..";
 
 export const fetchHomePageData = async () => {
   try {
@@ -12,7 +12,8 @@ export const fetchHomePageData = async () => {
       homePageDetails,
       categoriesData,
       portfolioData,
-      bestSellers
+      bestSellers,
+      testimonials
     ] = await Promise.all([
       queryCollection({ dataCollectionId: "BannerHomePage" }),
       queryCollection({ dataCollectionId: "HeroSectionDataHome" }),
@@ -20,6 +21,7 @@ export const fetchHomePageData = async () => {
       fetchOurCategoriesData(),
       fetchPortfolioData(),
       fetchBestSellers(),
+      fetchTestimonials()
     ]);
 
     if (!Array.isArray(heroSectionData.items) || !homePageDetails || !categoriesData || !portfolioData || !bestSellers) {
@@ -32,7 +34,8 @@ export const fetchHomePageData = async () => {
       homePageDetails,
       categoriesData,
       portfolioData,
-      bestSellers
+      bestSellers,
+      testimonials
     };
 
     return response;
