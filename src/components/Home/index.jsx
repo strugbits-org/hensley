@@ -8,11 +8,11 @@ export const HomePage = ({ data }) => {
     const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers } = data;
     return (
         <>
-            <HeroSection data={heroSectionData} />
+            {/* <HeroSection data={heroSectionData} />
             <OurCategories data={categoriesData} pageDetils={homePageDetails} />
             <OurProjects data={portfolioData} pageDetils={homePageDetails} />
-            <Banner data={bannerData} />
-            <BestSellers data={bestSellers} />
+            <Banner data={bannerData} /> */}
+            <BestSellers data={bestSellers} pageDetils={homePageDetails} />
         </>
     )
 }

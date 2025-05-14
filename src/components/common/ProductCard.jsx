@@ -1,60 +1,64 @@
-import Image from 'next/image';
 import React from 'react';
-import copyIcon from '@/assets/icons/copy.png';
-import arrowIcon from '@/assets/icons/darkrightArrow.svg';
-import cartIcon from '@/assets/icons/saveCart.svg';
-import cartIconFill from '@/assets/icons/saveCartFill.svg'
 import { PrimaryImage } from './PrimaryImage';
+import { CopyIcon } from './helpers/CopyIcon';
+import { copyToClipboard } from '@/utils';
 
-function ProductCard({ imageSrc, title, code, dimensions, onAddToCart }) {
+function ProductCard({ data, onAddToCart }) {
+    const { product } = data;
+    const { name } = product;
     return (
-        <div className="group transition-all duration-300 ease-in-out max-w-[450px] border flex flex-col pt-[7px] relative">
-            <div className="overflow-hidden h-full w-full">
-                <PrimaryImage fit='fit' alt={title} url={imageSrc} customClasses={"h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"} />
-
+        <div className="relative group transition-all duration-300 ease-in-out max-w-[450px] border flex flex-col bg-white p-2">
+            <div className="overflow-hidden flex justify-center items-center">
+                <PrimaryImage alt={name} url={product.mainMedia} fit='fit' customClasses={"transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
-            <div className="lg:pt-[23px] lg:pb-[8px] lg:pl-[23px]">
-                <div className="pl-[18px] pt-[15px] pb-[11px] lg:p-0">
-                    <span className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt text-center font-haasRegular">
-                        {title}
-                    </span>
-                </div>
+            <div className="lg:pt-6 lg:pb-2 lg:pl-4">
+                <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular">
+                    {name}
+                </h2>
 
-                <div className="w-full flex justify-between items-center flex-wrap gap-y-4">
-                    <div className="lg:flex justify-center items-center hidden">
-                        <span className="text-[12px] text-secondary-alt mr-[8px]">{code}</span>
-                        <Image src={copyIcon} className="h-[12px] w-[10px]" alt="Copy Icon" />
+                <div className="mt-1 w-full flex flex-col 2xl:flex-row justify-between items-center gap-4">
+                    <div className='w-2/3 flex justify-between flex-wrap items-center gap-2'>
+                        {product.sku && (
+                            <div onClick={() => copyToClipboard(product.sku)} className="flex justify-center items-center">
+                                <span className="text-[12px] text-secondary-alt mr-[8px] word-break">{product.sku}</span>
+                                <CopyIcon />
+                            </div>
+                        )}
+                        {product.additionalInfoSections?.map((data, index) => {
+                            const { title, description } = data;
+                            if (title == "Size") {
+                                return (
+                                    <div
+                                        className="text-[12px] grow text-center text-secondary-alt"
+                                        key={index}
+                                        dangerouslySetInnerHTML={{
+                                            __html: description,
+                                        }}
+                                    ></div>
+                                );
+                            }
+                        })}
                     </div>
 
-                    <span className="text-[12px] text-secondary-alt lg:block hidden">{dimensions}</span>
-
                     <button
-                        className="bg-primary flex items-center lg:justify-evenly gap-2 lg:w-[151px] lg:h-[42px] w-full h-[32px] justify-between
-              pl-[25px] pr-[13px] lg:pl-0 lg:pr-0 group/button"
+                        className="w-full grow group bg-primary flex items-center lg:justify-evenly gap-2 lg:h-[42px] h-[32px] justify-between pl-[25px] pr-[13px] lg:pl-0 lg:pr-0 group/button min-w-[151px]"
                         onClick={onAddToCart}
                     >
                         <span className="uppercase font-haasRegular text-[12px]">add to cart</span>
-                        <Image
-                            src={arrowIcon}
-                            alt="Arrow Icon"
-                            className="w-4 h-4 transition-all duration-300 group-hover/button:w-[20px] group-hover/button:h-[20px]"
-                        />
+                        <svg className='rotate-45 size-3 group-hover:w-4 transition-all duration-300 ease-in-out' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.665 10.367">
+                            <g id="Group_2072" data-name="Group 2072" transform="translate(-13.093 0.385)">
+                                <path id="Path_3283" data-name="Path 3283" d="M0,0H9.867V9.867" transform="translate(13.39 0.115)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                                <line id="Line_14" data-name="Line 14" x1="9.822" y2="9.27" transform="translate(13.436 0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                            </g>
+                        </svg>
                     </button>
                 </div>
             </div>
 
             <div className="group/cart absolute right-[24px] top-[23px] border border-black rounded-full w-[56px] h-[56px] flex items-center justify-center shrink-0 cursor-pointer">
-                <Image
-                    src={cartIcon}
-                    alt="Cart Icon"
-                    className="block group-hover/cart:hidden"
-                />
-                <Image
-                    src={cartIconFill}
-                    alt="Cart Icon Filled"
-                    className="hidden group-hover/cart:block"
-                />
+                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg" alt="Cart Icon" customClasses={"block group-hover/cart:hidden"} />
+                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg" alt="Cart Icon" customClasses={"hidden group-hover/cart:block"} />
             </div>
 
         </div>

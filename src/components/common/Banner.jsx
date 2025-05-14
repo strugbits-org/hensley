@@ -3,7 +3,6 @@ import { PrimaryImage } from './PrimaryImage';
 import { PrimaryButton } from './PrimaryButton';
 
 export const Banner = ({ data }) => {
-    console.log("Banner Data: ", data);
     const { backgroundImage, title, subtitle, buttonLabel } = data;
 
     return (

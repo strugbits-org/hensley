@@ -50,7 +50,7 @@ export const sortByOrderNumber = (array, options = {}) => {
         nullsLast = true,
         key = "orderNumber",
         fallbackSort = null
-    } = options;    
+    } = options;
 
     return [...array].sort((a, b) => {
         const orderA = a[key];
@@ -72,13 +72,15 @@ export const sortByOrderNumber = (array, options = {}) => {
 }
 
 export const sleep = (ms) => {
-  return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(resolve => setTimeout(resolve, ms));
 };
 
 export const insertBreaks = (str, interval, onlyFirst = false) => {
-  if (onlyFirst) {
-    return parse(str.substring(0, interval) + '<br/>' + str.substring(interval));
-  } else {
-    return parse(str.replace(new RegExp(`(.{${interval}})`, 'g'), '$1<br/>'));
-  }
+    if (onlyFirst) {
+        return parse(str.substring(0, interval) + '<br/>' + str.substring(interval));
+    } else {
+        return parse(str.replace(new RegExp(`(.{${interval}})`, 'g'), '$1<br/>'));
+    }
 }
+
+export const copyToClipboard = (text) => navigator.clipboard.writeText(text);

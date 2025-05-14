@@ -3,12 +3,11 @@ import React, { useRef } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { PrimaryButton } from '../common/PrimaryButton'
 import ProductCard from '../common/ProductCard'
-import { CustomLink } from '../common/CustomLink'
-import { PrimaryImage } from '../common/PrimaryImage'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 
-export const BestSellers = ({ data }) => {
+export const BestSellers = ({ data, pageDetils }) => {
+    const { bestSellerTitle } = pageDetils;
     console.log("Best Sellers Data: ", data);
 
     const sliderInstance = useRef();
@@ -21,6 +20,9 @@ export const BestSellers = ({ data }) => {
                 origin: "center",
                 perView: 4,
                 spacing: 4,
+            },
+            created(slider){
+                sliderInstance.current = slider;
             },
             breakpoints: {
                 "(max-width: 768px)": {
@@ -40,28 +42,22 @@ export const BestSellers = ({ data }) => {
     return (
         <div className='bg-secondary-alt w-full'>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={"best sellers"} classes="!text-primary py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
+                <SectionTitle text={bestSellerTitle} classes="!text-primary py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
                 <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
             </div>
             <div className="p-6">
-                <div ref={sliderRef} className="keen-slider mt-[20px] ">
-                    {data.map(({ product }, index) => {
+                <div ref={sliderRef} className="keen-slider">
+                    {data.map((productData, index) => {
                         return (
-                            <CustomLink
-                                to={"/"}
+                            <div
                                 key={index}
-                                className={`keen-slider__slide  flex flex-col md:p-[10px]`}
+                                className={`keen-slider__slide  flex flex-col px-2`}
                             >
-                                <div className="h-[325px] lg:h-[448px] relative">
-                                    <ProductCard
-                                        imageSrc={product.mainMedia}
-                                        title="POLTRONA MONTANA"
-                                        code="MODCH39"
-                                        dimensions='24”L X 30”W X 37”H'
-                                        onAddToCart={() => console.log('Added to cart')}
-                                    />
-                                </div>
-                            </CustomLink>
+                                <ProductCard
+                                    data={productData}
+                                    onAddToCart={() => console.log('Added to cart')}
+                                />
+                            </div>
                         );
                     })}
                     <button
