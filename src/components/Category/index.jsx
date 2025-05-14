@@ -2,6 +2,9 @@ import React from 'react'
 import Listing from './Listing'
 import InstaFeedback from '../common/InstagramFeed'
 import OurCategories from '../common/OurCategories'
+import OurProjects from './OurProjects'
+
+const chairImage = "wix:image://v1/339f77_1bf80cddc0bd48d78d7c221389c03cc9~mv2.jpg/file.jpg#originWidth=3089&originHeight=4633";
 
 export const Categories = ({ slug }) => {
   const categories = [
@@ -86,9 +89,8 @@ export const Categories = ({ slug }) => {
 ]
   return (
     <>
-      <Listing slug={slug} />
-      <OurCategories data={categories} />
-      <InstaFeedback />
+      <Listing slug={slug} chairImage={chairImage}/>
+      <OurCategories data={categories} pageDetils={{ourCategoriesTitle:"Our Categories"}} />
     </>
   )
 }

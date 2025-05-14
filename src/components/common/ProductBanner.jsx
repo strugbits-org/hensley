@@ -3,16 +3,21 @@ import Image from 'next/image'
 export const ProductBanner = ({ img }) => {
     return (
         <div
-            className="w-full h-[425px] border bg-cover bg-center flex justify-end  items-center
-            lg:my-[24px]
+            className="w-full lg:h-[425px] sm:h-[230px] h-[600px] border bg-cover bg-center flex sm:justify-end justify-center items-center
+        my-[24px]
             "
             style={{ backgroundImage: `url(${img.src})` }}
         >
-          <div className='lg:flex hidden  items-start gap-x-[24px]'>
+          <div className='flex items-start lg:gap-x-[24px] sm:gap-x-[10px] lg:mr-[239px] sm:mr-[100px] gap-x-[15px] '>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 132.853 132.854"
-                className="lg:h-[132px] lg:w-[132px] sm:h-[25px] sm:w-[25px] mr-2"
+                className="lg:h-[132px] lg:w-[132px]
+                sm:h-[70px]
+                sm:w-[70px]
+                h-[148px]
+                w-[148px]
+                "
             >
                 <g transform="translate(0.702 0.379)">
                     <g transform="translate(-0.377 0.121)">
@@ -46,11 +51,14 @@ export const ProductBanner = ({ img }) => {
                 </g>
             </svg>
             <h3 className="text-white font-haasRegular
-            lg:w-[199px]
+            lg:text-[24px]
             lg:leading-[30px]
-            lg:mr-[239px]
+            sm:text-[12px]
+            sm:leading-[12px]
+            text-[27px]
+            uppercase
             ">
-                Intimate wedding with a breathtaking view.
+                Intimate <br /> wedding with a <br /> breathtaking <br /> view.
             </h3>
           </div>
         </div>
