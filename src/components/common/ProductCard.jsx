@@ -7,18 +7,18 @@ function ProductCard({ data, onAddToCart }) {
     const { product } = data;
     const { name } = product;
     return (
-        <div className="relative group transition-all duration-300 ease-in-out max-w-[450px] border flex flex-col bg-white p-2">
-            <div className="overflow-hidden flex justify-center items-center">
+        <div className="max-w-[450px] relative group transition-all duration-300 ease-in-out  border flex flex-col bg-white p-2 justify-between h-full">
+            <div className="aspect-[0.84] max-w-[436px]  overflow-hidden flex justify-center items-center">
                 <PrimaryImage alt={name} url={product.mainMedia} fit='fit' customClasses={"transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
-            <div className="lg:pt-6 lg:pb-2 lg:pl-4">
+            <div className="max-w-full flex-wrap lg:pt-6 lg:pb-2">
                 <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular">
                     {name}
                 </h2>
 
                 <div className="mt-1 w-full flex flex-col 2xl:flex-row justify-between items-center gap-4">
-                    <div className='w-2/3 flex justify-between flex-wrap items-center gap-2'>
+                    <div className='2xl:w-2/3 w-full grow flex lg:flex-row justify-start flex-wrap items-center gap-2'>
                         {product.sku && (
                             <div onClick={() => copyToClipboard(product.sku)} className="flex justify-center items-center">
                                 <span className="text-[12px] text-secondary-alt mr-[8px] word-break">{product.sku}</span>
@@ -42,7 +42,7 @@ function ProductCard({ data, onAddToCart }) {
                     </div>
 
                     <button
-                        className="w-full grow group bg-primary flex items-center lg:justify-evenly gap-2 lg:h-[42px] h-[32px] justify-between pl-[25px] pr-[13px] lg:pl-0 lg:pr-0 group/button min-w-[151px]"
+                        className="w-full 2xl:w-auto group bg-primary flex items-center max-lg:px-[10px] 2xl:justify-evenly gap-2 lg:h-[42px] h-[32px] justify-between pl-[25px] pr-[13px] group/button min-w-[151px]"
                         onClick={onAddToCart}
                     >
                         <span className="uppercase font-haasRegular text-[12px]">add to cart</span>
