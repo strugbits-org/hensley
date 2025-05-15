@@ -20,7 +20,7 @@ export const BestSellers = ({ data, pageDetails }) => {
                 perView: 4,
                 spacing: 4,
             },
-            created(slider){
+            created(slider) {
                 sliderInstance.current = slider;
             },
             breakpoints: {
@@ -53,6 +53,7 @@ export const BestSellers = ({ data, pageDetails }) => {
                                 className={`keen-slider__slide  flex flex-col px-2`}
                             >
                                 <ProductCard
+                                    type='slider'
                                     data={productData}
                                     onAddToCart={() => console.log('Added to cart')}
                                 />

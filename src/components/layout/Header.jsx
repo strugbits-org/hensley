@@ -99,6 +99,12 @@ export const Header = ({ data, marketsData, tentsData }) => {
         }
     }, [activeMenu]);
 
+    const closeAllModals = () => {
+        setSearchModal(false);
+        setSelectedMenu(false);
+        setIsMobileMenuOpen(false);
+    }
+
     return (
         <>
             <header>
@@ -108,7 +114,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                         <nav className="h-full flex items-center justify-between" aria-label="Main Navigation">
                             {/* Logo */}
                             <div className="flex p-2 lg:px-6">
-                                <CustomLink to="/">
+                                <CustomLink to="/" onClick={closeAllModals}>
                                     <span className="sr-only">Hensley Event Resources</span>
                                     <Image src={logo} className='min-w-[184px]' alt="Hensley Event Resources Logo" />
                                 </CustomLink>
@@ -179,6 +185,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                     </button>
                                 ) : (
                                     <CustomLink
+                                        onClick={closeAllModals}
                                         key={title}
                                         to={slug}
                                         className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
@@ -215,7 +222,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                     <div className='mobile-menu lg:hidden fixed inset-x-3 top-3 z-50 px-6 py-2'>
                         <div className={`absolute inset-0 -z-10 backdrop-blur-[20px] brightness-[50px] ${isMobileMenuOpen ? "bg-glass-white" : "bg-secondary-glass"}`}></div>
                         <div className="flex p-2 lg:px-6 justify-between">
-                            <CustomLink to="/">
+                            <CustomLink to="/" onClick={closeAllModals}>
                                 <span className="sr-only">Hensley Event Resources</span>
                                 <Image src={logo} className={`min-w-[174px] ${isMobileMenuOpen ? "hidden" : "block"}`} alt="Hensley Event Resources Logo" />
                                 <Image src={icon} className={`h-7 min-w-[27px] ${isMobileMenuOpen ? "block" : "hidden"}`} alt="Hensley Event Resources Logo" />
@@ -285,6 +292,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                         handleMainMenuClick={handleMainMenuClick}
                         handleSubMenuClick={handleSubMenuClick}
                         setIsMobileMenuOpen={setIsMobileMenuOpen}
+                        closeAllModals={closeAllModals}
                     />
                 </div>
 

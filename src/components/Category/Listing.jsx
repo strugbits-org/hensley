@@ -33,7 +33,7 @@ const filterData = [
   },
 ];
 
-function Listing({ slug, chairImage }) {
+function Listing({ slug, products }) {
   const [isOpen, setIsOpen] = useState(false);
   const toggleList = () => {
     setIsOpen(!isOpen);
@@ -75,48 +75,15 @@ function Listing({ slug, chairImage }) {
          sm:pt-[12px] sm:pb-[12px]
          pb-[12px]
         lg:border-t lg:border-b">
-          <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          />
-          <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          />
-          <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          />
-          <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          />
-          <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          />
-          <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          />
+          {products.map((productData, index) => {
+            return (
+              <ProductCard
+                key={index}
+                data={productData}
+                onAddToCart={() => console.log('Added to cart')}
+              />
+            )
+          })}
         </div>
       </div>
     </>

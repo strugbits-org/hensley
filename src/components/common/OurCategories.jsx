@@ -2,6 +2,7 @@ import React from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { PrimaryImage } from './PrimaryImage'
 import { insertBreaks } from '@/utils';
+import { CustomLink } from './CustomLink';
 
 function OurCategories({ data, pageDetails, classes }) {
   const { ourCategoriesTitle } = pageDetails;
@@ -16,7 +17,7 @@ function OurCategories({ data, pageDetails, classes }) {
           const { categories: category, title } = item;
 
           return (
-            <div
+            <CustomLink to={`/collections/${category.slug}`}
               key={category._id}
               className={`cursor-pointer group border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out ${item.rtl && 'lg:flex-row-reverse'
                 } lg:h-[474px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
@@ -56,7 +57,7 @@ function OurCategories({ data, pageDetails, classes }) {
                   />
                 </div>
               </div>
-            </div>
+            </CustomLink>
           )
         })}
       </div>
