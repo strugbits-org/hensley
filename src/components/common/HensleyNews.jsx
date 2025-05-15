@@ -2,7 +2,6 @@
 import React, { useRef } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { PrimaryButton } from '../common/PrimaryButton'
-import ProductCard from '../common/ProductCard'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import NewsCard from './NewsCard';
