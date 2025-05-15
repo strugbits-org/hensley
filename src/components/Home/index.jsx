@@ -1,5 +1,6 @@
 import { Banner } from "../common/Banner";
 import OurCategories from "../common/OurCategories";
+import ContactUs from "../Modals/ContactUs";
 import { BestSellers } from "./BestSellers";
 import { HeroSection } from "./HeroSection"
 import OurProjects from "./OurProjects";
@@ -12,7 +13,8 @@ export const HomePage = ({ data }) => {
             <OurCategories data={categoriesData} pageDetils={homePageDetails} />
             <OurProjects data={portfolioData} pageDetils={homePageDetails} />
             <Banner data={bannerData} /> */}
-            <BestSellers data={bestSellers} pageDetils={homePageDetails} />
+            {/* <BestSellers data={bestSellers} pageDetils={homePageDetails} /> */}
+            <ContactUs />
         </>
     )
 }
