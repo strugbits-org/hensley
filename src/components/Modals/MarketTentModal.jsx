@@ -16,7 +16,7 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
                     const { title, description, tagline, slug, headerCoverImage, tent, buttonLabel, buttonLabelMenu } = category;
 
                     return (
-                        <CustomLink key={title} to={`/${type === "markets" ? "market" : "tent"}${slug}`} className={"group relative min-h-[34rem] lg:h-full w-full lg:w-1/3 flex justify-center lg:border border-primary-border"}>
+                        <CustomLink key={title} to={`/${type === "markets" ? "market" : "tent"}${slug}`} className={"group relative min-h-[34rem] lg:h-full w-full lg:w-1/3 flex justify-center lg:border border-primary-border"} onClick={closeModal}>
                             <div className="absolute font-semibold inset-0 lg:inset-6 group-hover:inset-0 transition-[inset] duration-300 ease-in-out">
                                 {(headerCoverImage || tent.mainMedia) && <PrimaryImage timeout={0} url={headerCoverImage || tent.mainMedia} alt={title} customClasses="w-full h-full object-cover brightness-[90%]" />}
                             </div>

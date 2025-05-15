@@ -6,7 +6,7 @@ export const HeroSection = ({ data }) => {
     const { title, subTitle, estd, backgroundVideo, buttonLabel, buttonAction } = data;
 
     return (
-        <div className="relative h-screen isolate px-6 lg:px-8 flex items-center">
+        <div className="relative h-screen isolate pt-24 lg:pt-40 px-6 lg:px-8 flex items-center">
             <video src={generateVideoURL(backgroundVideo)} className="absolute inset-0 -z-10 h-full w-full object-cover bg-blend-overlay" autoPlay loop muted />
             <div className="mx-auto lg:max-w-[90rem] text-center font-haasRegular">
                 <div className="text-primary-alt text-[16px] font-haasRegular max-w-[250px] mx-auto">

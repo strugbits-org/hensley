@@ -4,11 +4,11 @@ import { MarketTentModal } from "../Modals/MarketTentModal";
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
 
-const SubCategoryItem = ({ data }) => {
+const SubCategoryItem = ({ data, closeModal }) => {
     const { title, category, redirection } = data;
     const linkTo = `${redirection || "/subcategory"}/${category.slug}`;
     return (
-        <CustomLink to={linkTo} className="w-1/2 flex flex-col items-center" key={title}>
+        <CustomLink to={linkTo} className="w-1/2 flex flex-col items-center" key={title} onClick={closeModal}>
             <div className="relative bg-primary rounded-full w-[115px] h-[115px] overflow-hidden">
                 {category.mainMedia && (
                     <PrimaryImage
@@ -35,7 +35,8 @@ export const HeaderMobileMenu = ({
     activeMenu,
     handleMainMenuClick,
     handleSubMenuClick,
-    setIsMobileMenuOpen
+    setIsMobileMenuOpen,
+    closeAllModals
 }) => {
     const transitionClass = isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full';
 
@@ -97,18 +98,18 @@ export const HeaderMobileMenu = ({
                                             <h3 className="text-center font-haasRegular uppercase text-[18px]">{selectedMenu.title}</h3>
                                         </div>
                                         {selectedMenu.type === "tents" && (
-                                            <MarketTentModal isMobileMenu selectedMenu={selectedMenu} />
+                                            <MarketTentModal selectedMenu={selectedMenu} closeModal={closeAllModals} />
                                         )}
                                         <div className="mt-8 flex flex-wrap justify-center gap-y-[31px] p-2">
                                             {selectedMenu.type !== "tents" && selectedMenu.data.map((category) => (
-                                                <SubCategoryItem key={category.title} data={category} />
+                                                <SubCategoryItem key={category.title} data={category} closeModal={closeAllModals} />
                                             ))}
                                         </div>
                                     </div>
                                 )}
 
                                 {selectedMenu && selectedMenu.type === "markets" && (
-                                    <MarketTentModal isMobileMenu selectedMenu={selectedMenu} />
+                                    <MarketTentModal selectedMenu={selectedMenu} closeModal={closeAllModals} />
                                 )}
                             </div>
                         </div>

@@ -1,65 +1,58 @@
 "use client";
-import React, { useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import SectionTitle from '../common/SectionTitle'
+import { PrimaryButton } from '../common/PrimaryButton'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
-import { TestimonialCard } from './TestimonialCard';
+import NewsCard from './NewsCard';
 
-export const Testimonials = ({ data, pageDetails }) => {
-    const { testimonialsTitle } = pageDetails;
+export const HensleyNews = ({ data, pageDetails }) => {
+    const { hensleyNewsTitle } = pageDetails;
+
     const sliderInstance = useRef();
-    const [currentSlide, setCurrentSlide] = useState(0);
 
     const [sliderRef] = useKeenSlider(
         {
             loop: true,
-            slides: data.length,
-            defaultAnimation: {
-                duration: 2000,
-            },
-            breakpoints: {
-                "(max-width: 768px)": {
-                    slides: { perView: 1, spacing: 10, origin: "center" },
-                },
-                "(min-width: 768px) and (max-width: 1024px)": {
-                    slides: { perView: 2, spacing: 10 },
-                },
-                "(min-width: 1025px)": {
-                    slides: { perView: 1.4, spacing: 10 },
-                },
+            mode: "free-snap",
+            slides: {
+                origin: "center",
+                perView: 4,
+                spacing: 4,
             },
             created(slider) {
                 sliderInstance.current = slider;
             },
-            slideChanged(slider) {
-                setCurrentSlide(slider.track.details.rel);
+            breakpoints: {
+                "(max-width: 768px)": {
+                    slides: { perView: 1.2, spacing: 5, origin: "center" },
+                },
+                "(min-width: 768px) and (max-width: 1024px)": {
+                    slides: { perView: 2, spacing: 4, origin: "center" },
+                },
+                "(min-width: 1025px) and (max-width: 1280px)": {
+                    slides: { perView: 3.5, spacing: 4, origin: "center" },
+                },
             },
         },
         []
     );
 
-    // Function to determine if a slide is before the active one
-    const isBeforeActive = (index) => {
-        if (currentSlide === 0) {
-            return index === data.length - 1; // Last slide is before the first one in loop mode
-        }
-        return index === currentSlide - 1;
-    };
-
     return (
-        <div className='w-full mb-20'>
+        <div className='w-full py-20 lg:py-6'>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={testimonialsTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
+                <SectionTitle text={hensleyNewsTitle} classes="lg:py-[40px] py-[20px] md:mt-6 lg:mt-0" />
+                <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
             </div>
             <div className="p-6">
-                <div ref={sliderRef} className="keen-slider lg:pl-32">
-                    {data.map((testimonial, index) => {
+                <div ref={sliderRef} className="keen-slider">
+                    {data.map((item, index) => {
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide flex transition-[opacity] duration-300 ease-in-out ${isBeforeActive(index) ? "invisible" : ""}`}
+                                className={`keen-slider__slide flex px-2`}
                             >
-                                <TestimonialCard data={testimonial} classes={""} />
+                                <NewsCard data={item} />
                             </div>
                         );
                     })}

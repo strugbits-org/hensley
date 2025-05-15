@@ -6,7 +6,7 @@ export const Banner = ({ data }) => {
     const { backgroundImage, title, subtitle, buttonLabel } = data;
 
     return (
-        <div className='relative banner h-screen p-6'>
+        <div className='relative banner h-screen lg:p-6'>
             <PrimaryImage timeout={0} url={backgroundImage} alt={title} customClasses="border border-primary-border h-full w-full object-cover" />
             <div className="absolute inset-6 lg:px-44 py-40 lg:py-20 flex justify-center lg:block">
                 <div className='flex flex-col max-w-xs lg:max-w-sm gap-4 lg:gap-6 items-center lg:items-start'>

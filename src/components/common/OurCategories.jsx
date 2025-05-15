@@ -1,14 +1,14 @@
 import React from 'react'
 import SectionTitle from '../common/SectionTitle'
-import Image from 'next/image'
 import { PrimaryImage } from './PrimaryImage'
 import { insertBreaks } from '@/utils';
+import { CustomLink } from './CustomLink';
 
-function OurCategories({ data, pageDetils, classes }) {
-  const { ourCategoriesTitle } = pageDetils;
+function OurCategories({ data, pageDetails, classes }) {
+  const { ourCategoriesTitle } = pageDetails;
 
   return (
-    <div className={classes}>
+    <div className={`mb-20 md:mb-40 lg:mb-0 ${classes}`}>
       <div className='w-full sm:px-0 px-[12px]'>
         <SectionTitle text={ourCategoriesTitle} classes="py-[40px] md:mt-6 lg:mt-0 border-t border-b" />
       </div>
@@ -17,7 +17,7 @@ function OurCategories({ data, pageDetils, classes }) {
           const { categories: category, title } = item;
 
           return (
-            <div
+            <CustomLink to={`/collections/${category.slug}`}
               key={category._id}
               className={`cursor-pointer group border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out ${item.rtl && 'lg:flex-row-reverse'
                 } lg:h-[474px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
@@ -39,12 +39,10 @@ function OurCategories({ data, pageDetils, classes }) {
                     </h3>
 
                     <div>
-                      <Image
-                        src={"https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
-                        width={25}
-                        height={25}
+                      <PrimaryImage
+                        url={"https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
                         alt="Arrow"
-                        className="hidden lg:block arrow w-[25px] h-[25px] transition-all duration-300 ease-in-out group-hover:w-[133px] group-hover:h-[133px] lg:mb-[12px] group-hover:filter brightness-50"
+                        customClasses="hidden lg:block arrow w-[25px] h-[25px] transition-all duration-300 ease-in-out group-hover:w-[133px] group-hover:h-[133px] lg:mb-[12px] group-hover:filter brightness-50"
                       />
 
                       <span className="text-sm font-haasRegular leading-4">
@@ -52,20 +50,18 @@ function OurCategories({ data, pageDetils, classes }) {
                       </span>
                     </div>
                   </div>
-                  <Image
-                    src={"https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
-                    width={25}
-                    height={25}
+                  <PrimaryImage
+                    url={"https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
                     alt="Arrow"
-                    className="lg:hidden arrow w-[25px] h-[25px]"
+                    customClasses="lg:hidden arrow w-[25px] h-[25px]"
                   />
                 </div>
               </div>
-            </div>
+            </CustomLink>
           )
         })}
       </div>
-      </div>
+    </div>
   )
 }
 

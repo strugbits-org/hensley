@@ -8,8 +8,8 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "../common/CustomLink";
 import SectionTitle from "../common/SectionTitle";
 
-export default function OurProjects({ data, pageDetils }) {
-    const { ourProjectsTitle } = pageDetils;
+export default function OurProjects({ data, pageDetails }) {
+    const { ourProjectsTitle } = pageDetails;
 
     const sliderInstance = React.useRef();
 

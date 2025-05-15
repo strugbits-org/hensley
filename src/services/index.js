@@ -180,6 +180,31 @@ export const fetchPortfolioData = async () => {
   }
 };
 
+export const fetchBlogsData = async () => {
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "ManageBlogs",
+      includeReferencedItems: ["blogRef", "author", "markets", "studios"],
+      ne: [
+        {
+          key: "isHidden",
+          value: true
+        }
+      ],
+      sortKey: "publishDate",
+      sortOrder: "desc"
+    });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching blogs data: ${error.message}`, error);
+  }
+};
+
 export const fetchBestSellers = async (slug = '/') => {
   try {
     const response = await queryCollection({

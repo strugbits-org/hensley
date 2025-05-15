@@ -8,8 +8,8 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "../common/CustomLink";
 import SectionTitle from "../common/SectionTitle";
 
-export default function OurProjects({ data, pageDetils }) {
-  const { ourProjectsTitle } = pageDetils;
+export default function OurProjects({ data, pageDetails }) {
+  const { ourProjectsTitle } = pageDetails;
 
   const sliderInstance = React.useRef();
 
@@ -33,9 +33,9 @@ export default function OurProjects({ data, pageDetils }) {
   });
 
   return (
-    <>
+    <div className="mb-20 md:mb-40 lg:mb-0">
       <div className='w-full sm:px-0 px-[12px]'>
-        <SectionTitle text={ourProjectsTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
+        <SectionTitle text={ourProjectsTitle} classes="py-[40px] md:mt-6 lg:mt-0" />
       </div>
       <div
         ref={sliderRef}
@@ -82,6 +82,6 @@ export default function OurProjects({ data, pageDetils }) {
           <MdOutlineChevronRight className="size-[20px]" />
         </button>
       </div>
-    </>
+    </div>
   );
 }
