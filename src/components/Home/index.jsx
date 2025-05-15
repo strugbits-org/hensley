@@ -15,7 +15,6 @@ export const HomePage = ({ data }) => {
             <OurProjects data={portfolioData} pageDetils={homePageDetails} />
             <Banner data={bannerData} /> */}
             {/* <BestSellers data={bestSellers} pageDetils={homePageDetails} /> */}
-            <ContactUs />
             <BestSellers data={bestSellers} pageDetils={homePageDetails} />
             <Testimonials data={testimonials} pageDetils={homePageDetails} />
         </>
