@@ -3,7 +3,7 @@ import React from "react";
 function SectionTitle({ text, classes }) {
   return (
     <h1
-      className={`uppercase text-secondary-alt font-recklessRegular text-4xl 
+      className={`w-full uppercase text-secondary-alt font-recklessRegular text-4xl 
           md:text-[65px]
           lg:text-[160px]
           xl:text-[200px]
@@ -11,7 +11,7 @@ function SectionTitle({ text, classes }) {
           lg:leading-[160px]
           text-center
           leading-[50px]
-          tracking-wide sm:border 
+          tracking-wide
           ${classes}`}
     >
       {text}

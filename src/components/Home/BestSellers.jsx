@@ -6,9 +6,8 @@ import ProductCard from '../common/ProductCard'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 
-export const BestSellers = ({ data, pageDetils }) => {
-    const { bestSellerTitle } = pageDetils;
-    console.log("Best Sellers Data: ", data);
+export const BestSellers = ({ data, pageDetails }) => {
+    const { bestSellerTitle } = pageDetails;
 
     const sliderInstance = useRef();
 
@@ -40,9 +39,9 @@ export const BestSellers = ({ data, pageDetils }) => {
     );
 
     return (
-        <div className='bg-secondary-alt w-full'>
+        <div className='bg-secondary-alt w-full py-20 lg:py-6'>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={bestSellerTitle} classes="!text-primary py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
+                <SectionTitle text={bestSellerTitle} classes="!text-primary lg:py-[40px] py-[20px] md:mt-6 lg:mt-0" />
                 <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
             </div>
             <div className="p-6">

@@ -90,7 +90,7 @@ export const Categories = ({ slug }) => {
   return (
     <>
       <Listing slug={slug} chairImage={chairImage}/>
-      <OurCategories data={categories} pageDetils={{ourCategoriesTitle:"Our Categories"}} />
+      <OurCategories data={categories} pageDetails={{ourCategoriesTitle:"Our Categories"}} />
     </>
   )
 }

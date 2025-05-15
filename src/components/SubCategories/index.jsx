@@ -86,7 +86,7 @@ export const SubCategories = () => {
   return (
     <>
       <Listing />
-      <OurCategories classes={"lg:block hidden"} data={categories} pageDetils={{ ourCategoriesTitle: "Our Categories" }} />
+      <OurCategories classes={"lg:block hidden"} data={categories} pageDetails={{ ourCategoriesTitle: "Our Categories" }} />
     </>
   )
 }

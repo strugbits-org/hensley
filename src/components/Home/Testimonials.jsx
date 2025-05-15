@@ -1,15 +1,14 @@
 "use client";
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import { TestimonialCard } from './TestimonialCard';
 
-export const Testimonials = ({ data, pageDetils }) => {
-    const { testimonialsTitle } = pageDetils;
-    console.log("Testimonials Data: ", data[0]);
-
+export const Testimonials = ({ data, pageDetails }) => {
+    const { testimonialsTitle } = pageDetails;
     const sliderInstance = useRef();
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     const [sliderRef] = useKeenSlider(
         {
@@ -19,35 +18,48 @@ export const Testimonials = ({ data, pageDetils }) => {
                 duration: 2000,
             },
             breakpoints: {
-                "(max-width: 1024px)": {
-                    slides: { perView: 1.2, spacing: 10, origin: "center" },
+                "(max-width: 768px)": {
+                    slides: { perView: 1, spacing: 10, origin: "center" },
                 },
-                "(min-width: 1024px)": {
-                    slides: { perView: 1.5, spacing: 10 },
+                "(min-width: 768px) and (max-width: 1024px)": {
+                    slides: { perView: 2, spacing: 10 },
+                },
+                "(min-width: 1025px)": {
+                    slides: { perView: 1.4, spacing: 10 },
                 },
             },
             created(slider) {
                 sliderInstance.current = slider;
             },
+            slideChanged(slider) {
+                setCurrentSlide(slider.track.details.rel);
+            },
         },
         []
     );
 
+    // Function to determine if a slide is before the active one
+    const isBeforeActive = (index) => {
+        if (currentSlide === 0) {
+            return index === data.length - 1; // Last slide is before the first one in loop mode
+        }
+        return index === currentSlide - 1;
+    };
+
     return (
-        <div className='w-full'>
+        <div className='w-full mb-20'>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
                 <SectionTitle text={testimonialsTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
             </div>
             <div className="p-6">
-                <div ref={sliderRef} className="keen-slider pl-32">
-
+                <div ref={sliderRef} className="keen-slider lg:pl-32">
                     {data.map((testimonial, index) => {
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide`}
+                                className={`keen-slider__slide flex transition-[opacity] duration-300 ease-in-out ${isBeforeActive(index) ? "invisible" : ""}`}
                             >
-                                <TestimonialCard data={testimonial} />
+                                <TestimonialCard data={testimonial} classes={""} />
                             </div>
                         );
                     })}
@@ -66,13 +78,6 @@ export const Testimonials = ({ data, pageDetils }) => {
                     </button>
                 </div>
             </div>
-            {/* <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          /> */}
         </div>
     )
 }
