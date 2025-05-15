@@ -16,6 +16,7 @@ function SectionTitle({ text, classes }) {
     >
       {text}
     </h1>
+
   );
 }
 
