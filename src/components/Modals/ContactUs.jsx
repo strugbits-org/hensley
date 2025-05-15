@@ -88,10 +88,10 @@ const ContactUs = () => {
                         ></textarea>
                     </div>
                     <button className='lg:col-span-2 relative bg-primary lg:h-[130px] h-[90px] w-full my-[33px] group'>
-                        <span className='lg:block hidden font-haasLight uppercase text-[16px] group-hover:font-haasBold tracking-[5px]'>
+                        <span className='lg:block hidden font-haasLight uppercase text-[16px]  tracking-[5px]'>
                             Sign in
                         </span>
-                        <span className='lg:hidden block font-haasLight uppercase text-[16px] group-hover:font-haasBold tracking-[5px]'>
+                        <span className='lg:hidden block font-haasLight uppercase text-[16px] tracking-[5px]'>
                             send message
                         </span>
                         <svg
@@ -99,7 +99,7 @@ const ContactUs = () => {
                             width="19.877"
                             height="19.67"
                             viewBox="0 0 19.877 19.67"
-                            className='ml-2 transition-all duration-300 stroke-[#2c2216] group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
+                            className='ml-2 transition-all duration-300 stroke-[#2c2216] absolute right-[5%] top-1/2 -translate-y-1/2'
                         >
                             <g transform="translate(9.835 0.5) rotate(45)">
                                 <path
