@@ -203,3 +203,17 @@ export const fetchBestSellers = async (slug = '/') => {
     logError(`Error fetching best sellers data: ${error.message}`, error);
   }
 };
+
+export const fetchTestimonials = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "WhatPeopleSay", sortKey: "order" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching testimonials data: ${error.message}`, error);
+  }
+};
