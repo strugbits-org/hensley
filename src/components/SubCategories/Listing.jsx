@@ -37,27 +37,7 @@ const filterData = [
     },
 ];
 
-// Reusable product grid
-const ProductGrid = ({ count = 8 }) => {
-    return (
-        <div className='w-full max-w-[1886px] grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2
-      lg:gap-x-[31px] sm:gap-x-[12px] gap-x-[10px]
-      lg:gap-y-[20px] sm:gap-y-[12px] gap-y-[20px]'>
-            {Array.from({ length: count }).map((_, index) => (
-                <ProductCard
-                    key={index}
-                    imageSrc={chairImage}
-                    title="POLTRONA MONTANA"
-                    code="MODCH39"
-                    dimensions='24”L X 30”W X 37”H'
-                    onAddToCart={() => console.log('Added to cart')}
-                />
-            ))}
-        </div>
-    );
-};
-
-export const Listing = () => {
+export const Listing = ({ products }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleList = () => setIsOpen(!isOpen);
@@ -96,13 +76,23 @@ export const Listing = () => {
             </div>
 
             {/* Product Grids */}
-            <ProductGrid count={8} />
+            <div className='w-full max-w-[1886px] grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2
+      lg:gap-x-[31px] sm:gap-x-[12px] gap-x-[10px]
+      lg:gap-y-[20px] sm:gap-y-[12px] gap-y-[20px]'>
+                {products.map((productData, index) => (
+                    <ProductCard
+                        key={index}
+                        data={productData}
+                        onAddToCart={() => console.log('Added to cart')}
+                    />
+                ))}
+            </div>
 
             {/* Banner */}
             <ProductBanner img={BannerImg} />
-
+            {/* 
             {/* More Products */}
-            <ProductGrid count={8} />
+            {/* <ProductGrid count={8} /> */}
 
             {/* Load More Button */}
             <div className='w-full flex justify-center'>

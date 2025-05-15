@@ -13,7 +13,7 @@ export const SubCategoriesModal = ({ selectedMenu, closeModal }) => {
                 {data.map(({ title, category, redirection }) => {
                     return (
                         <div key={title} className="w-1/5 flex flex-col items-center">
-                            <CustomLink to={`${redirection ? redirection : "/subcategory"}/${category.slug}`}>
+                            <CustomLink to={`${redirection ? redirection : "/subcategory"}/${category.slug}`} onClick={closeModal}>
                                 <div className="relative bg-primary-alt rounded-full w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-[169px] lg:h-[169px] overflow-hidden">
                                     {category.mainMedia && <PrimaryImage timeout={0} url={category.mainMedia} alt={title} customClasses="h-full w-full object-cover" />}
                                 </div>
