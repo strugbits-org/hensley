@@ -13,6 +13,7 @@ import { SubCategoriesModal } from '../Modals/SubCategoriesModal';
 import { MarketTentModal } from '../Modals/MarketTentModal';
 import { SearchModal } from '../Modals/SearchModal';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
+import { sortByOrderNumber } from '@/utils';
 
 const userMenu = [
     { icon: searchIcon, slug: '#', type: 'search' },
@@ -20,194 +21,20 @@ const userMenu = [
     { icon: cartIcon, slug: '#', count: 1, type: 'cart' },
 ];
 
-const navigation = [
-    {
-        name: 'RENTALS',
-        type: 'submenu',
-        subMenu: [
-            {
-                name: 'TENTS',
-                slug: '#',
-                type: 'categoriesModal',
-                subCategories: [
-                    {
-                        name: 'STRUCTURES',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_8285d7e25f64490d875c3ef3eabb7c7c~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2019_Corinne_David_1077-topaz-upscale-2x.jpg",
-                        description: `"Clear span" -Kedered beams
-                        Curved beam or A-frame style
-                        50', 60', 70', 80', 100' & 120' widths
-                        
-                        STRUCTURES – ATRIUM
-                        Currently 50' (30' middles & 10' wings)
-                        Rental companies outside CA can purchase`
-                    },
-                    {
-                        name: 'FRAME TENTS',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_36662d5195014c1cb66b83fcda6539b0~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/option%201%20(1).jpg",
-                        description: `Fabric tension
-Push pole -Bail ring -Sail cloth`,
-                    },
-                    {
-                        name: 'SAIL CLOTH TENTS',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_472b7a68fef34c418ba181a6a00ea1e1~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/17-LauraGordon%C2%A9_brianaandtripwed.jpg",
-                        description: `Pipe supported canopy
-                        2" or Jumbo track framework
-                        Festival style`
-                    }
-                ]
-            },
-            {
-                name: 'TABLETOP',
-                slug: '#',
-                type: 'subCategoriesModal',
-                subCategories: [
-                    {
-                        name: 'PREMIUM COLLECTION',
-                        slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_af2fdc208ef040ba8f3979fc7f75a21d~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/premium-v2.jpg"
-                    },
-                    {
-                        name: 'CHINA', slug: '#',
-                        imageSrc: "https://static.wixstatic.com/media/626075_7ea4412ce6cd439e8eaa105e49f5ec38~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/china-v3.jpg"
-                    },
-                    { name: 'CHARGERS', slug: '#', imageSrc: "https://static.wixstatic.com/media/626075_84ef0ffebac14c9eaf806d12f4a86c6b~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/chargers-v2.jpg" },
-                    { name: 'FLATWARE', slug: '#', imageSrc: "https://static.wixstatic.com/media/626075_fa9c482889f24cf3857d0ee812066d8e~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/fraltware-v2.jpg" },
-                    { name: 'STEMWARE', slug: '#', imageSrc: "https://static.wixstatic.com/media/626075_cbadf59363f64aa7bfc69034fab5f16d~mv2.jpg/v1/fill/w_172,h_172,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/stemware-v2.jpg" },
-                    { name: 'BARWARE', slug: '#' },
-                    { name: 'TABLE ACCESSORIES', slug: '#' },
-                    { name: 'NAPKINS', slug: '#' },
-                    { name: 'TABLE RUNNERS', slug: '#' },
-                    { name: 'LINENS', slug: '#' }
-                ]
-            },
-            {
-                name: 'FURNISHINGS',
-                type: 'subCategoriesModal',
-                slug: '#',
-                subCategories: [
-                    { name: 'CHAIRS', slug: '#' },
-                    { name: 'BARSTOOLS', slug: '#' },
-                    { name: 'BANQUETTES', slug: '#' },
-                    { name: 'BENCHES', slug: '#' },
-                    { name: 'CUSHIONS', slug: '#' },
-                    { name: 'DINING TABLES', slug: '#' },
-                    { name: 'BANQUET TABLES', slug: '#' },
-                    { name: 'KIOSK TABLES', slug: '#' },
-                    { name: 'BARS & BACKBARS', slug: '#' },
-                    { name: 'SOFA & LOVESEATS', slug: '#' },
-                    { name: 'LOUNGE CHAIRS', slug: '#' },
-                    { name: 'COFFEE & END TABLES', slug: '#' },
-                    { name: 'OTTOMANS & PILLOWS', slug: '#' },
-                    { name: 'KIDS', slug: '#' },
-                    { name: 'OUTDOOR', slug: '#' }
-                ]
-            },
-            {
-                name: 'CATERING',
-                type: 'subCategoriesModal',
-                slug: '#',
-                subCategories: [
-                    { name: 'BEVERAGE SERVICES', slug: '#' },
-                    { name: 'SERVING PIECES', slug: '#' },
-                    { name: 'COOKING EQUIPMENT', slug: '#' }
-                ]
-            },
-            {
-                name: 'PAVILIONS',
-                slug: 'pavillions',
-                type: 'url',
-            },
-            {
-                name: 'ADDITIONAL PRODUCTS',
-                slug: '#',
-                type: 'subCategoriesModal',
-                subCategories: [
-                    { name: 'SCREENS', slug: '#' },
-                    { name: 'DANCE FLOORS & STAGE', slug: '#' },
-                    { name: 'PIPE & DRAPE', slug: '#' },
-                    { name: 'HEATERS', slug: '#' },
-                    { name: 'MISCELLANEOUS', slug: '#' },
-                    { name: 'ESCORT BOARDS', slug: '#' },
-                    { name: 'LIGHTING', slug: '#' },
-                    { name: 'POOL COVER', slug: '#' }
-                ]
-            },
-        ],
-        order: 1,
-        orderMobile: 1
-    },
-    {
-        name: 'MARKETS',
-        type: 'categoriesModal',
-        subMenu: [
-            {
-                name: 'SOCIAL',
-                slug: '#',
-                type: 'url',
-                imageSrc: "https://static.wixstatic.com/media/626075_8285d7e25f64490d875c3ef3eabb7c7c~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/2019_Corinne_David_1077-topaz-upscale-2x.jpg",
-                description: `"Clear span" -Kedered beams
-                Curved beam or A-frame style
-                50', 60', 70', 80', 100' & 120' widths
-                
-                STRUCTURES – ATRIUM
-                Currently 50' (30' middles & 10' wings)
-                Rental companies outside CA can purchase`
-            },
-            {
-                name: 'NONPROFIT',
-                slug: '#',
-                type: 'url',
-                imageSrc: "https://static.wixstatic.com/media/626075_36662d5195014c1cb66b83fcda6539b0~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/option%201%20(1).jpg",
-                description: `Fabric tension
-Push pole -Bail ring -Sail cloth`,
-            },
-            {
-                name: 'CORPORATE',
-                slug: '#',
-                type: 'url',
-                imageSrc: "https://static.wixstatic.com/media/626075_472b7a68fef34c418ba181a6a00ea1e1~mv2.jpg/v1/fill/w_555,h_894,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/17-LauraGordon%C2%A9_brianaandtripwed.jpg",
-                description: `Pipe supported canopy
-                2" or Jumbo track framework
-                Festival style`
-            }
-        ],
-        order: 2,
-        orderMobile: 3
-    },
-    {
-        name: 'ABOUT',
-        type: 'submenu',
-        subMenu: [
-            { name: 'ABOUT US', slug: '#' },
-            { name: 'PROJECTS', slug: '#' },
-            { name: 'BLOG', slug: '#' },
-            { name: 'CONTACT', slug: '#' },
-            { name: 'CAREERS', slug: '#' },
-        ],
-        order: 3,
-        orderMobile: 2
-    },
-];
-
-export const Header = () => {
-    const [activeMenu, setActiveMenu] = useState(navigation[0].name);
-    const [subNavigation, setSubNavigation] = useState(navigation[0].subMenu);
+export const Header = ({ data, marketsData, tentsData }) => {
+    const [activeMenu, setActiveMenu] = useState("RENTALS");
+    const [subNavigation, setSubNavigation] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState(false);
     const [searchModal, setSearchModal] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
 
+    const { header, headerSubMenu, headerMegaMenu } = data;
+
     const handleClickUserMenu = (item) => {
         if (item.type === 'search') {
             setSearchModal(prev => {
-                console.log(prev);
-
-                if (prev) {
-                    setSelectedMenu("RENTALS");
-                } else {
+                if (!prev) {
                     setSelectedMenu(false);
                 }
                 return !prev;
@@ -218,23 +45,30 @@ export const Header = () => {
     const handleMainMenuClick = (item) => {
         setSelectedMenu(false);
         setSearchModal(false);
-        if (item.type === 'submenu') {
-            setActiveMenu(item.name);
-        } else if (item.type === 'categoriesModal') {
-            setActiveMenu(item.name);
-            setSelectedMenu(item);
-        }
+        setActiveMenu(false);
+        setTimeout(() => {
+            setActiveMenu(item.title);
+        }, 50);
     }
 
     const handleSubMenuClick = (item) => {
         setSearchModal(false);
+
+        const currentSubMenu = headerMegaMenu.filter(x => x.HeaderSubMenu_categories.some(y => y._id === item._id));
+
+        const newMenu = {
+            title: item.title,
+            type: item.type,
+            data: item.type !== 'tents' ? sortByOrderNumber(currentSubMenu) : sortByOrderNumber(tentsData)
+        };
+
         if (selectedMenu) {
             setSelectedMenu(false);
             setTimeout(() => {
-                setSelectedMenu(item);
+                setSelectedMenu(newMenu);
             }, 50);
         } else {
-            setSelectedMenu(item);
+            setSelectedMenu(newMenu);
         }
     }
 
@@ -246,9 +80,30 @@ export const Header = () => {
     }
 
     useEffect(() => {
-        const currentMenu = navigation.find(item => item.name === activeMenu);
-        if (currentMenu) setSubNavigation(currentMenu.subMenu || []);
+        if (activeMenu === 'MARKETS') {
+            const marketsNavigation = marketsData.map(item => ({
+                ...item,
+                slug: `/market${item.slug}`,
+                type: 'slug'
+            }));
+            setSubNavigation(sortByOrderNumber(marketsNavigation) || []);
+            setSelectedMenu({
+                title: 'MARKETS',
+                type: 'markets',
+                data: sortByOrderNumber(marketsData)
+            });
+        } else {
+            const currentMenu = header.find(item => item.title === activeMenu);
+            const currentSubMenu = headerSubMenu.filter(item => item.Header_menuItems.some(subItem => subItem._id === currentMenu?._id));
+            if (currentMenu) setSubNavigation(sortByOrderNumber(currentSubMenu));
+        }
     }, [activeMenu]);
+
+    const closeAllModals = () => {
+        setSearchModal(false);
+        setSelectedMenu(false);
+        setIsMobileMenuOpen(false);
+    }
 
     return (
         <>
@@ -259,7 +114,7 @@ export const Header = () => {
                         <nav className="h-full flex items-center justify-between" aria-label="Main Navigation">
                             {/* Logo */}
                             <div className="flex p-2 lg:px-6">
-                                <CustomLink to="/">
+                                <CustomLink to="/" onClick={closeAllModals}>
                                     <span className="sr-only">Hensley Event Resources</span>
                                     <Image src={logo} className='min-w-[184px]' alt="Hensley Event Resources Logo" />
                                 </CustomLink>
@@ -267,17 +122,17 @@ export const Header = () => {
 
                             {/* Main Navigation */}
                             <ul className="flex h-full grow items-center justify-center gap-x-24">
-                                {navigation.map((item) => {
-                                    const { name } = item;
-                                    const isActive = activeMenu === name;
+                                {header.map((item) => {
+                                    const { title } = item;
+                                    const isActive = activeMenu === title;
 
                                     return (
-                                        <li className="h-full w-1/3 flex justify-center items-center relative group max-w-[288px]" key={name}>
+                                        <li key={title} className="h-full w-1/3 flex justify-center items-center relative group max-w-[288px]">
                                             <button
                                                 onClick={() => handleMainMenuClick(item)}
-                                                className={`h-full w-full text-secondary-alt text-xs font-haasBold tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out ${isActive ? "" : "hover:tracking-[4px]"}`}
+                                                className={`uppercase h-full w-full text-secondary-alt text-xs font-haasBold tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out ${isActive ? "" : "hover:tracking-[4px]"}`}
                                             >
-                                                {name}
+                                                {title}
                                             </button>
                                             <span
                                                 className={`absolute bottom-[0.5px] left-0 h-0.5 bg-secondary-alt transition-all duration-300 ease-in-out ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}
@@ -318,37 +173,38 @@ export const Header = () => {
                             style={{ gridTemplateColumns: `repeat(${subNavigation.length || 1}, minmax(0, 1fr))` }}
                         >
                             {subNavigation.map((item) => {
-                                const { name, slug, type } = item;
+                                const { title, slug, type } = item;
 
-                                return type !== "url" ? (
+                                return type !== "slug" ? (
                                     <button
-                                        key={name}
-                                        className="text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                        key={title}
+                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
                                         onClick={() => handleSubMenuClick(item)}
                                     >
-                                        {name}
+                                        {title}
                                     </button>
                                 ) : (
                                     <CustomLink
-                                        key={name}
-                                        to={`/subCategory/${slug}`}
-                                        className="text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                        onClick={closeAllModals}
+                                        key={title}
+                                        to={slug}
+                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
                                     >
-                                        {name}
+                                        {title}
                                     </CustomLink>
                                 )
                             })}
                         </nav>
                     </div>
                     {/* Modal Area */}
-                    {selectedMenu && selectedMenu.type === "subCategoriesModal" && selectedMenu.subCategories?.length ? (
+                    {selectedMenu && selectedMenu.type === "submenu" ? (
                         <SubCategoriesModal
                             closeModal={() => setSelectedMenu(false)}
-                            data={selectedMenu.subCategories}
+                            selectedMenu={selectedMenu}
                         />
-                    ) : selectedMenu && selectedMenu.type === "categoriesModal" ? (
+                    ) : selectedMenu && (selectedMenu.type === "markets" || selectedMenu.type === "tents") ? (
                         <MarketTentModal
-                            data={selectedMenu.subCategories || selectedMenu.subMenu || []}
+                            selectedMenu={selectedMenu}
                             closeModal={() => setSelectedMenu(false)}
                         />
                     ) : null}
@@ -366,7 +222,7 @@ export const Header = () => {
                     <div className='mobile-menu lg:hidden fixed inset-x-3 top-3 z-50 px-6 py-2'>
                         <div className={`absolute inset-0 -z-10 backdrop-blur-[20px] brightness-[50px] ${isMobileMenuOpen ? "bg-glass-white" : "bg-secondary-glass"}`}></div>
                         <div className="flex p-2 lg:px-6 justify-between">
-                            <CustomLink to="/">
+                            <CustomLink to="/" onClick={closeAllModals}>
                                 <span className="sr-only">Hensley Event Resources</span>
                                 <Image src={logo} className={`min-w-[174px] ${isMobileMenuOpen ? "hidden" : "block"}`} alt="Hensley Event Resources Logo" />
                                 <Image src={icon} className={`h-7 min-w-[27px] ${isMobileMenuOpen ? "block" : "hidden"}`} alt="Hensley Event Resources Logo" />
@@ -422,27 +278,28 @@ export const Header = () => {
                         </div>
                     </div>
 
+                    {/* Mobile Menu */}
                     <HeaderMobileMenu
-                        data={navigation}
+                        menuItems={sortByOrderNumber(header, { key: 'orderMobile' })}
                         searchModal={searchModal}
                         setSearchModal={setSearchModal}
                         isMobileMenuOpen={isMobileMenuOpen}
                         activeMenu={activeMenu}
                         setActiveMenu={setActiveMenu}
                         subNavigation={subNavigation}
-                        setSubNavigation={setSubNavigation}
                         selectedMenu={selectedMenu}
                         setSelectedMenu={setSelectedMenu}
                         handleMainMenuClick={handleMainMenuClick}
                         handleSubMenuClick={handleSubMenuClick}
                         setIsMobileMenuOpen={setIsMobileMenuOpen}
+                        closeAllModals={closeAllModals}
                     />
                 </div>
 
             </header>
 
             {/* Spacer for non-homepage content */}
-            {pathname !== "/" && <div className='h-24'></div>}
+            {pathname !== "/" && <div className='h-[90px]'></div>}
         </>
     );
 };

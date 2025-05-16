@@ -2,6 +2,8 @@ import { Header } from "@/components/layout/Header";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import localFont from 'next/font/local';
+import { fetchFooterData, fetchHeaderData, fetchHomePageDetails, fetchInstagramFeed, fetchMarketsData, fetchTentsData } from "@/services";
+import InstagramFeed from "@/components/common/InstagramFeed";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -47,15 +49,33 @@ export const metadata = {
   title: "RENTALS | Hensley Event Resources",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+
+  const [
+    headerData,
+    marketsData,
+    tentsData,
+    footerData,
+    instagramFeed,
+    homePageDetails
+  ] = await Promise.all([
+    fetchHeaderData(),
+    fetchMarketsData(),
+    fetchTentsData(),
+    fetchFooterData(),
+    fetchInstagramFeed(),
+    fetchHomePageDetails()
+  ]);
+
   return (
     <html lang="en" className={`${neueHaasDisplayRegular.variable} ${neueHaasDisplayLight.variable} ${neueHaasDisplayMedium.variable} ${neueHaasDisplayBold.variable} ${recklessNeueRegular.variable} ${recklessNeueBold.variable} ${recklessNeueLight.variable} ${recklessNeueMedium.variable}`}>
       <body className={`antialiased`} >
-        <Header />
+        <Header data={headerData} marketsData={marketsData} tentsData={tentsData} />
         <main>
           {children}
         </main>
-        <Footer />
+        <InstagramFeed data={instagramFeed} details={homePageDetails} />
+        <Footer data={footerData} />
       </body>
     </html>
   );
