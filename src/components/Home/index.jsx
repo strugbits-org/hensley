@@ -12,13 +12,13 @@ export const HomePage = ({ data }) => {
     return (
         <>
             <HeroSection data={heroSectionData} />
-            {/* <OurCategories data={categoriesData} pageDetails={homePageDetails} />
+            <OurCategories data={categoriesData} pageDetails={homePageDetails} />
             <OurProjects data={portfolioData} pageDetails={homePageDetails} />
             <Banner data={bannerData} />
             <BestSellers data={bestSellers} pageDetails={homePageDetails} />
             <Testimonials data={testimonials} pageDetails={homePageDetails} />
             <MarketSection data={marketsData} pageDetails={homePageDetails} />
-            <HensleyNews data={blogsData} pageDetails={homePageDetails} /> */}
+            <HensleyNews data={blogsData} pageDetails={homePageDetails} />
         </>
     )
 }
