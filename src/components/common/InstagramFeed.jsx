@@ -45,11 +45,11 @@ function InstagramFeed({ data, details }) {
     <div className="instagram-feed bg-white">
       <SectionTitle
         text={instaFeedHeading}
-        classes={"py-[40px] hidden lg:block"}
+        classes={"py-[40px] hidden lg:block border-b border-primary-border"}
       />
       <div className="p-6">
         <div className="flex flex-col w-full border">
-          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border px-8 lg:pt-[30px] pb-[40px] pt-[131px] ">
+          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border border-b-0 px-8 lg:pt-[30px] pb-[40px] pt-[131px] ">
             <h3 className="lg:hidden block text-secondary-alt text-[55px] max-w-[280px] font-recklessRegular leading-[50px] text-center uppercase">
               {instaFeedHeading}
             </h3>

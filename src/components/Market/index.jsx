@@ -1,7 +1,10 @@
 import React from 'react'
+import HeroSection from './HeroSection'
 
-export const MarketPage = ({ slug }) => {
+export const MarketPage = ({ data }) => {
     return (
-        <div>MarketPage {slug}</div>
+        <>
+            <HeroSection data={data} />
+        </>
     )
 }

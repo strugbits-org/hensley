@@ -20,7 +20,7 @@ TURPIS EGESTAS.`,
 
   return (
     <div className="flex justify-center items-center px-4 lg:min-h-screen lg:py-0 py-[60px] border">
-      <div className="lg:w-full lg:max-w-[1556px] w-[492px]">
+      <div className="w-full">
         {/* Future Conditional Section (e.g., wedding/social) */}
         {/* <p className="...">...</p> */}
 
@@ -32,7 +32,7 @@ TURPIS EGESTAS.`,
           sm:leading-[33px]
           text-[35px]
           leading-[30px]
-          mt-4 mb-6 max-w-4xl text-center sm:text-left lg:text-left"
+          max-w-7xl mt-4 mb-6 text-center sm:text-left lg:text-left"
         >
           {data.title}
         </h1>
@@ -44,7 +44,7 @@ TURPIS EGESTAS.`,
           sm:mt-[40px]
           mt-[10px]
           text-[14px] leading-[18px]
-          max-w-3xl text-center lg:text-left sm:text-left"
+          max-w-7xl text-center lg:text-left sm:text-left"
         >
           {data.description}
         </p>
