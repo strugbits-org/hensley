@@ -23,12 +23,22 @@ function HeroSection({ data = {} }) {
     <div className="w-full">
       {/* First Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px] h-screen py-6">
-        <div className="bg-secondary-glass p-6 md:p-12 lg:p-16 flex flex-col justify-center">
-          <div className="max-w-[600px] ml-auto mr-0">
-            <p className="text-secondary uppercase text-lg font-haasRegular mb-4">
+        <div className="border bg-secondary-glass p-6 md:p-12 lg:p-16 flex flex-col justify-center">
+          <div className="lg:max-w-[600px] lg:text-left text-center ml-auto mr-0">
+            <p className="text-secondary uppercase text-lg
+            sm:text-[14px]
+            sm:leading-[20px]
+            font-haasRegular mb-4">
               {title}
             </p>
-            <h1 className="text-3xl md:text-4xl lg:text-6xl font-recklessRegular text-secondary leading-[55px] tracking-tight mb-2">
+            <h1 className="text-3xl md:text-4xl lg:text-6xl 
+            text-[35px]
+            leading-[30px]
+            lg:mt-0
+            mt-[29px]
+            mb-[34px]
+            font-recklessRegular text-secondary tracking-tight lg:mb-0
+            ">
               {tagline}
             </h1>
             <CustomLink to={buttonLink}>
