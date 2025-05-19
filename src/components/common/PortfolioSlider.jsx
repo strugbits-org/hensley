@@ -108,7 +108,7 @@ function PortfolioSlider({ display, tab = false, cardCss }) {
                 <Image
                   src={arrow}
                   alt="Arrow"
-                  className={`lg:hidden md:block ${tab && 'lg:!block'} sm:block hidden absolute bottom-3 left-2`}
+                  className={`lg:hidden md:block ${tab ? 'lg:!block' : ''} sm:block hidden absolute bottom-3 left-2`}
                 />
               </div>
               <div>
