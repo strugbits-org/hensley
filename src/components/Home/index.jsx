@@ -2,13 +2,14 @@ import { Banner } from "../common/Banner";
 import { HensleyNews } from "../common/HensleyNews";
 import { MarketSection } from "../common/MarketSection";
 import OurCategories from "../common/OurCategories";
+import { Testimonials } from "../common/Testimonials";
 import { BestSellers } from "./BestSellers";
 import { HeroSection } from "./HeroSection"
 import OurProjects from "./OurProjects";
-import { Testimonials } from "./Testimonials";
 
 export const HomePage = ({ data }) => {
     const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers, testimonials, marketsData, blogsData } = data;
+
     return (
         <>
             <HeroSection data={heroSectionData} />

@@ -2,7 +2,7 @@ import React from "react";
 import PortfolioSlider from "../common/PortfolioSlider";
 import SectionTitle from "../common/SectionTitle";
 
-function HowWeDoITSection() {
+function  HowWeDoITSection({ data }) {
   return (
     <>
       <SectionTitle
@@ -13,7 +13,7 @@ function HowWeDoITSection() {
       />
       <div className="flex flex-col ">
         <div className="bg-primary pb-11 min-h-screen relative">
-          <PortfolioSlider />
+          <PortfolioSlider data={data} />
         </div>
       </div>
     </>

@@ -1,10 +1,10 @@
 import React from "react";
-import Slider from "../common/Slider";
+import SliderComponent from "../common/SliderComponent";
 
 function ProjectSlider() {
   return (
     <div className="h-screen lg:mt-[100px] lg:pl-[15px] lg:pr-[15px] border">
-      <Slider />
+      <SliderComponent />
     </div>
   );
 }

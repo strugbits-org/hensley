@@ -8,7 +8,7 @@ export const CopyIcon = () => {
                     <rect width="8" height="11" stroke="none" />
                     <rect x="0.5" y="0.5" width="7" height="10" fill="none" />
                 </g>
-                <path id="Path_351" data-name="Path 351" d="M3686.488-7795.265v-9.078h7.08" transform="translate(-3686.488 7804.343)" fill="none" stroke="#2c2216" stroke-width="1" />
+                <path id="Path_351" data-name="Path 351" d="M3686.488-7795.265v-9.078h7.08" transform="translate(-3686.488 7804.343)" fill="none" stroke="#2c2216" strokeWidth="1" />
             </g>
         </svg>
     )

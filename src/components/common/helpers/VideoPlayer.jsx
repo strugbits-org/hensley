@@ -44,7 +44,7 @@ export const VideoPlayer = ({ url, classes, controls = false }) => {
                     className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
                     onClick={togglePlay}
                 >
-                    <svg className="size-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" preserveAspectRatio="xMidYMin slice"><g fill="none" fill-rule="evenodd"><circle cx="18" cy="18" r="17" stroke="#fff" strokeWidth="2"></circle><path fill="#fff" d="m23.935 17.708-10.313 6.033V11.676z"></path></g></svg>
+                    <svg className="size-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" preserveAspectRatio="xMidYMin slice"><g fill="none" fillRule="evenodd"><circle cx="18" cy="18" r="17" stroke="#fff" strokeWidth="2"></circle><path fill="#fff" d="m23.935 17.708-10.313 6.033V11.676z"></path></g></svg>
                 </button>
             )}
         </div>

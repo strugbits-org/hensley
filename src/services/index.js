@@ -54,7 +54,7 @@ export const fetchHeaderData = async () => {
 
 export const fetchMarketsData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "MarketsCollection" });
+    const response = await queryCollection({ dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"] });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
@@ -150,7 +150,7 @@ export const fetchHomePageDetails = async () => {
       throw new Error(`Response does not contain items array`);
     }
 
-    return response.items[0];
+    return response.items[0] || {};
   } catch (error) {
     logError(`Error fetching home page data: ${error.message}`, error);
   }
@@ -240,5 +240,19 @@ export const fetchTestimonials = async () => {
     return response.items;
   } catch (error) {
     logError(`Error fetching testimonials data: ${error.message}`, error);
+  }
+};
+
+export const fetchBannerData = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "BannerHomePage" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items[0];
+  } catch (error) {
+    logError(`Error fetching banner data: ${error.message}`, error);
   }
 };

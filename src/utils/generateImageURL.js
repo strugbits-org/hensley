@@ -72,7 +72,6 @@ export const formatProductImageURL = (url) => {
 };
 
 export const generateVideoURL = (videoSRC) => {
-  console.log("videoSRC", videoSRC);
   
   if (videoSRC && videoSRC.startsWith("wix:video://v1/")) {
     const videoID = videoSRC.replace('wix:video://v1/', '').split('/')[0];

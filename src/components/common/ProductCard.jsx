@@ -3,7 +3,7 @@ import { PrimaryImage } from './PrimaryImage';
 import { CopyIcon } from './helpers/CopyIcon';
 import { copyToClipboard } from '@/utils';
 
-function ProductCard({ data, onAddToCart, type='listing' }) {
+function ProductCard({ data, onAddToCart, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
     return (
