@@ -38,7 +38,7 @@ function HeroSection({ data = {} }) {
           </div>
         </div>
         <div className="w-full">
-          <PrimaryImage url={image1} alt="Hensley Events" max_h={600} customClasses="min-h-[400px] lg:min-h-[600px] w-full h-full" />
+          <PrimaryImage url={image1} alt="Hensley Events" customClasses="min-h-[400px] lg:min-h-[600px] w-full h-full" />
         </div>
       </div>
 

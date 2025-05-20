@@ -1,10 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import ProductCard from '../common/ProductCard'
 import Image from 'next/image'
-import chairImage from '@/assets/chair.png'
 import catTab from '@/assets/icons/cat-tab.svg'
 import FilterMenu from '../common/MenuFilter'
 import SubCategories from '../common/SubCategories'
@@ -33,15 +32,23 @@ const filterData = [
   },
 ];
 
-function Listing({ slug, products }) {
+function Listing({ data }) {
+  const { selectedCategory, sortedProducts } = data;
   const [isOpen, setIsOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+
   const toggleList = () => {
     setIsOpen(!isOpen);
   };
+
+  useEffect(() => {
+    setProducts(sortedProducts);
+  }, [sortedProducts]);
+
   return (
     <>
       <div className='w-full relative'>
-        <SectionTitle text={slug} classes="text-[35px] pt-[40px] pb-[40px] border-none" />
+        <SectionTitle text={selectedCategory?.name} classes="text-[35px] pt-[40px] pb-[40px] border-none" />
         <div
           className={`lg:hidden absolute top-[40px] sm:right-[10%] right-[2%] z-[9999] ${isOpen ? 'min-h-[300px] w-[330px] px-[20px] py-[40px]' : 'h-[55px] w-[55px]'} rounded-[50px] bg-white flex flex-col`}
         >

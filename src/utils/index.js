@@ -93,3 +93,16 @@ export const formatDate = (dateString) => {
     year: "numeric",
   });
 };
+
+export const findSortIndexByCategory = (data) => {
+    const sortMapping = {
+        'Highlights': 'highlightSubCategoryIndex',
+        'Premium': 'premiumSubCategoryIndex',
+        'Main': 'categorySortIndex',
+        'L1': 'l1SubCategoryIndex',
+        'L2': 'l2SubCategoryIndex'
+    }
+    const sortIndex = data?.sortTitle?.[0];
+
+    return sortIndex ? sortMapping[sortIndex] : null;
+};
