@@ -1,10 +1,8 @@
-import React from 'react'
-import Listing from './Listing'
-import InstaFeedback from '../common/InstagramFeed'
-import OurCategories from '../common/OurCategories'
-import OurProjects from './OurProjects'
-
-const chairImage = "wix:image://v1/339f77_1bf80cddc0bd48d78d7c221389c03cc9~mv2.jpg/file.jpg#originWidth=3089&originHeight=4633";
+"use client";
+import React from 'react';
+import Listing from './Listing';
+import OurCategories from '../common/OurCategories';
+import { loaderActions } from '@/store/loaderStore';
 
 export const Categories = ({ slug }) => {
   const categories = [
@@ -882,10 +880,19 @@ export const Categories = ({ slug }) => {
       }
     }
   ]
+
+  const handleShowLoading = () => {
+    loaderActions.show('Loading... Please wait');
+    setTimeout(() => {
+      loaderActions.hide();
+    }, 2000);
+  };
+
   return (
     <>
+      <button onClick={handleShowLoading} style={{padding: '8px 16px', background: '#222', color: '#fff', borderRadius: 4, marginBottom: 16}}>Show Loading</button>
       <Listing slug={slug} products={products} />
       <OurCategories data={categories} pageDetails={{ ourCategoriesTitle: "Our Categories" }} />
     </>
-  )
+  );
 }
