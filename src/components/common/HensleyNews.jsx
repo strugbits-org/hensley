@@ -6,17 +6,17 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import NewsCard from './NewsCard';
 
-export const HensleyNews = ({ data, pageDetails }) => {
+export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center" }) => {
     const { hensleyNewsTitle } = pageDetails;
 
     const sliderInstance = useRef();
 
     const [sliderRef] = useKeenSlider(
         {
-            loop: true,
+            loop: loop,
             mode: "free-snap",
             slides: {
-                origin: "center",
+                origin: origin,
                 perView: 4,
                 spacing: 4,
             },

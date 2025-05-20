@@ -1,10 +1,8 @@
 import React from 'react'
 import PortfolioSlider from '../common/PortfolioSlider'
 import SectionTitle from '../common/SectionTitle'
-import { Banner } from '../common/Banner'
 
 const PortfolioSection = () => {
-
 
     return (
         <div className='bg-primary w-full'>

@@ -2,7 +2,7 @@
 
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
-import { fetchBestSellers, fetchBlogsData, fetchHomePageDetails, fetchMarketsData, fetchOurCategoriesData, fetchPortfolioData, fetchTestimonials } from "..";
+import { fetchBannerData, fetchBestSellers, fetchBlogsData, fetchHomePageDetails, fetchMarketsData, fetchOurCategoriesData, fetchPortfolioData, fetchTestimonials } from "..";
 
 export const fetchHomePageData = async () => {
   try {
@@ -17,7 +17,7 @@ export const fetchHomePageData = async () => {
       marketsData,
       blogsData
     ] = await Promise.all([
-      queryCollection({ dataCollectionId: "BannerHomePage" }),
+      fetchBannerData(),
       queryCollection({ dataCollectionId: "HeroSectionDataHome" }),
       fetchHomePageDetails(),
       fetchOurCategoriesData(),
@@ -33,8 +33,8 @@ export const fetchHomePageData = async () => {
     }
 
     const response = {
-      bannerData: bannerData.items[0],
       heroSectionData: heroSectionData.items[0],
+      bannerData,
       homePageDetails,
       categoriesData,
       portfolioData,

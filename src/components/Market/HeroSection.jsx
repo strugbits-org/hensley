@@ -7,23 +7,14 @@ import { convertToHTML } from "@/utils/renderRichText";
 import { VideoPlayer } from "../common/helpers/VideoPlayer";
 
 function HeroSection({ data = {} }) {
-  console.log("HeroSection data:", data);
 
-  const {
-    title,
-    tagline = "WE HAVE A BIG SOFT SPOT FOR MILESTONE EVENTS BECAUSE THEY ARE SO PERSONAL.",
-    image1,
-    content1,
-    buttonLabel,
-    video,
-    buttonLink = "#",
-  } = data;
+  const { title, tagline, image1, content1, buttonLabel, video, buttonLink = "#" } = data;
 
   return (
     <div className="w-full">
       {/* First Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px] h-screen py-6">
-        <div className="border bg-secondary-glass p-6 md:p-12 lg:p-16 flex flex-col justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px] h-screen mb-10 lg:mb-0 p-6 lg:px-0">
+        <div className="bg-secondary-glass p-6 md:p-12 lg:p-16 flex flex-col justify-center">
           <div className="lg:max-w-[600px] lg:text-left text-center ml-auto mr-0">
             <p className="text-secondary uppercase text-lg
             sm:text-[14px]
@@ -47,14 +38,14 @@ function HeroSection({ data = {} }) {
           </div>
         </div>
         <div className="w-full">
-          <PrimaryImage url={image1} alt="Hensley Events" customClasses="min-h-[400px] lg:min-h-[600px] w-full h-full" />
+          <PrimaryImage url={image1} alt="Hensley Events" max_h={600} customClasses="min-h-[400px] lg:min-h-[600px] w-full h-full" />
         </div>
       </div>
 
       {/* Second Section */}
       <div className="bg-primary p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 border border-primary-border">
-          <div className="relative min-h-[400px] m-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 border border-primary-border items-center">
+          <div className="relative min-h-[600px] m-6">
             <VideoPlayer url={video} classes={"h-[600px]"} />
           </div>
           <div className="p-6 md:p-12 lg:pl-16 xl:p-28 flex flex-col justify-center">

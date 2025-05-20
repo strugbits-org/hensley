@@ -9,15 +9,10 @@ import heroImage from "@/assets/Atrium 5-X2.png";
 import leftArrow from "@/assets/icons/leftArrow.svg";
 import arrow from "@/assets/icons/arrow.svg";
 import rightArrow from "../../assets/icons/rightArrow.svg";
-import { useMediaQuery } from "@uidotdev/usehooks"; // ✅ Added usehook
 
 function PortfolioSlider({ display, tab = false, cardCss }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderInstance = useRef(null);
-
-  // ✅ Replaces manual window.innerWidth checks
-  const isMobile = useMediaQuery("(max-width: 768px)");
-  const isTablet = useMediaQuery("(min-width: 641px) and (max-width: 1024px)");
 
   const [sliderRef] = useKeenSlider(
     {

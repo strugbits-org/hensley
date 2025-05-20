@@ -13,7 +13,6 @@ export const BestSellers = ({ data, pageDetails }) => {
 
     const [sliderRef] = useKeenSlider(
         {
-            loop: true,
             mode: "free-snap",
             slides: {
                 origin: "center",

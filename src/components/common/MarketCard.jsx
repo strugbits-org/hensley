@@ -2,10 +2,10 @@ import React from 'react'
 import { PrimaryImage } from './PrimaryImage'
 import { CustomLink } from './CustomLink';
 
-export const MarketCard = ({ data }) => {
+export const MarketCard = ({ data, size }) => {
     const { title, image1 } = data;
     return (
-        <CustomLink to={`/market${data.slug}`} className='relative group w-full lg:w-1/3 border border-primary-border min-h-[382px] lg:min-h-[608px] overflow-hidden'>
+        <CustomLink to={`/market${data.slug}`} className={`relative group w-full border border-primary-border min-h-[382px] lg:min-h-[608px] overflow-hidden ${size === "large" ? "lg:w-1/2" : "lg:w-1/3"}`}>
             <div className='absolute inset-0 p-6 group-hover:p-0 transition-all duration-300 ease-in-out'>
                 <PrimaryImage timeout={0} url={image1} alt={title} customClasses='h-full w-full object-cover' />
             </div>

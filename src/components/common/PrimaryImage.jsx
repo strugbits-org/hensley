@@ -12,6 +12,8 @@ export const PrimaryImage = ({
     q = "90",
     min_w,
     min_h,
+    max_w,
+    max_h,
     customClasses = "",
     alt = "",
     attributes = {},
@@ -19,12 +21,16 @@ export const PrimaryImage = ({
     timeout = 200,
     useNextImage = false
 }) => {
-    if (!url) return null;
-
-    const ref = useRef(null);
-    const [dimensions, setDimensions] = useState({
-        width: defaultDimensions.width,
-        height: defaultDimensions.height
+    if (!url) return null;    const ref = useRef(null);
+    const [dimensions, setDimensions] = useState(() => {
+        // Apply max constraints to default dimensions if provided
+        let width = defaultDimensions.width;
+        let height = defaultDimensions.height;
+        
+        if (max_w && width > max_w) width = max_w;
+        if (max_h && height > max_h) height = max_h;
+        
+        return { width, height };
     });
     const [isLoaded, setIsLoaded] = useState(false);
 
@@ -55,17 +61,20 @@ export const PrimaryImage = ({
         const newWidth = ref.current.clientWidth;
         const newHeight = ref.current.clientHeight;
 
-        const width = min_w && min_w > newWidth ? min_w : newWidth || defaultDimensions.width;
-        const height = min_h && min_h > newHeight ? min_h : newHeight || defaultDimensions.height;
+        // Apply min/max constraints
+        let width = min_w && min_w > newWidth ? min_w : newWidth || defaultDimensions.width;
+        let height = min_h && min_h > newHeight ? min_h : newHeight || defaultDimensions.height;
+
+        // Apply max constraints if provided
+        if (max_w && width > max_w) width = max_w;
+        if (max_h && height > max_h) height = max_h;
 
         if (width !== dimensions.width || height !== dimensions.height) {
             setDimensions({ width, height });
         }
-    };
-
-    const handleResize = useMemo(() =>
+    };    const handleResize = useMemo(() =>
         debounce(updateDimensions, 200),
-        []);
+        [min_w, min_h, max_w, max_h, defaultDimensions]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
