@@ -6,16 +6,17 @@ import ProductCard from '../common/ProductCard'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 
-export const BestSellers = ({ data, pageDetails }) => {
+export const BestSellers = ({ data, pageDetails, loop = true, origin = "center" }) => {
     const { bestSellerTitle } = pageDetails;
 
     const sliderInstance = useRef();
 
     const [sliderRef] = useKeenSlider(
         {
+            loop,
             mode: "free-snap",
             slides: {
-                origin: "center",
+                origin,
                 perView: 4,
                 spacing: 4,
             },
@@ -74,13 +75,6 @@ export const BestSellers = ({ data, pageDetails }) => {
                     </button>
                 </div>
             </div>
-            {/* <ProductCard
-            imageSrc={chairImage}
-            title="POLTRONA MONTANA"
-            code="MODCH39"
-            dimensions='24”L X 30”W X 37”H'
-            onAddToCart={() => console.log('Added to cart')}
-          /> */}
         </div>
     )
 }
