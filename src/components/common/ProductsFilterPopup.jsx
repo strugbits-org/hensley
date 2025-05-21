@@ -6,7 +6,7 @@ export const ProductsFilterPopup = ({ selectedCategory, subCategories, onFilterC
     const [isActive, setIsActive] = useState(false);
     return (
         <div className={`lg:hidden z-10 absolute right-6 top-1/2 translate-y-[-50%]`}>
-            <div className={`absolute right-full top-0 flex z-20 justify-center items-center size-[55px] border border-secondary-alt rounded-[50px]`}>
+            <div className={`absolute right-full top-0 flex z-20 justify-center items-center w-[55px] h-[55px] border border-secondary-alt rounded-[50px]`}>
                 <Image
                     src={catTab}
                     onClick={() => setIsActive(!isActive)}
