@@ -1,4 +1,11 @@
-export default function Loading({ inline = true }) {
+export default function Loading({ inline = true, custom = false, classes = "" }) {
+    if (custom) {
+        return (
+            <div className={classes}>
+                <div className="loader"></div>
+            </div>
+        )
+    }
     return inline ? (
         <div className='z-[999] bg-primary-alt h-screen w-full flex items-center justify-center'>
             <div className="loader"></div>

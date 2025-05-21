@@ -1,15 +1,18 @@
-import { Categories } from "@/components/Category";
+import { ProductsListing } from "@/components/Category";
+import { fetchSelectedCollectionData } from "@/services/collections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
-export default async function Page({params}) {
+export default async function Page({ params }) {
   try {
-
-     const slug = decodeURIComponent(params.slug);
-     console.log("The Slug is: ",slug);
+    const slug = decodeURIComponent(params.slug);
+    if (!slug) {
+      throw new Error("Slug is required");
+    }
+    const data = await fetchSelectedCollectionData(slug);
 
     return (
-        <Categories slug={slug} />
+      <ProductsListing slug={slug} data={data} />
     );
   } catch (error) {
     logError("Error fetching category page data:", error);

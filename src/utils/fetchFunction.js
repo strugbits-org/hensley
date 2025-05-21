@@ -42,7 +42,7 @@ const queryCollection = async (payload) => {
       ne = [],
       hasSome = [],
       skip,
-      increasedLimit = 50,
+      extendedLimit = 50,
       sortOrder,
       sortKey,
       isNotEmpty,
@@ -113,7 +113,7 @@ const queryCollection = async (payload) => {
     const useInfiniteScroll = limit === "infinite";
 
     if (useInfiniteScroll) {
-      dataQuery = dataQuery.limit(increasedLimit);
+      dataQuery = dataQuery.limit(extendedLimit);
     } else if (limit) {
       dataQuery = dataQuery.limit(limit);
     }

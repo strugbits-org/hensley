@@ -7,7 +7,7 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
     return (
-        <div className={`max-w-[450px] relative group transition-all duration-300 ease-in-out  border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white' : ''}`}>
+        <div className={`max-w-[450px] relative group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white' : ''}`}>
             <div className={`aspect-[0.84] max-w-[436px] overflow-hidden flex justify-center items-center ${type === 'listing' ? 'bg-white' : ''}`}>
                 <PrimaryImage alt={name} url={product.mainMedia} fit='fit' customClasses={"transition-transform duration-300 group-hover:scale-105"} />
             </div>
@@ -56,7 +56,7 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
                 </div>
             </div>
 
-            <div className="group/cart absolute right-[24px] top-[23px] border border-black rounded-full w-[56px] h-[56px] flex items-center justify-center shrink-0 cursor-pointer">
+            <div className="group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full w-[56px] h-[56px] flex items-center justify-center shrink-0 cursor-pointer">
                 <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg" alt="Cart Icon" customClasses={"block group-hover/cart:hidden"} />
                 <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg" alt="Cart Icon" customClasses={"hidden group-hover/cart:block"} />
             </div>

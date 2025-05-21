@@ -49,7 +49,7 @@ const Careers = () => {
     <>
     <CareerOppurtunities />
     <Testimonials data={testimonials} pageDetails={{testimonialsTitle:"who works"}}/>
-    <PortfolioSlider display={true} cardCss={'border border-[#E0D6CA]'}/>
+    <PortfolioSlider display={true} cardCss={'border border-primary-border'}/>
     <JobBoard />
 
     </>

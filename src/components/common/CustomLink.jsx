@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-// import { pageLoadEnd, pageLoadStart } from "@/Utils/AnimationFunctions";
+import { loaderActions } from '@/store/loaderStore';
 
 export const CustomLink = ({ to, children, className, target, attributes, onClick }) => {
   const router = useRouter();
@@ -14,13 +14,13 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
     if (to === undefined || !to || to === "") return;
 
     if (pathname === to) {
-    //   pageLoadStart(false);
-    //   setTimeout(() => pageLoadEnd(), 900);
+      loaderActions.show();
+      setTimeout(() => loaderActions.hide(), 900);
       return;
     }
 
     if (target === undefined || !target || target === "") {
-    //   pageLoadStart();
+      loaderActions.show();
       setTimeout(() => {
         router.push(to);
         router.refresh();
