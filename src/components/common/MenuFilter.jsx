@@ -8,7 +8,7 @@ const Checkbox = ({ label, onChange, checked }) => (
             onChange={onChange}
             checked={checked}
         />
-        <div className="relative w-5 h-5 border-[1.5px] border-secondary-alt bg-transparnt">
+        <div className="relative w-5 h-5 border-[1.5px] border-secondary-alt bg-transparent">
             {checked && (
                 <div className="absolute inset-0 bg-white flex items-center justify-center">
                     <div className="w-3 h-3 bg-secondary-alt"></div>
