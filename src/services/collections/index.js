@@ -85,7 +85,7 @@ export const fetchCategorysSortStructure = async (categoryId) => {
         }
         return response.items[0];
     } catch (error) {
-        logError(`Error fetching subcategories data: ${error.message}`, error);
+        logError(`Error fetching category sort structure: ${error.message}`, error);
     }
 }
 
