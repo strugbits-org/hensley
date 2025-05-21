@@ -1,3 +1,4 @@
+"use server";
 import { findSortIndexByCategory, logError } from "@/utils";
 import { fetchCategoriesData } from "../products";
 import { fetchOurCategoriesData } from "..";
@@ -122,10 +123,14 @@ export const fetchSortedProducts = async ({ collectionIds, limit = 12, skip = 0,
         }
 
         const response = await queryCollection(payload);
+
         if (!Array.isArray(response.items)) {
             throw new Error(`Response does not contain items array`);
         }
-        return response.items;
+        return {
+            items: response.items,
+            hasNext: response.paging.hasNext
+        };
 
     } catch (error) {
         logError(`Error fetching sorted products data: ${error.message}`, error);

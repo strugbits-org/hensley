@@ -1,96 +1,143 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import ProductCard from '../common/ProductCard'
-import Image from 'next/image'
-import catTab from '@/assets/icons/cat-tab.svg'
 import FilterMenu from '../common/MenuFilter'
-import SubCategories from '../common/SubCategories'
+import FilterCardSubCategories from '../common/FilterCardSubCategories'
+import { ProductBanner } from '../common/ProductBanner'
+import BannerImg from '@/assets/banner.png'
+import Loading from '@/app/loading'
+import AutoClickWrapper from '../common/helpers/AutoClickWrapper'
+import { fetchSortedProducts } from '@/services/collections'
+import { logError } from '@/utils'
+import { ProductsFilterPopup } from '../common/ProductsFilterPopup'
 
-const filterData = [
-  {
-    title: "Tents",
-    children: [
-      { label: "Chargers" },
-      { label: "Tension tents" },
-      { label: "Frame tents" },
-    ],
-  },
-  {
-    title: "Lighting",
-    children: [
-      { label: "String Lights" },
-      {
-        title: "LED Options",
-        children: [
-          { label: "White LEDs" },
-          { label: "RGB LEDs" },
-        ],
-      },
-    ],
-  },
-];
+// Debounce utility function
+const useDebounce = (callback, delay) => {
+  const timeoutRef = useRef(null);
+
+  return useCallback((...args) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]);
+};
 
 function Listing({ data }) {
-  const { selectedCategory, sortedProducts } = data;
-  const [isOpen, setIsOpen] = useState(false);
-  const [products, setProducts] = useState([]);
+  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex } = data;
 
-  const toggleList = () => {
-    setIsOpen(!isOpen);
+  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Extract common fetch logic into a reusable function
+  const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
+    const activeCollectionIds = newFilters.length > 0
+      ? newFilters.map(f => f._id)
+      : collectionIds;
+
+    try {
+      const newSortedProducts = await fetchSortedProducts({
+        collectionIds: activeCollectionIds,
+        limit: 12,
+        skip: newSkip,
+        sortIndex
+      });
+
+      if (isLoadMore) {
+        setProducts(prevProducts => [...prevProducts, ...newSortedProducts.items]);
+      } else {
+        setProducts(newSortedProducts.items);
+      }
+
+      setHasMore(newSortedProducts.hasNext);
+      return newSortedProducts;
+    } catch (error) {
+      logError(`Error fetching ${isLoadMore ? 'more' : 'sorted'} products:`, error);
+      return null;
+    }
+  }, [collectionIds, selectedFilters, sortIndex]);
+
+  const debouncedFetchForFilters = useDebounce((newFilters) => {
+    fetchProducts({ newFilters, isLoadMore: false, newSkip: 0 })
+      .finally(() => setIsLoading(false));
+  }, 300);
+
+  const handleFilterChange = (filter) => {
+    const isSelected = selectedFilters.some(f => f._id === filter._id);
+    const newFilters = isSelected
+      ? selectedFilters.filter(f => f._id !== filter._id)
+      : [...selectedFilters, filter];
+
+    setSelectedFilters(newFilters);
+    setIsLoading(true);
+    debouncedFetchForFilters(newFilters);
+  };
+
+  const handleLoadMore = async () => {
+    if (!hasMore) return;
+    await fetchProducts({
+      isLoadMore: true,
+      newSkip: products.length
+    });
   };
 
   useEffect(() => {
-    setProducts(sortedProducts);
+    setProducts(sortedProducts.items);
+    setHasMore(sortedProducts.hasNext);
+    setIsLoading(false);
   }, [sortedProducts]);
 
   return (
     <>
       <div className='w-full relative'>
         <SectionTitle text={selectedCategory?.name} classes="text-[35px] pt-[40px] pb-[40px] border-none" />
-        <div
-          className={`lg:hidden absolute top-[40px] sm:right-[10%] right-[2%] z-[9999] ${isOpen ? 'min-h-[300px] w-[330px] px-[20px] py-[40px]' : 'h-[55px] w-[55px]'} rounded-[50px] bg-white flex flex-col`}
-        >
-          <div
-            className={`flex flex-1 items-center ${isOpen ? 'justify-end px-4' : 'justify-center'
-              }`}
-          >
-
-            <Image
-              src={catTab}
-              onClick={toggleList}
-              className={`absolute ${isOpen && 'right-[18px] top-[19px]'}`}
-            />
-          </div>
-          {isOpen && (
-            <div>
-              <FilterMenu items={filterData} />
-            </div>
-          )}
-        </div>
+        <ProductsFilterPopup
+          selectedCategory={selectedCategory}
+          subCategories={subCategories}
+          onFilterChange={handleFilterChange}
+          selectedFilters={selectedFilters}
+        />
       </div>
 
-      <SubCategories />
+      <FilterCardSubCategories data={subCategories} />
 
       <div className="w-full flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:px-0 px-[12px]">
         <div className="lg:w-1/4 w-full lg:h-screen pl-[24px] lg:block hidden">
-          <FilterMenu items={filterData} />
+          <FilterMenu
+            selectedCategory={selectedCategory}
+            items={subCategories}
+            onFilterChange={handleFilterChange}
+            selectedFilters={selectedFilters}
+          />
         </div>
-        <div className="w-full lg:w-3/4 min-h-screen grid sm:grid-cols-3 grid-cols-2 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px]
-         lg:pb-[28px] lg:pt-[28px] 
-         sm:pt-[12px] sm:pb-[12px]
-         pb-[12px]
-        lg:border-t lg:border-b">
-          {products.map((productData, index) => {
-            return (
-              <ProductCard
-                key={index}
-                data={productData}
-                onAddToCart={() => console.log('Added to cart')}
-              />
-            )
-          })}
+        <div className="w-full lg:w-3/4 min-h-screen pr-6 lg:pb-[28px] lg:pt-[28px] sm:pt-[12px] sm:pb-[12px] pb-[12px] lg:border-t lg:border-b border-primary-border">
+          <div className="grid sm:grid-cols-3 grid-cols-2 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px]">
+            {products.map((productData, index) => {
+              return (
+                <ProductCard
+                  key={productData._id}
+                  data={productData}
+                  onAddToCart={() => console.log('Added to cart')}
+                />
+              );
+            })}
+          </div>
+
+          {!isLoading && hasMore && (
+            <AutoClickWrapper onIntersect={handleLoadMore}>
+              <Loading custom={true} classes='w-full flex justify-center p-6' />
+            </AutoClickWrapper>
+          )}
+
+          {isLoading && (<Loading custom={true} classes='w-full flex justify-center p-6' />)}
+          <ProductBanner img={BannerImg} />
         </div>
       </div>
     </>
