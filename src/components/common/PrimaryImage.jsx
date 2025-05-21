@@ -133,7 +133,9 @@ export const PrimaryImage = ({
             handleResize.cancel();
             window.removeEventListener('resize', handleResize);
         };
-    }, [timeout, handleResize, updateDimensions]); const imageProps = {
+    }, [timeout, handleResize, updateDimensions]);
+
+    const imageProps = {
         ref,
         className: customClasses,
         alt: alt || "Image",
