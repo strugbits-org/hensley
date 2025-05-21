@@ -9,7 +9,7 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
     return (
         <div className={`max-w-[450px] relative group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white' : ''}`}>
             <div className={`aspect-[0.84] max-w-[436px] overflow-hidden flex justify-center items-center ${type === 'listing' ? 'bg-white' : ''}`}>
-                <PrimaryImage alt={name} url={product.mainMedia} fit='fit' customClasses={"transition-transform duration-300 group-hover:scale-105"} />
+                <PrimaryImage timeout={0} alt={name} url={product.mainMedia} fit='fit' customClasses={"min-w-1/2 transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
             <div className="max-w-full flex-wrap pt-2 lg:pt-6 lg:pb-2">

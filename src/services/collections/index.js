@@ -6,23 +6,22 @@ import queryCollection from "@/utils/fetchFunction";
 
 export const fetchSelectedCollectionData = async (slug) => {
     try {
-        const categoriesData = await fetchCategoriesData();
+        const [ourCategoriesData, categoriesData, categoriesSortData, productBannersData] = await Promise.all([
+            fetchOurCategoriesData(),
+            fetchCategoriesData(),
+            fetchCategoriesSortStructure(),
+            fetchProductBannersData()
+        ]);
 
         const selectedCategory = categoriesData.find(category => category.slug === slug);
         if (!selectedCategory) {
             throw new Error(`Category with slug "${slug}" not found`);
         }
 
-        const [ourCategoriesData, subCategoriesData, categorySortData, productBannersData] = await Promise.all([
-            fetchOurCategoriesData(),
-            fetchSubcategoriesData(selectedCategory._id),
-            fetchCategorysSortStructure(selectedCategory._id),
-            fetchProductBannersData()
-        ]);
-
+        const subCategoriesData = await fetchSubcategoriesData(selectedCategory._id);
         const subCategories = subCategoriesData?.subcategories || [];
         const collectionIds = [selectedCategory._id, ...subCategories.map(item => item._id)];
-        const sortIndex = findSortIndexByCategory(categorySortData);
+        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory._id);
 
         const sortedProducts = await fetchSortedProducts({
             collectionIds,
@@ -35,7 +34,7 @@ export const fetchSelectedCollectionData = async (slug) => {
             selectedCategory,
             ourCategoriesData,
             subCategories,
-            categorySortData,
+            categoriesSortData,
             productBannersData,
             collectionIds,
             sortIndex,
@@ -69,21 +68,16 @@ export const fetchSubcategoriesData = async (categoryId) => {
     }
 }
 
-export const fetchCategorysSortStructure = async (categoryId) => {
+export const fetchCategoriesSortStructure = async () => {
     try {
         const response = await queryCollection({
             dataCollectionId: "CategorySortStructure",
-            eq: [
-                {
-                    key: "collections",
-                    value: categoryId
-                }
-            ]
+            limit: 1000,
         });
         if (!Array.isArray(response.items)) {
             throw new Error(`Response does not contain items array`);
         }
-        return response.items[0];
+        return response.items;
     } catch (error) {
         logError(`Error fetching category sort structure: ${error.message}`, error);
     }

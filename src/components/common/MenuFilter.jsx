@@ -50,7 +50,7 @@ const CollapsibleSection = ({ title, children }) => {
 const FilterMenu = ({ items, selectedCategory, onFilterChange, selectedFilters = [], type }) => {
     return (
         <div className="text-[#3E3E3E] font-sans w-full">
-            <div className={`lg:border-t border-b w-full lg:py-[14px] border-primary-border ${type === 'popup' ? 'border-t-0' : ''}`}>
+            <div className={`lg:border-t border-b w-full lg:py-[14px] border-primary-border ${type === 'popup' ? 'border-t-0 pb-2' : ''}`}>
                 <h4 className="font-bold font-haasBold uppercase lg:text-[18px] sm:text-[14px]">CATEGORIES</h4>
             </div>
             <div className="flex flex-col h-full mt-3">
