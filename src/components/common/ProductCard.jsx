@@ -7,9 +7,9 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
     return (
-        <div className={`relative group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white' : ''}`}>
-            <div className={`h-full overflow-hidden flex justify-center items-center min-h-[600px] p-10 ${type === 'listing' ? 'bg-white' : ''}`}>
-                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"} />
+        <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
+            <div className={`h-full overflow-hidden flex justify-center items-center p-10 ${type === 'listing' ? 'bg-white' : ''}`}>
+                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
             <div className="max-w-full flex-wrap pt-2 lg:pt-6 lg:pb-2">

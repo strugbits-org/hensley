@@ -17,7 +17,7 @@ export const PrimaryImage = ({
     alt = "",
     attributes,
     defaultDimensions,
-    timeout = 200,
+    timeout = 100,
     useNextImage = false
 }) => {
 
@@ -61,7 +61,7 @@ export const PrimaryImage = ({
     const handleResize = debounce(() => {
         const newSrc = generateSrc();
         setSrc(newSrc);
-    }, 2000);
+    }, 1000);
 
     useEffect(() => {
         setTimeout(() => {

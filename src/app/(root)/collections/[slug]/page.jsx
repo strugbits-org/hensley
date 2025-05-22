@@ -1,4 +1,4 @@
-import { ProductsListing } from "@/components/Category";
+import { ProductsListing } from "@/components/Collections";
 import { fetchSelectedCollectionData } from "@/services/collections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
