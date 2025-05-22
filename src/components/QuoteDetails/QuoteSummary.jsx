@@ -1,26 +1,21 @@
 import React from 'react'
-import {CartCollection, CartNormal, CartTent} from './CartItems'
-import CartHeading from './CartHeading'
+import { CartTent,CartCollection,CartNormal } from './CartItems'
 import PriceDisplay from './PriceDisplay'
-import { AddToQuote } from './AddtoQuoteButton'
+import CartHeading from './CartHeading'
 
-const Cart = () => {
+const QuoteSummary = () => {
   return (
-    <>
-    <div className='w-full min-h-screen flex lg:flex-row flex-col'>
+      <div className='w-full flex lg:flex-row flex-col'>
         <div className='lg:w-[30%] border lg:pl-[24px] py-[36px] lg:pr-[95px]'>
             <PriceDisplay />
         </div>
         <div className='lg:w-[70%] border'>
-            <CartHeading />
             <CartTent />
             <CartCollection />
             <CartNormal />
         </div>
     </div>
-    <AddToQuote text={"request to quote"}/>
-    </>
   )
 }
 
-export default Cart
+export default QuoteSummary

@@ -129,7 +129,7 @@ const CartTent = () => {
                     <span className='block text-[12px] font-haasLight uppercase'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel diam est. Mauris mattis lacinia tellus, luctus accumsan libero euismod in. Aenean sagittis nibh odio, id vulputate mi ornare sit amet. In vitae sapien nec lorem vehicula ultrices sodales vitae lectus. Sed felis arcu, pretium eu mi sed, venenatis vulputate dui. Vivamus hendrerit velit et arcu placerat faucibus. Mauris ante dui, fringilla consectetur tortor nec, </span>
                 </div>
             </div>
-            <button className='absolute right-[24px] top-[66px]'>
+            <button className='absolute right-[24px]  sm:top-[50px] top-[15px]'>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
                     <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
                         <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" stroke-width="1" />
@@ -194,7 +194,7 @@ const CartCollection = () => {
                 sm:mb-[27px]
                 mr-[100px]
                 '>rs 210</span>
-                    <button className='absolute right-[24px] top-[50px]'>
+                    <button className='absolute right-[24px] sm:top-[50px] top-[15px]'>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
                             <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
                                 <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" stroke-width="1" />
@@ -204,13 +204,13 @@ const CartCollection = () => {
 
                     </button>
                 </div>
-                <table className="sm:max-w-[766px] text-left border-separate border-spacing-y-[15px]">
+                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px]">
                     <thead>
-                        <tr className="text-xs uppercase text-gray-500 border-b border-black">
-                            <td className="pb-2 w-1/4 lg:block hidden text-[16px] uppercase font-haasLight text-secondary-alt"></td>
-                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt"></td>
-                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt"></td>
-                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt"></td>
+                        <tr className="text-xs max-lg:hidden uppercase text-gray-500 border-b border-black">
+                            <td className="pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt">Product</td>
+                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt">Size</td>
+                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt">Price</td>
+                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt">Quantity</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -229,10 +229,8 @@ const CartCollection = () => {
                                 <td className="text-center border-b">{item.size}</td>
                                 <td className="text-center border-b ">{item.price}</td>
                                 <td className="border-b border-black">
-                                    <div className="flex items-center justify-center gap-x-[30px]">
-                                        <button className="text-xl font-light">−</button>
+                                    <div className="flex items-center justify-center ">
                                         <span className="font-bold">02</span>
-                                        <button className="text-xl font-light">+</button>
                                     </div>
                                 </td>
                             </tr>
@@ -246,6 +244,81 @@ const CartCollection = () => {
     )
 }
 
+const CartNormal = () => {
+    return (
+        <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
+            <div className='
+            h-[104px]
+            w-[104px]
+           bg-white
+            '>
+                <Image src={image} className='h-full w-full object-contain' />
+            </div>
+            <div className='w-full lg:flex justify-between'>
+                <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>
+                    <span className='block 
+                lg:text-[16px]
+                text-[20px]
+                 text-secondary-alt font-haasRegular uppercase
+                lg:mt-[21px]
+                lg:mb-[27px]
+                '>romana collection</span>
 
+                    <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase
+                lg:mt-[21px]
+                lg:mb-[27px]
+                mr-[100px]
+                '>rs 210</span>
+                </div>
+                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full  text-left border-separate border-spacing-y-[15px] ">
+                    <thead>
+                        <tr className="text-xs  uppercase text-gray-500">
+                            <td className="pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt">Product</td>
+                            <td className="pb-2 w-1/4 max-lg:hidden text-center text-[16px] uppercase font-haasLight text-secondary-alt">Size</td>
+                            <td className="pb-2 w-1/4 max-lg:hidden text-center text-[16px] uppercase font-haasLight text-secondary-alt">Price</td>
+                            <td className="pb-2 w-1/4 max-lg:hidden text-center text-[16px] uppercase font-haasLight text-secondary-alt">Quantity</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {[
+                            { product: 'CHARGER', size: '-', price: '$5.80' },
+                        ].map((item, index) => (
+                            <tr key={index}>
+                                <td className="py-2 font-semibold lg:block hidden ">{item.product}</td>
+                                <td className="text-center ">{item.size}</td>
+                                <td className="text-center  ">{item.price}</td>
+                                <td className=" border-b border-black">
+                                    <div className="flex items-center justify-center">
+                                        <span className="font-bold">02</span>
+                                    </div>
+                                </td>
+                            </tr>
 
-export { CartTent, CartCollection }
+                        ))}
+                    </tbody>
+                </table>
+                <span className='lg:block 
+                  hidden
+                    sm:text-[16px]
+                    text-[20px]
+                     text-secondary-alt font-haasRegular uppercase
+                lg:mt-[21px]
+                sm:mb-[27px]
+                mr-[100px]
+                self-end
+                '>rs 210</span>
+            </div>
+            <button className='absolute right-[24px] sm:top-[35px] top-[15px]'>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
+                    <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
+                        <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" stroke-width="1" />
+                        <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" stroke-width="1" />
+                    </g>
+                </svg>
+
+            </button>
+        </div>
+    )
+}
+
+export { CartTent, CartCollection, CartNormal }

@@ -1,9 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Submit } from "./Button";
 import Datepicker from 'flowbite-datepicker/Datepicker';
 
-export const QuoteRequest = () => {
+export const Form = () => {
   const formConfig = {
     header: {
       title: "QUOTE REQUEST",
@@ -109,6 +108,7 @@ export const QuoteRequest = () => {
                         checked={orderType === type.id}
                         onChange={() => setOrderType(type.id)}
                         className="form-radio h-[34px] w-[34px] accent-[#57442D] focus:ring-[#57442D]"
+                        disabled
                       />
                       <span className="ml-2 font-medium text-secondary-alt font-recklessRegular">{type.label}</span>
                     </label>
@@ -125,7 +125,7 @@ export const QuoteRequest = () => {
         <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {formConfig.eventDetails.fields.slice(0, 3).map((field) => (
-              <div className={`${field.id == "eventDescription" && 'md:col-span-2'}`} key={field.id}>
+              <div key={field.id}>
                 <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">{field.label}</label>
                 <input
                   id={field.id}
@@ -137,16 +137,15 @@ export const QuoteRequest = () => {
                   data-datepicker
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  disabled
                 />
-
-
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {formConfig.eventDetails.fields.slice(3).map((field) => (
-              <div key={field.id}>
+              <div className={`${field.id == "eventDescription" && 'md:col-span-2'}`} key={field.id}>
                 <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">{field.label}</label>
                 <input
                   type={field.type}
@@ -156,6 +155,7 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
@@ -182,6 +182,7 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
@@ -199,6 +200,7 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
@@ -216,6 +218,7 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
@@ -240,6 +243,7 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
@@ -257,6 +261,7 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
@@ -274,6 +279,7 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
@@ -284,7 +290,7 @@ export const QuoteRequest = () => {
 
       {/* Order By */}
       <div className="w-full border-secondary-alt">
-        <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] mt-[56px]">
+        <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] mt-[56px] mb-[80px]">
           <h2 className="text-3xl font-['reckless-neue-regular'] text-center text-secondary-alt mb-8">{formConfig.orderBy.title}</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -299,12 +305,11 @@ export const QuoteRequest = () => {
                   required={field.required}
                   onChange={handleInputChange}
                   value={formData[field.id] || ""}
+                  readOnly
                 />
               </div>
             ))}
           </div>
-          <Submit text={formConfig.submitButton} />
-
         </div>
       </div>
 

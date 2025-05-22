@@ -4,6 +4,7 @@ import { fontFamily } from 'tailwindcss/defaultTheme';
 
 module.exports = {
   content: [
+    "./node_modules/flowbite-datepicker/**/*.js",
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
