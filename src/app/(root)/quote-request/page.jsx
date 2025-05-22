@@ -1,4 +1,4 @@
-import Contact from "@/components/Contact";
+import { QuoteRequest } from "@/components/quote-request";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -6,10 +6,10 @@ export default async function Page() {
   try {
 
     return (
-        <Contact />
+        <QuoteRequest />
     );
   } catch (error) {
-    logError("Error fetching category page data:", error);
+    logError("Error fetching quote request form data:", error);
     notFound();
   }
 }
