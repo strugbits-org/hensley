@@ -4,7 +4,7 @@ import { CustomLink } from './CustomLink';
 export const ProductBanner = ({ data }) => {
     const { title, image, url } = data;
     return (
-        <div className="relative col-span-3 lg:h-[425px] sm:h-[230px] h-[600px] border my-[24px]">
+        <li className="relative col-span-3 lg:h-[425px] sm:h-[230px] h-[600px] border my-[24px]">
             <PrimaryImage url={image} alt={`Banner for ${title}`} customClasses={"w-full h-full absolute inset-0 bg-cover bg-center "} />
             <CustomLink to={url} className='absolute inset-0 z-20 flex justify-end items-center lg:gap-x-[24px] sm:gap-x-[10px] lg:mr-[239px] sm:mr-[100px] gap-x-[15px] '>
                 <svg
@@ -60,6 +60,6 @@ export const ProductBanner = ({ data }) => {
                     {title}
                 </h3>
             </CustomLink>
-        </div>
+        </li>
     )
 }

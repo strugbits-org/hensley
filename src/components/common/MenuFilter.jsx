@@ -8,10 +8,10 @@ const Checkbox = ({ label, onChange, checked }) => (
             onChange={onChange}
             checked={checked}
         />
-        <div className="relative w-5 h-5 border-[1.5px] border-secondary-alt bg-transparent">
+        <div className="relative w-4 h-4 border-[1.5px] border-secondary-alt bg-transparent">
             {checked && (
-                <div className="absolute inset-0 bg-white flex items-center justify-center">
-                    <div className="w-3 h-3 bg-secondary-alt"></div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-2 h-2 bg-secondary-alt"></div>
                 </div>
             )}
         </div>
@@ -48,13 +48,27 @@ const CollapsibleSection = ({ title, children }) => {
 };
 
 const FilterMenu = ({ items, selectedCategory, onFilterChange, selectedFilters = [], type }) => {
+    const isCollapsible = type !== "subCategory";
+
     return (
         <div className="text-[#3E3E3E] font-sans w-full">
-            <div className={`lg:border-t border-b w-full lg:py-[14px] border-primary-border ${type === 'popup' ? 'border-t-0 pb-2' : ''}`}>
-                <h4 className="font-bold font-haasBold uppercase lg:text-[18px] sm:text-[14px]">CATEGORIES</h4>
+            <div className={`lg:border-t border-b w-full lg:py-[14px] border-primary-border ${type === 'popup' ? 'border-t-0 pb-2' : type === 'subCategory' ? 'border-none' : ''}`}>
+                <h4 className="font-bold font-haasBold uppercase lg:text-[18px] sm:text-[14px]">{type === "subCategory" ? "SUBCATEGORY" : "Categories"}</h4>
             </div>
             <div className="flex flex-col h-full mt-3">
-                <CollapsibleSection title={selectedCategory?.name}>
+                {isCollapsible ? (
+                    <CollapsibleSection title={selectedCategory?.name}>
+                        <div className="space-y-3">
+                            {items.map((item, index) => (
+                                <Checkbox
+                                    key={index}
+                                    label={item.name}
+                                    onChange={() => onFilterChange(item)}
+                                    checked={selectedFilters.some(filter => filter._id === item._id)}
+                                />
+                            ))}
+                        </div>
+                    </CollapsibleSection>) : (
                     <div className="space-y-3">
                         {items.map((item, index) => (
                             <Checkbox
@@ -65,7 +79,7 @@ const FilterMenu = ({ items, selectedCategory, onFilterChange, selectedFilters =
                             />
                         ))}
                     </div>
-                </CollapsibleSection>
+                )}
             </div>
         </div>
     );
