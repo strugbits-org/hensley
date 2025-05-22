@@ -86,15 +86,15 @@ export const insertBreaks = (str, interval, onlyFirst = false) => {
 export const copyToClipboard = (text) => navigator.clipboard.writeText(text);
 
 export const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-  });
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    });
 };
 
-export const findSortIndexByCategory = (data) => {
+export const findSortIndexByCategory = (data, categoryId) => {
     const sortMapping = {
         'Highlights': 'highlightSubCategoryIndex',
         'Premium': 'premiumSubCategoryIndex',
@@ -102,7 +102,7 @@ export const findSortIndexByCategory = (data) => {
         'L1': 'l1SubCategoryIndex',
         'L2': 'l2SubCategoryIndex'
     }
-    const sortIndex = data?.sortTitle?.[0];
-
+    const category = data?.find(item => item.collections === categoryId);    
+    const sortIndex = category?.sortTitle?.[0];
     return sortIndex ? sortMapping[sortIndex] : null;
 };

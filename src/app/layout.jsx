@@ -6,6 +6,7 @@ import { fetchFooterData, fetchHeaderData, fetchHomePageDetails, fetchInstagramF
 import InstagramFeed from "@/components/common/InstagramFeed";
 import Loader from "@/components/common/Loader";
 import LoaderProvider from "@/components/common/providers/LoaderProvider";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -49,6 +50,7 @@ const recklessNeueMedium = localFont({
 
 export const metadata = {
   title: "RENTALS | Hensley Event Resources",
+  robots: "noindex,nofollow",
 };
 
 export default async function RootLayout({ children }) {
@@ -80,6 +82,7 @@ export default async function RootLayout({ children }) {
         </main>
         <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
+        <SpeedInsights />
         <Loader />
       </body>
     </html>
