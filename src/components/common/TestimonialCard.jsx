@@ -6,7 +6,7 @@ export const TestimonialCard = ({ data, classes }) => {
     return (
         <div className={`flex flex-col lg:flex-row group lg:hover:bg-primary bg-primary lg:bg-transparent relative min-h-[499px] lg:h-full w-full lg:border border-primary-border duration-300 ease-in-out max-w-[1240px] flex-shrink-0 ${classes}`}>
             <div className='w-full lg:w-1/2 max-h-[364px] lg:max-h-none h-full relative flex p-3 lg:p-6 group-hover:lg:p-0 transition-all duration-300 ease-in-out'>
-                <PrimaryImage url={image} alt={title} customClasses="grow" max_h={600} />
+                <PrimaryImage url={image} alt={title} customClasses="grow" />
             </div>
             <div className='w-full lg:w-1/2 p-6 flex flex-col'>
                 <h2 className='text-center lg:text-start text-[35px] leading-[42px] lg:text-[45px] lg:leading-[42px] uppercase tracking-wider text-secondary-alt font-recklessRegular mb-2'>{name}</h2>

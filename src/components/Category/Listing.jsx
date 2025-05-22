@@ -132,16 +132,16 @@ function Listing({ data }) {
       <FilterCardSubCategories data={subCategories} />
 
       <div className="w-full flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:px-0 px-[12px]">
-        <div className="lg:w-1/4 w-full lg:h-screen pl-[24px] lg:block hidden">
+        {subCategories.length > 0 && (<div className="lg:w-1/4 w-full lg:h-screen pl-[24px] lg:block hidden">
           <FilterMenu
             selectedCategory={selectedCategory}
             items={subCategories}
             onFilterChange={handleFilterChange}
             selectedFilters={selectedFilters}
           />
-        </div>
-        <div className="w-full lg:w-3/4 min-h-screen pr-6 lg:pb-[28px] lg:pt-[28px] sm:pt-[12px] sm:pb-[12px] pb-[12px] lg:border-t lg:border-b border-primary-border">
-          <div className="grid sm:grid-cols-3 grid-cols-2 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px]">
+        </div>)}
+        <div className={`w-full min-h-screen lg:pb-[28px] lg:pt-[28px] sm:pt-[12px] sm:pb-[12px] pb-[12px] lg:border-t lg:border-b border-primary-border ${subCategories.length > 0 ? 'lg:w-3/4 pr-6' : 'lg:w-full px-6'}`}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px] ${subCategories.length > 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
             {products.map((productData, index) => {
               const shouldInsertBanner = (index + 1) % 12 === 0 && bannersDesktop.length > 0;
               if (shouldInsertBanner) bannerIndex = (bannerIndex + 1) % bannersDesktop.length;
