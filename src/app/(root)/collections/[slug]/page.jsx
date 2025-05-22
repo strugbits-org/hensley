@@ -1,4 +1,4 @@
-import { ProductsListing } from "@/components/Collections";
+import { CollectionPage } from "@/components/Collections";
 import { fetchSelectedCollectionData } from "@/services/collections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
@@ -12,10 +12,10 @@ export default async function Page({ params }) {
     const data = await fetchSelectedCollectionData(slug);
 
     return (
-      <ProductsListing slug={slug} data={data} />
+      <CollectionPage data={data} />
     );
   } catch (error) {
     logError("Error fetching category page data:", error);
     notFound();
   }
-}
+};
