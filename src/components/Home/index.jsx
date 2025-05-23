@@ -10,6 +10,8 @@ import OurProjects from "./OurProjects";
 export const HomePage = ({ data }) => {
     const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers, testimonials, marketsData, blogsData } = data;
 
+    console.log("---HensleyNews---",blogsData);
+
     return (
         <>
             <HeroSection data={heroSectionData} />
