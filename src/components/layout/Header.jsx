@@ -8,7 +8,7 @@ import userIcon from '@/assets/icons/user.svg';
 import cartIcon from '@/assets/icons/cart.svg';
 import { CustomLink } from '../common/CustomLink';
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { SubCategoriesModal } from '../Modals/SubCategoriesModal';
 import { MarketTentModal } from '../Modals/MarketTentModal';
 import { SearchModal } from '../Modals/SearchModal';
@@ -17,7 +17,7 @@ import { sortByOrderNumber } from '@/utils';
 
 const userMenu = [
     { icon: searchIcon, slug: '#', type: 'search' },
-    { icon: userIcon, slug: '#', type: 'account' },
+    { icon: userIcon, slug: '/account/my-account', type: 'account' },
     { icon: cartIcon, slug: '#', count: 1, type: 'cart' },
 ];
 
@@ -28,6 +28,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
     const [searchModal, setSearchModal] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const pathname = usePathname();
+    const router = useRouter()
 
     const { header, headerSubMenu, headerMegaMenu } = data;
 
@@ -39,6 +40,8 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 }
                 return !prev;
             });
+        } else if (item.type === 'account') {
+            router.push(item.slug)
         }
     }
 
