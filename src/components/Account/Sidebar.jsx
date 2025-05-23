@@ -12,7 +12,7 @@ function Sidebar() {
         {
             name: "My Account", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="15.955" height="16.043" viewBox="0 0 15.955 16.043">
                 <path id="fe2df171891038b33e9624c27e96e367" d="M13,10.585a4.81,4.81,0,1,0-5.949,0,8.017,8.017,0,0,0-4.987,6.558.807.807,0,1,0,1.6.176,6.414,6.414,0,0,1,12.747,0,.8.8,0,0,0,.8.714h.088a.8.8,0,0,0,.705-.882A8.017,8.017,0,0,0,13,10.585Zm-2.974-.569a3.207,3.207,0,1,1,3.207-3.207A3.207,3.207,0,0,1,10.03,10.016Z" transform="translate(-2.064 -1.995)" fill="#2c2216" />
-            </svg>, href: '#'
+            </svg>, href: '/account/my-account'
         },
         {
             name: "Saved Products", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="14.413" height="18.476" viewBox="0 0 14.413 18.476">
