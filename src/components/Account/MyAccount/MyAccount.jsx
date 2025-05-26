@@ -25,19 +25,19 @@ function MyAccount() {
   return (
     <div className='MyAccount w-full max-lg:mb-[85px]'>
       <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0'>
-        <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[85px] max-lg:text-[55px] max-lg:leading-[50px]'>{data.heading}</h2>
+        <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[85px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px]'>{data.heading}</h2>
       </div>
-      <div className='py-[86px] px-6 max-lg:py-0 max-lg:mt-3'>
+      <div className='py-[86px] px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>
         <div className='max-w-[924px] w-full mx-auto'>
           <div className='flex justify-between items-center max-lg:flex-col gap-y-[7px]'>
-            <div className='flex flex-col gap-y-[7px]'>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center'>View and edit your personal info below.</p>
-              <p className='text-base font-haasBold leading-[16px] text-secondary-alt max-lg:text-center'>ACCOUNT</p>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center'>Update your personal information.</p>
+            <div className='flex flex-col gap-y-[7px] max-md:gap-0'>
+              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs'>View and edit your personal info below.</p>
+              <p className='text-base font-haasBold leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs'>ACCOUNT</p>
+              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs'>Update your personal information.</p>
             </div>
-            <div className='flex flex-col gap-y-[7px]'>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center'>Login Email: <br className='max-lg:hidden' /> <b className='text-base font-haasBold leading-[16px] text-secondary-alt text-right max-lg:text-center'>{data.email}</b></p>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center'>Your Login email can’t be changed</p>
+            <div className='flex flex-col gap-y-[7px] max-md:gap-0'>
+              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs'>Login Email: <br className='max-lg:hidden' /> <b className='text-base font-haasBold leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs'>{data.email}</b></p>
+              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs'>Your Login email can’t be changed</p>
             </div>
           </div>
 
@@ -45,13 +45,13 @@ function MyAccount() {
             {formField.map((field, i) => (
 
               <div key={field.id} className='w-[calc(50%-12px)] max-lg:max-w-[491px] max-lg:w-full'>
-                <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">{field.label}</label>
+                <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2 max-md:text-sm">{field.label}</label>
                 <input
                   id={field.id}
                   type={field.type}
                   name={field.id}
                   placeholder={field.placeholder}
-                  className="datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white  focus:outline-none  shadow-sm text-secondary-alt placeholder-secondary"
+                  className="datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white  focus:outline-none  shadow-sm text-secondary-alt placeholder-secondary max-md:text-sm"
                   required={field.required}
                   data-datepicker
                   onChange={handleInputChange}
