@@ -20,7 +20,7 @@ const LightboxForm = ({ isOpen, onClose }) => {
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center p-4">
+                    <div className="flex min-h-full items-center justify-center ">
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -30,7 +30,7 @@ const LightboxForm = ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel onClick={onClose} className="w-full transform overflow-hidden bg-secondary-alt text-left align-middle shadow-xl transition-all relative">
+                            <Dialog.Panel onClick={onClose} className="w-full transform overflow-hidden bg-[#2c2216a6]  text-left align-middle shadow-xl transition-all relative">
                                 <ContactUs />
                             </Dialog.Panel>
                         </Transition.Child>

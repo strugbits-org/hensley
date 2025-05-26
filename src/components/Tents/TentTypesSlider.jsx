@@ -44,7 +44,7 @@ const TentTypesSlider = () => {
                 className="h-full w-full object-contain"
               /> */}
                             <div className='w-full h-full border px-[12px] py-[12px]' >
-                                <div className='w-full h-full px-[21px] py-[24px]' style={{ backgroundImage: `url(${image.src})` }}>
+                                <div className='w-full h-full bg-no-repeat bg-center px-[21px] py-[24px]' style={{ backgroundImage: `url(${image.src})` }}>
                                     <div className='border-b  border-white pb-[17px] w-full'>
                                         <h3 className='w-full break-words 
                              text-[35px]

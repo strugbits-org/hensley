@@ -2,8 +2,8 @@ import React from 'react'
 
 const ContactUs = () => {
     return (
-        <div className='bg-transparent w-full flex justify-center items-center lg:py-[80px]'>
-            <form className='lg:w-[762px] h-full w-full bg-primary-alt lg:px-[50px] sm:px-[12px] px-[36px] pt-[50px] pb-[55px]'>
+        <div className=' w-full flex justify-center items-center lg:py-[80px]'>
+            <form className='lg:w-[762px] h-full w-full bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[12px] px-[36px] pt-[50px] pb-[55px]'>
                 <div className='w-full flex flex-col sm:flex-row justify-between gap-y-[31px] gap-x-[12px]'>
                     <h3 className='w-full text-secondary-alt uppercase font-recklessRegular text-[45px] leading-[40px]'>
                         send your <br /> message
