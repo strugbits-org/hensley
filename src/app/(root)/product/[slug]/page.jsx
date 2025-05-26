@@ -1,18 +1,22 @@
-import Cart from "@/components/Product";
-import { fetchSelectedMarketData } from "@/services/market";
+import { Product } from "@/components/Product";
+import { fetchProductPageData } from "@/services/products";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
 export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
-    const data = await fetchSelectedMarketData(slug);
+    const data = await fetchProductPageData(slug);
+
+    if (!data) {
+      throw new Error("Product data not found");
+    }
 
     return (
-      <Cart />
+      <Product data={data} />
     );
   } catch (error) {
-    logError("Error fetching category page data:", error);
+    logError("Error fetching product page data:", error);
     notFound();
   }
 }
