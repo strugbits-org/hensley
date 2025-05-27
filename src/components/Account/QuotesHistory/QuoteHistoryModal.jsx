@@ -1,4 +1,5 @@
 "use client"
+import { CartCollection, CartNormal, CartTent } from '@/components/Cart/CartItems';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 
@@ -19,7 +20,7 @@ const LightboxForm = ({ isOpen, onClose }) => {
                 </Transition.Child>
 
                 <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center p-4">
+                    <div className="flex min-h-full items-center justify-center ">
                         <Transition.Child
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -29,8 +30,25 @@ const LightboxForm = ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel onClick={onClose} className="w-full transform overflow-hidden bg-secondary-alt text-left align-middle shadow-xl transition-all relative">
-
+                            <Dialog.Panel onClick={onClose} className="w-full transform overflow-hidden bg-[#2c221696] text-left align-middle shadow-xl transition-all relative">
+                                <div className=' py-[120px] max-w-[1288px] mx-auto'>
+                                    <div className='bg-white w-full '>
+                                        <div className='heading w-full  flex justify-center items-center flex-col max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
+                                            <p className='font-haasLight text-base '>February, 09h, 2024</p>
+                                            <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[160px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>ANNA & JOHN</h2>
+                                        </div>
+                                        <div className='w-full px-6'>
+                                        <div className='w-full bg-[#F4F1EC] pt-[18px] pb-[17px]'>
+                                            <h4 className='text-center text-[35px] font-recklessRegular leading-[39px]'>
+                                            U$ 45.000
+                                            </h4>
+                                        </div>
+                                        </div>
+                                        <CartTent />
+                                        <CartCollection />
+                                        <CartNormal />
+                                    </div>
+                                </div>
                             </Dialog.Panel>
                         </Transition.Child>
                     </div>
