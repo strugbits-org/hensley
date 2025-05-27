@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import SectionTitle from '../common/SectionTitle'
@@ -6,13 +6,11 @@ import ProductCard from '../common/ProductCard'
 import FilterMenu from '../common/MenuFilter'
 import FilterCardSubCategories from '../common/FilterCardSubCategories'
 import { ProductBanner } from '../common/ProductBanner'
-import BannerImg from '@/assets/banner.png'
 import Loading from '@/app/loading'
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper'
 import { fetchSortedProducts } from '@/services/collections'
 import { findSortIndexByCategory, logError } from '@/utils'
 import { ProductsFilterPopup } from '../common/ProductsFilterPopup'
-import { Banner } from '../common/Banner'
 
 // Debounce utility function
 const useDebounce = (callback, delay) => {
@@ -32,9 +30,7 @@ const useDebounce = (callback, delay) => {
 function Listing({ data }) {
   const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData } = data;
   let bannerIndex = -1;
-
-  console.log("productBannersData", productBannersData);
-
+  const pageSize = 12;
 
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
@@ -43,7 +39,6 @@ function Listing({ data }) {
   const [bannersDesktop, setBannersDesktop] = useState([]);
   const [bannersMobile, setBannersMobile] = useState([]);
 
-  // Extract common fetch logic into a reusable function
   const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
     const activeCollectionIds = newFilters.length > 0
       ? newFilters.map(f => f._id)
@@ -53,7 +48,7 @@ function Listing({ data }) {
       const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, newFilters[0]._id) : sortIndex;
       const newSortedProducts = await fetchSortedProducts({
         collectionIds: activeCollectionIds,
-        limit: 12,
+        limit: pageSize,
         skip: newSkip,
         sortIndex: newSortIndex
       });
@@ -117,6 +112,14 @@ function Listing({ data }) {
     setIsLoading(false);
   }, [sortedProducts, productBannersData]);
 
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <>
       <div className='w-full relative flex items-center py-10'>
@@ -132,30 +135,47 @@ function Listing({ data }) {
       <FilterCardSubCategories data={subCategories} />
 
       <div className="w-full flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:px-0 px-[12px]">
-        <div className="lg:w-1/4 w-full lg:h-screen pl-[24px] lg:block hidden">
+        {subCategories.length > 0 && (<div className="lg:w-1/4 w-full lg:h-screen pl-[24px] lg:block hidden">
           <FilterMenu
             selectedCategory={selectedCategory}
             items={subCategories}
             onFilterChange={handleFilterChange}
             selectedFilters={selectedFilters}
           />
-        </div>
-        <div className="w-full lg:w-3/4 min-h-screen pr-6 lg:pb-[28px] lg:pt-[28px] sm:pt-[12px] sm:pb-[12px] pb-[12px] lg:border-t lg:border-b border-primary-border">
-          <div className="grid sm:grid-cols-3 grid-cols-2 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px]">
+        </div>)}
+        <div className={`w-full min-h-screen lg:pb-[28px] lg:pt-[28px] sm:pt-[12px] sm:pb-[12px] pb-[12px] lg:border-t lg:border-b border-primary-border ${subCategories.length > 0 ? 'lg:w-3/4 lg:pr-6' : 'lg:w-full px-6'}`}>
+          <ul className={`grid grid-cols-2 md:grid-cols-3 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px] ${subCategories.length > 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
             {products.map((productData, index) => {
-              const shouldInsertBanner = (index + 1) % 12 === 0 && bannersDesktop.length > 0;
-              if (shouldInsertBanner) bannerIndex = (bannerIndex + 1) % bannersDesktop.length;
+              const banners = isMobile ? bannersMobile : bannersDesktop;
+              const shouldInsertBanner = (index + 1) % pageSize === 0 && banners.length > 0;
+              
+              const isLastProduct = index === products.length - 1;
+              const forceInsertBanner = isLastProduct && 
+                bannerIndex === -1 && 
+                products.length < pageSize && 
+                banners.length > 0;
+              
+              if (shouldInsertBanner || forceInsertBanner) bannerIndex = (bannerIndex + 1) % banners.length;
+              
               return (
                 <React.Fragment key={productData._id}>
-                  <ProductCard
-                    data={productData}
-                    onAddToCart={() => console.log('Added to cart')}
-                  />
-                  {shouldInsertBanner && <ProductBanner data={bannersDesktop[bannerIndex]} />}
+                  <li>
+                    <ProductCard
+                    key={productData._id}
+                      data={productData}
+                      onAddToCart={() => console.log('Added to cart')}
+                    />
+                  </li>
+                  {(shouldInsertBanner || forceInsertBanner) && (
+                    <li className={`col-span-2 md:col-span-3 ${subCategories.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
+                      <ProductBanner
+                      key={banners[bannerIndex]._id} data={banners[bannerIndex]} />
+                    </li>
+                  )}
                 </React.Fragment>
               );
             })}
-          </div>
+          </ul>
           {!isLoading && hasMore && (
             <AutoClickWrapper onIntersect={handleLoadMore}>
               <Loading custom={true} classes='w-full flex justify-center p-6' />

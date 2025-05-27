@@ -1,13 +1,13 @@
 import React from 'react';
-import Listing from './Listing';
+import ProductListing from './ProductListing';
 import OurCategories from '../common/OurCategories';
 
-export const ProductsListing = ({ data }) => {
+export const CollectionPage = ({ data }) => {
   const { ourCategoriesData } = data;
 
   return (
     <>
-      <Listing data={data} />
+      <ProductListing data={data} />
       <OurCategories data={ourCategoriesData} pageDetails={{ ourCategoriesTitle: "Our Categories" }} />
     </>
   );
