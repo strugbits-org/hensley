@@ -106,3 +106,7 @@ export const findSortIndexByCategory = (data, categoryId) => {
     const sortIndex = category?.sortTitle?.[0];
     return sortIndex ? sortMapping[sortIndex] : null;
 };
+
+export const formatTotalPrice = (price) => {
+    return '$' + price.toFixed(2);
+}

@@ -1,11 +1,4 @@
-body {
-  margin: 0;
-  font-family: "Inter", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-[class^="number-slide"],
+/* [class^="number-slide"],
 [class*=" number-slide"] {
   background: grey;
   display: flex;
@@ -15,8 +8,6 @@ body {
   color: #fff;
   background-color: white;
   font-weight: 500;
-  /* height: 200px; */
-  /* max-height: 100vh; */
   width: 100% !important
   
 }
@@ -29,4 +20,4 @@ body {
 }
 .thumbnail .keen-slider__slide {
   cursor: pointer;
-}
+} */
