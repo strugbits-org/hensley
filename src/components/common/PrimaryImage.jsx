@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { debounce } from 'lodash';
 import Image from 'next/image';
 import { generateImageURL, generateImageURLAlternate, generateSVGURL } from "@/utils/generateImageURL";
-
+import fallbackImage from "@/assets/fallback-img.png";
 
 export const PrimaryImage = ({
     url,
@@ -77,10 +77,11 @@ export const PrimaryImage = ({
 
     return (
         <>
-            {useNextImage && src && height && width ? <Image ref={ref} src={src} quality={q} loading={"eager"} height={height} width={width} className={customClasses} {...attributes} alt={alt} /> :
-                <img
+            {useNextImage && src && height && width ?
+                <Image ref={ref} src={src} quality={q} loading={"eager"} height={height} width={width} className={customClasses} {...attributes} alt={alt} />
+                : <img
                     ref={ref}
-                    src={src}
+                    src={src || fallbackImage.src}
                     className={customClasses}
                     alt={alt}
                     {...attributes}
