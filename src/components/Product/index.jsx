@@ -4,6 +4,8 @@ import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToQuote } from './AddtoQuoteButton'
 import { PrimaryImage } from '../common/PrimaryImage'
+import parse from 'html-react-parser';
+import ProductDescription from '../common/helpers/ProductDescription';
 
 const infoHeaders = [
   {
@@ -28,8 +30,7 @@ export const Product = ({ data }) => {
   const { productData } = data;
   const { product } = productData;
   const [productInfoSection, setProductInfoSection] = useState([]);
-  const [productQuantity, setProductQuantity] = useState(1);
-  console.log("Product data:", productData);
+  const [cartQuantity, setCartQuantity] = useState(1);
 
   const setAdditionalInfoSections = () => {
     if (product.productSetItem) {
@@ -57,6 +58,12 @@ export const Product = ({ data }) => {
   useEffect(() => {
     setAdditionalInfoSections();
   }, [productData]);
+
+  const handleQuantityChange = async (value) => {
+    if (value < 10001 && value > 0) {
+      setCartQuantity(value);
+    }
+  };
 
   return (
     <>
@@ -107,9 +114,20 @@ export const Product = ({ data }) => {
                     <td className="text-center border-b border-black">{item.price}</td>
                     <td className="border-b border-black">
                       <div className="flex items-center justify-center gap-x-[30px] font-haasRegular">
-                        <button className="text-xl font-light" onClick={() => setProductQuantity(productQuantity - 1)}>-</button>
-                        <input className="font-bold bg-transparent max-w-[80px] outline-none text-center" value={productQuantity} onChange={(e) => setProductQuantity(Number(e.target.value))} />
-                        <button className="text-xl font-light" onClick={() => setProductQuantity(productQuantity + 1)}>+</button>
+                        <button className="text-xl font-light"
+                          onClick={() => handleQuantityChange(+cartQuantity - 1)}
+                        >-</button>
+                        <input
+                          className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+                          type="number"
+                          min="1"
+                          placeholder="1"
+                          value={cartQuantity}
+                          onInput={(e) => handleQuantityChange(e.target.value)}
+                        />
+                        <button className="text-xl font-light"
+                          onClick={() => handleQuantityChange(+cartQuantity + 1)}
+                        >+</button>
                       </div>
                     </td>
                   </tr>
@@ -118,17 +136,7 @@ export const Product = ({ data }) => {
               </tbody>
             </table>
 
-            <div className='flex flex-col gap-y-[15px]'>
-              <span className='text-[16px] text-secondary-alt font-haasLight block'>Description</span>
-              <span className='text-[16px] text-secondary-alt font-haasLight block'>{product.description || "lorem ipsum"}</span>
-              <button className="flex items-center gap-2 text-sm font-medium text-black text-secondary-alt font-haasBold uppercase">
-                Read more
-                <svg xmlns="http://www.w3.org/2000/svg" width="12.231" height="13.578" viewBox="0 0 12.231 13.578">
-                  <path id="SETA" d="M13.578,6.115,6.458,12.231l-.884-.756L11.2,6.658H0V5.548H11.2L5.574.755,6.458,0Z" transform="translate(12.231) rotate(90)" fill="#2c2216" />
-                </svg>
-              </button>
-
-            </div>
+            <ProductDescription text={product.description} />
 
           </div>
           <AddToQuote text="add to quote" />
