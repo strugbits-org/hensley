@@ -1,4 +1,5 @@
-import React from 'react'
+"use client"
+import React, { useState } from 'react'
 import { FiArrowUpRight } from "react-icons/fi";
 import LightboxForm from './QuoteHistoryModal';
 
@@ -7,6 +8,9 @@ function QuotesHistory() {
     const data = {
         heading: "QUOTES HISTORY",
 
+    }
+    const onClose = () =>{
+        setIsOpen(false)
     }
     const orders = [
         {
@@ -97,7 +101,7 @@ function QuotesHistory() {
                     </button>
                 </div>
             </div>
-            <LightboxForm isOpen={isOpen} setIsOpen={setIsOpen} />
+            <LightboxForm isOpen={isOpen} setIsOpen={setIsOpen} onClose={onClose}/>
         </div>
     )
 }
