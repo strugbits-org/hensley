@@ -13,7 +13,7 @@ const BannerStructures = () => {
                     sm:leading-[70px]
                     text-[45px]
                     leading-[55px]
-                    text-white font-recklessRegular uppercase'>structures</h3>
+                    text-white font-recklessRegular uppercase '>structures</h3>
                     <Button text="add to quote" classes={"xl:!height-[130px] xl:!w-[450px] lg:!w-[300px] lg:!h-[130px] lg:block hidden"} />
                 </div>
 
