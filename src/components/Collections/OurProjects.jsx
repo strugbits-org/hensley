@@ -9,7 +9,6 @@ import { CustomLink } from "../common/CustomLink";
 import SectionTitle from "../common/SectionTitle";
 
 export default function OurProjects({ data, pageDetails }) {
-    const { ourProjectsTitle } = pageDetails;
 
     const sliderInstance = React.useRef();
 
@@ -34,12 +33,9 @@ export default function OurProjects({ data, pageDetails }) {
 
     return (
         <>
-            <div className='w-full sm:px-0 px-[12px]'>
-                <SectionTitle text={ourProjectsTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
-            </div>
             <div
                 ref={sliderRef}
-                className="relative keen-slider h-screen"
+                className="mt-[21px] relative keen-slider h-screen"
             >
                 {data.map((item, index) => {
                     const { portfolioRef } = item;
