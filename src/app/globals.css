@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   --primary: #F0DEA2;
   --primary-alt: #F4F1EC;
@@ -25,6 +26,7 @@ body {
   color: var(--foreground);
   background: var(--primary-alt);
 }
+
 
 .hide-scrollbar {
   -ms-overflow-style: none;

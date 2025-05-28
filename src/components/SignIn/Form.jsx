@@ -1,0 +1,68 @@
+"use client"
+import React, { useState, Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import SignIn from '../Modals/Signin';
+
+const LightboxForm = ({ isOpen, onClose }) => {
+    return (
+        <Transition appear show={isOpen} as={Fragment}>
+            <Dialog as="div" className="relative z-50" onClose={onClose}>
+                <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                >
+                    <div className="fixed inset-0 bg-black bg-opacity-50" />
+                </Transition.Child>
+
+                <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center ">
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-300"
+                            enterFrom="opacity-0 scale-95"
+                            enterTo="opacity-100 scale-100"
+                            leave="ease-in duration-200"
+                            leaveFrom="opacity-100 scale-100"
+                            leaveTo="opacity-0 scale-95"
+                        >
+                            <Dialog.Panel onClick={onClose} className="w-full transform overflow-hidden bg-[#2c2216a6]  text-left align-middle shadow-xl transition-all relative">
+                                <SignIn />
+                            </Dialog.Panel>
+                        </Transition.Child>
+                    </div>
+                </div>
+            </Dialog>
+        </Transition>
+    );
+};
+
+const Form = () => {
+    const [isOpen, setIsOpen] = useState(true);
+
+    return (
+        <>
+            {/* Desktop: show button */}
+            <div className="hidden lg:flex justify-center items-center py-[80px]">
+                <button
+                    className="bg-primary text-white px-6 py-4 rounded-lg font-bold hover:bg-primary-dark transition"
+                    onClick={() => setIsOpen(true)}
+                >
+                    Open Contact Form
+                </button>
+            </div>
+
+            {/* Mobile: show full form inline */}
+            <SignIn classes={"lg:!hidden block"}/>
+
+            {/* Lightbox Dialog */}
+            <LightboxForm isOpen={isOpen} onClose={() => setIsOpen(false)} />
+        </>
+    );
+};
+
+export default Form;

@@ -8,7 +8,7 @@ export const generateImageURL = ({
 }) => {
   if (!wix_url) return "";
 
-  const cleanUrl = wix_url.split("#")[0];
+  const cleanUrl = wix_url?.split("#")[0];
 
   if (!cleanUrl.startsWith("wix:image://v1/") && !cleanUrl.startsWith("wix:vector://v1/")) {
     return wix_url;

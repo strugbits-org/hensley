@@ -1,5 +1,5 @@
 import React from 'react'
-import {CartCollection, CartTent} from './CartTent'
+import {CartCollection, CartNormal, CartTent} from './CartItems'
 import CartHeading from './CartHeading'
 import PriceDisplay from './PriceDisplay'
 import { AddToQuote } from './AddtoQuoteButton'
@@ -15,6 +15,7 @@ const Cart = () => {
             <CartHeading />
             <CartTent />
             <CartCollection />
+            <CartNormal />
         </div>
     </div>
     <AddToQuote text={"request to quote"}/>
