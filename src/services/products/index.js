@@ -1,4 +1,4 @@
-import { logError } from "@/utils";
+import { logError, mapProductSetItems } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 
 export const fetchProductsByCategory = async (id) => {
@@ -67,6 +67,7 @@ export const fetchProductCollectionData = async (id) => {
     try {
         const response = await queryCollection({
             dataCollectionId: "MultipleProductsSet",
+            includeReferencedItems: ["products"],
             eq: [
                 {
                     key: "product",
@@ -74,11 +75,9 @@ export const fetchProductCollectionData = async (id) => {
                 }
             ]
         });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items[0] || false;
+        const productSetItems = mapProductSetItems(response.items[0]);
+        if (productSetItems.length === 0) return false;
+        return productSetItems;
     } catch (error) {
         logError(`Error fetching product collection data: ${error.message}`, error);
     }
