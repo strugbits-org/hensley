@@ -1,17 +1,20 @@
-import React from 'react'
-import SectionTitle from '../common/SectionTitle'
+"use client";
+import React from 'react';
+import FilterCardSubCategories from '../common/FilterCardSubCategories';
+import { PrimaryButton } from '../common/PrimaryButton';
 import { PrimaryImage } from '../common/PrimaryImage'
-import Image from 'next/image'
+import Image from 'next/image';
 import image from '@/assets/search-image-3.png'
-import { PrimaryButton } from '../common/PrimaryButton'
+import { Button } from './Button';
 
 const Buttons = ({ text, classes }) => {
-  return (
-    <>
-      <button className={`${classes} border uppercase bg-white font-haasLight text-[10px] leading-[15px] p-2`}>{text}</button>
-    </>
-  )
+    return (
+        <>
+            <button className={`${classes} border uppercase bg-white font-haasLight text-[10px] leading-[15px] p-2`}>{text}</button>
+        </>
+    )
 }
+
 
 const ProjectCards = () => {
     return (
@@ -86,29 +89,28 @@ const ProjectCards = () => {
     )
 }
 
-function RelatedProjects({ classes }) {
-  return (
-    <div className={`mb-20 md:mb-40 lg:mb-0 pb-[100px] ${classes}`}>
-      <SectionTitle text="PROJECTS RELATED TO YOUR SEARCH" classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />
-      <div className="w-full lg:px-[24px] px-[12px] grid sm:grid-cols-2 grid-cols-1 lg:gap-0 lg:py-[24px] sm:gap-y-[12px] sm:gap-x-[12px] gap-y-[30px] lg:mt-0 mt-[12px]">
-        <ProjectCards />
-        <ProjectCards />
-        <ProjectCards />
-        <ProjectCards />
-      </div>
+const Categories = () => {
+    return (
+        <div className='w-full '>
+            <div className='w-full bg-primary-border py-[20px]'>
+                <FilterCardSubCategories data={[{ name: "one" }, { name: "two" }, { name: "three" }, { name: "four" }]} />
+            </div>
 
-      <div className='w-full flex justify-center items-center'>
-        <PrimaryButton
-          className="border border-black text-secondary-alt hover:bg-primary hover:border-secondary-alt 
-                                    max-h-[60px] max-w-[280px]
-                                    p-0  mt-[15px] hover:[letter-spacing:4px]"
-        >
-          see all
-        </PrimaryButton>
-      </div>
-
-    </div>
-  )
+            <div className="w-full lg:px-[24px] px-[12px] grid sm:grid-cols-2 grid-cols-1 lg:gap-0 lg:py-[24px] sm:gap-y-[12px] sm:gap-x-[12px] gap-y-[30px] lg:mt-0 mt-[12px]">
+                <ProjectCards />
+                <ProjectCards />
+                <ProjectCards />
+                <ProjectCards />
+                <ProjectCards />
+                <ProjectCards />
+                <ProjectCards />
+                <ProjectCards />
+            </div>
+            <div className='w-full flex justify-center items-center py-[10px]'>
+                <Button text="load more" />
+            </div>
+        </div>
+    );
 }
 
-export default RelatedProjects
+export default Categories;
