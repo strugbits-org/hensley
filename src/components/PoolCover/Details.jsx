@@ -69,11 +69,11 @@ export const Details = ({ data }) => {
     return (
         <>
             <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] min-h-[937px] '>
-                <div className='xl:w-1/2 '>
+                <div className='lg:w-1/2 '>
                     <ProductSlider />
                     <ProductSlider_tab />
                 </div>
-                <div className='xl:w-1/2 flex flex-col items-center relative'>
+                <div className='lg:w-1/2 flex flex-col items-center relative'>
                     <div className='lg:max-w-[656px] sm:max-w-[492px] h-full'>
                         <span className='text-secondary-alt 
           lg:text-[16px]
@@ -98,6 +98,7 @@ export const Details = ({ data }) => {
                             <span className=' 
                             col-span-2
                             uppercase
+                            font-recklessRegular
                 text-[30px] 
                 leading-[30px] 
                 text-secondary-alt'>PLEASE FILL THE BELLOW RFP FORM & A SPECIALIST WILL PROVIDE A CUSTOM QUOTE
@@ -115,9 +116,13 @@ export const Details = ({ data }) => {
                             <CheckBox data={{ label: "HOW MUCH OF THE POOL ARE YOU LOOKING TO COVER? *", options: ["entire pool", "partial pool covering"] }} />
 
 
-                              <div className='col-span-2'>
+                            <div className='col-span-2'>
                                 <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">PLEASE SHARE ANY RELEVANT VENUE OR INSPIRATION IMAGES</label>
-                                <button className='bg-primary py-[10px] uppercase font-haasRegular text-[25px] w-full'>upload +</button>
+                                <button className='bg-primary py-[10px] uppercase font-haasRegular text-[16px] w-full
+                                 hover:bg-secondary-alt
+                                 hover:text-primary
+                                 transform transition-all duration-300
+                                '>upload file +</button>
                             </div>
 
                         </form>

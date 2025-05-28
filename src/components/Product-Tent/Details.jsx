@@ -98,6 +98,7 @@ export const Details = ({ data }) => {
                             <span className='lg:col-span-4 
                             col-span-2
                             uppercase
+                                                        font-recklessRegular
                 text-[30px] 
                 leading-[30px] 
                 text-secondary-alt'>​​Please fill the bellow RFP form & A tenting Specialist will provide a custom quote</span>

@@ -9,7 +9,7 @@ import { DownloadButton } from './DownloadButton'
 
 const TentGallery = () => {
   return (
-    <div className='w-full min-h-screen bg-secondary-alt pt-[75px] px-[24px]'>
+    <div className='w-full min-h-screen bg-secondary-alt py-[75px] px-[24px]'>
             <BannerStructures />
             <div className="w-full grid gap-[24px] mt-6 grid-cols-1 lg:grid-cols-[minmax(0,1082px)_minmax(0,766px)]">
     <div className='lg:h-[1304px] sm:h-[950px] h-[668px]'>
@@ -22,9 +22,7 @@ const TentGallery = () => {
         <Image src={tent3} className="h-full w-full" />
     </div>
     </div>
-    <div className='w-full flex justify-center items-center'>
-        <DownloadButton text="DOWNLOAD MASTERCLASS TENTING 101" classes={"lg:!w-[656px] sm:!w-[492px]"} iconTrue={"true"}/>
-    </div>
+    
     </div>
   )
 }
