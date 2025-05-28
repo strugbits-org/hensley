@@ -1,13 +1,14 @@
 "use client"
 import React, { useState, Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import ContactUs from '../Modals/ContactUs';
+import { storeActions } from '@/store';
 
-const LightboxForm = ({ isOpen, onClose }) => {
+export const ContactFormLightbox = ({ isOpen, onClose }) => {
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
-                <Transition.Child
+                <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0"
@@ -17,11 +18,11 @@ const LightboxForm = ({ isOpen, onClose }) => {
                     leaveTo="opacity-0"
                 >
                     <div className="fixed inset-0 bg-black bg-opacity-50" />
-                </Transition.Child>
+                </TransitionChild>
 
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center ">
-                        <Transition.Child
+                        <TransitionChild
                             as={Fragment}
                             enter="ease-out duration-300"
                             enterFrom="opacity-0 scale-95"
@@ -30,10 +31,10 @@ const LightboxForm = ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel onClick={onClose} className="w-full transform overflow-hidden bg-[#2c2216a6]  text-left align-middle shadow-xl transition-all relative">
+                            <DialogPanel className="w-full transform overflow-hidden bg-[#2c2216a6]  text-left align-middle shadow-xl transition-all relative">
                                 <ContactUs />
-                            </Dialog.Panel>
-                        </Transition.Child>
+                            </DialogPanel>
+                        </TransitionChild>
                     </div>
                 </div>
             </Dialog>
@@ -41,8 +42,8 @@ const LightboxForm = ({ isOpen, onClose }) => {
     );
 };
 
-const Form = () => {
-    const [isOpen, setIsOpen] = useState(false);
+const ContactForm = () => {
+    
 
     return (
         <>
@@ -50,7 +51,7 @@ const Form = () => {
             <div className="hidden lg:flex justify-center items-center py-[80px]">
                 <button
                     className="bg-primary text-white px-6 py-4 rounded-lg font-bold hover:bg-primary-dark transition"
-                    onClick={() => setIsOpen(true)}
+                    onClick={() => storeActions.showContactForm()}
                 >
                     Open Contact Form
                 </button>
@@ -115,11 +116,8 @@ const Form = () => {
                     </div>
                 </form>
             </div>
-
-            {/* Lightbox Dialog */}
-            <LightboxForm isOpen={isOpen} onClose={() => setIsOpen(false)} />
         </>
     );
 };
 
-export default Form;
+export default ContactForm;

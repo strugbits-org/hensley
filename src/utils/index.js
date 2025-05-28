@@ -102,7 +102,30 @@ export const findSortIndexByCategory = (data, categoryId) => {
         'L1': 'l1SubCategoryIndex',
         'L2': 'l2SubCategoryIndex'
     }
-    const category = data?.find(item => item.collections === categoryId);    
+    const category = data?.find(item => item.collections === categoryId);
     const sortIndex = category?.sortTitle?.[0];
     return sortIndex ? sortMapping[sortIndex] : null;
+};
+
+export const formatTotalPrice = (price) => {
+    return '$' + price.toFixed(2);
+}
+
+
+export const mapProductSetItems = (data) => {
+    try {        
+        if (!data?.productSetItems || !data?.products) return [];
+        const productMap = new Map(data.products.map(product => [product._id, product]));
+
+        const result = data.productSetItems
+            .filter(set => productMap.has(set.product))
+            .map(set => ({
+                _id: productMap.get(set.product)._id,
+                product: productMap.get(set.product),
+                quantity: set.quantity,
+            }));
+        return result;
+    } catch (error) {
+        return [];
+    }
 };

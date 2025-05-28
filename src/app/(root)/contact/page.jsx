@@ -6,7 +6,7 @@ export default async function Page() {
   try {
 
     return (
-        <Contact />
+      <Contact />
     );
   } catch (error) {
     logError("Error fetching category page data:", error);

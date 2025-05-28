@@ -128,6 +128,7 @@ export const ProductListing = ({ data }) => {
                 <div className='relative lg:block flex flex-col justify-center items-center lg:gap-y-0 gap-y-[10px]'>
                     <SectionTitle text={selectedCategory?.name} classes="xl:text-[200px] lg:text-[95px] border-none" />
                     <ProductsFilterPopup
+                        hidden={subCategories.length === 0}
                         type={"subCategory"}
                         selectedCategory={selectedCategory}
                         subCategories={subCategories}
