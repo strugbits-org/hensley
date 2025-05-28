@@ -1,4 +1,4 @@
-import SearchResult from "@/components/SearchResult";
+import SignIn from "@/components/SignIn";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -6,7 +6,7 @@ export default async function Page() {
   try {
 
     return (
-        <SearchResult />
+      <SignIn />
     );
   } catch (error) {
     logError("Error fetching quote request form data:", error);

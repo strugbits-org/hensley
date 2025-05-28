@@ -58,16 +58,16 @@ const OurMarkets = () => {
     <>
       <div className='px-[24px]'>
         <SectionTitle text="our markets" classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />
-      <div className='w-full sm:h-[330px] grid sm:grid-cols-3 grid-cols-2 justify-center gap-x-[24px] sm:gap-y-0 gap-y-[11px]'>
-        <MarketCard />
-        <MarketCard />
-        <MarketCard />
-        <CardButtons />
-        <CardButtons />
-        <div className='sm:hidden px-[100px] col-span-2 w-full flex justify-center items-center'>
+        <div className='w-full sm:h-[330px] grid sm:grid-cols-3 grid-cols-2 justify-center gap-x-[24px] sm:gap-y-0 gap-y-[11px]'>
+          <MarketCard />
+          <MarketCard />
+          <MarketCard />
           <CardButtons />
+          <CardButtons />
+          <div className='sm:hidden px-[100px] col-span-2 w-full flex justify-center items-center'>
+            <CardButtons />
+          </div>
         </div>
-      </div>
       </div>
     </>
   )

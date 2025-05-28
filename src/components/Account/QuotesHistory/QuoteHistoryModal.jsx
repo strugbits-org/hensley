@@ -1,13 +1,13 @@
 "use client"
 import { CartCollection, CartNormal, CartTent } from '@/components/Cart/CartItems';
-import { Dialog, Transition } from '@headlessui/react';
+import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment } from 'react';
 
 const LightboxForm = ({ isOpen, onClose }) => {
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
-                <Transition.Child
+                <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
                     enterFrom="opacity-0"
@@ -17,11 +17,11 @@ const LightboxForm = ({ isOpen, onClose }) => {
                     leaveTo="opacity-0"
                 >
                     <div className="fixed inset-0 bg-black bg-opacity-50" />
-                </Transition.Child>
+                </TransitionChild>
 
                 <div className="fixed inset-0 overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center ">
-                        <Transition.Child
+                        <TransitionChild
                             as={Fragment}
                             enter="ease-out duration-300"
                             enterFrom="opacity-0 scale-95"
@@ -30,7 +30,7 @@ const LightboxForm = ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel onClick={onClose} className="w-full transform overflow-hidden bg-[#2c221696] text-left align-middle shadow-xl transition-all relative">
+                            <DialogPanel onClick={onClose} className="w-full transform overflow-hidden bg-[#2c221696] text-left align-middle shadow-xl transition-all relative">
                                 <div className=' py-[120px] max-w-[1288px] mx-auto'>
                                     <div className='bg-white w-full '>
                                         <div className='heading w-full  flex justify-center items-center flex-col max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
@@ -49,8 +49,8 @@ const LightboxForm = ({ isOpen, onClose }) => {
                                         <CartNormal />
                                     </div>
                                 </div>
-                            </Dialog.Panel>
-                        </Transition.Child>
+                            </DialogPanel>
+                        </TransitionChild>
                     </div>
                 </div>
             </Dialog>

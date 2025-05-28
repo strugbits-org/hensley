@@ -1,7 +1,5 @@
 import React from 'react';
 import { PrimaryImage } from './PrimaryImage';
-import { CopyIcon } from './helpers/CopyIcon';
-import { copyToClipboard } from '@/utils';
 
 function SecondryProductCard({ data, onAddToCart, type = 'listing' }) {
     const { product } = data;

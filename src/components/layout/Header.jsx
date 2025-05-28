@@ -14,11 +14,12 @@ import { MarketTentModal } from '../Modals/MarketTentModal';
 import { SearchModal } from '../Modals/SearchModal';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
 import { sortByOrderNumber } from '@/utils';
+import { loaderActions } from '@/store/loaderStore';
 
 const userMenu = [
     { icon: searchIcon, slug: '#', type: 'search' },
     { icon: userIcon, slug: '/account/my-account', type: 'account' },
-    { icon: cartIcon, slug: '#', count: 1, type: 'cart' },
+    { icon: cartIcon, slug: '/cart', count: 1, type: 'cart' },
 ];
 
 export const Header = ({ data, marketsData, tentsData }) => {
@@ -40,7 +41,8 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 }
                 return !prev;
             });
-        } else if (item.type === 'account') {
+        } else {
+            loaderActions.show();
             router.push(item.slug)
         }
     }
@@ -186,6 +188,15 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                     >
                                         {title}
                                     </button>
+                                ) : type.startsWith("modal") ? (
+                                    <CustomLink
+                                        onClick={closeAllModals}
+                                        key={title}
+                                        to={slug}
+                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                    >
+                                        {title}
+                                    </CustomLink>
                                 ) : (
                                     <CustomLink
                                         onClick={closeAllModals}
