@@ -1,7 +1,7 @@
 "use server";
-import logError from "@/Utils/ServerActions";
 import { AddProductToCartVisitor, getProductsCartVisitor, removeProductFromCartVisitor, updateProductsQuantityCartVisitor } from "./CartApisVisitor";
 import { getAuthToken, getCartId, getMemberTokens } from "../auth";
+import { logError } from "@/utils";
 
 const baseUrl = process.env.BASE_URL;
 
@@ -56,6 +56,8 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
 export const AddProductToCart = async (productData) => {
   try {
     const authToken = await getAuthToken();
+    console.log("authToken", authToken);
+    
     const memberTokens = await getMemberTokens();
     const payload = {
       memberTokens,
