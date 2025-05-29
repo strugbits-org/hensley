@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import ContactUs from '../Modals/ContactUs';
 import { storeActions } from '@/store';
@@ -44,7 +44,7 @@ export const ContactFormLightbox = ({ isOpen, onClose }) => {
 };
 
 const ContactForm = () => {
-    
+
 
     return (
         <>
@@ -52,7 +52,7 @@ const ContactForm = () => {
             <div className="hidden lg:flex justify-center items-center py-[80px]">
                 <button
                     className="bg-primary text-white px-6 py-4 rounded-lg font-bold hover:bg-primary-dark transition"
-                    onClick={() => storeActions.showContactForm()}
+                    onClick={() => storeActions.showLightBox("contact")}
                 >
                     Open Contact Form
                 </button>

@@ -15,10 +15,11 @@ import { SearchModal } from '../Modals/SearchModal';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
 import { sortByOrderNumber } from '@/utils';
 import { loaderActions } from '@/store/loaderStore';
+import { storeActions } from '@/store';
 
 const userMenu = [
     { icon: searchIcon, slug: '#', type: 'search' },
-    { icon: userIcon, slug: '/account/my-account', type: 'account' },
+    { icon: userIcon, slug: '/account', type: 'account' },
     { icon: cartIcon, slug: '/cart', count: 1, type: 'cart' },
 ];
 
@@ -33,6 +34,16 @@ export const Header = ({ data, marketsData, tentsData }) => {
 
     const { header, headerSubMenu, headerMegaMenu } = data;
 
+    const redirectwithLoader = (slug) => {
+        if (pathname === slug) {
+            loaderActions.show();
+            setTimeout(() => loaderActions.hide(), 900);
+        } else {
+            loaderActions.show();
+            router.push(slug);
+        }
+    }
+
     const handleClickUserMenu = (item) => {
         if (item.type === 'search') {
             setSearchModal(prev => {
@@ -42,8 +53,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 return !prev;
             });
         } else {
-            loaderActions.show();
-            router.push(item.slug)
+            redirectwithLoader(item.slug);
         }
     }
 
@@ -74,6 +84,12 @@ export const Header = ({ data, marketsData, tentsData }) => {
             }, 50);
         } else {
             setSelectedMenu(newMenu);
+        }
+
+        if (item.type === "slug") {
+            redirectwithLoader(item.slug);
+        } else if (item.type === "lightbox") {
+            storeActions.showLightBox(item.lightbox);
         }
     }
 
@@ -180,7 +196,8 @@ export const Header = ({ data, marketsData, tentsData }) => {
                             {subNavigation.map((item) => {
                                 const { title, slug, type } = item;
 
-                                return type !== "slug" ? (
+                                // return type !== "slug" ? (
+                                return (
                                     <button
                                         key={title}
                                         className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
@@ -188,24 +205,24 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                     >
                                         {title}
                                     </button>
-                                ) : type.startsWith("modal") ? (
-                                    <CustomLink
-                                        onClick={closeAllModals}
-                                        key={title}
-                                        to={slug}
-                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
-                                    >
-                                        {title}
-                                    </CustomLink>
-                                ) : (
-                                    <CustomLink
-                                        onClick={closeAllModals}
-                                        key={title}
-                                        to={slug}
-                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
-                                    >
-                                        {title}
-                                    </CustomLink>
+                                    // ) : type.startsWith("modal") ? (
+                                    //     <CustomLink
+                                    //         onClick={closeAllModals}
+                                    //         key={title}
+                                    //         to={slug}
+                                    //         className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                    //     >
+                                    //         {title}
+                                    //     </CustomLink>
+                                    // ) : (
+                                    //     <CustomLink
+                                    //         onClick={closeAllModals}
+                                    //         key={title}
+                                    //         to={slug}
+                                    //         className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                    //     >
+                                    //         {title}
+                                    //     </CustomLink>
                                 )
                             })}
                         </nav>

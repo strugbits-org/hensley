@@ -1,10 +1,9 @@
-import { logError } from "@/utils";
-import { createWixClient } from "@/Utils/CreateWixClient";
+import { createWixClientOAuth, logError } from "@/utils";
 import { NextResponse } from "next/server";
 
 export const POST = async () => {
   try {
-    const wixClient = await createWixClient();
+    const wixClient = await createWixClientOAuth();
     const cartResponse = await wixClient.cart.createCart({
       lineItems: [
         {
@@ -25,7 +24,7 @@ export const POST = async () => {
       { status: 200 }
     );
   } catch (error) {
-    logError("Error", error);
+    logError(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

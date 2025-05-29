@@ -1,16 +1,23 @@
 import { proxy } from 'valtio';
 
 export const storeState = proxy({
-    contactForm: false,
+    lightboxes: {
+        contact: false
+    },
     cartItems: 0
 });
 
 export const storeActions = {
-    showContactForm: () => {
-        storeState.contactForm = true;
+    showLightBox: (ligtbox) => {
+        storeState.lightboxes[ligtbox] = true;
     },
-    hideContactForm: () => {
-        storeState.contactForm = false;
+    hideLightBox: (ligtbox) => {
+        storeState[ligtbox] = false;
+    },
+    hideAllLightBoxes: () => {
+        for (const key in storeState.lightboxes) {
+            storeState.lightboxes[key] = false;
+        }
     },
     setCartQuantity: (quantity) => {
         storeState.cartItems = quantity;

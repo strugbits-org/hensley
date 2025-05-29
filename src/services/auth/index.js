@@ -21,13 +21,22 @@ export const getMemberTokens = async () => {
 };
 
 export const getCartId = async (createNew = true) => {
-  const cookieStore = cookies();
-  const cartId = cookieStore?.get("cartId");
-  if (!cartId && createNew) {
-    const cart = await createCart();
-    cookieStore.set("cartId", cart._id, { path: "/" })
-    return cart._id;
-  }
+  try {
+    const cookieStore = cookies();
+    const cartId = cookieStore?.get("cartId");
+    if (!cartId && createNew) {
+      const cart = await createCart();
 
-  return cartId?.value || "";
+      if (!cart) {
+        throw new Error("Failed to create cart");
+      }
+
+      cookieStore.set("cartId", cart._id, { path: "/" })
+      return cart._id;
+    }
+
+    return cartId?.value || "";
+  } catch (error) {
+    throw new Error(error);
+  }
 };

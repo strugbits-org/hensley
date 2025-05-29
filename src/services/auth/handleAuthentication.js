@@ -1,5 +1,5 @@
 import { logError } from "@/utils";
-import { isAuthenticated } from "./IsAuthenticated";
+import { isAuthenticated } from "./isAuthenticated";
 
 async function handleAuthentication(req) {
   try {

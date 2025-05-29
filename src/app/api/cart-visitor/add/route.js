@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
-import { createWixClientApiStrategy } from "@/Utils/CreateWixClient";
-import { logError } from "@/utils";
+import { createWixClient, logError } from "@/utils";
 
 export const POST = async (req) => {
   try {
     const body = await req.json();
     const { cartId, productData } = body;
 
-    const wixClient = await createWixClientApiStrategy();
+    const wixClient = await createWixClient();
     await wixClient.cart.addToCart(cartId, productData);
 
     return NextResponse.json(
-      { message: "Cart updated Successfully" },
+      { message: "Product added to cart" },
       { status: 200 }
     );
   } catch (error) {

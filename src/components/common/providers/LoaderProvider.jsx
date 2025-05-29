@@ -9,7 +9,7 @@ export default function LoaderProvider({ children }) {
 
   useEffect(() => {
     loaderActions.hide();
-    storeActions.hideContactForm();
+    storeActions.hideAllLightBoxes();
   }, [pathname]);
 
   return children;

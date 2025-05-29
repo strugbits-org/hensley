@@ -12,17 +12,17 @@ function Sidebar() {
         {
             name: "My Account", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="15.955" height="16.043" viewBox="0 0 15.955 16.043">
                 <path id="fe2df171891038b33e9624c27e96e367" d="M13,10.585a4.81,4.81,0,1,0-5.949,0,8.017,8.017,0,0,0-4.987,6.558.807.807,0,1,0,1.6.176,6.414,6.414,0,0,1,12.747,0,.8.8,0,0,0,.8.714h.088a.8.8,0,0,0,.705-.882A8.017,8.017,0,0,0,13,10.585Zm-2.974-.569a3.207,3.207,0,1,1,3.207-3.207A3.207,3.207,0,0,1,10.03,10.016Z" transform="translate(-2.064 -1.995)" fill="#2c2216" />
-            </svg>, href: '/account/my-account'
+            </svg>, href: '/account'
         },
         {
             name: "Saved Products", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="14.413" height="18.476" viewBox="0 0 14.413 18.476">
                 <path id="Caminho_13152" data-name="Caminho 13152" d="M4885.519,4822.486h12.913a.75.75,0,0,1,.75.75v16.976a.75.75,0,0,1-1.28.53l-5.926-5.926-5.926,5.926a.75.75,0,0,1-1.28-.53v-16.976A.75.75,0,0,1,4885.519,4822.486Zm12.163,1.5h-11.413V4838.4l5.176-5.176a.75.75,0,0,1,1.061,0l5.176,5.176Z" transform="translate(-4884.769 -4822.486)" fill="#2c2216" />
-            </svg>, href: '/account/saved-products'
+            </svg>, href: '/saved-products'
         },
         {
             name: "Quotes History", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="17.921" height="15.897" viewBox="0 0 17.921 15.897">
                 <path id="Path_13185" data-name="Path 13185" d="M11.909,3a7.955,7.955,0,0,0-8.177,7.947H2.151a.437.437,0,0,0-.309.751L4.306,14.17a.437.437,0,0,0,.627,0L7.4,11.7a.441.441,0,0,0-.318-.751H5.5a6.179,6.179,0,0,1,6.269-6.181,6.259,6.259,0,0,1,6.093,6.093,6.185,6.185,0,0,1-6.181,6.269A6.089,6.089,0,0,1,7.9,15.821.883.883,0,0,0,6.8,17.207a7.822,7.822,0,0,0,4.874,1.687,7.955,7.955,0,0,0,7.947-8.177A8.041,8.041,0,0,0,11.909,3Zm-.45,4.415a.667.667,0,0,0-.662.662v3.25a.893.893,0,0,0,.433.759l2.755,1.634a.663.663,0,0,0,.68-1.139l-2.543-1.51v-3a.665.665,0,0,0-.662-.653Z" transform="translate(-1.708 -2.997)" fill="#2c2216" />
-            </svg>, href: '/account/quotes-history'
+            </svg>, href: '/quotes-history'
         },
         {
             name: "Change Password", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="16.987" height="21.62" viewBox="0 0 16.987 21.62">

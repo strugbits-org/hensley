@@ -5,10 +5,12 @@ import { storeActions, storeState } from '@/store';
 import { ContactFormLightbox } from '@/components/Contact/ContactForm';
 
 export const ModalsWrapper = () => {
-    const { contactForm } = useSnapshot(storeState);
+    const { lightboxes } = useSnapshot(storeState);
+    const { contact } = lightboxes;
+
     return (
         <>
-            <ContactFormLightbox isOpen={contactForm} onClose={storeActions.hideContactForm} />
+            <ContactFormLightbox isOpen={contact} onClose={() => storeActions.hideLightBox("contact")} />
         </>
     )
 }

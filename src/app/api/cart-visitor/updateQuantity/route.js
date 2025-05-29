@@ -1,5 +1,4 @@
-import { logError } from "@/utils";
-import { createWixClient } from "@/Utils/CreateWixClient";
+import { createWixClient, logError } from "@/utils";
 import { NextResponse } from "next/server";
 
 export const POST = async (req) => {
