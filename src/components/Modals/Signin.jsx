@@ -2,15 +2,60 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import image from '@/assets/hens-logo.png';
 
+
+const InputField = ({ id, label, placeholder, classes, borderColor = 'black', type = "text" }) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const [isEmpty, setIsEmpty] = useState(false);
+
+    const handleBlur = (e) => {
+        setIsFocused(false);
+        if (!e.target.value.trim()) {
+            setIsEmpty(true);
+        } else {
+            setIsEmpty(false);
+        }
+    };
+
+    const handleFocus = () => {
+        setIsFocused(true);
+        setIsEmpty(false);
+    };
+
+    return (
+        <div className={`gap-y-[8px] flex flex-col ${classes}`}>
+            <label htmlFor={id} className="uppercase block text-sm font-medium text-secondary-alt font-haasBold">
+                {label}
+            </label>
+            <input
+                type={type}
+                id={id}
+                placeholder={placeholder}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                className={`
+                    w-full placeholder-secondary font-haasLight p-3 rounded-sm
+                    border-b 
+                    ${isEmpty ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
+                    ${!isEmpty && 'hover:border-b-2'}
+                    outline-none transition-all duration-300
+                `}
+            />
+        </div>
+    );
+};
+
+
+
+
 const SignIn = ({ classes }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center lg:py-[80px]`}>
-            <form className='lg:w-[762px] sm:w-[490px] flex flex-col gap-y-[41px] justify- items-center w-full bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[12px] px-[36px] pt-[121px] pb-[55px] relative'>
+        <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center z-[9999] relative lg:w-[762px] lg:py-[80px]`}>
+            <form className='w-full flex flex-col gap-y-[41px] justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[120px] px-[36px] pt-[121px] pb-[55px] relative'>
 
                 {/* Existing SVG and Image */}
-                <svg xmlns="http://www.w3.org/2000/svg" width="24.5" height="24.5" className='lg:block hidden absolute left-11 top-11' viewBox="0 0 24.5 24.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24.5" height="24.5" className='lg:block hidden absolute left-11 top-11 cursor-pointer' viewBox="0 0 24.5 24.5">
                     <g id="Group_3530" data-name="Group 3530" transform="translate(0.5 24.5) rotate(-90)">
                         <path id="Path_3283" data-name="Path 3283" d="M.354.5h24v24" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
                         <line id="Line_13" data-name="Line 13" x1="23.501" y2="23.501" transform="translate(0.499)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
@@ -23,25 +68,27 @@ const SignIn = ({ classes }) => {
                 <h3 className='lg:hidden block uppercase text-[55px] leading-[30px] text-secondary-alt font-recklessRegular'>Login</h3>
 
                 <div className='w-full'>
-                    <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">email</label>
+                    {/* <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">email</label>
                     <input
                         type="email"
                         placeholder='exemplo@myemail.com'
                         className="text w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                    />
+                    /> */}
+                        <InputField id="email" label="Email" placeholder="exemplo@myemail.com" borderColor="secondary-alt" />
                 </div>
 
                 <div className='w-full grid grid-cols-2 relative'>
                     <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">password</label>
                     <label className="block text-[16px] leading-[19px] font-haasLight text-secondary-alt mb-2 text-right">
-                        <a href="" className="uppercase underline text-secondary-alt">forget your password?</a>
+                        <a href="" className="underline text-secondary-alt">Forget your password?</a>
                     </label>
 
-                    <input
+                    {/* <input
                         type={showPassword ? "text" : "password"}
                         placeholder='*****'
                         className="col-span-2 text w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                    />
+                    /> */}
+                    <InputField id="password" placeholder="*****" borderColor="secondary-alt" type={showPassword ? "text" : "password"} classes={'col-span-2 !gap-y-0'}/>
 
                     {/* Eye SVG Button */}
                     <button
