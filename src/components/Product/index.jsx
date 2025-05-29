@@ -226,7 +226,7 @@ export const Product = ({ data }) => {
           <ProductDescription text={product.description} />
         </div>
 
-        <AddToCartButton text="Add to Quote" onClick={handleAddToCart} />
+        <AddToCartButton text="Add to Quote" disabled={isButtonDisabled} onClick={handleAddToCart} />
         <SaveProductButton />
       </div>
     </div>

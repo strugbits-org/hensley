@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createWixClientCart, logError } from "@/utils";
-import handleAuthentication from "@/services/auth/HandleAuthentication";
+import handleAuthentication from "@/services/auth/handleAuthentication";
 
 // POST method handler
 export const POST = async (req) => {

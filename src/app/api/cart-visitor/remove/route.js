@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { createWixClient } from "@/Utils/CreateWixClient";
-import { logError } from "@/utils";
+import { createWixClient, logError } from "@/utils";
 
 export const POST = async (req) => {
   try {

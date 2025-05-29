@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { encryptPriceFields } from "@/Utils/Encrypt";
 import { createWixClientCart } from "@/utils";
-import handleAuthentication from "@/services/auth/HandleAuthentication";
+import handleAuthentication from "@/services/auth/handleAuthentication";
 
 const addItemToCart = async (cartClient) => {
   return await cartClient.currentCart.addToCurrentCart({
@@ -41,20 +40,6 @@ export const POST = async (req) => {
 
     const cartClient = await createWixClientCart(memberTokens);
     const cart = await cartClient.currentCart.getCurrentCart();
-
-    const fieldsToEncrypt = [
-      'amount',
-      'convertedAmount',
-      'formattedAmount',
-      'formattedConvertedAmount'
-    ];
-
-    cart.lineItems.forEach((item) => {
-      ['price', 'fullPrice', 'priceBeforeDiscounts', 'lineItemPrice'].forEach((field) => {
-        encryptPriceFields(item[field], fieldsToEncrypt);
-      });
-    });
-
     return handleCartResponse(cart);
   } catch (error) {
     if (error?.details?.applicationError?.code === "OWNED_CART_NOT_FOUND") {

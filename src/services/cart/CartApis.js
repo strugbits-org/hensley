@@ -52,11 +52,9 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
   }
 };
 
-
 export const AddProductToCart = async (productData) => {
   try {
     const authToken = await getAuthToken();
-    console.log("authToken", authToken);
     
     const memberTokens = await getMemberTokens();
     const payload = {

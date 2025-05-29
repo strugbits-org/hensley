@@ -40,6 +40,9 @@ export const createWixClientOAuth = async () => {
                 collections,
                 items,
                 submissions,
+                members,
+                cart,
+                currentCart
             },
             auth: OAuthStrategy({ clientId: process.env.CLIENT_ID_WIX }),
         });
@@ -50,20 +53,22 @@ export const createWixClientOAuth = async () => {
 };
 
 export const createWixClientCart = async (memberTokens) => {
-  try {
-    const wixClient = createClient({
-      modules: { currentCart },
-      auth: OAuthStrategy({
-        clientId: process.env.CLIENT_ID_WIX,
-        tokens: memberTokens,
-      }),
-    });
+    try {
+        const wixClient = createClient({
+            modules: { currentCart },
+            auth: OAuthStrategy({
+                clientId: process.env.CLIENT_ID_WIX,
+                tokens: memberTokens,
+            }),
+        });
 
-    return wixClient;
-  } catch (error) {
-    logError("Error creating cart wix client: ", error);
-  }
+        return wixClient;
+    } catch (error) {
+        logError("Error creating cart wix client: ", error);
+    }
 };
+
+// -------------------------------------------------------------- WIX Clients END --------------------------------------------------------------
 
 export const sortByOrderNumber = (array, options = {}) => {
     const {
@@ -134,7 +139,7 @@ export const formatTotalPrice = (price) => {
 
 
 export const mapProductSetItems = (data) => {
-    try {        
+    try {
         if (!data?.productSetItems || !data?.products) return [];
         const productMap = new Map(data.products.map(product => [product._id, product]));
 
@@ -150,3 +155,7 @@ export const mapProductSetItems = (data) => {
         return [];
     }
 };
+
+export const calculateCartTotalQuantity = (lineItems) => {
+    return lineItems.reduce((total, currentItem) => total + currentItem.quantity, 0);
+}
