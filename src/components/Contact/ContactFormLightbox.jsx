@@ -2,7 +2,6 @@
 import React, { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import ContactUs from '../Modals/ContactUs';
-import { storeActions } from '@/store';
 
 export const ContactFormLightbox = ({ isOpen, onClose }) => {
     return (
@@ -31,7 +30,7 @@ export const ContactFormLightbox = ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="w-full transform overflow-hidden   text-left align-middle shadow-xl transition-all relative flex justify-center items-center"> 
+                            <DialogPanel className="w-full transform overflow-hidden   text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
                                 <div onClick={onClose} className='bg-[#2c2216a6] absolute top-0 left-0 w-full h-full z-[1]'></div>
                                 <ContactUs />
                             </DialogPanel>
@@ -42,26 +41,3 @@ export const ContactFormLightbox = ({ isOpen, onClose }) => {
         </Transition>
     );
 };
-
-const ContactForm = () => {
-
-
-    return (
-        <>
-            {/* Desktop: show button */}
-            <div className="hidden lg:flex justify-center items-center py-[80px]">
-                <button
-                    className="bg-primary text-white px-6 py-4 rounded-lg font-bold hover:bg-primary-dark transition"
-                    onClick={() => storeActions.showLightBox("contact")}
-                >
-                    Open Contact Form
-                </button>
-            </div>
-
-            {/* Mobile: show full form inline */}
-            <ContactUs classes="lg:hidden block"/>
-        </>
-    );
-};
-
-export default ContactForm;

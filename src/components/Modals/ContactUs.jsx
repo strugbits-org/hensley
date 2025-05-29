@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from 'react';
 
 const InputField = ({ id, label, placeholder, classes, borderColor = 'black', type = "text" }) => {

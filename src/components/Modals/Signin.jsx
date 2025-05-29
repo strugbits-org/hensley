@@ -57,9 +57,9 @@ const SignIn = ({ classes, close }) => {
                 {/* Existing SVG and Image */}
                 <svg xmlns="http://www.w3.org/2000/svg" width="24.5" height="24.5" onClick={close} className='lg:block hidden absolute left-11 top-11 cursor-pointer' viewBox="0 0 24.5 24.5">
                     <g id="Group_3530" data-name="Group 3530" transform="translate(0.5 24.5) rotate(-90)">
-                        <path id="Path_3283" data-name="Path 3283" d="M.354.5h24v24" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
-                        <line id="Line_13" data-name="Line 13" x1="23.501" y2="23.501" transform="translate(0.499)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
-                        <line id="Line_14" data-name="Line 14" x1="23.501" y2="23.501" transform="translate(0.499)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
+                        <path id="Path_3283" data-name="Path 3283" d="M.354.5h24v24" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" stroke-miterlimit="10" strokeWidth="1" />
+                        <line id="Line_13" data-name="Line 13" x1="23.501" y2="23.501" transform="translate(0.499)" fill="none" stroke="#2c2216" stroke-miterlimit="10" strokeWidth="1" />
+                        <line id="Line_14" data-name="Line 14" x1="23.501" y2="23.501" transform="translate(0.499)" fill="none" stroke="#2c2216" stroke-miterlimit="10" strokeWidth="1" />
                     </g>
                 </svg>
 

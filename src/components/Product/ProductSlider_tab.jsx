@@ -51,6 +51,8 @@ const ProductSlider_tab = ({ product }) => {
       return (
         <div key={`slide-${idx}`} className="keen-slider__slide relative bg-white">
           <PrimaryImage
+            min_h={200}
+            min_w={200}
             url={slide.src}
             alt={`Product image ${idx + 1}`}
             customClasses="h-full w-full object-contain"

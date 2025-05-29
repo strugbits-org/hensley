@@ -1,16 +1,16 @@
 "use client";
 import React from 'react';
 import { useSnapshot } from 'valtio';
-import { storeActions, storeState } from '@/store';
-import { ContactFormLightbox } from '@/components/Contact/ContactForm';
+import { lightboxActions, lightboxState } from '@/store/lightboxStore';
+import { ContactFormLightbox } from '@/components/Contact/ContactFormLightbox';
 
 export const ModalsWrapper = () => {
-    const { lightboxes } = useSnapshot(storeState);
+    const { lightboxes } = useSnapshot(lightboxState);
     const { contact } = lightboxes;
 
     return (
         <>
-            <ContactFormLightbox isOpen={contact} onClose={() => storeActions.hideLightBox("contact")} />
+            <ContactFormLightbox isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
         </>
     )
 }

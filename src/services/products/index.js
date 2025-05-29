@@ -117,18 +117,19 @@ export const fetchMatchedProducts = async (id) => {
         const response = await queryCollection({
             dataCollectionId: "MATCHITWITH",
             includeReferencedItems: ["matchProducts"],
-            hasSome: [
+            eq: [
                 {
                     key: "product",
-                    values: [id]
+                    value: id
                 }
-            ]
+            ],
         });
-        if (!Array.isArray(response.items)) {
+        if (!Array.isArray(response.items) || response.items.length === 0) {
             throw new Error(`Response does not contain items array`);
         }
 
-        return response.items;
+        const data = response.items[0].matchProducts.filter(item => typeof item !== "string");
+        return data;
     } catch (error) {
         logError(`Error fetching matched products: ${error.message}`, error);
     }

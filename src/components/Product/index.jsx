@@ -4,11 +4,11 @@ import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { formatTotalPrice, logError } from '@/utils';
+import { calculateTotalCartQuantity, formatTotalPrice, logError } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
-import { useSnapshot } from 'valtio';
-import { storeActions, storeState } from '@/store';
 import { AddProductToCart } from '@/services/cart/CartApis';
+import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import { useCookies } from 'react-cookie';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -50,15 +50,21 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
 );
 
 export const Product = ({ data }) => {
-  const { productData, productCollectionData } = data;
-  const { product } = productData;
-  const { cartItems } = useSnapshot(storeState);
-
-  const isProductCollection = productCollectionData?.length > 0;
-  const [cartQuantity, setCartQuantity] = useState(1);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  console.log("data", data);
+  
+  const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
   const [productSetItems, setProductSetItems] = useState([]);
+  const [cartQuantity, setCartQuantity] = useState(1);
+  const [isUpdatingCart, setIsUpdatingCart] = useState(false);
+
+  const redirectWithLoader = useRedirectWithLoader();
+
+  const { productData, productCollectionData } = data;
+  const { product } = productData;
+
+  const isProductCollection = productCollectionData?.length > 0;
+
 
   useMemo(() => {
     if (!isProductCollection) {
@@ -117,8 +123,7 @@ export const Product = ({ data }) => {
   }, [isProductCollection]);
 
   const handleAddToCart = async () => {
-    console.log("Product added to cart!");
-    setIsButtonDisabled(true);
+    setIsUpdatingCart(true);
     try {
       const product_id = product._id;
       const cartData = {
@@ -133,21 +138,15 @@ export const Product = ({ data }) => {
         ],
       };
 
-      const res = await AddProductToCart(cartData);
-      console.log("res", res);
-      return;
-
-
+      await AddProductToCart(cartData);
       const newItems = calculateTotalCartQuantity(cartData.lineItems);
-      const total = cookies.cartItems ? cookies.cartItems + newItems : newItems;
-      storeActions.setCartQuantity(total);
-
-      pageLoadStart();
-      router.push("/cart");
+      const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      setCookie("cartQuantity", total, { path: "/" });
+      redirectWithLoader("/cart");
     } catch (error) {
       logError("Error while adding item to cart:", error);
     } finally {
-      setIsButtonDisabled(false);
+      setIsUpdatingCart(false);
     }
   };
 
@@ -226,7 +225,7 @@ export const Product = ({ data }) => {
           <ProductDescription text={product.description} />
         </div>
 
-        <AddToCartButton text="Add to Quote" disabled={isButtonDisabled} onClick={handleAddToCart} />
+        <AddToCartButton text={isUpdatingCart ? "Adding..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
         <SaveProductButton />
       </div>
     </div>

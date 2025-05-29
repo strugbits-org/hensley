@@ -156,6 +156,6 @@ export const mapProductSetItems = (data) => {
     }
 };
 
-export const calculateCartTotalQuantity = (lineItems) => {
+export const calculateTotalCartQuantity = (lineItems) => {
     return lineItems.reduce((total, currentItem) => total + currentItem.quantity, 0);
 }
