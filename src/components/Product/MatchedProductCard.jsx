@@ -1,17 +1,15 @@
 import React from 'react';
-import { PrimaryImage } from './PrimaryImage';
-import { CopyIcon } from './helpers/CopyIcon';
 import { copyToClipboard } from '@/utils';
-import { CustomLink } from './CustomLink';
+import { CopyIcon } from '../common/helpers/CopyIcon';
+import { PrimaryImage } from '../common/PrimaryImage';
+import { CustomLink } from '../common/CustomLink';
 
-
-function ProductCard({ data, onAddToCart, type = 'listing' }) {
-    const { product } = data;
-    const { name } = product;
+function MatchedProductCard({ data, onAddToCart, type = 'listing' }) {
+    const { mainMedia, name, slug, sku, additionalInfoSections } = data;
     return (
-        <CustomLink to={`/product/${product.slug}`} className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
+        <CustomLink to={`/product/${slug}`} className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
             <div className={`h-full overflow-hidden flex justify-center items-center p-10 ${type === 'listing' ? 'bg-white' : ''}`}>
-                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"} />
+                <PrimaryImage timeout={50} alt={name} url={mainMedia} fit='fit' customClasses={"min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
             <div className="max-w-full flex-wrap pt-2 lg:pt-6 lg:pb-2">
@@ -21,13 +19,13 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
 
                 <div className="mt-1 w-full flex flex-col 2xl:flex-row justify-between items-center gap-4">
                     <div className='2xl:w-2/3 w-full grow flex lg:flex-row justify-start flex-wrap items-center gap-2'>
-                        {product.sku && (
-                            <div onClick={() => copyToClipboard(product.sku)} className="flex justify-center items-center">
-                                <span className="text-[12px] text-secondary-alt mr-[8px] word-break">{product.sku}</span>
+                        {sku && (
+                            <div onClick={() => copyToClipboard(sku)} className="flex justify-center items-center">
+                                <span className="text-[12px] text-secondary-alt mr-[8px] word-break">{sku}</span>
                                 <CopyIcon />
                             </div>
                         )}
-                        {product.additionalInfoSections?.map((data, index) => {
+                        {additionalInfoSections?.map((data, index) => {
                             const { title, description } = data;
                             if (title == "Size") {
                                 return (
@@ -44,7 +42,7 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
                     </div>
 
                     <button
-                        className="w-full 2xl:w-auto min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary px-4 py-3 gap-x-7"
+                        className="w-full 2xl:w-auto min-w-[151px] border border-secondary-alt flex items-center justify-between 2xl:justify-center bg-primary px-4 py-3 gap-x-7"
                         onClick={onAddToCart}
                     >
                         <span className="uppercase font-haasRegular text-[12px]">add to cart</span>
@@ -66,4 +64,4 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
     );
 }
 
-export default ProductCard;
+export default MatchedProductCard;

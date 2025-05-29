@@ -24,7 +24,7 @@ export default function OurProjects({ data, pageDetails }) {
         slides: { perView: 1.2, spacing: 10, origin: "center" },
       },
       "(min-width: 1024px)": {
-        slides: { perView: 1.1, spacing: 10, },
+        slides: { perView: 1.1, spacing: 0, },
       },
     },
     created(s) {

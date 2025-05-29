@@ -66,6 +66,7 @@ export const PrimaryImage = ({
     useEffect(() => {
         setTimeout(() => {
             const newSrc = generateSrc();
+            console.log("--newSrc--",newSrc);
             setSrc(newSrc);
         }, timeout);
 
@@ -73,7 +74,9 @@ export const PrimaryImage = ({
         return () => {
             window.removeEventListener('resize', handleResize);
         };
+
     }, []);
+
 
     return (
         <>
