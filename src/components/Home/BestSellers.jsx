@@ -6,7 +6,7 @@ import ProductCard from '../common/ProductCard'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 
-export const BestSellers = ({ data, pageDetails, loop = true, origin = "center",classes, headingClasses, buttonHide=false }) => {
+export const BestSellers = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false }) => {
     const { bestSellerTitle } = pageDetails;
 
     const sliderInstance = useRef();

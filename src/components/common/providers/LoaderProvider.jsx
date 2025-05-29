@@ -7,9 +7,13 @@ import { lightboxActions } from "@/store/lightboxStore";
 export default function LoaderProvider({ children }) {
   const pathname = usePathname();
 
+  const dynamicPages = ["/cart"];
+
   useEffect(() => {
-    loaderActions.hide();
-    lightboxActions.hideAllLightBoxes();
+    if (!dynamicPages.includes(pathname)) {
+      loaderActions.hide();
+      lightboxActions.hideAllLightBoxes();
+    }
   }, [pathname]);
 
   return children;

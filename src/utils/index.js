@@ -159,3 +159,12 @@ export const mapProductSetItems = (data) => {
 export const calculateTotalCartQuantity = (lineItems) => {
     return lineItems.reduce((total, currentItem) => total + currentItem.quantity, 0);
 }
+
+export const formatDescriptionLines = (items) => {
+    return items.reduce((acc, item) => {
+        const title = item.name?.translated || item.name?.original;
+        const value = item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
+        acc.push({ title, value });
+        return acc;
+    }, []);
+}

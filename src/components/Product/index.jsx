@@ -51,7 +51,7 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
 
 export const Product = ({ data }) => {
   console.log("data", data);
-  
+
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
   const [productSetItems, setProductSetItems] = useState([]);
@@ -126,12 +126,18 @@ export const Product = ({ data }) => {
     setIsUpdatingCart(true);
     try {
       const product_id = product._id;
+      const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
       const cartData = {
         lineItems: [
           {
             catalogReference: {
               appId: "215238eb-22a5-4c36-9e7b-e7c08025e04e",
               catalogItemId: product_id,
+              options: {
+                customTextFields: {
+                  size: size,
+                },
+              },
             },
             quantity: cartQuantity,
           },

@@ -13,7 +13,9 @@ export default async function Page({ params }) {
     }
 
     return (
-      <Product data={data} />
+      <>
+        <Product data={data} />
+      </>
     );
   } catch (error) {
     logError("Error fetching product page data:", error);
