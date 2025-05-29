@@ -35,7 +35,6 @@ export const HeaderMobileMenu = ({
     activeMenu,
     handleMainMenuClick,
     handleSubMenuClick,
-    setIsMobileMenuOpen,
     closeAllModals
 }) => {
     const transitionClass = isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full';
@@ -59,24 +58,14 @@ export const HeaderMobileMenu = ({
                                             </button>
                                             {activeMenu === item.title && item.type !== "markets" && (
                                                 subNavigation.map((subItem) => (
-                                                    subItem.type !== "slug" ? (
-                                                        <button
-                                                            key={subItem.title}
-                                                            onClick={() => handleSubMenuClick(subItem)}
-                                                            className="font-haasLight text-center cursor-pointer text-[21px] tracking-widest"
-                                                        >
-                                                            {subItem.title}
-                                                        </button>
-                                                    ) : (
-                                                        <CustomLink
-                                                            key={subItem.title}
-                                                            to={subItem.slug}
-                                                            onClick={() => setIsMobileMenuOpen(false)}
-                                                            className="font-haasLight text-center cursor-pointer text-[21px] tracking-wider"
-                                                        >
-                                                            {subItem.title}
-                                                        </CustomLink>
-                                                    )
+                                                    <button
+                                                        key={subItem.title}
+                                                        onClick={() => handleSubMenuClick(subItem, true)}
+                                                        className="font-haasLight text-center cursor-pointer text-[21px] tracking-widest"
+                                                    >
+                                                        {subItem.title}
+                                                    </button>
+
                                                 ))
                                             )}
                                         </React.Fragment>

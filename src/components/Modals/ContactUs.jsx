@@ -100,7 +100,7 @@ const FormHeading = () => (
 
 const ContactUs = ({ classes }) => {
     return (
-        <div className={`${classes} w-full flex justify-center items-center lg:py-[80px] z-[9999] relative lg:w-[762px]`}>
+        <div className={`${classes} w-full flex justify-center items-center lg:py-[80px] z-[1] relative lg:w-[762px]`}>
             <form className=' h-full w-full bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[12px] px-[36px] pt-[50px] pb-[55px]'>
 
                 {/* Top Section */}

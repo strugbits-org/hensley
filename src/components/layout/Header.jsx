@@ -66,11 +66,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
         }, 50);
     }
 
-    const handleSubMenuClick = (item) => {
+    const handleSubMenuClick = (item, isMobile = false) => {
         setSearchModal(false);
-
         const currentSubMenu = headerMegaMenu.filter(x => x.HeaderSubMenu_categories.some(y => y._id === item._id));
-
         const newMenu = {
             title: item.title,
             type: item.type,
@@ -86,8 +84,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
             setSelectedMenu(newMenu);
         }
 
-        if (item.type === "slug") {
+        if (item.type === "slug" || (item?.useSlugForMobile && isMobile)) {
             redirectwithLoader(item.slug);
+            toggleMobileMenu();
         } else if (item.type === "lightbox") {
             storeActions.showLightBox(item.lightbox);
         }
@@ -190,39 +189,27 @@ export const Header = ({ data, marketsData, tentsData }) => {
                     <div className="h-[45px] relative">
                         <div className="absolute inset-0 -z-10 bg-primary-glass backdrop-blur-[10px] brightness-[30px]"></div>
                         <nav
-                            className="h-full p-2 lg:px-6 grid items-center max-w-7xl mx-auto"
+                            className="h-full px-2 lg:px-6 grid items-center max-w-7xl mx-auto"
                             style={{ gridTemplateColumns: `repeat(${subNavigation.length || 1}, minmax(0, 1fr))` }}
                         >
                             {subNavigation.map((item) => {
-                                const { title, slug, type } = item;
+                                const { title } = item;
+                                const isActive = selectedMenu?.title === title || item.slug === pathname;
 
-                                // return type !== "slug" ? (
                                 return (
-                                    <button
-                                        key={title}
-                                        className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
-                                        onClick={() => handleSubMenuClick(item)}
-                                    >
-                                        {title}
-                                    </button>
-                                    // ) : type.startsWith("modal") ? (
-                                    //     <CustomLink
-                                    //         onClick={closeAllModals}
-                                    //         key={title}
-                                    //         to={slug}
-                                    //         className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
-                                    //     >
-                                    //         {title}
-                                    //     </CustomLink>
-                                    // ) : (
-                                    //     <CustomLink
-                                    //         onClick={closeAllModals}
-                                    //         key={title}
-                                    //         to={slug}
-                                    //         className="uppercase text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
-                                    //     >
-                                    //         {title}
-                                    //     </CustomLink>
+
+                                    <li key={title} className="h-full flex justify-center items-center relative group">
+                                        <button
+                                            key={title}
+                                            className="uppercase h-full w-full text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                            onClick={() => handleSubMenuClick(item)}
+                                        >
+                                            {title}
+                                        </button>
+                                        <span
+                                            className={`absolute bottom-[0.5px] left-0 h-0.5 bg-secondary-alt transition-all duration-300 ease-in-out ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}
+                                        ></span>
+                                    </li>
                                 )
                             })}
                         </nav>
