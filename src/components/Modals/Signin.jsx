@@ -155,8 +155,8 @@ const SignIn = ({ classes, close }) => {
 
                 <span className='font-recklessLight text-[35px] leading-[20px] text-secondary-alt block lg:mt-0 mt-[100px]'>NEW TO HENSLEY?</span>
 
-                <button className='tracking-[5px] hover:tracking-[8px] transform transition-all duration-300 border border-secondary-alt h-[45px] lg:w-[292px] w-full text-secondary-alt uppercase text-[12px] font-haasRegular'>
-                    create account
+                <button className='tracking-[3px] hover:tracking-[5px] hover:bg-primary hover:font-haasBold transform transition-all duration-300 border border-secondary-alt h-[45px] lg:w-[292px] w-full text-secondary-alt uppercase text-[12px] font-haasRegular'>
+                    create your account
                 </button>
             </form>
         </div>
