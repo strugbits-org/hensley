@@ -2,10 +2,13 @@
 import React, { useMemo, useState, useCallback } from 'react'
 import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
-import { AddToQuote } from './AddtoQuoteButton'
+import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { formatTotalPrice } from '@/utils';
+import { formatTotalPrice, logError } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
+import { useSnapshot } from 'valtio';
+import { storeActions, storeState } from '@/store';
+import { AddProductToCart } from '@/services/cart/CartApis';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -49,9 +52,11 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
 export const Product = ({ data }) => {
   const { productData, productCollectionData } = data;
   const { product } = productData;
+  const { cartItems } = useSnapshot(storeState);
 
   const isProductCollection = productCollectionData?.length > 0;
   const [cartQuantity, setCartQuantity] = useState(1);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const [productSetItems, setProductSetItems] = useState([]);
 
@@ -110,6 +115,41 @@ export const Product = ({ data }) => {
       setCartQuantity(numValue);
     }
   }, [isProductCollection]);
+
+  const handleAddToCart = async () => {
+    console.log("Product added to cart!");
+    setIsButtonDisabled(true);
+    try {
+      const product_id = product._id;
+      const cartData = {
+        lineItems: [
+          {
+            catalogReference: {
+              appId: "215238eb-22a5-4c36-9e7b-e7c08025e04e",
+              catalogItemId: product_id,
+            },
+            quantity: cartQuantity,
+          },
+        ],
+      };
+
+      const res = await AddProductToCart(cartData);
+      console.log("res", res);
+      return;
+
+
+      const newItems = calculateTotalCartQuantity(cartData.lineItems);
+      const total = cookies.cartItems ? cookies.cartItems + newItems : newItems;
+      storeActions.setCartQuantity(total);
+
+      pageLoadStart();
+      router.push("/cart");
+    } catch (error) {
+      logError("Error while adding item to cart:", error);
+    } finally {
+      setIsButtonDisabled(false);
+    }
+  };
 
   const renderTableRows = () => {
     if (isProductCollection) {
@@ -186,7 +226,7 @@ export const Product = ({ data }) => {
           <ProductDescription text={product.description} />
         </div>
 
-        <AddToQuote text="add to quote" />
+        <AddToCartButton text="Add to Quote" onClick={handleAddToCart} />
         <SaveProductButton />
       </div>
     </div>

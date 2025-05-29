@@ -1,5 +1,7 @@
 import { ApiKeyStrategy, createClient, OAuthStrategy } from "@wix/sdk";
 import { collections, items } from "@wix/data";
+import { members } from "@wix/members";
+import { cart, currentCart } from "@wix/ecom";
 import { submissions } from "@wix/forms";
 import parse from 'html-react-parser';
 
@@ -16,6 +18,9 @@ export const createWixClient = async () => {
                 collections,
                 items,
                 submissions,
+                members,
+                cart,
+                currentCart
             },
             auth: ApiKeyStrategy({
                 siteId: process.env.SITE_ID_WIX,
@@ -40,8 +45,24 @@ export const createWixClientOAuth = async () => {
         });
         return wixClient;
     } catch (error) {
-        logError("Error creating wix client: ", error);
+        logError("Error creating OAuth wix client: ", error);
     }
+};
+
+export const createWixClientCart = async (memberTokens) => {
+  try {
+    const wixClient = createClient({
+      modules: { currentCart },
+      auth: OAuthStrategy({
+        clientId: process.env.CLIENT_ID_WIX,
+        tokens: memberTokens,
+      }),
+    });
+
+    return wixClient;
+  } catch (error) {
+    logError("Error creating cart wix client: ", error);
+  }
 };
 
 export const sortByOrderNumber = (array, options = {}) => {

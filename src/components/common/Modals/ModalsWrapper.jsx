@@ -6,8 +6,6 @@ import { ContactFormLightbox } from '@/components/Contact/ContactForm';
 
 export const ModalsWrapper = () => {
     const { contactForm } = useSnapshot(storeState);
-    console.log("contactForm", contactForm);
-
     return (
         <>
             <ContactFormLightbox isOpen={contactForm} onClose={storeActions.hideContactForm} />

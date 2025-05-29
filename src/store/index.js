@@ -2,7 +2,7 @@ import { proxy } from 'valtio';
 
 export const storeState = proxy({
     contactForm: false,
-    cartQuantity: 0
+    cartItems: 0
 });
 
 export const storeActions = {
@@ -13,6 +13,6 @@ export const storeActions = {
         storeState.contactForm = false;
     },
     setCartQuantity: (quantity) => {
-        storeState.cartQuantity = quantity;
+        storeState.cartItems = quantity;
     }
 };
