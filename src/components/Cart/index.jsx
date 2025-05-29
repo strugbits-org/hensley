@@ -6,22 +6,21 @@ import PriceDisplay from './PriceDisplay'
 import { AddToQuote } from './AddtoQuoteButton'
 import { CustomLink } from '../common/CustomLink'
 import { getProductsCart } from '@/services/cart/CartApis';
-import { storeActions } from '@/store';
-import { calculateCartTotalQuantity } from '@/utils';
+import { calculateTotalCartQuantity } from '@/utils';
+import { useCookies } from 'react-cookie';
 
 const Cart = () => {
-
+  const [_cookies, setCookie] = useCookies(["cartQuantity"]);
   const [cartItems, setCartItems] = useState([]);
 
-  const getCartItems = async () => {
+  const fetchCartItems = async () => {
     try {
-      const cart = await getProductsCart();
-      setCartItems(cart);
+      const response = await getProductsCart();
+      setCartItems(response);
 
-      const cartQuantity = calculateCartTotalQuantity(cart);
-      storeActions.setCartQuantity(cartQuantity);
-      console.log("cart", cart);
-      console.log("cartQuantity", cartQuantity);
+      const total = calculateTotalCartQuantity(response);
+      setCookie("cartQuantity", total > 0 ? String(total) : "0", { path: "/" });
+      console.log("cart", response);
 
     } catch (error) {
       console.error("Error fetching cart items:", error);
@@ -29,7 +28,7 @@ const Cart = () => {
   };
 
   useEffect(() => {
-    getCartItems();
+    fetchCartItems();
   }, []);
   return (
     <>

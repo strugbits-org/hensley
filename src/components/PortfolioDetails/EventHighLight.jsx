@@ -84,9 +84,9 @@ const EventHighLight = () => {
                     viewBox="0 0 36.355 36.562"
                 >
                     <g id="Group_3530" data-name="Group 3530" transform="translate(35.855 18.178) rotate(135)">
-                        <path id="Path_3283" data-name="Path 3283" d="M.354.5h25v25" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
-                        <line id="Line_13" data-name="Line 13" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
-                        <line id="Line_14" data-name="Line 14" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
+                        <path id="Path_3283" data-name="Path 3283" d="M.354.5h25v25" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" stroke-miterlimit="10" strokeWidth="1" />
+                        <line id="Line_13" data-name="Line 13" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" stroke-miterlimit="10" strokeWidth="1" />
+                        <line id="Line_14" data-name="Line 14" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" stroke-miterlimit="10" strokeWidth="1" />
                     </g>
                 </svg> */}
 

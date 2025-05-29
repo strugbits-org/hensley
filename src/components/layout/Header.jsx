@@ -13,36 +13,37 @@ import { SubCategoriesModal } from '../Modals/SubCategoriesModal';
 import { MarketTentModal } from '../Modals/MarketTentModal';
 import { SearchModal } from '../Modals/SearchModal';
 import { HeaderMobileMenu } from './HeaderMobileMenu';
-import { sortByOrderNumber } from '@/utils';
-import { loaderActions } from '@/store/loaderStore';
-import { storeActions } from '@/store';
+import { calculateTotalCartQuantity, sortByOrderNumber } from '@/utils';
+import { lightboxActions } from '@/store/lightboxStore';
+import { getProductsCart } from '@/services/cart/CartApis';
+import { useCookies } from 'react-cookie';
+import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 
 const userMenu = [
-    { icon: searchIcon, slug: '#', type: 'search' },
+    { icon: searchIcon, type: 'search' },
     { icon: userIcon, slug: '/account', type: 'account' },
-    { icon: cartIcon, slug: '/cart', count: 1, type: 'cart' },
+    { icon: cartIcon, slug: '/cart', type: 'cart' },
 ];
 
 export const Header = ({ data, marketsData, tentsData }) => {
+    const [cookies, setCookie, removeCookie] = useCookies(["cartQuantity"]);
+
     const [activeMenu, setActiveMenu] = useState("RENTALS");
     const [subNavigation, setSubNavigation] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState(false);
     const [searchModal, setSearchModal] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [cartTotalQuantity, setCartTotalQuantity] = useState(typeof window !== 'undefined' && localStorage?.getItem('cartQuantity') || "0");
     const pathname = usePathname();
-    const router = useRouter()
+    const router = useRouter();
 
     const { header, headerSubMenu, headerMegaMenu } = data;
+    const redirectWithLoader = useRedirectWithLoader();
 
-    const redirectwithLoader = (slug) => {
-        if (pathname === slug) {
-            loaderActions.show();
-            setTimeout(() => loaderActions.hide(), 900);
-        } else {
-            loaderActions.show();
-            router.push(slug);
-        }
-    }
+    useEffect(() => {
+        const quantity = cookies?.cartQuantity !== undefined ? String(cookies.cartQuantity) : "0";
+        setCartTotalQuantity(quantity);
+    }, [cookies.cartQuantity]);
 
     const handleClickUserMenu = (item) => {
         if (item.type === 'search') {
@@ -53,7 +54,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 return !prev;
             });
         } else {
-            redirectwithLoader(item.slug);
+            redirectWithLoader(item.slug);
         }
     }
 
@@ -85,10 +86,10 @@ export const Header = ({ data, marketsData, tentsData }) => {
         }
 
         if (item.type === "slug" || (item?.useSlugForMobile && isMobile)) {
-            redirectwithLoader(item.slug);
+            redirectWithLoader(item.slug);
             toggleMobileMenu();
         } else if (item.type === "lightbox") {
-            storeActions.showLightBox(item.lightbox);
+            lightboxActions.showLightBox(item.lightbox);
         }
     }
 
@@ -124,6 +125,30 @@ export const Header = ({ data, marketsData, tentsData }) => {
         setSelectedMenu(false);
         setIsMobileMenuOpen(false);
     }
+
+    const fetchCartItems = async () => {
+        try {
+            const response = await getProductsCart();
+            if (response === "Token has expired") {
+                removeCookie("authToken", { path: "/" });
+                removeCookie("cartQuantity", { path: "/" });
+                setTimeout(() => {
+                    router.push("/");
+                }, 500);
+                return;
+            }
+            const total = response ? calculateTotalCartQuantity(response) : "0";
+            if (total !== cookies.cartQuantity) {
+                setCookie("cartQuantity", total, { path: "/" });
+            }
+        } catch (error) {
+            console.error("Error fetching cart items:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartItems();
+    }, []);
 
     return (
         <>
@@ -165,7 +190,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                             {/* User Menu */}
                             <div className="p-2 lg:px-12 py-0.5 flex gap-x-4">
                                 {userMenu.map((item, index) => {
-                                    const { icon, count } = item;
+                                    const { icon, type } = item;
                                     return (
                                         <button
                                             key={index}
@@ -173,9 +198,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                             className="relative h-10 w-10 flex justify-center items-center"
                                         >
                                             <Image height={"20"} src={icon} alt={item.type} />
-                                            {count !== undefined && (
+                                            {type === 'cart' && (
                                                 <span className="absolute top-0 font-haasRegular left-9 min-w-[32px] inline-flex items-center justify-center px-1.5 text-[13px] text-secondary-alt bg-primary rounded-full">
-                                                    {count}
+                                                    {cartTotalQuantity}
                                                 </span>
                                             )}
                                         </button>
@@ -207,7 +232,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                             {title}
                                         </button>
                                         <span
-                                            className={`absolute bottom-[0.5px] left-0 h-0.5 bg-secondary-alt transition-all duration-300 ease-in-out ${isActive ? 'w-full' : 'w-0 group-hover:w-full'}`}
+                                            className={`absolute bottom-[0.5px] left-0 h-0.5 bg-secondary-alt transition-all duration-300 ease-in-out ${isActive ? 'w-full' : 'w-0'}`}
                                         ></span>
                                     </li>
                                 )
@@ -246,7 +271,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                 <Image src={icon} className={`h-7 min-w-[27px] ${isMobileMenuOpen ? "block" : "hidden"}`} alt="Hensley Event Resources Logo" />
                             </CustomLink>
                             {isMobileMenuOpen && userMenu.map((item, index) => {
-                                const { icon, count } = item;
+                                const { icon, type } = item;
                                 return (
                                     <button
                                         key={index}
@@ -254,9 +279,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                         className="relative h-8 flex justify-center items-center"
                                     >
                                         <Image height={"18"} src={icon} alt={item.type} />
-                                        {count !== undefined && (
+                                        {type === 'cart' && (
                                             <span className="absolute -top-1 font-haasRegular left-full min-w-[32px] inline-flex items-center justify-center px-1.5 text-[13px] text-secondary-alt bg-primary rounded-full">
-                                                {count}
+                                                {cartTotalQuantity}
                                             </span>
                                         )}
                                     </button>

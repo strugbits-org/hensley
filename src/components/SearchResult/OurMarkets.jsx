@@ -13,9 +13,9 @@ const MarketCard = () => {
             <svg xmlns="http://www.w3.org/2000/svg" width="34.736" height="34.736" viewBox="0 0 34.736 34.736">
               <g id="Group_3565" data-name="Group 3565" transform="translate(0.354 0.383)">
                 <g id="Group_2072" data-name="Group 2072">
-                  <path id="Path_3283" data-name="Path 3283" d="M.354.5H34.121V34.268" transform="translate(-0.238 -0.383)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" stroke-width="1" />
-                  <line id="Line_13" data-name="Line 13" x1="34" y2="34" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" stroke-width="1" />
-                  <line id="Line_14" data-name="Line 14" x1="34" y2="34" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" stroke-width="1" />
+                  <path id="Path_3283" data-name="Path 3283" d="M.354.5H34.121V34.268" transform="translate(-0.238 -0.383)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
+                  <line id="Line_13" data-name="Line 13" x1="34" y2="34" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
+                  <line id="Line_14" data-name="Line 14" x1="34" y2="34" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
                 </g>
               </g>
             </svg>
