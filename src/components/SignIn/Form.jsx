@@ -32,7 +32,7 @@ const LightboxForm = ({ isOpen, onClose }) => {
                         >
                              <DialogPanel className="w-full transform overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center"> 
                                 <div  onClick={onClose} className='bg-[#2c2216a6] absolute top-0 left-0 w-full h-full z-[1]'></div>
-                                <SignIn />
+                                <SignIn  close={onClose}/>
                             </DialogPanel>
                         </TransitionChild>
                     </div>

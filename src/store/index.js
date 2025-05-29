@@ -12,7 +12,7 @@ export const storeActions = {
         storeState.lightboxes[ligtbox] = true;
     },
     hideLightBox: (ligtbox) => {
-        storeState[ligtbox] = false;
+        storeState.lightboxes[ligtbox] = false;
     },
     hideAllLightBoxes: () => {
         for (const key in storeState.lightboxes) {

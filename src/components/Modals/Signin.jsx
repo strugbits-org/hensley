@@ -47,7 +47,7 @@ const InputField = ({ id, label, placeholder, classes, borderColor = 'black', ty
 
 
 
-const SignIn = ({ classes }) => {
+const SignIn = ({ classes, close }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
@@ -55,7 +55,7 @@ const SignIn = ({ classes }) => {
             <form className='w-full flex flex-col gap-y-[41px] justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[120px] px-[36px] pt-[121px] pb-[55px] relative'>
 
                 {/* Existing SVG and Image */}
-                <svg xmlns="http://www.w3.org/2000/svg" width="24.5" height="24.5" className='lg:block hidden absolute left-11 top-11 cursor-pointer' viewBox="0 0 24.5 24.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24.5" height="24.5" onClick={close} className='lg:block hidden absolute left-11 top-11 cursor-pointer' viewBox="0 0 24.5 24.5">
                     <g id="Group_3530" data-name="Group 3530" transform="translate(0.5 24.5) rotate(-90)">
                         <path id="Path_3283" data-name="Path 3283" d="M.354.5h24v24" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
                         <line id="Line_13" data-name="Line 13" x1="23.501" y2="23.501" transform="translate(0.499)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
