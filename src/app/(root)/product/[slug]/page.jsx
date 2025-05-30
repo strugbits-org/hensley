@@ -1,6 +1,6 @@
 'use client'
 import { Product } from "@/components/Product";
-import { FeatuedProducts } from "@/components/Product/FeaturedProducts";
+import { FeatuedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import { fetchProductPageData } from "@/services/products";
 import { logError } from "@/utils";
@@ -612,6 +612,9 @@ export default async function Page({ params }) {
 
     const {matchedProducts, featuredProjectsData} = data;
 
+    console.log("---featuredProjects----",featuredProjectsData);
+
+
     if (!data) {
       throw new Error("Product data not found");
     }
@@ -619,8 +622,8 @@ export default async function Page({ params }) {
     return (
       <>
         <Product data={data} />
-        {/* <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{bestSellerTitle:"match it with"}} buttonHide={true} /> */}
-        <FeatuedProducts data={featuredProjectsData} pageDetails={{ hensleyNewsTitle: "Products featured in this PROJECT entry:" }}/>
+        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{matchProductsTitle:"match it with"}} buttonHide={true} loop={false} origin="start"/>
+        <FeatuedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }}/>
 
       </>
     );

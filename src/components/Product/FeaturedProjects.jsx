@@ -6,8 +6,8 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import FeaturedCard from './FeaturedCard';
 
-export const FeatuedProducts = ({ data, pageDetails, loop = true, origin = "center" }) => {
-    const { hensleyNewsTitle } = pageDetails;
+export const FeatuedProjects = ({ data, pageDetails, loop = true, origin = "center" }) => {
+    const { featuredProjectTitle } = pageDetails;
 
     const sliderInstance = useRef();
 
@@ -41,11 +41,11 @@ export const FeatuedProducts = ({ data, pageDetails, loop = true, origin = "cent
     );
 
     return (
-        <div className='w-full py-20 bg-primary lg:py-6'>
-            <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col '>
-                <SectionTitle text={hensleyNewsTitle} classes="xl:!text-[60px] lg:!py-[20px] " />
+        data.length > 0 && <div className='w-full py-20 bg-primary lg:py-6'>
+            <div className='sm:px-0 px-[12px] flex items-center flex-col '>
+                <SectionTitle text={featuredProjectTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
             </div>
-            <div className="p-6 bg-[#F4F1EC]">
+            <div className="p-6 bg-[#F4F1EC] bg-primary">
                 <div ref={sliderRef} className="keen-slider ">
                     {data.map((item, index) => {
                         return (
@@ -53,7 +53,7 @@ export const FeatuedProducts = ({ data, pageDetails, loop = true, origin = "cent
                                 key={index}
                                 className={`keen-slider__slide flex px-2 `}
                             >
-                                <FeaturedCard data={item} />
+                                <FeaturedCard data={item} classes={"bg-primary-alt"}/>
                             </div>
                         );
                     })}

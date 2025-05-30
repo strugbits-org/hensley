@@ -9,7 +9,7 @@ import { useKeenSlider } from 'keen-slider/react'
 import MatchedProductCard from './MatchedProductCard';
 
 export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center",classes, headingClasses, buttonHide=false }) => {
-    const { bestSellerTitle } = pageDetails;
+    const { matchProductsTitle } = pageDetails;
 
     const sliderInstance = useRef();
 
@@ -41,9 +41,9 @@ export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center
     );
 
     return (
-        <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-6`}>
+       data.length > 0 && <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-6`}>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={bestSellerTitle} classes={`!text-primary lg:py-[40px] py-[20px] md:mt-6 lg:mt-0 ${headingClasses}`} />
+                 <SectionTitle text={matchProductsTitle} classes={`lg:!text-[200px] lg:!leading-[160px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] ${headingClasses}`} />
                 {!buttonHide && <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>}
             </div>
             <div className="p-6">

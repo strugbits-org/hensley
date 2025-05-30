@@ -4,17 +4,20 @@ import { Tag } from '../common/helpers/Tag';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { generateImageURLAlternate } from '@/utils/generateImageURL';
 
-function FeaturedCard({ data }) {
+function FeaturedCard({ data, classes }) {
 
     // const { portfolioRef, author, slug, markets, studios } = data;
-    const {image, slug, portfolioRef, markets, studios } = data;
+    const {image, slug, portfolioRef, markets, studios,publishDate } = data;
     const { title, coverImage, seoData } = portfolioRef;
     const {tags} = seoData
+
+    console.log("-----Data------",data);
+    console.log("--Portfolio--",portfolioRef);
 
 
 
     return (
-        <div className="relative group border border-primary-border pb-2">
+        <div className={`${classes} relative group border border-primary-border pb-2`}>
             <PrimaryImage alt={title} url={coverImage.imageInfo} type={"alternate"} customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
             {/* <img src={generateImageURLAlternate({wix_url:coverImage.imageInfo})} className="h-full w-full object-cover min-h-[528px] max-h-[528px]" /> */}
             <div className='w-full flex gap-1 p-6 pb-0'>
@@ -32,7 +35,7 @@ function FeaturedCard({ data }) {
                 </div>
             </div>
             <div className='px-6'>
-                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>{formatDate(portfolioRef.publishedDate)} - {portfolioRef.nickname}</p>
+                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>{formatDate(publishDate)} - {portfolioRef.nickname}</p>
 
                 <ul className="flex gap-2 flex-wrap">
                     {markets?.map((market, index) => (
