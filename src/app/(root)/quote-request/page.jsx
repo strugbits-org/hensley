@@ -6,7 +6,7 @@ export default async function Page() {
   try {
 
     return (
-        <QuoteRequest />
+      <QuoteRequest />
     );
   } catch (error) {
     logError("Error fetching quote request form data:", error);

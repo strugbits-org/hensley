@@ -134,7 +134,7 @@ const Cart = () => {
         </div>
       </div>
       <CustomLink to={"/quote-request"}>
-        <AddToQuote text={"request to quote"} onClick={() => { }} />
+        <AddToQuote text={"request to quote"} />
       </CustomLink>
     </>
   )
