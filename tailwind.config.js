@@ -3,6 +3,7 @@
 import { fontFamily } from 'tailwindcss/defaultTheme';
 
 module.exports = {
+  darkMode: 'class',
   content: [
     "./node_modules/flowbite-datepicker/**/*.js",
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",

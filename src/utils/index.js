@@ -2,8 +2,10 @@ import { ApiKeyStrategy, createClient, OAuthStrategy } from "@wix/sdk";
 import { collections, items } from "@wix/data";
 import { members } from "@wix/members";
 import { cart, currentCart } from "@wix/ecom";
+import { contacts } from "@wix/crm";
 import { submissions } from "@wix/forms";
 import parse from 'html-react-parser';
+import { generateImageURL, generateImageURLAlternate } from "./generateImageURL";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
 
@@ -20,7 +22,8 @@ export const createWixClient = async () => {
                 submissions,
                 members,
                 cart,
-                currentCart
+                currentCart,
+                contacts
             },
             auth: ApiKeyStrategy({
                 siteId: process.env.SITE_ID_WIX,
@@ -167,4 +170,88 @@ export const formatDescriptionLines = (items) => {
         acc.push({ title, value });
         return acc;
     }, []);
+}
+
+export function formatLineItemsForQuote(lineItems) {
+    const formattedCartData = [];
+    let counter = 0;
+
+    for (const item of lineItems || []) {
+        const { productName, price, quantity, customTextFields } = item;
+
+        if (!customTextFields?.length) {
+            formattedCartData.push({
+                id: `${counter++}`,
+                name: productName.original,
+                description: "—",
+                price: price.amount,
+                quantity
+            });
+            continue;
+        }
+
+        const isSet = customTextFields.find(f => f.title === "Set");
+        const isTentOrCover = customTextFields.find(f => f.title === "TENT TYPE" || f.title === "POOLCOVER");
+
+        if (isSet) {
+            const setItems = isSet.value.split("; ");
+            formattedCartData.push({
+                id: `${counter++}`,
+                name: productName.original,
+                description: "PRODUCT SET",
+                price: 0,
+                quantity: 1
+            });
+
+            for (const setItem of setItems) {
+                const [setName, size, setPrice, setQuantity] = setItem.split("~").map(v => v.trim());
+                const description = size && size !== "—" ? `${size} | SET OF ${name}` : `SET OF ${name}`;
+                const existing = formattedCartData.find(i => i.name === `${setName} - ` && i.description === description);
+
+                if (existing) {
+                    existing.quantity += parseInt(setQuantity, 10);
+                } else {
+                    formattedCartData.push({
+                        id: `${counter++}`,
+                        name: `${setName} - `,
+                        description,
+                        price: parseFloat(setPrice),
+                        quantity: parseInt(setQuantity, 10)
+                    });
+                }
+            }
+        }
+
+        if (isTentOrCover) {
+            formattedCartData.push({
+                id: `${counter++}`,
+                name: productName.original,
+                description: generateDescriptionForQuote(customTextFields, isTentOrCover.title === "POOLCOVER"),
+                price: price.amount,
+                quantity
+            });
+        }
+    }
+
+    return formattedCartData;
+}
+
+function generateDescriptionForQuote(customTextFields, poolCover) {
+    const fields = customTextFields || [];
+
+    const imageField = fields.find(f => f.title === "RELEVENT IMAGES");
+    const images = imageField?.value?.split("~~") || [];
+
+    const descriptionLines = fields
+        .filter(f => f.title !== "POOLCOVER" && f.title !== "RELEVENT IMAGES")
+        .map(f => `${f.title}: ${f.value || "Not provided"}`);
+
+    if (poolCover && images.length > 0) {
+        const imageUrls = images.map(url =>
+            generateImageURL({ wix_url: url }) || generateImageURLAlternate({ wix_url: url })
+        );
+        descriptionLines.push("RELEVANT IMAGES:", ...imageUrls);
+    }
+
+    return descriptionLines.join("\n");
 }
