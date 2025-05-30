@@ -227,6 +227,7 @@ export const QuoteRequest = () => {
                         onChange={() => setOrderType(type.id)}
                         className="form-radio h-[34px] w-[34px] accent-[#57442D] focus:ring-[#57442D]"
                         disabled={isSubmitting}
+                        autoComplete="false"
                       />
                       <span className="ml-2 font-medium text-secondary-alt font-recklessRegular">{type.label}</span>
                     </label>
@@ -253,6 +254,7 @@ export const QuoteRequest = () => {
                   className={`datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''}`}
                   data-datepicker
                   disabled={isSubmitting}
+                  autoComplete="false"
                 />
               </div>
             ))}
@@ -268,7 +270,8 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                  disabled={isSubmitting}
+                    disabled={isSubmitting}
+                  autoComplete="false"
                 />
               </div>
             ))}
@@ -293,7 +296,8 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                  disabled={isSubmitting}
+                    disabled={isSubmitting}
+                  autoComplete="false"
                 />
               </div>
             ))}
@@ -309,7 +313,8 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                  disabled={isSubmitting}
+                    disabled={isSubmitting}
+                  autoComplete="false"
                 />
               </div>
             ))}
@@ -330,7 +335,8 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                  disabled={isSubmitting}
+                    disabled={isSubmitting}
+                  autoComplete="false"
                 />
               </div>
             ))}
@@ -353,7 +359,8 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                  disabled={isSubmitting}
+                    disabled={isSubmitting}
+                  autoComplete="false"
                 />
               </div>
             ))}
@@ -363,6 +370,7 @@ export const QuoteRequest = () => {
             <Submit
               text={isSubmitting ? "SUBMITTING..." : formConfig.submitButton}
               disabled={isSubmitting}
+              autoComplete="false"
             />
           </div>
         </div>
