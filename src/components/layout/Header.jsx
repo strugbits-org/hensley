@@ -137,7 +137,8 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 }, 500);
                 return;
             }
-            const total = response ? calculateTotalCartQuantity(response) : "0";
+            const lineItems = response?.lineItems || [];
+            const total = calculateTotalCartQuantity(lineItems);
             if (total !== cookies.cartQuantity) {
                 setCookie("cartQuantity", total, { path: "/" });
             }

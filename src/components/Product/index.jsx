@@ -50,8 +50,6 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
 );
 
 export const Product = ({ data }) => {
-  console.log("data", data);
-
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
   const [productSetItems, setProductSetItems] = useState([]);

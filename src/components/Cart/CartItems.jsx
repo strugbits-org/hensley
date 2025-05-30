@@ -13,10 +13,10 @@ const INFO_HEADERS = [
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const QuantityControls = ({ quantity, onQuantityChange }) => (
+const QuantityControls = ({ quantity, onQuantityChange, updateProducts }) => (
     <div className="border-b border-black pb-1 flex items-center justify-center gap-x-[30px] font-haasRegular">
         <button
-            className="text-xl font-light hover:opacity-70 transition-opacity"
+            className="select-none text-xl font-light hover:opacity-70 transition-opacity"
             onClick={() => onQuantityChange(quantity - 1)}
             disabled={quantity <= QUANTITY_LIMITS.MIN}
             aria-label="Decrease quantity"
@@ -29,11 +29,12 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
             min={QUANTITY_LIMITS.MIN}
             max={QUANTITY_LIMITS.MAX}
             value={quantity}
-            onChange={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN)}
+            onInput={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN, true)}
+            onBlur={(e) => updateProducts(parseInt(e.target.value) || QUANTITY_LIMITS.MIN)}
             aria-label="Quantity"
         />
         <button
-            className="text-xl font-light hover:opacity-70 transition-opacity"
+            className="select-none text-xl font-light hover:opacity-70 transition-opacity"
             onClick={() => onQuantityChange(quantity + 1)}
             disabled={quantity >= QUANTITY_LIMITS.MAX}
             aria-label="Increase quantity"
@@ -43,7 +44,7 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
     </div>
 );
 
-const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange }) => {
+const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQuantityChange }) => {
     return productInfoSection.map((item, index) => (
         <tr key={`item-${index}`}>
             <td className="py-2 font-semibold">{item.product}</td>
@@ -52,7 +53,8 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange })
             <td className="font-haasRegular">
                 <QuantityControls
                     quantity={quantity}
-                    onQuantityChange={(value) => handleQuantityChange(value, item._id)}
+                    updateProducts={(value) => updateProducts(item._id, value)}
+                    onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id, isDisabled)}
                 />
             </td>
         </tr>
@@ -303,9 +305,7 @@ const CartCollection = () => {
 }
 
 const CartNormal = ({ data, actions }) => {
-    console.log("data", data);
-
-    const { removeProduct, handleQuantityChange } = actions;
+    const { removeProduct, handleQuantityChange, updateProducts } = actions;
     const formattedDescription = formatDescriptionLines(data.descriptionLines);
     const price = data.fullPrice.amount * data.quantity;
     const formattedPrice = formatTotalPrice(price);
@@ -325,6 +325,7 @@ const CartNormal = ({ data, actions }) => {
             <div className='
             h-[104px]
             w-[104px]
+            min-w-[50px]
            bg-white
             '>
                 <PrimaryImage url={data.image} alt={data.productName.original} customClasses='h-full w-full object-contain' />
@@ -360,7 +361,7 @@ const CartNormal = ({ data, actions }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {renderTableRows({ handleQuantityChange, quantity: data.quantity, productInfoSection: productInfoSection })}
+                        {renderTableRows({ handleQuantityChange, updateProducts, quantity: data.quantity, productInfoSection: productInfoSection })}
                     </tbody>
                 </table>
                 <span className='lg:block 

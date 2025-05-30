@@ -31,12 +31,11 @@ export const getProductsCartVisitor = async (cartId) => {
       cache: "no-store",
     });
     const data = await response.json();
-
-    if (!data.cart?.lineItems) {
+    if (!data.cart) {
       throw new Error("Error fetching visitor cart");
     }
 
-    return data.cart.lineItems;
+    return data.cart;
   } catch (error) {
     throw new Error(error);
   }
