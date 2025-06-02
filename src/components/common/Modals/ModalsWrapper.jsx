@@ -13,7 +13,7 @@ export const ModalsWrapper = () => {
     return (
         <>
             <ContactFormLightbox isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
-            <AddToCartLightBox isOpen={true} onClose={() => lightboxActions.hideLightBox("addToCart")} />
+            <AddToCartLightBox isOpen={addToCart} onClose={() => lightboxActions.hideLightBox("addToCart")} />
         </>
     )
 }
