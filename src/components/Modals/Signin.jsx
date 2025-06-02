@@ -74,7 +74,7 @@ const SignIn = ({ classes, close }) => {
                         placeholder='exemplo@myemail.com'
                         className="text w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
                     /> */}
-                        <InputField id="email" label="Email" placeholder="exemplo@myemail.com" borderColor="secondary-alt" />
+                    <InputField id="email" label="Email" placeholder="exemplo@myemail.com" borderColor="secondary-alt" />
                 </div>
 
                 <div className='w-full grid grid-cols-2 relative'>
@@ -84,11 +84,11 @@ const SignIn = ({ classes, close }) => {
                     </label>
 
                     {/* <input
-                        type={showPassword ? "text" : "password"}
-                        placeholder='*****'
-                        className="col-span-2 text w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                    /> */}
-                    <InputField id="password" placeholder="*****" borderColor="secondary-alt" type={showPassword ? "text" : "password"} classes={'col-span-2 !gap-y-0'}/>
+                            type={showPassword ? "text" : "password"}
+                            placeholder='*****'
+                            className="col-span-2 text w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
+                        /> */}
+                    <InputField id="password" placeholder="*****" borderColor="secondary-alt" type={showPassword ? "text" : "password"} classes={'col-span-2 !gap-y-0'} />
 
                     {/* Eye SVG Button */}
                     <button

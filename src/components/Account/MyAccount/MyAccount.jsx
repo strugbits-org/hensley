@@ -55,15 +55,15 @@ function MyAccount() {
                   required={field.required}
                   data-datepicker
                   onChange={handleInputChange}
-                value={formData[field.id] || ""}
+                  value={formData[field.id] || ""}
                 />
               </div>
             ))}
             <div className='flex justify-between w-full max-lg:flex-col max-lg:justify-center max-lg:items-center'>
               <button className='w-[292px] max-lg:max-w-[491px] max-lg:w-full h-[60px] text-sm font-haasRegular tracking-widest	 border border-[#2C2216]  max-lg:mb-[13px]'
-              onClick={()=>{
-                setFormData({})
-              }}
+                onClick={() => {
+                  setFormData({})
+                }}
               >DISCARD</button>
               <button type='submit' className={`
         max-w-[608px]
