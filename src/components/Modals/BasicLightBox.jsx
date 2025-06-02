@@ -1,8 +1,8 @@
 "use client"
 import React, { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
-import { PrimaryButton } from '../PrimaryButton';
-import { CustomLink } from '../CustomLink';
+import { PrimaryButton } from '../common/PrimaryButton';
+import { CustomLink } from '../common/CustomLink';
 
 export const BasicLightBox = ({ data, onClose }) => {
     const { title, description, buttonText, buttonLink, open, disableClose } = data;
@@ -33,7 +33,7 @@ export const BasicLightBox = ({ data, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="w-full transform text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
+                            <DialogPanel className="w-full transform text-left align-middle transition-all relative flex justify-center items-center">
                                 <div className={`w-full flex flex-col items-center gap-y-8 bg-primary-alt p-8 lg:py-[60px] z-[9999] relative lg:w-[762px]`}>
                                     <h2 className='text-center text-[30px] leading-[42px] lg:text-[40px] lg:leading-[42px] uppercase tracking-wider text-secondary-alt font-recklessRegular'>{title}</h2>
                                     <p className='text-center text-[20px] text-secondary-alt font-haasRegular max-w-lg mx-auto'>{description}</p>
