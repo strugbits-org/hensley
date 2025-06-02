@@ -7,7 +7,8 @@ import InstagramFeed from "@/components/common/InstagramFeed";
 import Loader from "@/components/common/Loader";
 import LoaderProvider from "@/components/common/providers/LoaderProvider";
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import { ModalsWrapper } from "@/components/common/Modals/ModalsWrapper";
+import { ModalsWrapper } from "@/components/Modals/ModalsWrapper";
+import 'air-datepicker/air-datepicker.css';
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',

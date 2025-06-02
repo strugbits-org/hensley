@@ -66,7 +66,6 @@ export const PrimaryImage = ({
     useEffect(() => {
         setTimeout(() => {
             const newSrc = generateSrc();
-            console.log("--newSrc--",newSrc);
             setSrc(newSrc);
         }, timeout);
 

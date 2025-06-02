@@ -4,16 +4,32 @@ import { Submit } from "./Button";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { logError } from '@/utils';
-import Datepicker from 'flowbite-datepicker/Datepicker';
+import { formatDateNumeric, logError } from '@/utils';
+import AirDatepicker from 'air-datepicker';
+import localeEn from 'air-datepicker/locale/en';
 import { getProductsCart } from "@/services/cart/CartApis";
+import { createPriceQuote } from "@/services/quotes/QuoteApis";
+import { useCookies } from "react-cookie";
+import { lightboxActions } from "@/store/lightboxStore";
 
-// Validation schema
+// Validation schema with date validations
 const schema = yup.object({
   // Event Details
   eventDate: yup.string().required('Event date is required'),
-  deliveryDate: yup.string().required('Delivery date is required'),
-  pickupDate: yup.string().required('Pickup date is required'),
+  deliveryDate: yup.string()
+    .required('Delivery date is required')
+    .test('delivery-before-event', 'Delivery date must be before event date', function (value) {
+      const { eventDate } = this.parent;
+      if (!value || !eventDate) return true;
+      return new Date(value) <= new Date(eventDate);
+    }),
+  pickupDate: yup.string()
+    .required('Pickup date is required')
+    .test('pickup-after-event', 'Pickup date must be after event date', function (value) {
+      const { eventDate } = this.parent;
+      if (!value || !eventDate) return true;
+      return new Date(value) >= new Date(eventDate);
+    }),
   eventLocation: yup.string(),
   eventDescription: yup.string(),
 
@@ -27,12 +43,13 @@ const schema = yup.object({
 
   // Special Instructions
   specialInstructions: yup.string(),
-  city2: yup.string(),
-  state2: yup.string(),
+  city1: yup.string(),
+  state1: yup.string(),
 
   // Order By
   name: yup.string().required('Name is required'),
   email: yup.string().email('Email is invalid').required('Email is required'),
+  phone: yup.string().required('Phone number is required'),
 }).required();
 
 export const QuoteRequest = () => {
@@ -72,8 +89,8 @@ export const QuoteRequest = () => {
     specialInstructions: {
       fields: [
         { id: "specialInstructions", label: "SPECIAL INSTRUCTIONS OR ORDER COMMENTS", placeholder: "", required: false, type: "text" },
-        { id: "city2", label: "CITY", placeholder: "", required: false, type: "text" },
-        { id: "state2", label: "STATE", placeholder: "", required: false, type: "text" },
+        { id: "city1", label: "CITY", placeholder: "", required: false, type: "text" },
+        { id: "state1", label: "STATE", placeholder: "", required: false, type: "text" },
       ]
     },
     orderBy: {
@@ -81,24 +98,24 @@ export const QuoteRequest = () => {
       fields: [
         { id: "name", label: "NAME*", placeholder: "GABRIEL MACCHI", required: true, type: "text" },
         { id: "email", label: "EMAIL*", placeholder: "GABRIEL@PETRICHDESIGN", required: true, type: "email" },
+        { id: "phone", label: "PHONE*", placeholder: "(123) 456-7890", required: true, type: "tel" },
       ],
     },
     submitButton: "SUBMIT",
   };
 
+  const [_cookies, setCookie] = useCookies(["cartQuantity"]);
   const [orderType, setOrderType] = useState("delivery");
   const [cartItems, setCartItems] = useState([]);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-
-  // Form state management similar to Footer component
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formState, setFormState] = useState();
-  const [feedbackMessage, setFeedbackMessage] = useState();
+  const [datepickers, setDatepickers] = useState({});
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    trigger,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -107,13 +124,76 @@ export const QuoteRequest = () => {
     }
   });
 
+  // Initialize Air Datepickers
   useEffect(() => {
-    const dateIds = ['eventDate', 'deliveryDate', 'pickupDate'];
-    dateIds.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) new Datepicker(el);
+    const today = new Date();
+    const datePickerInstances = {};
+
+    // Common datepicker configuration
+    const baseConfig = {
+      minDate: today,
+      dateFormat: 'MM/dd/yyyy',
+      autoClose: true,
+      locale: localeEn,
+      classes: "custom-date-picker",
+    };
+
+    const datePickerConfigs = [
+      {
+        id: 'eventDate',
+        field: 'eventDate',
+        onSelect: ({ date, datepicker }) => {
+          setValue('eventDate', date);
+          trigger('eventDate');
+
+          const dateStr = date ? formatDateNumeric(date) : '';
+          datepicker.$el.value = dateStr;
+          // Update dependent datepickers
+          datePickerInstances.deliveryDate?.update({ maxDate: date || undefined });
+          datePickerInstances.pickupDate?.update({ minDate: date || today });
+        }
+      },
+      {
+        id: 'deliveryDate',
+        field: 'deliveryDate',
+        onSelect: ({ date, datepicker }) => {
+          setValue('deliveryDate', date);
+          trigger('deliveryDate');
+
+          const dateStr = date ? formatDateNumeric(date) : '';
+          datepicker.$el.value = dateStr;
+        }
+      },
+      {
+        id: 'pickupDate',
+        field: 'pickupDate',
+        onSelect: ({ date, datepicker }) => {
+          setValue('pickupDate', date);
+          trigger('pickupDate');
+
+          const dateStr = date ? formatDateNumeric(date) : '';
+          datepicker.$el.value = dateStr;
+        }
+      }
+    ];
+
+    datePickerConfigs.forEach(({ id, onSelect }) => {
+      const element = document.getElementById(id);
+      if (element) {
+        datePickerInstances[id] = new AirDatepicker(element, {
+          ...baseConfig,
+          onSelect
+        });
+      }
     });
-  }, []);
+
+    setDatepickers(datePickerInstances);
+
+    // Cleanup function
+    return () => {
+      Object.values(datePickerInstances).forEach(dp => dp?.destroy?.());
+    };
+  }, [setValue, trigger]);
 
   // Your existing cart fetch function
   const fetchCart = async () => {
@@ -121,12 +201,18 @@ export const QuoteRequest = () => {
       const response = await getProductsCart();
       const lineItems = response.lineItems || [];
       if (lineItems.length === 0) {
-        // handleEmptyCart();
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Your cart is empty",
+          description: "Please add items to your cart before submitting a quote request.",
+          buttonText: "Continue Shopping",
+          buttonLink: "/",
+          disableClose: true,
+          open: true
+        })
         return;
       }
 
       setCartItems(lineItems);
-      setIsButtonDisabled(false);
     } catch (error) {
       console.error("Error fetching cart:", error);
     }
@@ -136,52 +222,49 @@ export const QuoteRequest = () => {
     fetchCart();
   }, []);
 
-  // Enhanced submit handler with validation and state management
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      // Include orderType in the submission data
-      const submissionData = { ...data, orderType };
-
-      // Replace this with your actual submission service
-      // await submitQuoteRequest(submissionData);
-      console.log("Form submitted with data:", submissionData);
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setFormState("success");
-      setFeedbackMessage("Your quote request has been submitted successfully. We'll respond within 48 hours.");
+      const submissionData = { orderType, ...data };
+      await createPriceQuote({
+        lineItems: cartItems,
+        quoteDetails: submissionData
+      });
 
       setTimeout(() => {
         reset();
         setOrderType("delivery");
-        resetStates();
+        Object.values(datepickers).forEach(dp => {
+          if (dp && typeof dp.clear === 'function') {
+            dp.clear();
+          }
+        });
+        lightboxActions.setBasicLightBoxDetails({
+          title: "THANKS FOR CHOOSING US!",
+          description: "Your quote request has been sent and we will contact you shortly via email.",
+          buttonText: "Continue Shopping",
+          buttonLink: "/",
+          disableClose: true,
+          open: true,
+        })
+        setCookie("cartQuantity", 0, { path: "/" });
+        setIsSubmitting(false);
       }, 3000);
     } catch (error) {
       logError(error);
-      setFeedbackMessage(error.message || "An error occurred while submitting your request. Please try again.");
-      setFormState("error");
 
       setTimeout(() => {
-        resetStates();
+        setIsSubmitting(false);
       }, 3000);
     }
   };
 
-  const resetStates = () => {
-    setIsSubmitting(false);
-    setFormState(null);
-    setFeedbackMessage(null);
-  };
-
-  // Helper function to get error message for a field
   const getFieldError = (fieldName) => {
     return errors[fieldName]?.message;
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full" data-form-state={formState}>
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full">
       {/* Header */}
       <div className="w-full border-secondary-alt">
         <div className="container mx-auto max-w-5xl px-4 py-12 font-['neue-haas-display'] text-center">
@@ -196,18 +279,6 @@ export const QuoteRequest = () => {
           </p>
         </div>
       </div>
-
-      {/* Feedback Message */}
-      {feedbackMessage && (
-        <div className="w-full">
-          <div className="container mx-auto max-w-5xl px-4 py-4">
-            <div className={`text-center p-4 rounded-sm ${formState === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`} data-aos="fadeIn">
-              {feedbackMessage}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Order Type */}
       <div className="w-full border-secondary-alt">
@@ -227,7 +298,6 @@ export const QuoteRequest = () => {
                         onChange={() => setOrderType(type.id)}
                         className="form-radio h-[34px] w-[34px] accent-[#57442D] focus:ring-[#57442D]"
                         disabled={isSubmitting}
-                        autoComplete="false"
                       />
                       <span className="ml-2 font-medium text-secondary-alt font-recklessRegular">{type.label}</span>
                     </label>
@@ -251,11 +321,14 @@ export const QuoteRequest = () => {
                   type="text"
                   {...register(field.id)}
                   placeholder={field.placeholder}
-                  className={`datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''}`}
-                  data-datepicker
+                  className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''}`}
                   disabled={isSubmitting}
-                  autoComplete="false"
+                  autoComplete="off"
+                  readOnly={field.type === 'date'}
                 />
+                {getFieldError(field.id) && (
+                  <p className="text-red-500 text-sm mt-1">{getFieldError(field.id)}</p>
+                )}
               </div>
             ))}
           </div>
@@ -270,9 +343,11 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                    disabled={isSubmitting}
-                  autoComplete="false"
+                  disabled={isSubmitting}
                 />
+                {getFieldError(field.id) && (
+                  <p className="text-red-500 text-sm mt-1">{getFieldError(field.id)}</p>
+                )}
               </div>
             ))}
           </div>
@@ -296,9 +371,11 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                    disabled={isSubmitting}
-                  autoComplete="false"
+                  disabled={isSubmitting}
                 />
+                {getFieldError(field.id) && (
+                  <p className="text-red-500 text-sm mt-1">{getFieldError(field.id)}</p>
+                )}
               </div>
             ))}
           </div>
@@ -313,9 +390,11 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                    disabled={isSubmitting}
-                  autoComplete="false"
+                  disabled={isSubmitting}
                 />
+                {getFieldError(field.id) && (
+                  <p className="text-red-500 text-sm mt-1">{getFieldError(field.id)}</p>
+                )}
               </div>
             ))}
           </div>
@@ -335,9 +414,11 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                    disabled={isSubmitting}
-                  autoComplete="false"
+                  disabled={isSubmitting}
                 />
+                {getFieldError(field.id) && (
+                  <p className="text-red-500 text-sm mt-1">{getFieldError(field.id)}</p>
+                )}
               </div>
             ))}
           </div>
@@ -349,7 +430,7 @@ export const QuoteRequest = () => {
         <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] mt-[56px]">
           <h2 className="text-3xl font-['reckless-neue-regular'] text-center text-secondary-alt mb-8">{formConfig.orderBy.title}</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {formConfig.orderBy.fields.map((field) => (
               <div key={field.id}>
                 <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">{field.label}</label>
@@ -359,9 +440,11 @@ export const QuoteRequest = () => {
                   placeholder={field.placeholder}
                   className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${getFieldError(field.id) ? 'border-b-red-500' : ''
                     }`}
-                    disabled={isSubmitting}
-                  autoComplete="false"
+                  disabled={isSubmitting}
                 />
+                {getFieldError(field.id) && (
+                  <p className="text-red-500 text-sm mt-1">{getFieldError(field.id)}</p>
+                )}
               </div>
             ))}
           </div>
@@ -370,7 +453,6 @@ export const QuoteRequest = () => {
             <Submit
               text={isSubmitting ? "SUBMITTING..." : formConfig.submitButton}
               disabled={isSubmitting}
-              autoComplete="false"
             />
           </div>
         </div>
