@@ -13,38 +13,49 @@ const INFO_HEADERS = [
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const QuantityControls = ({ quantity, onQuantityChange, updateProducts }) => (
+const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly }) => (
     <div className="border-b border-black pb-1 flex items-center justify-center gap-x-[30px] font-haasRegular">
-        <button
-            className="select-none text-xl font-light hover:opacity-70 transition-opacity"
-            onClick={() => onQuantityChange(quantity - 1)}
-            disabled={quantity <= QUANTITY_LIMITS.MIN}
-            aria-label="Decrease quantity"
-        >
-            -
-        </button>
-        <input
-            className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
-            type="number"
-            min={QUANTITY_LIMITS.MIN}
-            max={QUANTITY_LIMITS.MAX}
-            value={quantity}
-            onInput={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN, true)}
-            onBlur={(e) => updateProducts(parseInt(e.target.value) || QUANTITY_LIMITS.MIN)}
-            aria-label="Quantity"
-        />
-        <button
-            className="select-none text-xl font-light hover:opacity-70 transition-opacity"
-            onClick={() => onQuantityChange(quantity + 1)}
-            disabled={quantity >= QUANTITY_LIMITS.MAX}
-            aria-label="Increase quantity"
-        >
-            +
-        </button>
+        {!readOnly ? (
+            <>
+                <button
+                    className="select-none text-xl font-light hover:opacity-70 transition-opacity"
+                    onClick={() => onQuantityChange(quantity - 1)}
+                    disabled={quantity <= QUANTITY_LIMITS.MIN}
+                    aria-label="Decrease quantity"
+                >
+                    -
+                </button>
+                <input
+                    className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+                    type="number"
+                    min={QUANTITY_LIMITS.MIN}
+                    max={QUANTITY_LIMITS.MAX}
+                    value={quantity}
+                    onInput={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN, true)}
+                    onBlur={(e) => updateProducts(parseInt(e.target.value) || QUANTITY_LIMITS.MIN)}
+                    aria-label="Quantity"
+                />
+                <button
+                    className="select-none text-xl font-light hover:opacity-70 transition-opacity"
+                    onClick={() => onQuantityChange(quantity + 1)}
+                    disabled={quantity >= QUANTITY_LIMITS.MAX}
+                    aria-label="Increase quantity"
+                >
+                    +
+                </button></>
+        ) : (
+            <input
+                className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+                type="number"
+                value={quantity}
+                aria-label="Quantity"
+                readOnly
+            />
+        )}
     </div>
 );
 
-const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQuantityChange }) => {
+const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQuantityChange, readOnly }) => {
     return productInfoSection.map((item, index) => (
         <tr key={`item-${index}`}>
             <td className="py-2 font-semibold">{item.product}</td>
@@ -55,6 +66,7 @@ const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQ
                     quantity={quantity}
                     updateProducts={(value) => updateProducts(item._id, value)}
                     onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id, isDisabled)}
+                    readOnly={readOnly}
                 />
             </td>
         </tr>
@@ -304,7 +316,7 @@ const CartCollection = () => {
     )
 }
 
-const CartNormal = ({ data, actions }) => {
+const CartNormal = ({ data, actions = {}, readOnly = false }) => {
     const { removeProduct, handleQuantityChange, updateProducts } = actions;
     const formattedDescription = formatDescriptionLines(data.descriptionLines);
     const price = data.fullPrice.amount * data.quantity;
@@ -321,7 +333,7 @@ const CartNormal = ({ data, actions }) => {
     ]
 
     return (
-        <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
+        <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative items-center'>
             <div className='
             h-[104px]
             w-[104px]
@@ -330,7 +342,7 @@ const CartNormal = ({ data, actions }) => {
             '>
                 <PrimaryImage url={data.image} alt={data.productName.original} customClasses='h-full w-full object-contain' />
             </div>
-            <div className='w-full lg:flex justify-between'>
+            <div className='w-full lg:flex justify-between items-center'>
                 <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>
                     <span className='block 
                 lg:text-[16px]
@@ -346,14 +358,13 @@ const CartNormal = ({ data, actions }) => {
                 mr-[100px]
                 '>{data.price.amount}</span>
                 </div>
-                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full  text-left border-separate border-spacing-y-[15px] ">
+                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] ">
                     <thead>
                         <tr className="text-xs uppercase text-gray-500">
                             {INFO_HEADERS.map((title, index) => (
                                 <th
                                     key={title}
-                                    className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'
-                                        }`}
+                                    className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}
                                 >
                                     {title}
                                 </th>
@@ -361,29 +372,21 @@ const CartNormal = ({ data, actions }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {renderTableRows({ handleQuantityChange, updateProducts, quantity: data.quantity, productInfoSection: productInfoSection })}
+                        {renderTableRows({ handleQuantityChange, updateProducts, quantity: data.quantity, productInfoSection: productInfoSection, readOnly })}
                     </tbody>
                 </table>
-                <span className='lg:block 
-                  hidden
-                    sm:text-[16px]
-                    text-[20px]
-                     text-secondary-alt font-haasRegular uppercase
-                lg:mt-[21px]
-                sm:mb-[27px]
-                mr-[100px]
-                self-end
-                '>{formattedPrice}</span>
+                <span className='lg:block hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] mr-[100px]'>{formattedPrice}</span>
             </div>
-            <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                    <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                        <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                        <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                    </g>
-                </svg>
-
-            </button>
+            {!readOnly && (
+                <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
+                        <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
+                            <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                            <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                        </g>
+                    </svg>
+                </button>
+            )}
         </div>
     )
 }

@@ -1,4 +1,4 @@
-import { QuoteRequest } from "@/components/quote-request";
+import { QuoteRequest } from "@/components/QuoteRequest";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 

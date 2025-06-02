@@ -1,15 +1,16 @@
 import { createWixClient, logError } from "@/utils";
 import { NextResponse } from "next/server";
 
-export const GET = async (_req, context) => {
+export const POST = async (_req, context) => {
   try {
     const { params } = context;
     const id = params.id;
 
     const wixClient = await createWixClient();
-    const data = await wixClient.items.get("RequestQuote", id);
+    const response = await wixClient.items.query("QuoteRequest").eq("quoteId", id).find();
+    const data = response.items[0];
 
-    if (!data.lineItems.length) {
+    if (!data || !data.lineItems.length) {
       return NextResponse.json({ error: "Quote not found" }, { status: 404 })
     };
 
@@ -25,5 +26,3 @@ export const GET = async (_req, context) => {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };
-
-export const dynamic = "force-dynamic";

@@ -11,7 +11,7 @@ const PriceDisplay = ({ name = "MIRCEA", totalPrice }) => {
         block
         '>
           HEY, <br />
-          MIRCEA, THE TOTAL OF  YOUR PURCHASE IS
+          {name}, THE TOTAL OF  YOUR PURCHASE IS
         </span>
         <span className='
         font-recklessBold
@@ -29,7 +29,7 @@ const PriceDisplay = ({ name = "MIRCEA", totalPrice }) => {
         text-secondary-alt
         font-recklessRegular
         uppercase
-        '>our categories</span>
+        '>Your Cart</span>
         <span className='text-[14px] leading-[18px] font-haasRegular block text-secondary-alt uppercase'>HEY , {name}<br />
           THE TOTAL OF YOUR PURCHASE IS</span>
         <span className='text-[35px] leading-[45px] text-secondary-alt uppercase font-recklessRegular'>{totalPrice}</span>
