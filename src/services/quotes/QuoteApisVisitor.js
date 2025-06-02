@@ -19,7 +19,7 @@ export const createPriceQuoteVisitor = async ({ cartId, lineItems, quoteDetails 
     const data = await response.json();
     return data;
   } catch (error) {
-    logError("Error creating cart: ", error);
+    logError("Eror creating quote: ", error);
     throw new Error(error);
   }
 };

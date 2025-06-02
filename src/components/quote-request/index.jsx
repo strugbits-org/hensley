@@ -4,11 +4,13 @@ import { Submit } from "./Button";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { logError } from '@/utils';
+import { formatDateNumeric, logError } from '@/utils';
 import AirDatepicker from 'air-datepicker';
 import localeEn from 'air-datepicker/locale/en';
 import { getProductsCart } from "@/services/cart/CartApis";
 import { createPriceQuote } from "@/services/quotes/QuoteApis";
+import { useCookies } from "react-cookie";
+import { lightboxActions } from "@/store/lightboxStore";
 
 // Validation schema with date validations
 const schema = yup.object({
@@ -102,6 +104,7 @@ export const QuoteRequest = () => {
     submitButton: "SUBMIT",
   };
 
+  const [_cookies, setCookie] = useCookies(["cartQuantity"]);
   const [orderType, setOrderType] = useState("delivery");
   const [cartItems, setCartItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,11 +142,12 @@ export const QuoteRequest = () => {
       {
         id: 'eventDate',
         field: 'eventDate',
-        onSelect: ({ date }) => {
-          const dateStr = date ? formatDate(date) : '';
-          setValue('eventDate', dateStr);
+        onSelect: ({ date, datepicker }) => {
+          setValue('eventDate', date);
           trigger('eventDate');
 
+          const dateStr = date ? formatDateNumeric(date) : '';
+          datepicker.$el.value = dateStr;
           // Update dependent datepickers
           datePickerInstances.deliveryDate?.update({ maxDate: date || undefined });
           datePickerInstances.pickupDate?.update({ minDate: date || today });
@@ -152,19 +156,23 @@ export const QuoteRequest = () => {
       {
         id: 'deliveryDate',
         field: 'deliveryDate',
-        onSelect: ({ date }) => {
-          const dateStr = date ? formatDate(date) : '';
-          setValue('deliveryDate', dateStr);
+        onSelect: ({ date, datepicker }) => {
+          setValue('deliveryDate', date);
           trigger('deliveryDate');
+
+          const dateStr = date ? formatDateNumeric(date) : '';
+          datepicker.$el.value = dateStr;
         }
       },
       {
         id: 'pickupDate',
         field: 'pickupDate',
-        onSelect: ({ date }) => {
-          const dateStr = date ? formatDate(date) : '';
-          setValue('pickupDate', dateStr);
+        onSelect: ({ date, datepicker }) => {
+          setValue('pickupDate', date);
           trigger('pickupDate');
+
+          const dateStr = date ? formatDateNumeric(date) : '';
+          datepicker.$el.value = dateStr;
         }
       }
     ];
@@ -187,21 +195,20 @@ export const QuoteRequest = () => {
     };
   }, [setValue, trigger]);
 
-  // Helper function to format date
-  const formatDate = (date) => {
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${month}/${day}/${year}`;
-  };
-
   // Your existing cart fetch function
   const fetchCart = async () => {
     try {
       const response = await getProductsCart();
       const lineItems = response.lineItems || [];
       if (lineItems.length === 0) {
-        // handleEmptyCart();
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Your cart is empty",
+          description: "Please add items to your cart before submitting a quote request.",
+          buttonText: "Continue Shopping",
+          buttonLink: "/",
+          disableClose: true,
+          open: true
+        })
         return;
       }
 
@@ -219,24 +226,28 @@ export const QuoteRequest = () => {
     setIsSubmitting(true);
     try {
       const submissionData = { orderType, ...data };
-      const response = await createPriceQuote({
+      await createPriceQuote({
         lineItems: cartItems,
         quoteDetails: submissionData
       });
-      console.log("response", response);
-      setIsSubmitting(false);
-      return;
 
       setTimeout(() => {
         reset();
         setOrderType("delivery");
-        // Clear datepicker values
         Object.values(datepickers).forEach(dp => {
           if (dp && typeof dp.clear === 'function') {
             dp.clear();
           }
         });
-
+        lightboxActions.setBasicLightBoxDetails({
+          title: "THANKS FOR CHOOSING US!",
+          description: "Your quote request has been sent and we will contact you shortly via email.",
+          buttonText: "Continue Shopping",
+          buttonLink: "/",
+          disableClose: true,
+          open: true,
+        })
+        setCookie("cartQuantity", 0, { path: "/" });
         setIsSubmitting(false);
       }, 3000);
     } catch (error) {
