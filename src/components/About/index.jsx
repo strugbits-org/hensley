@@ -6,7 +6,8 @@ import MeetFamily from "./MeetFamily"
 import HowWeDoITSection from "./HowWeDoITSection"
 import SliderComponent from "../common/SliderComponent"
 
-export const About = () => {
+export const About = ({data}) => {
+    const {heroSectionData} = data
     const pageDetails = {
         buttonLabelPortfolioSlider: "View Portfolio",
     }
@@ -62,7 +63,7 @@ export const About = () => {
     ]
     return (
         <>
-            <HeroSection />
+            <HeroSection heroSectionData={heroSectionData}/>
             <AboutSection />
             <HowWeDoITSection />
             <div className="h-screen lg:mt-[100px] lg:pl-[15px] lg:pr-[15px] border">

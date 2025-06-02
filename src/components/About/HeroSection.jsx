@@ -1,17 +1,26 @@
+'use client'
 import React from "react";
 import Image from "next/image";
 import { PrimaryButton } from "../common/PrimaryButton";
 import arrow from "@/assets/icons/arrow.svg";
+import { PrimaryImage } from "../common/PrimaryImage";
 
-function HeroSection() {
+function HeroSection({heroSectionData}) {
+
+  const {title, subtitle, image, buttonLabel, buttonLink} = heroSectionData;
+
   const data = {
-    title: "WE ARE HENSLEY",
-    tagline: "CORPORATE & SOCIAL EVENTS",
+    title: title,
+    tagline: subtitle,
     imageSrc: require("@/assets/Atrium 5-X2.png"),
-    buttonLabel: "DISCOVER",
+    buttonLabel,
     buttonAction: () => {
       // You can replace this with a navigation function or scroll action
-      console.log("Button clicked!");
+     if (buttonLink) {
+      window.location.href = buttonLink; // Navigates to the link
+    } else {
+      console.log("Button clicked! No link provided.");
+    }
     },
   };
 
@@ -33,6 +42,7 @@ function HeroSection() {
             {data.tagline}
           </p>
           <PrimaryButton
+           onClick={data.buttonAction} 
             className="border border-black text-secondary-alt hover:bg-primary hover:border-secondary-alt 
               max-h-[60px] max-w-[280px]
               p-0 lg:mt-[60px] sm:mt-[59px] mt-[40px] hover:[letter-spacing:4px]"
@@ -43,11 +53,12 @@ function HeroSection() {
       </div>
 
       <div className="lg:w-1/2 p-5 md:h-screen sm:h-[500px] md:w-full relative">
-        <Image
+        {/* <Image
           className="h-full w-full object-cover"
           src={data.imageSrc}
           alt="Hero Image"
-        />
+        /> */}
+        <PrimaryImage timeout={0} url={image} customClasses={"h-full w-full object-cover "}  />
         <Image
           src={arrow}
           alt="Scroll Arrow"

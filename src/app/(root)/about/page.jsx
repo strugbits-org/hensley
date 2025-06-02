@@ -1,11 +1,15 @@
 import { About } from "@/components/About";
+import { fetchAboutPageData } from "@/services/about";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
-export default async function Page() {
+export default async function Page() {  
   try {
+    const data = await fetchAboutPageData();
+    const {heroSectionData} = data
+    console.log("we got",heroSectionData);
     return (
-      <About />
+      <About data={data}/>
     );
   } catch (error) {
     logError("Error fetching category page data:", error);

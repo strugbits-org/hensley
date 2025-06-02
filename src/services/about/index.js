@@ -19,6 +19,7 @@ export const fetchAboutPageData = async () => {
       heroSectionData: heroSectionData.items[0],
     };
 
+
     return response;
   } catch (error) {
     logError(`Error fetching hero section data: ${error.message}`, error);
