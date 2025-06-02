@@ -2,13 +2,16 @@
 import React, { useState } from 'react';
 import ProductList from './ProductList';
 import ProductListUpdate from './ProductListUpdate';
+import ProductListAdd from './ProductListAdd';
 
 function ProductSets() {
   const [open, setOpen] = useState(false);
+  const [addProdOpen, setAddProdOpen] = useState(false);
+  const [currentProd, setCurrentProd] = useState('');
 
-  function toggle() {
-    setOpen((open) => !open);
-  }
+  // Toggle functions
+  const toggle = () => setOpen(prev => !prev);
+  const addProdToggle = () => setAddProdOpen(prev => !prev);
 
   const data = {
     heading: "product sets",
@@ -18,7 +21,7 @@ function ProductSets() {
         id: 1,
         title: "vintage - dance floor",
         tags: ["corporate", "event design and production", "creative services agency", "+3 studios"],
-        image: "/product-set-1.png"  // path to image
+        image: "/product-set-1.png"
       },
       {
         id: 2,
@@ -44,11 +47,17 @@ function ProductSets() {
       </div>
       <div className='px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>
         <div className='max-w-[900px] w-full mx-auto'>
-          {open ? (
-            <ProductListUpdate toggle={toggle} data={data.productSetsData} />
+
+          {addProdOpen ? (
+            <ProductListAdd addProdToggle={addProdToggle} toggle={toggle} />
           ) : (
-            <ProductList toggle={toggle} data={data.productSetsData} />
+            open ? (
+              <ProductListUpdate toggle={toggle} data={data.productSetsData} currentProd={currentProd} />
+            ) : (
+              <ProductList addProdToggle={addProdToggle} toggle={toggle} data={data.productSetsData} setCurrentProd={setCurrentProd} />
+            )
           )}
+
         </div>
       </div>
     </div>
