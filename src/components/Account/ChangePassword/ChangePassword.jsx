@@ -66,14 +66,14 @@ function ChangePassword() {
     );
 
     return (
-        <div className='MyAccount w-full max-lg:mb-[85px]'>
+        <div className='MyAccount w-full max-lg:mb-[85px] '>
             <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0'>
                 <h2 className='uppercase text-[140px]  font-recklessRegular text-center w-full leading-[97px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px]'>
                     {data.heading}
                 </h2>
             </div>
-            <div className='px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>
-                <div className='max-w-[608px] w-full mx-auto'>
+            <div className='px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9 '>
+                <div className='max-w-[608px] w-full mx-auto '>
                     <form className='w-full flex flex-wrap gap-x-6 mt-[103px] max-lg:mt-[43px] gap-y-9 max-lg:gap-y-8 items-center justify-center'>
                         <div className='w-full relative'>
                             <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">Enter your old password</label>

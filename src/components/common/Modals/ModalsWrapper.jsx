@@ -4,6 +4,7 @@ import { useSnapshot } from 'valtio';
 import { lightboxActions, lightboxState } from '@/store/lightboxStore';
 import { ContactFormLightbox } from '@/components/Contact/ContactFormLightbox';
 import AddToCart from '@/components/Modals/AddToCart/AddToCart';
+import { AddToCartLightBox } from '@/components/AddToCart/AddToCartLightBox';
 
 export const ModalsWrapper = () => {
     const { lightboxes } = useSnapshot(lightboxState);
@@ -12,7 +13,7 @@ export const ModalsWrapper = () => {
     return (
         <>
             <ContactFormLightbox isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
-            <AddToCart isOpen={addToCart} onClose={() => lightboxActions.hideLightBox("addToCart")}/>
+            <AddToCartLightBox isOpen={true} onClose={() => lightboxActions.hideLightBox("addToCart")} />
         </>
     )
 }

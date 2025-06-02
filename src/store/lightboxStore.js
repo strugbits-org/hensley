@@ -3,7 +3,7 @@ import { proxy } from 'valtio';
 export const lightboxState = proxy({
     lightboxes: {
         contact: false,
-        addToCart:false
+        addToCart: false
     },
 });
 
