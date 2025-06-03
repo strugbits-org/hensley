@@ -26,7 +26,7 @@ const userMenu = [
 ];
 
 export const Header = ({ data, marketsData, tentsData }) => {
-    const [cookies, setCookie, removeCookie] = useCookies(["cartQuantity"]);
+    const [cookies, setCookie, removeCookie] = useCookies(["cartQuantity", "authToken"]);
 
     const [activeMenu, setActiveMenu] = useState("RENTALS");
     const [subNavigation, setSubNavigation] = useState([]);
@@ -45,7 +45,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
         setCartTotalQuantity(quantity);
     }, [cookies.cartQuantity]);
 
-    const handleClickUserMenu = (item) => {
+    const handleClickUserMenu = (item, isMobile) => {
         if (item.type === 'search') {
             setSearchModal(prev => {
                 if (!prev) {
@@ -53,6 +53,8 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 }
                 return !prev;
             });
+        } else if (item.type === 'account' && !isMobile && !cookies.authToken) {
+            lightboxActions.showLightBox('login');
         } else {
             redirectWithLoader(item.slug);
         }
@@ -276,7 +278,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                 return (
                                     <button
                                         key={index}
-                                        onClick={() => handleClickUserMenu(item)}
+                                        onClick={() => handleClickUserMenu(item, true)}
                                         className="relative h-8 flex justify-center items-center"
                                     >
                                         <Image height={"18"} src={icon} alt={item.type} />
