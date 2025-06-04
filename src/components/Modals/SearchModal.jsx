@@ -1,10 +1,13 @@
 import searchIcon from '@/assets/icons/search-light.svg';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { loaderActions } from '@/store/loaderStore';
 
 export const SearchModal = ({ closeModal, isActive }) => {
     const inputRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const router = useRouter();
 
     useEffect(() => {
         if (isActive && inputRef.current) {
@@ -20,6 +23,8 @@ export const SearchModal = ({ closeModal, isActive }) => {
 
     const handleSearch = () => {
         console.log('Searching for:', searchTerm);
+        loaderActions.show();
+        router.push(`/search?query=${searchTerm}`);
     };
 
     if (!isActive) return null;
@@ -27,8 +32,6 @@ export const SearchModal = ({ closeModal, isActive }) => {
 
     return (
         <div className='search-modal z-10'>
-            {/* // Mobile layout */}
-
             <div
                 className="lg:hidden flex flex-col items-center justify-start pb-4"
                 role="dialog"

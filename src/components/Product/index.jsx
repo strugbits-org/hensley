@@ -1,11 +1,15 @@
 "use client";
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
-import { AddToQuote } from './AddtoQuoteButton'
+import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { formatTotalPrice } from '@/utils';
+import { calculateTotalCartQuantity, formatTotalPrice, logError } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
+import { AddProductToCart } from '@/services/cart/CartApis';
+import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import { useCookies } from 'react-cookie';
+import { fetchSavedProductData } from '@/services/products';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -47,13 +51,20 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
 );
 
 export const Product = ({ data }) => {
+  const [cookies, setCookie] = useCookies(["cartQuantity"]);
+
+  const [productSetItems, setProductSetItems] = useState([]);
+  const [cartQuantity, setCartQuantity] = useState(1);
+  const [isUpdatingCart, setIsUpdatingCart] = useState(false);
+  const [savedProducts, setSavedProducts] = useState([]);
+
+  const redirectWithLoader = useRedirectWithLoader();
+
   const { productData, productCollectionData } = data;
   const { product } = productData;
 
   const isProductCollection = productCollectionData?.length > 0;
-  const [cartQuantity, setCartQuantity] = useState(1);
 
-  const [productSetItems, setProductSetItems] = useState([]);
 
   useMemo(() => {
     if (!isProductCollection) {
@@ -111,6 +122,40 @@ export const Product = ({ data }) => {
     }
   }, [isProductCollection]);
 
+  const handleAddToCart = async () => {
+    setIsUpdatingCart(true);
+    try {
+      const product_id = product._id;
+      const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+      const cartData = {
+        lineItems: [
+          {
+            catalogReference: {
+              appId: "215238eb-22a5-4c36-9e7b-e7c08025e04e",
+              catalogItemId: product_id,
+              options: {
+                customTextFields: {
+                  size: size,
+                },
+              },
+            },
+            quantity: cartQuantity,
+          },
+        ],
+      };
+
+      await AddProductToCart(cartData);
+      const newItems = calculateTotalCartQuantity(cartData.lineItems);
+      const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      setCookie("cartQuantity", total, { path: "/" });
+      redirectWithLoader("/cart");
+    } catch (error) {
+      logError("Error while adding item to cart:", error);
+    } finally {
+      setIsUpdatingCart(false);
+    }
+  };
+
   const renderTableRows = () => {
     if (isProductCollection) {
       return productSetItems.map((item, index) => (
@@ -141,6 +186,19 @@ export const Product = ({ data }) => {
       </tr>
     ));
   };
+
+  const fetchSavedProducts = async () => {
+    try {
+      const savedProducts = await fetchSavedProductData();
+      setSavedProducts(savedProducts);
+    } catch (error) {
+      logError("Error while fetching Saved Product", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSavedProducts();
+  }, []);
 
   return (
     <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] min-h-[937px]'>
@@ -186,8 +244,13 @@ export const Product = ({ data }) => {
           <ProductDescription text={product.description} />
         </div>
 
-        <AddToQuote text="add to quote" />
-        <SaveProductButton />
+        <AddToCartButton text={isUpdatingCart ? "Adding..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
+        <SaveProductButton
+          key={product.id}
+          productData={productData}
+          savedProducts={savedProducts}
+          setSavedProducts={setSavedProducts}
+        />
       </div>
     </div>
   );

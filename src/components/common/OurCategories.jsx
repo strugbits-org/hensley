@@ -30,7 +30,7 @@ function OurCategories({ data, pageDetails, classes }) {
               </div>
 
               {/* Content */}
-              <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] px-[12px]">
+              <div className={`lg:w-1/2 ${item.rtl ? 'lg:pl-[24px] ' : 'lg:pr-[24px]'} lg:py-[24px] py-[13px] max-lg:px-[12px]`}>
                 <div className='h-full w-full flex justify-between gap-x-2'>
                   <div className='h-full flex flex-col justify-between'>
                     <h3 className="font-recklessRegular uppercase text-[35px] lg:text-[60px] xl:text-[80px] 2xl:text-[90px] leading-[45px] lg:leading-[50px] xl:leading-[70px] transition-all duration-300 ease-in-out group-hover:tracking-widest">

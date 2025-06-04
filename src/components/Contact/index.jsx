@@ -1,10 +1,10 @@
 import React from 'react'
-import Form from './Form'
+import ContactUs from '../Modals/ContactUs';
 
 const Contact = () => {
   return (
-    <Form />
+    <ContactUs classes="mx-auto" />
   )
 }
 
-export default Contact
+export default Contact;

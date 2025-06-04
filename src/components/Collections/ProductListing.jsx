@@ -11,6 +11,7 @@ import AutoClickWrapper from '../common/helpers/AutoClickWrapper'
 import { fetchSortedProducts } from '@/services/collections'
 import { findSortIndexByCategory, logError } from '@/utils'
 import { ProductsFilterPopup } from '../common/ProductsFilterPopup'
+import { fetchSavedProductData } from '@/services/products';
 
 // Debounce utility function
 const useDebounce = (callback, delay) => {
@@ -38,6 +39,8 @@ function Listing({ data }) {
   const [hasMore, setHasMore] = useState(true);
   const [bannersDesktop, setBannersDesktop] = useState([]);
   const [bannersMobile, setBannersMobile] = useState([]);
+  const [savedProducts, setSavedProducts] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
     const activeCollectionIds = newFilters.length > 0
@@ -112,12 +115,24 @@ function Listing({ data }) {
     setIsLoading(false);
   }, [sortedProducts, productBannersData]);
 
-  const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  const fetchSavedProducts = async () => {
+    try {
+      const savedProducts = await fetchSavedProductData();
+      setSavedProducts(savedProducts);
+    } catch (error) {
+      logError("Error while fetching Saved Product", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSavedProducts();
   }, []);
 
   return (
@@ -148,28 +163,30 @@ function Listing({ data }) {
             {products.map((productData, index) => {
               const banners = isMobile ? bannersMobile : bannersDesktop;
               const shouldInsertBanner = (index + 1) % pageSize === 0 && banners.length > 0;
-              
+
               const isLastProduct = index === products.length - 1;
-              const forceInsertBanner = isLastProduct && 
-                bannerIndex === -1 && 
-                products.length < pageSize && 
+              const forceInsertBanner = isLastProduct &&
+                bannerIndex === -1 &&
+                products.length < pageSize &&
                 banners.length > 0;
-              
+
               if (shouldInsertBanner || forceInsertBanner) bannerIndex = (bannerIndex + 1) % banners.length;
-              
+
               return (
                 <React.Fragment key={productData._id}>
                   <li>
                     <ProductCard
-                    key={productData._id}
+                      key={productData._id}
                       data={productData}
+                      savedProducts={savedProducts}
+                      setSavedProducts={setSavedProducts}
                       onAddToCart={() => console.log('Added to cart')}
                     />
                   </li>
                   {(shouldInsertBanner || forceInsertBanner) && (
                     <li className={`col-span-2 md:col-span-3 ${subCategories.length > 0 ? 'lg:col-span-3' : 'lg:col-span-4'}`}>
                       <ProductBanner
-                      key={banners[bannerIndex]._id} data={banners[bannerIndex]} />
+                        key={banners[bannerIndex]._id} data={banners[bannerIndex]} />
                     </li>
                   )}
                 </React.Fragment>

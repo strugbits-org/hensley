@@ -11,8 +11,8 @@ export const PrimaryImage = ({
     original,
     fit = "fill",
     q = "90",
-    min_w,
-    min_h,
+    min_w = 10,
+    min_h = 10,
     customClasses = "",
     alt = "",
     attributes,
@@ -73,7 +73,9 @@ export const PrimaryImage = ({
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-    }, []);
+
+    }, [url]);
+
 
     return (
         <>

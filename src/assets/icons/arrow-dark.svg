@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg data-bbox="0.354 0.499 25 25.001" viewBox="0 0 25.854 25.854" height="25.854" width="25.854" xmlns="http://www.w3.org/2000/svg" data-type="ugc">
     <g>
-        <path stroke-miterlimit="10" stroke="#2c2216" fill="none" d="M.354.499h25v25"/>
-        <path stroke-miterlimit="10" stroke="#2c2216" fill="none" d="m25.354.5-25 25"/>
-        <path stroke-miterlimit="10" stroke="#2c2216" fill="none" d="m25.354.5-25 25"/>
+        <path strokeMiterlimit="10" stroke="#2c2216" fill="none" d="M.354.499h25v25"/>
+        <path strokeMiterlimit="10" stroke="#2c2216" fill="none" d="m25.354.5-25 25"/>
+        <path strokeMiterlimit="10" stroke="#2c2216" fill="none" d="m25.354.5-25 25"/>
     </g>
 </svg>

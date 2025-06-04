@@ -1,13 +1,16 @@
 "use client";
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { PrimaryButton } from '../common/PrimaryButton'
 import ProductCard from '../common/ProductCard'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
+import { fetchSavedProductData } from '@/services/products';
+import { logError } from '@/utils';
 
-export const BestSellers = ({ data, pageDetails, loop = true, origin = "center" }) => {
+export const BestSellers = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false }) => {
     const { bestSellerTitle } = pageDetails;
+    const [savedProducts, setSavedProducts] = useState([]);
 
     const sliderInstance = useRef();
 
@@ -38,11 +41,24 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center" 
         []
     );
 
+    const fetchSavedProducts = async () => {
+        try {
+            const savedProducts = await fetchSavedProductData();
+            setSavedProducts(savedProducts);
+        } catch (error) {
+            logError("Error while fetching Saved Product", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSavedProducts();
+    }, []);
+
     return (
-        <div className='bg-secondary-alt w-full py-20 lg:py-6'>
+        <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-6`}>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={bestSellerTitle} classes="!text-primary lg:py-[40px] py-[20px] md:mt-6 lg:mt-0" />
-                <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
+                <SectionTitle text={bestSellerTitle} classes={`!text-primary lg:py-[40px] py-[20px] md:mt-6 lg:mt-0 ${headingClasses}`} />
+                {!buttonHide && <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>}
             </div>
             <div className="p-6">
                 <div ref={sliderRef} className="keen-slider">
@@ -55,6 +71,8 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center" 
                                 <ProductCard
                                     type='slider'
                                     data={productData}
+                                    savedProducts={savedProducts}
+                                    setSavedProducts={setSavedProducts}
                                     onAddToCart={() => console.log('Added to cart')}
                                 />
                             </div>

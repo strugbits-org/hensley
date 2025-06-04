@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
   --primary: #F0DEA2;
   --primary-alt: #F4F1EC;
@@ -20,11 +21,17 @@
     margin: 0;
   }
 }
+@layer components {
+  .air-datepicker-cell.-selected- {
+    @apply bg-primary text-white border-[#57442D];
+  }
+}
 
 body {
   color: var(--foreground);
   background: var(--primary-alt);
 }
+
 
 .hide-scrollbar {
   -ms-overflow-style: none;
@@ -91,4 +98,21 @@ body {
   100% {
     transform: scaleY(-1) rotate(-135deg)
   }
+}
+
+.custom-date-picker .air-datepicker-nav--title {
+  @apply uppercase font-haasLight tracking-widest;
+}
+.custom-date-picker .air-datepicker-body--day-name {
+  @apply text-secondary-alt ;
+}
+
+.custom-date-picker .air-datepicker-cell {
+  @apply hover:bg-primary-alt text-secondary-alt font-haasLight rounded-none ;
+}
+.custom-date-picker .air-datepicker-cell.-selected- {
+  @apply bg-primary hover:bg-primary rounded-none text-secondary-alt font-haasLight;
+}
+.custom-date-picker .air-datepicker-cell.-current- {
+  @apply text-primary;
 }

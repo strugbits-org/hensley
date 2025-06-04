@@ -1,4 +1,4 @@
-import { createWixClient, createWixClientOAuth, logError } from ".";
+import { createWixClient, logError } from ".";
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -48,6 +48,7 @@ const queryCollection = async (payload) => {
       isNotEmpty,
       startsWith = [],
       not,
+      log = false
     } = payload;
 
     // Create Wix client

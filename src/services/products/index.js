@@ -1,5 +1,8 @@
 import { logError, mapProductSetItems } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
+import { getAuthToken } from "../auth";
+
+const baseUrl = process.env.BASE_URL;
 
 export const fetchProductsByCategory = async (id) => {
     try {
@@ -117,18 +120,19 @@ export const fetchMatchedProducts = async (id) => {
         const response = await queryCollection({
             dataCollectionId: "MATCHITWITH",
             includeReferencedItems: ["matchProducts"],
-            hasSome: [
+            eq: [
                 {
                     key: "product",
-                    values: [id]
+                    value: id
                 }
-            ]
+            ],
         });
-        if (!Array.isArray(response.items)) {
+        if (!Array.isArray(response.items) || response.items.length === 0) {
             throw new Error(`Response does not contain items array`);
         }
 
-        return response.items;
+        const data = response.items[0].matchProducts.filter(item => typeof item !== "string");
+        return data;
     } catch (error) {
         logError(`Error fetching matched products: ${error.message}`, error);
     }
@@ -188,3 +192,91 @@ export const fetchProductPageData = async (slug) => {
         logError(`Error fetching product data: ${error.message}`, error);
     }
 }
+
+export const fetchSavedProductData = async (retries = 3, delay = 1000) => {
+    const retryDelay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const authToken = await getAuthToken();
+            if (!authToken) return [];
+
+            const response = await fetch(`${baseUrl}/api/product/getSavedProducts`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: authToken,
+                },
+                cache: "no-store",
+            });
+
+            const data = await response.json();
+
+            if (data && data.items) {
+                return data.items;
+            } else {
+                throw new Error("Response does not contain _items", response);
+            }
+        } catch (error) {
+            logError(`Error fetching saved products: Attempt ${attempt + 1} failed: ${error}`);
+
+            if (attempt < retries) {
+                logError(`Retrying in ${delay}ms...`);
+                await retryDelay(delay);
+                delay *= 2;
+            } else {
+                logError(`Attempt ${attempt} failed. No more retries left.`);
+                return [];
+            }
+        }
+    }
+};
+
+export const saveProduct = async (id) => {
+    try {
+        const authToken = await getAuthToken();
+
+        const response = await fetch(`${baseUrl}/api/product/saveProduct/${id}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: authToken,
+            },
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        logError("Error saving product:", error);
+        throw new Error(error.message);
+    }
+};
+
+export const unSaveProduct = async (id) => {
+    try {
+        const authToken = await getAuthToken();
+        const response = await fetch(
+            `${baseUrl}/api/product/removeSavedProduct/${id}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: authToken,
+                },
+            }
+        );
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        logError("Error removing product:", error);
+        throw new Error(error.message);
+    }
+};

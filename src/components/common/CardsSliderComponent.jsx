@@ -10,10 +10,15 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 // Tablet version
 function TabletCardsSlider({ data, cardCss }) {
   const sliderInstance = useRef(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const [sliderRef] = useKeenSlider(
     {
-      mode: "free-snap",
+      loop: true,
+      slides: data.length,
+      defaultAnimation: {
+        duration: 2000,
+      },
       breakpoints: {
         "(max-width: 768px)": {
           loop: true,
@@ -24,35 +29,67 @@ function TabletCardsSlider({ data, cardCss }) {
           slides: { perView: 1.5, spacing: 15, origin: "auto" },
         },
         "(min-width: 1025px)": {
-          loop: false,
-          slides: { perView: 2.5, spacing: 15, origin: "auto" },
+          loop: true,
+          slides: { perView: 2.5, spacing: 15 },
         },
       },
       created(slider) {
         sliderInstance.current = slider;
       },
+      slideChanged(slider) {
+                setCurrentSlide(slider.track.details.rel);
+            },
     },
     []
   );
 
+
+  const isBeforeActive = (index) => {
+    if (currentSlide === 0) {
+      return index === data.length - 1; // Last slide is before the first one in loop mode
+    }
+    return index === currentSlide - 1;
+  };
+
   return (
     <div
       ref={sliderRef}
-      className="lg:pl-[100px] keen-slider mt-[30px] md:min-h-[850px] pb-[70px]"
+      className="lg:pl-[100px]  keen-slider mt-[30px] md:min-h-[850px] pb-[70px]"
     >
       {data.map((slide, index) => {
         return (
           <div
             key={index}
-            className={`${cardCss} keen-slider__slide border border-white flex flex-col p-[20px] sm:min-h-[680px]`}
+            className={`${cardCss}  group keen-slider__slide border border-white flex flex-col p-[20px] sm:min-h-[680px] ${isBeforeActive(index) ? "invisible" : ""} `}
           >
-            <div className="h-[425px] relative">
-              <PrimaryImage url={slide.image} customClasses={"h-full w-full object-cover"} alt={slide.heading} />
-              <PrimaryImage
+            <div className="h-[425px] relative overflow-hidden">
+              <PrimaryImage url={slide.image} customClasses={"h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"} alt={slide.heading} />
+              {/* <PrimaryImage
                 url={"https://static.wixstatic.com/shapes/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"}
                 alt="Arrow"
-                customClasses="size-10 lg:!block sm:block hidden absolute bottom-4 left-4"
-              />
+                customClasses="h-auto w-[34px] lg:!block sm:block hidden absolute bottom-4 left-4
+                group-hover:h-[calc(100%-40px)]
+                group-hover:w-auto
+                transition-all duration-300 ease-in-out
+                "
+              /> */}
+              <div className="arrow block ">
+                <PrimaryImage
+                  url={"https://static.wixstatic.com/shapes/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"}
+                  alt="Arrow"
+                  customClasses="group-hover:invisible absolute left-6 bottom-8 h-[20px] w-[20px] xl:h-[34px] xl:w-[34px] 
+                   lg:group-hover:h-full
+                   lg:group-hover:w-auto
+                    transition-[height] transition-[width] duration-300 ease-in-out"
+                />
+                <PrimaryImage
+                  url={"https://static.wixstatic.com/shapes/0e0ac5_7f17be7b63744aaf83be995827c7ff34.svg"}
+                  alt="Arrow"
+                  customClasses="invisible group-hover:visible absolute left-6 bottom-8 h-[20px] w-[20px] xl:h-[34px] xl:w-[34px] 
+                  lg:group-hover:h-[90%]
+                   lg:group-hover:w-auto transition-[height] transition-[width] duration-300 ease-in-out"
+                />
+              </div>
             </div>
             <div>
               <h3 className="text-secondary-alt text-[25px] leading-[35px] lg:text-[35px] lg:leading-[35px] lg:max-w-[139px] font-recklessRegular mt-[20px] mb-[20px] !max-w-none uppercase">
@@ -131,7 +168,9 @@ function NormalCardsSlider({ data, cardCss }) {
               <PrimaryImage
                 url={"https://static.wixstatic.com/shapes/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"}
                 alt="Arrow"
-                customClasses="size-10 lg:hidden md:block sm:block hidden absolute bottom-4 left-4"
+                customClasses="size-10 lg:hidden md:block sm:block hidden absolute bottom-4 left-4
+                
+                "
               />
             </div>
             <div>

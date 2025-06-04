@@ -1,7 +1,7 @@
 "use server";
-import logError from "@/Utils/ServerActions";
 import { AddProductToCartVisitor, getProductsCartVisitor, removeProductFromCartVisitor, updateProductsQuantityCartVisitor } from "./CartApisVisitor";
 import { getAuthToken, getCartId, getMemberTokens } from "../auth";
+import { logError } from "@/utils";
 
 const baseUrl = process.env.BASE_URL;
 
@@ -30,9 +30,9 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
       });
 
       const data = await response.json();
-      if (!data.cart?.lineItems) throw new Error(data.error);
+      if (!data.cart) throw new Error(data.error);
 
-      return data.cart.lineItems;
+      return data.cart;
 
     } catch (error) {
       logError(`Error fetching cart: Attempt ${attempt} failed: ${error}`);
@@ -52,10 +52,10 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
   }
 };
 
-
 export const AddProductToCart = async (productData) => {
   try {
     const authToken = await getAuthToken();
+    
     const memberTokens = await getMemberTokens();
     const payload = {
       memberTokens,

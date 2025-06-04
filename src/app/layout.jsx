@@ -7,6 +7,9 @@ import InstagramFeed from "@/components/common/InstagramFeed";
 import Loader from "@/components/common/Loader";
 import LoaderProvider from "@/components/common/providers/LoaderProvider";
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { ModalsWrapper } from "@/components/Modals/ModalsWrapper";
+import 'air-datepicker/air-datepicker.css';
+import { Toaster } from "sonner";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -82,8 +85,17 @@ export default async function RootLayout({ children }) {
         </main>
         <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
+        <ModalsWrapper />
         <SpeedInsights />
         <Loader />
+        <Toaster position="top-center"
+          toastOptions={{
+            classNames: {
+              title: '!text-secondary-alt',
+              description: '!text-secondary-alt',
+            },
+          }}
+        />
       </body>
     </html>
   );

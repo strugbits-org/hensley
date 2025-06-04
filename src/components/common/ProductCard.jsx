@@ -3,15 +3,17 @@ import { PrimaryImage } from './PrimaryImage';
 import { CopyIcon } from './helpers/CopyIcon';
 import { copyToClipboard } from '@/utils';
 import { CustomLink } from './CustomLink';
+import { SaveProductButton } from './SaveProductButton';
 
-function ProductCard({ data, onAddToCart, type = 'listing' }) {
+
+function ProductCard({ data, onAddToCart, type = 'listing', savedProducts = [], setSavedProducts }) {
     const { product } = data;
     const { name } = product;
     return (
-        <CustomLink to={`/product/${product.slug}`} className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
-            <div className={`h-full overflow-hidden flex justify-center items-center p-10 ${type === 'listing' ? 'bg-white' : ''}`}>
+        <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
+            <CustomLink to={`/product/${product.slug}`} className={`h-full overflow-hidden flex justify-center items-center p-10 ${type === 'listing' ? 'bg-white' : ''}`}>
                 <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"} />
-            </div>
+            </CustomLink>
 
             <div className="max-w-full flex-wrap pt-2 lg:pt-6 lg:pb-2">
                 <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular">
@@ -57,11 +59,13 @@ function ProductCard({ data, onAddToCart, type = 'listing' }) {
                 </div>
             </div>
 
-            <div className="group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full w-[56px] h-[56px] flex items-center justify-center shrink-0 cursor-pointer">
-                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg" alt="Cart Icon" customClasses={"block group-hover/cart:hidden"} />
-                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg" alt="Cart Icon" customClasses={"hidden group-hover/cart:block"} />
-            </div>
-        </CustomLink>
+            <SaveProductButton
+                key={product._id}
+                productData={data}
+                savedProducts={savedProducts}
+                setSavedProducts={setSavedProducts}
+            />
+        </div>
     );
 }
 
