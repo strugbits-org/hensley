@@ -49,7 +49,7 @@ export const signInUser = async (userData) => {
         return data;
     } catch (error) {
         logError(error);
-        throw new Error(error);
+        throw new Error(error.message);
     }
 };
 
@@ -116,14 +116,14 @@ export const updateProfile = async (userData) => {
 
         if (!response.ok) {
             const data = await response.json();
-            return { error: true, message: data.message };
+            throw new Error(data.message);
         }
         const data = await response.json();
 
         return data;
     } catch (error) {
         logError(error);
-        throw new Error(error);
+        throw new Error(error.message);
     }
 };
 
