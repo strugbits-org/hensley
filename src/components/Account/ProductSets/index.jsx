@@ -1,9 +1,6 @@
 "use client"
-import React, { useState } from 'react';
-import ProductList from './ProductList';
+import React from 'react';
 import ProductListUpdate from './ProductListUpdate';
-
-
 
 function ProductSets() {
 
@@ -11,8 +8,6 @@ function ProductSets() {
         heading: "product sets",
         email: "gabriel@petrikor.design"
     };
-
-  
 
     return (
         <div className='MyAccount w-full max-lg:mb-[85px] '>
@@ -22,9 +17,8 @@ function ProductSets() {
                 </h2>
             </div>
             <div className='px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>
-            <div className='max-w-[900px] w-full mx-auto '>
-                {/* <ProductList /> */}
-                <ProductListUpdate />
+                <div className='max-w-[900px] w-full mx-auto '>
+                    <ProductListUpdate />
                 </div>
             </div>
         </div>

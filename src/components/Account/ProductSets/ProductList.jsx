@@ -1,5 +1,5 @@
 'use client'
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image';
 import image from '@/assets/product-set-1.png'
 
@@ -50,11 +50,11 @@ const Buttons = ({ text, classes }) => {
 }
 
 
-const ProductCards = ()=>{
-    return(
+const ProductCards = () => {
+    return (
         <div className='w-full flex gap-y-[10px] gap-x-[20px] py-[15px] px-[15px] cursor-pointer border hover:bg-primary transform transition-all duration-30'>
             <div className=' bg-white w-[100px] h-[90px] '>
-                <Image src={image} className='h-full w-full object-contain'/>
+                <Image src={image} className='h-full w-full object-contain' />
             </div>
             <div className='w-full text-left flex flex-col gap-y-[10px]'>
                 <span className='
@@ -66,7 +66,7 @@ const ProductCards = ()=>{
                 '>
                     vintage - dance floor
                 </span>
-                 <span className='
+                <span className='
                 font-haasRegular
                 text-secondary-alt
                 uppercase
@@ -75,13 +75,13 @@ const ProductCards = ()=>{
                 '>
                     set of products:
                 </span>
-                 <div className='w-full flex gap-x-[6px] flex-wrap gap-y-[10px]'>
-                                <Buttons text={"corporate"}  />
-                                <Buttons text={"event design and production"} />
-                                <Buttons text={"creative services agency"} />
-                                <Buttons text={"+3 studios"} />
+                <div className='w-full flex gap-x-[6px] flex-wrap gap-y-[10px]'>
+                    <Buttons text={"corporate"} />
+                    <Buttons text={"event design and production"} />
+                    <Buttons text={"creative services agency"} />
+                    <Buttons text={"+3 studios"} />
 
-                            </div>
+                </div>
 
             </div>
         </div>
@@ -103,7 +103,7 @@ const ProductList = () => {
             <button className='tracking-[3px] hover:tracking-[5px] hover:bg-primary hover:font-haasBold transform transition-all duration-300 border border-secondary-alt h-[45px] lg:w-[292px] w-full text-secondary-alt uppercase text-[12px] font-haasRegular'>
                 create a new set
             </button>
-            <InputField  id="oldPassword" placeholder="SEARCH SETS" borderColor="secondary-alt"  classes={"self-start w-[280px]"}/>
+            <InputField id="oldPassword" placeholder="SEARCH SETS" borderColor="secondary-alt" classes={"self-start w-[280px]"} />
             <ProductCards />
             <ProductCards />
             <ProductCards />
