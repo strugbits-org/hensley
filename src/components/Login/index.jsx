@@ -1,10 +1,10 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { createWixClientOAuth, logError } from '@/utils';
+import { calculateTotalCartQuantity, logError } from '@/utils';
 import image from '@/assets/hens-logo.png';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { CustomLink } from '../common/CustomLink';
@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { signInUser } from '@/services/auth/authentication';
 import { useCookies } from 'react-cookie';
+import { getProductsCart } from '@/services/cart/CartApis';
 
 // Validation schema
 const schema = yup.object({
@@ -84,18 +85,18 @@ const InputField = ({
                     </button>
                 )}
             </div>
-            {hasError && (
+            {/* {hasError && (
                 <p className="text-red-500 text-sm mt-1 font-haasLight">{error}</p>
-            )}
+            )} */}
         </div>
     );
 };
 
-const Login = ({ classes, close, isLightbox = true, onCreateAccount }) => {
+const Login = ({ classes, close, isLightbox = true }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const redirectWithLoader = useRedirectWithLoader();
-    const [_cookies, setCookie, removeCookie] = useCookies(["authToken", "userData"]);
+    const [cookies, setCookie, removeCookie] = useCookies(["authToken", "userData", "cartQuantity", "userTokens"]);
 
     const {
         register,
@@ -106,70 +107,55 @@ const Login = ({ classes, close, isLightbox = true, onCreateAccount }) => {
         resolver: yupResolver(schema)
     });
 
-    const checkLoginStatus = async () => {
-        const wixClient = await createWixClientOAuth();
-        const res = await wixClient.auth.loggedIn();
-        console.log("res", res);
-    }
-
-    useEffect(() => {
-        checkLoginStatus();
-    }, []);
-
-    // Enhanced submit handler
     const onSubmit = async (data) => {
         setIsSubmitting(true);
+
         try {
-            console.log("Login attempted with:", data);
-            const wixClient = await createWixClientOAuth();
-            const loginStatus = await wixClient.auth.login(data);
-            if (loginStatus.loginState !== "SUCCESS") {
-                const errorMessage = {
-                    invalidEmail: "No user found with the provided email.",
-                    invalidPassword: "Incorrect password. Please try again.",
-                    resetPassword: "Password reset required. Check your email for instructions.",
-                }[loginStatus.errorCode];
-                throw new Error(errorMessage);
-            }
             const response = await signInUser(data);
-            const authToken = response.jwtToken;
-            const userData = JSON.stringify(response.member);
-            setCookie("authToken", authToken, {
+            const { jwtToken: authToken, member: userData, userTokens } = response;
+
+            const cookieOptions = {
                 path: "/",
                 expires: new Date("2099-01-01"),
-            });
-            setCookie("userData", userData, {
-                path: "/",
-                expires: new Date("2099-01-01"),
-            });
+            };
+
+            setCookie("authToken", authToken, cookieOptions);
+            setCookie("userData", JSON.stringify(userData), cookieOptions);
+            setCookie("userTokens", JSON.stringify(userTokens), cookieOptions);
             removeCookie("cartId", { path: "/" });
+
             setTimeout(() => {
                 reset();
                 setIsSubmitting(false);
-                toast.success("Login successful! Redirecting...");
                 redirectWithLoader('/account');
+                updateCartQuantity();
                 if (isLightbox && close) {
                     close();
                 }
             }, 1500);
+
         } catch (error) {
             logError(error);
             toast.error(error.message || "Invalid email or password. Please try again.");
-            setTimeout(() => {
-                setIsSubmitting(false);
-            }, 3000);
+            // Reset submitting state after delay
+            setTimeout(() => setIsSubmitting(false), 3000);
         }
     };
-
-    const handleCreateAccount = () => {
-        if (onCreateAccount) {
-            onCreateAccount();
-        }
-    };
-
     const togglePasswordVisibility = () => {
         if (!isSubmitting) {
             setShowPassword(!showPassword);
+        }
+    };
+
+    const updateCartQuantity = async () => {
+        try {
+            const cart = await getProductsCart();
+            const total = calculateTotalCartQuantity(cart?.lineItems || []);
+            if (total !== cookies.cartQuantity) {
+                setCookie("cartQuantity", total, { path: "/" });
+            }
+        } catch (error) {
+            logError(error);
         }
     };
 
@@ -182,7 +168,6 @@ const Login = ({ classes, close, isLightbox = true, onCreateAccount }) => {
     return (
         <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center z-[99] relative lg:w-[762px] lg:py-[80px] mx-auto`}>
             <form
-                onSubmit={handleSubmit(onSubmit)}
                 className='w-full flex flex-col gap-y-[41px] justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[120px] px-[36px] pt-[121px] pb-[55px] relative'
             >
                 {isLightbox && (
@@ -241,7 +226,7 @@ const Login = ({ classes, close, isLightbox = true, onCreateAccount }) => {
 
                 {/* Submit Button */}
                 <button
-                    type="submit"
+                    onClick={handleSubmit(onSubmit)}
                     disabled={isSubmitting}
                     className={`group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] 
                    transition-all duration-300 hover:bg-[#2c2216] 
@@ -297,18 +282,19 @@ const Login = ({ classes, close, isLightbox = true, onCreateAccount }) => {
                     NEW TO HENSLEY?
                 </span>
 
-                <button
-                    type="button"
-                    onClick={handleCreateAccount}
-                    disabled={isSubmitting}
-                    className={`tracking-[3px] border border-secondary-alt h-[45px] lg:w-[292px] w-full 
+                <CustomLink to={isSubmitting ? undefined : "/create-account"}>
+                    <button
+                        type="button"
+                        disabled={isSubmitting}
+                        className={`tracking-[3px] border border-secondary-alt h-[45px] lg:w-[292px] w-full 
                                text-secondary-alt uppercase text-[12px] font-haasRegular
                                transition-all duration-300
                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' :
-                            'hover:tracking-[5px] hover:bg-primary hover:font-haasBold hover:text-primary-alt'}`}
-                >
-                    create your account
-                </button>
+                                'hover:tracking-[5px] hover:bg-primary hover:font-haasBold hover:text-primary-alt'}`}
+                    >
+                        create your account
+                    </button>
+                </CustomLink>
             </form>
         </div>
     );

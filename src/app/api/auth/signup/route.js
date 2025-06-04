@@ -1,107 +1,94 @@
 import { NextResponse } from "next/server";
-
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import { createWixClientCart, createWixClientOAuth, isValidEmail, logError } from "@/utils";
-
+import { createWixClient, createWixClientCart, createWixClientOAuth, logError } from "@/utils";
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export const POST = async (req) => {
   try {
     const body = await req.json();
+    const { email, password, firstName, lastName, phone, cartId } = body;
 
-    const { email, password, firstName, lastName, phone } = body;
 
-    const wixClient = await createWixClientOAuth();
+    const [wixClientApi, wixClient] = await Promise.all([
+      createWixClient(),
+      createWixClientOAuth()
+    ]);
 
-    if (!isValidEmail(email)) {
-      return NextResponse.json(
-        {
-          message: "Enter a valid email address",
-        },
-        { status: 404 }
-      );
+    const response = await wixClient.auth.register({
+      email, password, profile: {
+        firstName,
+        lastName,
+        phones: [phone]
+      }
+    });
+    if (response.loginState !== "SUCCESS") {
+      const errorMessage = {
+        invalidEmail: "No user found with the provided email.",
+        invalidPassword: "Incorrect password. Please try again.",
+        resetPassword: "Password reset required. Check your email for instructions.",
+        emailAlreadyExists: "Email already exists",
+      }[response.errorCode];
+      throw new Error(errorMessage);
     }
 
-    const memberData = await wixClient.items.query("membersPassword").eq("userEmail", email).find();
-
-    if (memberData.items.length > 0) {
-      return NextResponse.json(
-        { message: "Email already exists" },
-        { status: 403 }
-      );
-    }
-
-    let jwtToken = jwt.sign({ email: email }, process.env.JWT_SECRET, {
-      expiresIn: "30d",
+    await delay(3000);
+    const privateMemberData = await wixClientApi.items.query("Members/PrivateMembersData").eq("loginEmail", email).find({
+      consistentRead: true
     });
 
-    const memberResponse = await fetch(
-      `${process.env.RENTALS_URL}/createRentalsMember`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, firstName, lastName, phone }),
-      }
-    );
-
-    const responseData = await memberResponse.json();
-    const memberResponseData = responseData.data;
-
-    if (!memberResponseData) {
+    // Early return for non-existent user
+    const selectedMemberData = privateMemberData.items[0];
+    if (!selectedMemberData) {
       return NextResponse.json(
-        { message: "Error saving member data, please try again" },
-        { status: 500 }
-      )
-    }
-
-    const memberId = memberResponseData._id;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    try {
-      await wixClient.items.insert("membersPassword", {
-        userEmail: email,
-        userPassword: hashedPassword,
-      });
-    } catch (error) {
-      return NextResponse.json(
-        { message: "Error saving member data: " + error.message },
-        { status: 500 }
+        { message: "No user found with the provided email" },
+        { status: 401 }
       );
-    }
+    };
 
-    const memberTokens = await wixClient.auth.getMemberTokensForExternalLogin(
-      memberId,
-      process.env.CLIENT_API_KEY_WIX
-    );
+    // Parallel token generation and member tokens retrieval
+    const [jwtToken, memberTokens] = await Promise.all([
+      new Promise((resolve) => {
+        resolve(jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "30d" }));
+      }),
+      wixClient.auth.getMemberTokensForExternalLogin(
+        selectedMemberData._id,
+        process.env.API_KEY_WIX
+      )
+    ]);
 
-    if (body?.cartId) {
-      const wixClient = await createWixClientOAuth();
-      const visitorCart = await wixClient.cart.getCart(body.cartId);
+    // Handle cart merge if cartId is provided
+    if (cartId) {
+      try {
+        const [visitorCart, cartClient] = await Promise.all([
+          wixClientApi.cart.getCart(cartId),
+          createWixClientCart(memberTokens)
+        ]);
 
-      const cartClient = await createWixClientCart(memberTokens);
-      const lineItems = visitorCart.lineItems.map(x => ({
-        catalogReference: x.catalogReference,
-        quantity: x.quantity
-      }));
+        const lineItems = visitorCart.lineItems.map(({ catalogReference, quantity }) => ({
+          catalogReference,
+          quantity
+        }));
 
-      if (lineItems.length !== 0) {
-        await cartClient.currentCart.addToCurrentCart({ lineItems });
+        if (lineItems.length > 0) {
+          await cartClient.currentCart.addToCurrentCart({ lineItems });
+        }
+      } catch (cartError) {
+        // Log cart error but don't fail the login
+        logError(cartError);
       }
     }
 
+    // Prepare response data
     const finalData = {
-      memberId: memberResponseData._id,
-      loginEmail: email,
-      firstName: firstName,
-      lastName: lastName,
-      mainPhone: phone
+      memberId: selectedMemberData._id,
+      loginEmail: selectedMemberData.loginEmail,
+      firstName: selectedMemberData.firstName,
+      lastName: selectedMemberData.lastName,
+      mainPhone: selectedMemberData.mainPhone,
     };
 
     return NextResponse.json(
       {
-        message: "User registered successfully",
+        message: "Account created successfully",
         jwtToken,
         member: finalData,
         userTokens: memberTokens,
@@ -109,7 +96,7 @@ export const POST = async (req) => {
       { status: 200 }
     );
   } catch (error) {
-    logError("Error", error);
+    logError(error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 };

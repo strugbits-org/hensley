@@ -133,7 +133,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
             const response = await getProductsCart();
             if (response === "Token has expired") {
                 removeCookie("authToken", { path: "/" });
+                removeCookie("userData", { path: "/" });
                 removeCookie("cartQuantity", { path: "/" });
+                removeCookie("userTokens", { path: "/" });
                 setTimeout(() => {
                     router.push("/");
                 }, 500);

@@ -10,6 +10,7 @@ function Sidebar() {
         "authToken",
         "userData",
         "cartQuantity",
+        "userTokens",
     ]);
     const router = useRouter();
 
@@ -21,6 +22,7 @@ function Sidebar() {
                 removeCookie("authToken", { path: "/" });
                 removeCookie("userData", { path: "/" });
                 removeCookie("cartQuantity", { path: "/" });
+                removeCookie("userTokens", { path: "/" });
                 setTimeout(() => {
                     router.push("/");
                 }, 200);
