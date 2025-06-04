@@ -7,7 +7,6 @@ export const POST = async (req) => {
     const body = await req.json();
     const { email, password, firstName, lastName, phone, cartId } = body;
 
-
     const [wixClientApi, wixClient] = await Promise.all([
       createWixClient(),
       createWixClientOAuth()

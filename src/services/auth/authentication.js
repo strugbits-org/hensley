@@ -53,7 +53,7 @@ export const signInUser = async (userData) => {
     }
 };
 
-export const confirmEmail = async (userData) => {
+export const forgotPassword = async (userData) => {
     try {
         const response = await fetch(`${baseUrl}/api/auth/forgotPassword`, {
             method: "POST",
@@ -65,13 +65,13 @@ export const confirmEmail = async (userData) => {
 
         if (!response.ok) {
             const data = await response.json();
-            return { error: true, message: data.message };
+            throw new Error(data.message);
         }
         const data = await response.json();
         return data;
     } catch (error) {
         logError(error);
-        throw new Error(error);
+        throw new Error(error.message);
     }
 };
 

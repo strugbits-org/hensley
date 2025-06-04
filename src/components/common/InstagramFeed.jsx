@@ -10,12 +10,12 @@ import { CustomLink } from "./CustomLink";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { usePathname } from "next/navigation";
 
-  const privateRoutes = [
-    "/account",
-    "/change-password",
-    "/quotes-history",
-    "/saved-products",
-  ];
+const privateRoutes = [
+  "/account",
+  "/change-password",
+  "/quotes-history",
+  "/saved-products",
+];
 
 function InstagramFeed({ data, details }) {
   const { instaFeedHeading, instaFeedTitle, instaFeedIcon, instaFeedButtonLabel, instaFeedButtonAction } = details;

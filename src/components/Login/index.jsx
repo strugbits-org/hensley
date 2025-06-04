@@ -13,6 +13,7 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { signInUser } from '@/services/auth/authentication';
 import { useCookies } from 'react-cookie';
 import { getProductsCart } from '@/services/cart/CartApis';
+import { lightboxActions } from '@/store/lightboxStore';
 
 // Validation schema
 const schema = yup.object({
@@ -165,9 +166,17 @@ const Login = ({ classes, close, isLightbox = true }) => {
         }
     };
 
+    const handleForgotPassword = () => {
+        if (!isSubmitting) {
+            lightboxActions.hideLightBox("login");
+            lightboxActions.showLightBox("forgotPassword");
+        }
+    }
+
     return (
         <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center z-[99] relative lg:w-[762px] lg:py-[80px] mx-auto`}>
             <form
+                onSubmit={(e) => e.preventDefault()}
                 className='w-full flex flex-col gap-y-[41px] justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[120px] px-[36px] pt-[121px] pb-[55px] relative'
             >
                 {isLightbox && (
@@ -205,9 +214,9 @@ const Login = ({ classes, close, isLightbox = true }) => {
                         password
                     </label>
                     <label className="block text-[16px] leading-[19px] font-haasLight text-secondary-alt mb-2 text-right">
-                        <CustomLink className={"underline text-secondary-alt font-haasRegular hover:opacity-70 transition-opacity duration-200"}>
+                        <button onClick={handleForgotPassword} className={"underline text-secondary-alt font-haasRegular hover:opacity-70 transition-opacity duration-200"}>
                             Forgot your password?
-                        </CustomLink>
+                        </button>
                     </label>
                     <InputField
                         id="password"
