@@ -8,6 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { logError } from '@/utils';
 import { lightboxActions } from '@/store/lightboxStore';
+import { loaderActions } from '@/store/loaderStore';
 
 // Validation schema
 const schema = yup.object({
@@ -16,12 +17,6 @@ const schema = yup.object({
   email: yup.string().email('Email is invalid').required('Email is required'),
   phone: yup.string()
 }).required();
-
-// Form structure
-const FORM_STRUCTURE = {
-  personalInfo: ['firstName', 'lastName'],
-  contactInfo: ['email', 'phone']
-};
 
 // Field configurations
 const FIELD_CONFIGS = {
@@ -161,6 +156,7 @@ export const MyAccount = ({ content }) => {
   // Initialize form data when user data loads
   useEffect(() => {
     if (firstName || lastName || email || phone) {
+      loaderActions.hide();
       setInitialData();
     }
   }, [firstName, lastName, email, phone, setInitialData]);

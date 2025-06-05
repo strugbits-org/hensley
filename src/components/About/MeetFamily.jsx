@@ -1,12 +1,11 @@
 'use client'
 import React from "react";
 import SectionTitle from "../common/SectionTitle";
-import logo from "@/assets/testimonialLogo.png";
-import Image from "next/image";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { PrimaryImage } from "../common/PrimaryImage";
+import { CustomLink } from "../common/CustomLink";
 
-const Cards = ({ logo, title, buttonLabel, buttonLink}) => {
+const Cards = ({ logo, title, buttonLabel, buttonLink }) => {
   // Split title into parts by double line breaks or similar logic
   const [paragraph1, paragraph2] = title?.split(/\n\s*\n/) || ["", ""];
 
@@ -14,7 +13,7 @@ const Cards = ({ logo, title, buttonLabel, buttonLink}) => {
     <div className="lg:max-w-[608px] md:min-h-[902px] bg-[rgb(44,34,22)] flex justify-center items-center p-11">
       <div className="flex flex-col items-center justify-center">
         <div className="w-[246px] h-[87px]">
-          <PrimaryImage timeout={0} url={logo} customClasses={"h-full w-full object-cover "} />
+          <PrimaryImage timeout={0} url={logo} fit={"fit"} customClasses={"h-full w-full object-contain"} />
         </div>
 
         {paragraph1 && (
@@ -29,28 +28,24 @@ const Cards = ({ logo, title, buttonLabel, buttonLink}) => {
           </p>
         )}
 
-        <PrimaryButton onClick={()=>{
-          if (buttonLabel) {
-            window.location.href=buttonLink
-          } else {
-            console.log("no link");
-          }
-        }} className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
-          {buttonLabel}
-        </PrimaryButton>
+        <CustomLink to={buttonLink}>
+          <PrimaryButton className="block border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+            {buttonLabel}
+          </PrimaryButton>
+        </CustomLink>
       </div>
     </div>
   );
 };
 
 
-function MeetFamily({data}) {
-  
+function MeetFamily({ data }) {
+
   return (
     <>
-     <div className="w-full">
-       <SectionTitle text="meet the family" classes=" text-[55px] sm:pt-[40px] sm:pb-[40px]" />
-     </div>
+      <div className="w-full">
+        <SectionTitle text="meet the family" classes=" text-[55px] sm:pt-[40px] sm:pb-[40px]" />
+      </div>
       <div className="w-full grid grid-cols-1 lg:grid-cols-3 xl:gap-10 lg:gap-3 lg:px-8 px-2 pt-10 pb-10 gap-0">
         {data.map((card, idx) => (
           <Cards key={idx} {...card} />
