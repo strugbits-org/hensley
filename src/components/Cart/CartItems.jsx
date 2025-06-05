@@ -317,17 +317,27 @@ const CartCollection = () => {
 }
 
 const CartNormal = ({ data, actions = {}, readOnly = false }) => {
+
+    console.log("data", data);
+
     const { removeProduct, handleQuantityChange, updateProducts } = actions;
-    const formattedDescription = formatDescriptionLines(data.descriptionLines);
-    const price = data.fullPrice.amount * data.quantity;
+
+    const productName = data?.productName?.original || data?.name;
+
+    const productSize = () => {
+        if (!data.descriptionLines) return data.size;
+        const formattedDescription = formatDescriptionLines(data.descriptionLines);
+        return formattedDescription.find(x => x.title === "size")?.value;
+    }
+    const price = (data?.price?.amount || data.price) * data.quantity;
     const formattedPrice = formatTotalPrice(price);
 
     const productInfoSection = [
         {
-            product: data.productName.original,
-            price: data.fullPrice.amount,
-            size: formattedDescription.find(x => x.title === "size")?.value,
-            formattedPrice: data.fullPrice.formattedAmount,
+            product: productName,
+            price: data?.price?.amount || data?.price,
+            size: productSize(),
+            formattedPrice: data?.fullPrice?.formattedAmount || formatTotalPrice(data.price),
             _id: data._id
         }
     ]
@@ -340,7 +350,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false }) => {
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data.image} alt={data.productName.original} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>
@@ -350,13 +360,13 @@ const CartNormal = ({ data, actions = {}, readOnly = false }) => {
                  text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
                 lg:mb-[27px]
-                '>{data.productName.original}</span>
+                '>{productName}</span>
 
                     <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
                 lg:mb-[27px]
                 mr-[100px]
-                '>{data.price.amount}</span>
+                '>{data.price.amount || data.price}</span>
                 </div>
                 <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] ">
                     <thead>

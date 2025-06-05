@@ -11,6 +11,7 @@ import { getProductsCart } from "@/services/cart/CartApis";
 import { createPriceQuote } from "@/services/quotes/QuoteApis";
 import { useCookies } from "react-cookie";
 import { lightboxActions } from "@/store/lightboxStore";
+import useUserData from "@/hooks/useUserData";
 
 // Validation schema
 const schema = yup.object({
@@ -136,6 +137,11 @@ export const QuoteRequest = ({ content }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datepickers, setDatepickers] = useState({});
+  const { firstName, lastName, email, phone } = useUserData();
+
+  // Check if user data exists
+  const hasUserData = firstName && lastName && email && phone;
+  const fullName = hasUserData ? `${firstName} ${lastName}`.trim() : '';
 
   const {
     register,
@@ -147,9 +153,23 @@ export const QuoteRequest = ({ content }) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      orderType: "DELIVERED"
+      orderType: "DELIVERED",
+      ...(hasUserData && {
+        name: fullName,
+        email: email,
+        phone: phone
+      })
     }
   });
+
+  // Set form values when user data is available
+  useEffect(() => {
+    if (hasUserData) {
+      setValue('name', fullName);
+      setValue('email', email);
+      setValue('phone', phone);
+    }
+  }, [firstName, lastName, email, phone, setValue, fullName, hasUserData]);
 
   // Initialize Air Datepickers
   useEffect(() => {
@@ -279,6 +299,9 @@ export const QuoteRequest = ({ content }) => {
     const config = FIELD_CONFIGS[fieldId];
     const error = errors[fieldId]?.message;
 
+    const isOrderByField = FORM_STRUCTURE.orderBy.includes(fieldId);
+    const shouldBeReadOnly = isOrderByField && hasUserData;
+
     return (
       <div key={fieldId} className={gridClass}>
         <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
@@ -290,9 +313,9 @@ export const QuoteRequest = ({ content }) => {
           {...register(fieldId)}
           placeholder={config.placeholder}
           className={`w-full border-b font-haasRegular border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-secondary ${inputClass} ${error ? 'border-b-red-500' : ''
-            }`}
+            } ${shouldBeReadOnly ? '!bg-gray-100 cursor-not-allowed' : ''}`}
           disabled={isSubmitting}
-          readOnly={config.readOnly}
+          readOnly={config.readOnly || shouldBeReadOnly}
         />
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </div>

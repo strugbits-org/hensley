@@ -116,3 +116,6 @@ body {
 .custom-date-picker .air-datepicker-cell.-current- {
   @apply text-primary;
 }
+.custom-date-picker .air-datepicker-cell.-disabled- {
+  @apply text-primary-alt;
+}

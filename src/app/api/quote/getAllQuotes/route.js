@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import getDataFetchFunction from "@/Services/FetchFunction";
 import handleAuthentication from "@/services/auth/handleAuthentication";
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
@@ -12,14 +11,14 @@ export const POST = async (req) => {
     }
 
     const data = await queryCollection({
-      "dataCollectionId": "RequestQuote",
-      "eq": [
+      dataCollectionId: "QuoteRequest",
+      eq: [
         {
           key: "memberId",
           value: authenticatedUserData.memberId
         }
       ],
-      "limit": "infinite",
+      limit: "infinite",
     });
 
     return NextResponse.json(
