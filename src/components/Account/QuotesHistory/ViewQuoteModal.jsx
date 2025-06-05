@@ -31,7 +31,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                 </TransitionChild>
 
                 <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center ">
+                    <div className="flex items-center justify-center  ">
                         <TransitionChild
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -42,25 +42,29 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                             leaveTo="opacity-0 scale-95"
                         >
                             <DialogPanel className="transform overflow-hidden text-left align-middle transition-all relative">
-                                <div className=' py-[120px] max-w-[1288px] mx-auto'>
-                                    <div className='bg-white w-full '>
-                                        <div className='heading w-full  flex justify-center items-center flex-col max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
-                                            <p className='font-haasLight text-base '>{date}</p>
-                                            <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[160px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.eventDescriptionPo}</h2>
-                                        </div>
-                                        <div className='w-full px-6'>
-                                            <div className='w-full bg-[#F4F1EC] pt-[18px] pb-[17px]'>
-                                                <h4 className='text-center text-[35px] font-recklessRegular leading-[39px]'>
-                                                    {formattedTotalPrice}
-                                                </h4>
+                                <div className='h-screen max-w-[1288px] flex justify-center items-center mx-auto '>
+                                    <div >
+                                        <div className='bg-white w-full flex flex-col gap-y-[20px] py-[30px] px-[24px] h-[800px] overflow-y-scroll hide-scrollbar'>
+                                            <div className='heading w-full  flex justify-center items-center flex-col max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
+                                                <p className='font-haasLight text-base uppercase'>{date}</p>
+                                                <h2 className='uppercase text-[140px] text-secondary-alt font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.eventDescriptionPo}</h2>
+                                            </div>
+                                            <div className='w-full '>
+                                                <div className='w-full bg-[#F4F1EC] pt-[18px] pb-[17px]'>
+                                                    <h4 className='text-center text-[35px] font-recklessRegular leading-[39px]'>
+                                                        {formattedTotalPrice}
+                                                    </h4>
+                                                </div>
+                                            </div>
+                                            <div className=''>
+                                                {lineItems.map(({ product, size }) => {
+                                                    const data = product;
+                                                    return (
+                                                        <CartNormal key={data._id} data={{ ...data, size }} readOnly={true} />
+                                                    );
+                                                })}
                                             </div>
                                         </div>
-                                        {lineItems.map(({ product, size }) => {
-                                            const data = product;
-                                            return (
-                                                <CartNormal key={data._id} data={{ ...data, size }} readOnly={true} />
-                                            );
-                                        })}
                                     </div>
                                 </div>
                             </DialogPanel>
