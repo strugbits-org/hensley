@@ -1,7 +1,8 @@
 import React from 'react';
 import { PrimaryImage } from './PrimaryImage';
+import { SaveProductButton } from './SaveProductButton';
 
-function SecondryProductCard({ data, onAddToCart, type = 'listing' }) {
+function SecondaryProductCard({ data, onAddToCart, savedProducts, setSavedProducts, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
     return (
@@ -10,13 +11,13 @@ function SecondryProductCard({ data, onAddToCart, type = 'listing' }) {
                 <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={" w-full aspect-[0.849] object-contain transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
-            <div className="max-w-full flex py-[7px] justify-between items-center max-lg:flex-col">
-                <h2 className="uppercase lg:text-[12px] lg:leading-[12px] text-secondary-alt font-haasRegular max-lg:w-full max-lg:text-xs">
+            <div className="max-w-full flex gap-2 py-[7px] justify-between items-center max-lg:flex-col">
+                <h2 className="uppercase lg:text-[12px] lg:leading-[12px] text-secondary-alt font-haasRegular max-lg:w-full max-lg:text-xs max-w-sm">
                     {name}
                 </h2>
 
                 <button
-                    className=" group bg-primary flex items-center max-lg:px-[10px] 2xl:justify-evenly gap-2 lg:h-[27px] h-[32px] justify-between  group/button pt-[6px] pr-[10px] pb-[7px] pl-[15px] max-lg:w-full max-lg:mt-[11px] max-lg:text-xs"
+                    className="min-w-[125px] group bg-primary flex items-center max-lg:px-[10px] 2xl:justify-evenly gap-2 lg:h-[27px] h-[32px] justify-between group/button pt-[6px] pr-[10px] pb-[7px] pl-[15px] max-lg:w-full max-lg:mt-[11px] max-lg:text-xs"
                     onClick={onAddToCart}
                 >
                     <span className="uppercase font-haasRegular text-[12px] ">add to cart</span>
@@ -29,13 +30,14 @@ function SecondryProductCard({ data, onAddToCart, type = 'listing' }) {
                 </button>
             </div>
 
-            <div className="group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full w-[36px] h-[36px] flex items-center justify-center shrink-0 cursor-pointer">
-                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg" alt="Cart Icon" customClasses={"block group-hover/cart:hidden w-[8.62px] h-[12.47px]"} />
-                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg" alt="Cart Icon" customClasses={"hidden group-hover/cart:block w-[8.62px] h-[12.47px]"} />
-            </div>
-
+            <SaveProductButton
+                key={product._id}
+                productData={data}
+                savedProducts={savedProducts}
+                setSavedProducts={setSavedProducts}
+            />
         </div>
     );
 }
 
-export default SecondryProductCard;
+export default SecondaryProductCard;

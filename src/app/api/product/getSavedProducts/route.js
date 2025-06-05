@@ -10,8 +10,9 @@ export const POST = async (req) => {
     if (!authenticatedUserData) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+    const body = await req.json();
 
-    const data = await queryCollection({
+    const payload = {
       dataCollectionId: "ProductsSearchContent",
       hasSome: [
         {
@@ -19,7 +20,14 @@ export const POST = async (req) => {
           values: [authenticatedUserData.memberId]
         }
       ],
-    });
+    };
+    console.log("body.includeProducts", body.includeProducts);
+    
+    if (body.includeProducts) {
+      payload.includeReferencedItems = ["product"];
+    }
+
+    const data = await queryCollection(payload);
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
