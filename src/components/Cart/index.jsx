@@ -123,8 +123,6 @@ const Cart = () => {
         </div>
         <div className='lg:w-[70%] border'>
           <CartHeading />
-          {/* <CartTent />
-          <CartCollection /> */}
           {cartItems.map((item, index) => (
             <CartNormal key={index} data={item} actions={{ handleQuantityChange, removeProduct, updateProducts }} />
           ))}

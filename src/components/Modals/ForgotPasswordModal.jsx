@@ -1,9 +1,9 @@
 "use client"
-import React, { useState, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
-import SignIn from '../Modals/Signin';
+import { ForgotPassword } from './helpers/ForgotPassword';
 
-const LightboxForm = ({ isOpen, onClose }) => {
+export const ForgotPasswordModal = ({ isOpen, onClose }) => {
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -16,7 +16,7 @@ const LightboxForm = ({ isOpen, onClose }) => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black bg-opacity-50" />
+                    <div className="fixed inset-0 bg-[#2c2216a6] bg-opacity-50" />
                 </TransitionChild>
 
                 <div className="fixed inset-0 overflow-y-auto">
@@ -30,9 +30,8 @@ const LightboxForm = ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                             <DialogPanel className="w-full transform overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center"> 
-                                <div  onClick={onClose} className='bg-[#2c2216a6] absolute top-0 left-0 w-full h-full z-[1]'></div>
-                                <SignIn  close={onClose}/>
+                            <DialogPanel className="transform overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
+                                <ForgotPassword close={onClose} />
                             </DialogPanel>
                         </TransitionChild>
                     </div>
@@ -41,29 +40,3 @@ const LightboxForm = ({ isOpen, onClose }) => {
         </Transition>
     );
 };
-
-const Form = () => {
-    const [isOpen, setIsOpen] = useState(true);
-
-    return (
-        <>
-            {/* Desktop: show button */}
-            <div className="hidden lg:flex justify-center items-center py-[80px]">
-                <button
-                    className="bg-primary text-white px-6 py-4 rounded-lg font-bold hover:bg-primary-dark transition"
-                    onClick={() => setIsOpen(true)}
-                >
-                    Open Contact Form
-                </button>
-            </div>
-
-            {/* Mobile: show full form inline */}
-            <SignIn classes={"lg:!hidden block"}/>
-
-            {/* Lightbox Dialog */}
-            <LightboxForm isOpen={isOpen} onClose={() => setIsOpen(false)} />
-        </>
-    );
-};
-
-export default Form;

@@ -4,7 +4,8 @@ export const lightboxState = proxy({
     lightboxes: {
         contact: false,
         addToCart: false,
-        basicLightBox: false,
+        login: false,
+        forgotPassword: false
     },
     basicLightBoxDetails: {
         open: false,
@@ -18,6 +19,7 @@ export const lightboxState = proxy({
 });
 
 export const lightboxActions = {
+    getLightBoxState: (ligtbox) => lightboxState.lightboxes[ligtbox],
     showLightBox: (ligtbox) => {
         lightboxState.lightboxes[ligtbox] = true;
     },

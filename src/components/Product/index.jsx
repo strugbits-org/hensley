@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToCartButton } from './AddtoQuoteButton'
@@ -9,6 +9,7 @@ import { SaveProductButton } from '../common/SaveProductButton';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
+import { fetchSavedProductData } from '@/services/products';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -55,6 +56,7 @@ export const Product = ({ data }) => {
   const [productSetItems, setProductSetItems] = useState([]);
   const [cartQuantity, setCartQuantity] = useState(1);
   const [isUpdatingCart, setIsUpdatingCart] = useState(false);
+  const [savedProducts, setSavedProducts] = useState([]);
 
   const redirectWithLoader = useRedirectWithLoader();
 
@@ -185,6 +187,19 @@ export const Product = ({ data }) => {
     ));
   };
 
+  const fetchSavedProducts = async () => {
+    try {
+      const savedProducts = await fetchSavedProductData();
+      setSavedProducts(savedProducts);
+    } catch (error) {
+      logError("Error while fetching Saved Product", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSavedProducts();
+  }, []);
+
   return (
     <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] min-h-[937px]'>
       <div className='xl:w-1/2'>
@@ -230,7 +245,12 @@ export const Product = ({ data }) => {
         </div>
 
         <AddToCartButton text={isUpdatingCart ? "Adding..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
-        <SaveProductButton />
+        <SaveProductButton
+          key={product.id}
+          productData={productData}
+          savedProducts={savedProducts}
+          setSavedProducts={setSavedProducts}
+        />
       </div>
     </div>
   );

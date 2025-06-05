@@ -9,6 +9,7 @@ import Loading from '@/app/loading';
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper';
 import { findSortIndexByCategory, logError } from '@/utils';
 import { fetchSortedProducts } from '@/services/collections';
+import { fetchSavedProductData } from '@/services/products';
 
 // Debounce utility function
 const useDebounce = (callback, delay) => {
@@ -37,6 +38,8 @@ export const ProductListing = ({ data }) => {
     const [hasMore, setHasMore] = useState(true);
     const [bannersDesktop, setBannersDesktop] = useState([]);
     const [bannersMobile, setBannersMobile] = useState([]);
+    const [savedProducts, setSavedProducts] = useState([]);
+    const [isMobile, setIsMobile] = useState(false);
 
     const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
         const activeCollectionIds = newFilters.length > 0
@@ -111,12 +114,24 @@ export const ProductListing = ({ data }) => {
         setIsLoading(false);
     }, [sortedProducts, productBannersData]);
 
-    const [isMobile, setIsMobile] = useState(false);
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const fetchSavedProducts = async () => {
+        try {
+            const savedProducts = await fetchSavedProductData();
+            setSavedProducts(savedProducts);
+        } catch (error) {
+            logError("Error while fetching Saved Product", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSavedProducts();
     }, []);
 
     return (
@@ -159,6 +174,8 @@ export const ProductListing = ({ data }) => {
                                 <ProductCard
                                     key={productData._id}
                                     data={productData}
+                                    savedProducts={savedProducts}
+                                    setSavedProducts={setSavedProducts}
                                     onAddToCart={() => console.log('Added to cart')}
                                 />
                             </li>

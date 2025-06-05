@@ -25,9 +25,9 @@ const TentsTypes = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" width="120.423" height="120.676" viewBox="0 0 120.423 120.676">
                             <g id="Group_3704" data-name="Group 3704" transform="translate(120.256 60.545) rotate(135)">
                                 <g id="Group_2072" data-name="Group 2072" transform="translate(0 0.117)">
-                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H84.221V84.368" transform="translate(-0.066 -0.501)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_13" data-name="Line 13" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_14" data-name="Line 14" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
+                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H84.221V84.368" transform="translate(-0.066 -0.501)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_13" data-name="Line 13" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_14" data-name="Line 14" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
                                 </g>
                             </g>
                         </svg>
@@ -52,9 +52,9 @@ const TentsTypes = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" width="120.423" height="120.676" viewBox="0 0 120.423 120.676">
                             <g id="Group_3704" data-name="Group 3704" transform="translate(120.256 60.545) rotate(135)">
                                 <g id="Group_2072" data-name="Group 2072" transform="translate(0 0.117)">
-                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H84.221V84.368" transform="translate(-0.066 -0.501)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_13" data-name="Line 13" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_14" data-name="Line 14" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
+                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H84.221V84.368" transform="translate(-0.066 -0.501)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_13" data-name="Line 13" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_14" data-name="Line 14" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
                                 </g>
                             </g>
                         </svg>
@@ -79,9 +79,9 @@ const TentsTypes = () => {
                         <svg xmlns="http://www.w3.org/2000/svg" width="120.423" height="120.676" viewBox="0 0 120.423 120.676">
                             <g id="Group_3704" data-name="Group 3704" transform="translate(120.256 60.545) rotate(135)">
                                 <g id="Group_2072" data-name="Group 2072" transform="translate(0 0.117)">
-                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H84.221V84.368" transform="translate(-0.066 -0.501)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_13" data-name="Line 13" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_14" data-name="Line 14" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" stroke-miterlimit="10" strokeWidth="1" />
+                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H84.221V84.368" transform="translate(-0.066 -0.501)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_13" data-name="Line 13" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_14" data-name="Line 14" x1="84.445" y2="84.445" transform="translate(0 0.355)" fill="none" stroke="#f4f1ec" strokeMiterlimit="10" strokeWidth="1" />
                                 </g>
                             </g>
                         </svg>

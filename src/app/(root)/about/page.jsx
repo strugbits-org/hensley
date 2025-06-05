@@ -6,7 +6,7 @@ import { notFound } from "next/navigation";
 export default async function Page() {  
   try {
     const data = await fetchAboutPageData();
-    const {heroSectionData} = data
+    const {heroSectionData, } = data
     console.log("we got",heroSectionData);
     return (
       <About data={data}/>

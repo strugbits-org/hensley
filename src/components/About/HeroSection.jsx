@@ -4,10 +4,11 @@ import Image from "next/image";
 import { PrimaryButton } from "../common/PrimaryButton";
 import arrow from "@/assets/icons/arrow.svg";
 import { PrimaryImage } from "../common/PrimaryImage";
+import AboutSection from "./AboutSection";
 
 function HeroSection({heroSectionData}) {
 
-  const {title, subtitle, image, buttonLabel, buttonLink} = heroSectionData;
+  const {title, subtitle, image, buttonLabel, buttonLink, richcontent} = heroSectionData;
 
   const data = {
     title: title,
@@ -25,6 +26,7 @@ function HeroSection({heroSectionData}) {
   };
 
   return (
+    <>
     <div className="flex w-full lg:h-screen lg:flex-row md:justify-center md:items-center flex-col">
       <div className="lg:w-1/2 flex items-center justify-center md:pl-11 lg:mb-0 mb-[59px]">
         <div className="lg:w-min lg:text-left text-center w-[492px]">
@@ -66,6 +68,8 @@ function HeroSection({heroSectionData}) {
         />
       </div>
     </div>
+    <AboutSection richcontent={richcontent}/>
+    </>
   );
 }
 

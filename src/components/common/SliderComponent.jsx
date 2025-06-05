@@ -14,7 +14,7 @@ export default function SliderComponent({ data, classes, pageDetails }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderInstance = React.useRef(null);
 
-  const [sliderRef, instanceRef] = useKeenSlider({
+  const [sliderRef] = useKeenSlider({
     slides: data.length,
     breakpoints: {
       "(max-width: 1024px)": {
@@ -40,30 +40,33 @@ export default function SliderComponent({ data, classes, pageDetails }) {
         className="relative keen-slider h-screen pb-[150px] lg:pb-[0px] lg:block hidden"
       >
         {data.map((slide, index) => {
-          const { portfolioRef } = slide;
+          const { portfolioRef, titleAndDescription, image } = slide;
+
+          // Compute fallback title from titleAndDescription
+          const rawTitle = titleAndDescription?.split("~")[0] || "";
+          const maxLength = 85;
+          const displayedTitle = rawTitle.length > maxLength
+            ? rawTitle.slice(0, maxLength).trim() + "..."
+            : rawTitle;
+
           return (
             <div
               key={index}
-              className="keen-slider__slide relative transition-opacity duration-700 ease-in-out "
+              className="keen-slider__slide relative transition-opacity duration-700 ease-in-out"
             >
-              <PrimaryImage useNextImage={true} q={60} url={portfolioRef.coverImage.imageInfo} type={"alternate"} customClasses="size-full object-cover brightness-50" />
+              <PrimaryImage
+                useNextImage={true}
+                q={60}
+                url={portfolioRef?.coverImage?.imageInfo || image}
+                type="alternate"
+                customClasses="size-full object-cover brightness-50"
+              />
 
-              <div className="absolute top-1/2 lg:left-[20%] left-[10%] right-[10%] lg:transform -translate-y-1/2  z-10  flex flex-col justify-center items-center lg:block ">
-                <h2
-                  className="
-            text-[25px]
-            leading-[22px]
-            lg:text-[60px]
-            lg:leading-[55px]
-            max-w-[340px]
-            lg:max-w-[600px]
-            lg:text-left
-            text-center
-             text-white font-recklessLight mb-8"
-                >
-                  {portfolioRef.title}
+              <div className="absolute top-1/2 lg:left-[20%] left-[10%] right-[10%] lg:transform -translate-y-1/2 z-10 flex flex-col justify-center items-center lg:block">
+                <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] max-w-[340px] lg:max-w-[600px] lg:text-left text-center text-white font-recklessLight mb-8">
+                  {portfolioRef?.title || displayedTitle}
                 </h2>
-                <CustomLink to={`/project/${portfolioRef.slug}`}>
+                <CustomLink to={`/project/${portfolioRef?.slug}`}>
                   <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
                     {buttonLabelPortfolioSlider}
                   </PrimaryButton>
@@ -73,7 +76,7 @@ export default function SliderComponent({ data, classes, pageDetails }) {
               {/* Arrows */}
               <button
                 onClick={() => sliderInstance.current?.prev()}
-                className="absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20 "
+                className="absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
               >
                 <MdOutlineChevronLeft className="size-[20px]" />
               </button>
@@ -84,11 +87,12 @@ export default function SliderComponent({ data, classes, pageDetails }) {
               >
                 <MdOutlineChevronRight className="size-[20px]" />
               </button>
+
               <span className="lg:block hidden absolute bottom-[48px] left-[48px] text-white font-recklessRegular text-[35px]">
                 {currentSlide + 1}/{data.length}
               </span>
             </div>
-          )
+          );
         })}
       </div>
     </div>

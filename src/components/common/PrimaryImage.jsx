@@ -74,7 +74,7 @@ export const PrimaryImage = ({
             window.removeEventListener('resize', handleResize);
         };
 
-    }, []);
+    }, [url]);
 
 
     return (

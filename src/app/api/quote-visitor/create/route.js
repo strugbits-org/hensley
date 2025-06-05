@@ -54,7 +54,7 @@ export const POST = async (req) => {
 
     const payload = {
       data: sharedQuoteData,
-      phone: quoteDetails.phoneNumber,
+      phone: quoteDetails.phone,
       formattedLineItems
     };
 
@@ -74,7 +74,7 @@ export const POST = async (req) => {
       ...sharedQuoteData,
       quoteNumber: quote.number,
       quoteId: quote.id.id,
-      phoneNumber: quoteDetails.phoneNumber,
+      phoneNumber: quoteDetails.phone,
       lineItems: cartLineItems
     };
 

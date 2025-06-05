@@ -1,6 +1,7 @@
+import { convertToHTML } from "@/utils/renderRichText";
 import React from "react";
 
-function AboutSection() {
+function AboutSection({richcontent}) {
   const data = {
     title:
       "EVENTS ARE CRUCIAL FOR ENHANCING BRAND AWARENESS, OFFERING EXCLUSIVE CHANCES TO SHOWCASE IDEAS, PRODUCTS, AND SERVICES INTIMATELY.",
@@ -24,7 +25,7 @@ TURPIS EGESTAS.`,
         {/* Future Conditional Section (e.g., wedding/social) */}
         {/* <p className="...">...</p> */}
 
-        <h1
+        {/* <h1
           className="text-secondary-alt font-recklessRegular text-2xl
           lg:text-[60px]
           lg:leading-[55px]
@@ -35,9 +36,11 @@ TURPIS EGESTAS.`,
           max-w-7xl mt-4 mb-6 text-center sm:text-left lg:text-left"
         >
           {data.title}
-        </h1>
+        </h1> */}
 
-        <p
+        {convertToHTML({content:richcontent, class_p:'text-secondary-alt font-haasRegular text-sm md:text-base lg:text-[16px] lg:leading-[20px] sm:mt-[40px] mt-[10px] text-[14px] leading-[18px] max-w-7xl text-center lg:text-left sm:text-left',class_heading:"text-secondary-alt font-recklessRegular text-2xl lg:text-[60px] lg:leading-[55px] sm:text-[25px] sm:leading-[33px] text-[35px] leading-[30px] max-w-7xl mt-4 mb-6 text-center sm:text-left lg:text-left"})}
+
+        {/* <p
           className="text-secondary-alt font-haasRegular text-sm 
           md:text-base 
           lg:text-[16px] lg:leading-[20px] 
@@ -47,7 +50,7 @@ TURPIS EGESTAS.`,
           max-w-7xl text-center lg:text-left sm:text-left"
         >
           {data.description}
-        </p>
+        </p> */}
       </div>
     </div>
   );

@@ -59,15 +59,10 @@ export const getAllQuotes = async () => {
   }
 };
 
-export const getQuotesById = async (id) => {
+export const fetchQuote = async (id) => {
   try {
-    const authToken = await getAuthToken();
-    const response = await fetch(`${baseUrl}/api/quote/getById/${id}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: authToken,
-      },
+    const response = await fetch(`${baseUrl}/api/quote/get/${id}`, {
+      method: "POST",
       cache: "no-store",
     });
 

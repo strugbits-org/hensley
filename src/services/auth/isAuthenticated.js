@@ -8,9 +8,9 @@ export const isAuthenticated = async (token) => {
       throw new Error("Unauthorized: No token provided");
     }
 
-    let decoded;
+    let decodedUserData;
     try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
+      decodedUserData = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       if (err.name === "TokenExpiredError") {
         throw new Error("Token has expired");
@@ -20,34 +20,21 @@ export const isAuthenticated = async (token) => {
     }
 
     const wixClient = await createWixClient();
+    const response = await wixClient.items.query("Members/PrivateMembersData").eq("loginEmail", decodedUserData.email).find();
+    const memberData = response.items[0];    
 
-    const [privateMemberData, memberData] = await Promise.all([
-      wixClient.items
-        .query("Members/PrivateMembersData")
-        .eq("loginEmail", decoded.email)
-        .find(),
-
-      wixClient.items
-        .query("membersPassword")
-        .eq("userEmail", decoded.email)
-        .find()
-    ]);
-
-    const id = privateMemberData.items?.[0]?._id;
-
-    const loggedInUserData = {
-      ...memberData.items[0],
-      memberId: id,
-      firstName: privateMemberData.items[0].firstName,
-      lastName: privateMemberData.items[0].lastName,
-      phone: privateMemberData.items[0].mainPhone,
-    };
-
-    if (memberData.items.length === 0) {
+    if (!memberData) {
       throw new Error("Unauthorized: No matching user data");
     }
 
-    return loggedInUserData;
+    const data = {
+      memberId: memberData._id,
+      firstName: memberData.firstName,
+      lastName: memberData.lastName,
+      phone: memberData.mainPhone,
+    };
+
+    return data;
   } catch (error) {
     logError(error);
     if (error.message === "Token has expired") {

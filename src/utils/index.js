@@ -123,7 +123,8 @@ export const formatDate = (dateString) => {
     });
 };
 
-export const formatDateNumeric = (date) => {
+export const formatDateNumeric = (d) => {
+    const date = new Date(d);
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const year = date.getFullYear();
@@ -262,4 +263,15 @@ function generateDescriptionForQuote(customTextFields, poolCover) {
     }
 
     return descriptionLines.join("\n");
+}
+
+export function isValidPassword(password) {
+    const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()~<>?,./;:{}[\]|\\])[A-Za-z\d!@#$%^&*()~<>?,./;:{}[\]|\\]{6,}$/;
+    return passwordRegex.test(password);
+}
+
+export function isValidEmail(email) {
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    return emailRegex.test(email);
 }

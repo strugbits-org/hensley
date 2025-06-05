@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="29.586" height="22.26" viewBox="0 0 29.586 22.26">
   <g id="Component_298_3" data-name="Component 298 – 3" transform="translate(0 0.5)">
-    <path id="Path_159" data-name="Path 159" d="M29.117,1,24.472,13.633H11.9L7.251,1H0" transform="translate(0 -1)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1"/>
-    <path id="Path_160" data-name="Path 160" d="M74.784,124.055a2.549,2.549,0,1,0-2.549,2.549A2.549,2.549,0,0,0,74.784,124.055Z" transform="translate(-60.34 -105.344)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1"/>
-    <path id="Path_161" data-name="Path 161" d="M168.543,124.055a2.549,2.549,0,1,0-2.549,2.549A2.549,2.549,0,0,0,168.543,124.055Z" transform="translate(-141.523 -105.344)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1"/>
+    <path id="Path_159" data-name="Path 159" d="M29.117,1,24.472,13.633H11.9L7.251,1H0" transform="translate(0 -1)" fill="none" stroke="#2c2216" strokeMiterlimit="10" stroke-width="1"/>
+    <path id="Path_160" data-name="Path 160" d="M74.784,124.055a2.549,2.549,0,1,0-2.549,2.549A2.549,2.549,0,0,0,74.784,124.055Z" transform="translate(-60.34 -105.344)" fill="none" stroke="#2c2216" strokeMiterlimit="10" stroke-width="1"/>
+    <path id="Path_161" data-name="Path 161" d="M168.543,124.055a2.549,2.549,0,1,0-2.549,2.549A2.549,2.549,0,0,0,168.543,124.055Z" transform="translate(-141.523 -105.344)" fill="none" stroke="#2c2216" strokeMiterlimit="10" stroke-width="1"/>
   </g>
 </svg>

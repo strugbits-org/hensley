@@ -39,9 +39,9 @@ const TentCards = () => {
                 {/* <svg xmlns="http://www.w3.org/2000/svg" width="34.737" height="34.736" className='z-10 self-start lg:block hidden' viewBox="0 0 34.737 34.736">
                             <g id="Group_3706" data-name="Group 3706" transform="translate(0.354 0.383)">
                                 <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
-                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H34.121V34.268" transform="translate(-0.238 -0.383)" fill="none" stroke="#e0d6ca" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_13" data-name="Line 13" x1="34" y2="34" fill="none" stroke="#e0d6ca" stroke-miterlimit="10" strokeWidth="1" />
-                                    <line id="Line_14" data-name="Line 14" x1="34" y2="34" fill="none" stroke="#e0d6ca" stroke-miterlimit="10" strokeWidth="1" />
+                                    <path id="Path_3283" data-name="Path 3283" d="M.354.5H34.121V34.268" transform="translate(-0.238 -0.383)" fill="none" stroke="#e0d6ca" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_13" data-name="Line 13" x1="34" y2="34" fill="none" stroke="#e0d6ca" strokeMiterlimit="10" strokeWidth="1" />
+                                    <line id="Line_14" data-name="Line 14" x1="34" y2="34" fill="none" stroke="#e0d6ca" strokeMiterlimit="10" strokeWidth="1" />
                                 </g>
                             </g>
                         </svg> */}

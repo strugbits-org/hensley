@@ -2,9 +2,9 @@
 <svg data-bbox="0.353 0.499 132 132.001" viewBox="0 0 132.853 132.854" height="132.854" width="132.853" xmlns="http://www.w3.org/2000/svg" data-type="ugc">
     <g>
         <g>
-            <path stroke-miterlimit="10" stroke="#f4f1ec" fill="none" d="M.825.499h131.528v131.528"/>
-            <path stroke-miterlimit="10" stroke="#f4f1ec" fill="none" d="m132.353.5-132 132"/>
-            <path stroke-miterlimit="10" stroke="#f4f1ec" fill="none" d="m132.353.5-132 132"/>
+            <path strokeMiterlimit="10" stroke="#f4f1ec" fill="none" d="M.825.499h131.528v131.528"/>
+            <path strokeMiterlimit="10" stroke="#f4f1ec" fill="none" d="m132.353.5-132 132"/>
+            <path strokeMiterlimit="10" stroke="#f4f1ec" fill="none" d="m132.353.5-132 132"/>
         </g>
     </g>
 </svg>
