@@ -1,13 +1,11 @@
 
 "use client";
 import React, { useRef } from 'react'
-import SectionTitle from '@/components/common/SectionTitle';
-import { PrimaryButton } from '@/components/common/PrimaryButton';
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import AddToCartCard from './AddToCartCard';
 
-export const AddToCartSlider = ({ data, pageDetails, loop = true, origin = "center",classes, headingClasses, buttonHide=false }) => {
+export const AddToCartSlider = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false }) => {
 
     const sliderInstance = useRef();
 
@@ -39,15 +37,15 @@ export const AddToCartSlider = ({ data, pageDetails, loop = true, origin = "cent
     );
 
     return (
-       <div className={`${classes}  w-full h-full flex items-center `}>
+        <div className={`${classes}  w-full h-full flex items-center `}>
             <div className="">
                 <div ref={sliderRef} className="keen-slider ">
-                   
-                            <div
-                                className={`keen-slider__slide  flex flex-col px-2`}
-                            >
-                                <AddToCartCard />
-                            </div>
+
+                    <div
+                        className={`keen-slider__slide  flex flex-col px-2`}
+                    >
+                        <AddToCartCard />
+                    </div>
                     <button
                         onClick={() => sliderInstance.current?.prev()}
                         className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"

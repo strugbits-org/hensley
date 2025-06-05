@@ -20,10 +20,10 @@ const INFO_HEADERS = [
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const QuantityControls = ({ quantity, onQuantityChange }) => (
+export const QuantityControls = ({ quantity, onQuantityChange }) => (
   <div className="flex items-center justify-center gap-x-[30px] font-haasRegular">
     <button
-      className="text-xl font-light hover:opacity-70 transition-opacity"
+      className="select-none text-xl font-light hover:opacity-70 transition-opacity"
       onClick={() => onQuantityChange(quantity - 1)}
       disabled={quantity <= QUANTITY_LIMITS.MIN}
       aria-label="Decrease quantity"
@@ -40,7 +40,7 @@ const QuantityControls = ({ quantity, onQuantityChange }) => (
       aria-label="Quantity"
     />
     <button
-      className="text-xl font-light hover:opacity-70 transition-opacity"
+      className="select-none text-xl font-light hover:opacity-70 transition-opacity"
       onClick={() => onQuantityChange(quantity + 1)}
       disabled={quantity >= QUANTITY_LIMITS.MAX}
       aria-label="Increase quantity"

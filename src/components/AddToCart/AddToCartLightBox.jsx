@@ -3,9 +3,11 @@ import React, { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import AddToCart from '../Modals/AddToCart/AddToCart';
 
-export const AddToCartLightBox= ({ isOpen, onClose }) => {
+export const AddToCartLightBox = ({ data, onClose }) => {
+    const { open } = data;
+
     return (
-        <Transition appear show={isOpen} as={Fragment}>
+        <Transition appear show={open} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
                 <TransitionChild
                     as={Fragment}
@@ -16,7 +18,7 @@ export const AddToCartLightBox= ({ isOpen, onClose }) => {
                     leaveFrom="opacity-100"
                     leaveTo="opacity-0"
                 >
-                    <div className="fixed inset-0 bg-black bg-opacity-50" />
+                    <div className="fixed inset-0 bg-[#2c2216a6] bg-opacity-50" />
                 </TransitionChild>
 
                 <div className="fixed inset-0 overflow-y-auto">
@@ -30,9 +32,8 @@ export const AddToCartLightBox= ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="w-full transform overflow-hidden h-screen text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
-                                <div onClick={onClose} className='bg-[#2c2216a6] absolute top-0 left-0 w-full h-full z-[1]'></div>
-                                <AddToCart />
+                            <DialogPanel className="transform overflow-hidden h-screen text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
+                                <AddToCart data={data} onClose={onClose} />
                             </DialogPanel>
                         </TransitionChild>
                     </div>
