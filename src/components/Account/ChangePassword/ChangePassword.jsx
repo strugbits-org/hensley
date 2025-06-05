@@ -118,7 +118,6 @@ function ChangePassword({ content }) {
             //     newPassword: formData.newPassword
             // });
 
-            console.log("formData", formData);
 
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1500));
