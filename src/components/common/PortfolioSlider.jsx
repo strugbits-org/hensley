@@ -11,7 +11,7 @@ import arrow from "@/assets/icons/arrow.svg";
 import rightArrow from "../../assets/icons/rightArrow.svg";
 import { PrimaryImage } from "./PrimaryImage";
 
-function PortfolioSlider({ data, display, tab = false, cardCss }) {
+function  PortfolioSlider({ data, display, tab = false, cardCss }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderInstance = useRef(null);
 

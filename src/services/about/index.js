@@ -49,11 +49,11 @@ export const fetchAboutPageData = async () => {
     };
 
     // Optional logs for debugging
-    console.log("--hero section---", heroSectionData.items[0]);
-    console.log("--dream team---", dreamTeamData.items);
-    console.log("--family section---", familySectionData.items);
-    console.log("--how we do it---", howWeDoItData.items);
-    console.log("--portfolio---", portfolioData.items);
+    // console.log("--hero section---", heroSectionData.items[0]);
+    // console.log("--dream team---", dreamTeamData.items);
+    // console.log("--family section---", familySectionData.items);
+    // console.log("--how we do it---", howWeDoItData.items);
+    // console.log("--portfolio---", portfolioData.items);
 
     return response;
   } catch (error) {

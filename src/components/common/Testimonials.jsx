@@ -49,7 +49,7 @@ export const Testimonials = ({ data, pageDetails }) => {
     return (
         <div className='w-full mb-20'>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={testimonialsTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
+                <SectionTitle text={data[0].sectionTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
             </div>
             <div className="p-6">
                 <div ref={sliderRef} className="keen-slider lg:pl-32">

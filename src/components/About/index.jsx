@@ -8,7 +8,6 @@ import SliderComponent from "../common/SliderComponent"
 
 export const About = ({data}) => {
     const {heroSectionData,howWeDoItData,dreamTeamData,familySectionData,portfolioData} = data
-    console.log("meet family",familySectionData);
     const pageDetails = {
         buttonLabelPortfolioSlider: "View Portfolio",
     }

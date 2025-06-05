@@ -22,7 +22,6 @@ export const SearchModal = ({ closeModal, isActive }) => {
     };
 
     const handleSearch = () => {
-        console.log('Searching for:', searchTerm);
         loaderActions.show();
         router.push(`/search?query=${searchTerm}`);
     };
