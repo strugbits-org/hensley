@@ -47,11 +47,12 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center" }) => {
         <div className={`relative w-full h-full sm:max-w-[45%]`}>
             <div ref={sliderRef} className="keen-slider">
                 {mediaItems.map((item, index) => (
-                    <div key={item.id} className={`keen-slider__slide number-slide${index + 1} !max-h-[400px]`}>
+                    <div key={item.id} className={`keen-slider__slide number-slide${index + 1} !max-h-[400px] p-4`}>
                         <PrimaryImage
                             key={item.id}
                             url={item.src}
                             alt={'slide image'}
+                            fit='fit'
                             customClasses={"h-full w-full object-contain"} />
                     </div>
                 ))}

@@ -6,7 +6,7 @@ import { CustomLink } from './CustomLink';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
 
-function ProductCard({ data, onAddToCart, type = 'listing', savedProducts = [], setSavedProducts }) {
+function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts }) {
     const { product } = data;
     const { name } = product;
 

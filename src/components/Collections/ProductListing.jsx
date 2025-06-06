@@ -180,7 +180,6 @@ function Listing({ data }) {
                       data={productData}
                       savedProducts={savedProducts}
                       setSavedProducts={setSavedProducts}
-                      onAddToCart={() => console.log('Added to cart')}
                     />
                   </li>
                   {(shouldInsertBanner || forceInsertBanner) && (

@@ -1,6 +1,11 @@
+import useUserData from '@/hooks/useUserData';
 import React from 'react'
 
-const PriceDisplay = ({ name = "MIRCEA", totalPrice }) => {
+const PriceDisplay = ({ totalPrice }) => {
+  const { firstName, lastName } = useUserData();
+
+  const name = firstName && lastName ? `${firstName} ${lastName},` : '';
+
   return (
     <>
       <div className='lg:block hidden'>
@@ -9,9 +14,10 @@ const PriceDisplay = ({ name = "MIRCEA", totalPrice }) => {
         leading-[55px]
         font-haasLight
         block
+        uppercase
         '>
           HEY, <br />
-          {name}, THE TOTAL OF  YOUR PURCHASE IS
+          {name} THE TOTAL OF  YOUR PURCHASE IS
         </span>
         <span className='
         font-recklessBold

@@ -73,7 +73,6 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center",
                                     data={productData}
                                     savedProducts={savedProducts}
                                     setSavedProducts={setSavedProducts}
-                                    onAddToCart={() => console.log('Added to cart')}
                                 />
                             </div>
                         );

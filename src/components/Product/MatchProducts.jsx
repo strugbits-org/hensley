@@ -56,7 +56,6 @@ export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center
                                 <MatchedProductCard 
                                    type='slider'
                                     data={productData}
-                                    onAddToCart={() => console.log('Added to cart')}
                                 />
                             </div>
                         );

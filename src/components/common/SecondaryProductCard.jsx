@@ -1,10 +1,15 @@
 import React from 'react';
 import { PrimaryImage } from './PrimaryImage';
 import { SaveProductButton } from './SaveProductButton';
+import { lightboxActions } from '@/store/lightboxStore';
 
-function SecondaryProductCard({ data, onAddToCart, savedProducts, setSavedProducts, type = 'listing' }) {
+function SecondaryProductCard({ data, savedProducts, setSavedProducts, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
+
+    const handleAddToCart = () => {
+        lightboxActions.setAddToCartModal({ open: true, product });
+    };
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-[5px] pb-0 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
             <div className={`h-full overflow-hidden flex justify-center items-center  ${type === 'listing' ? 'bg-white' : ''}`}>
@@ -18,7 +23,7 @@ function SecondaryProductCard({ data, onAddToCart, savedProducts, setSavedProduc
 
                 <button
                     className="min-w-[125px] group bg-primary flex items-center max-lg:px-[10px] 2xl:justify-evenly gap-2 lg:h-[27px] h-[32px] justify-between group/button pt-[6px] pr-[10px] pb-[7px] pl-[15px] max-lg:w-full max-lg:mt-[11px] max-lg:text-xs"
-                    onClick={onAddToCart}
+                    onClick={handleAddToCart}
                 >
                     <span className="uppercase font-haasRegular text-[12px] ">add to cart</span>
                     <svg className='rotate-45 size-[6px] group-hover:w-4 transition-all duration-300 ease-in-out' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.665 10.367">

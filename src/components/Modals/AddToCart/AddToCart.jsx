@@ -4,7 +4,10 @@ import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteButton } from './AddtoQuoteButton'
 import ProductDescription from '@/components/common/helpers/ProductDescription'
 import { QuantityControls } from '@/components/Product'
-import { formatTotalPrice } from '@/utils'
+import { calculateTotalCartQuantity, formatTotalPrice } from '@/utils'
+import { AddProductToCart } from '@/services/cart/CartApis'
+import { useCookies } from 'react-cookie'
+import { lightboxActions } from '@/store/lightboxStore'
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -19,6 +22,9 @@ const AddToCart = ({ data, onClose }) => {
   const isProductCollection = false;
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [cookies, setCookie] = useCookies(["cartQuantity"]);
+
 
   const productInfoSection = useMemo(() => {
     if (isProductCollection) return [];
@@ -89,6 +95,57 @@ const AddToCart = ({ data, onClose }) => {
     }
   }, [isProductCollection]);
 
+  const handleAddToCart = async () => {
+    setIsLoading(true);
+    try {
+      const product_id = product._id;
+      const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+      const cartData = {
+        lineItems: [
+          {
+            catalogReference: {
+              appId: "215238eb-22a5-4c36-9e7b-e7c08025e04e",
+              catalogItemId: product_id,
+              options: {
+                customTextFields: {
+                  size: size,
+                },
+              },
+            },
+            quantity: cartQuantity,
+          },
+        ],
+      };
+
+      await AddProductToCart(cartData);
+      const newItems = calculateTotalCartQuantity(cartData.lineItems);
+      const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      setCookie("cartQuantity", total, { path: "/" });
+
+      setTimeout(() => {
+        lightboxActions.resetAddToCartModal();
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Cart Updated",
+          description: "Product has been added to your cart",
+          buttonText: "Continue Shopping",
+          open: true,
+        });
+        setIsLoading(false);
+      }, 500);
+    } catch (error) {
+      logError("Error while adding item to cart:", error);
+      setTimeout(() => {
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Error",
+          description: "Something went wrong. Please try again later.",
+          buttonText: "Close",
+          open: true,
+        });
+        setIsLoading(false);
+      }, 500);
+    }
+  };
+
   return (
     <div className='w-[850px] sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
       <AddToCartSlider data={data} isOpen={data.open} />
@@ -148,7 +205,7 @@ const AddToCart = ({ data, onClose }) => {
           </table>
           <ProductDescription maxChars={130} text={product.description} />
 
-          <AddToQuoteButton text="add to quote" classes={"!mt-0 !p-0 !h-[70px] !text-[14px]"} />
+          <AddToQuoteButton onClick={handleAddToCart} text={isLoading ? "ADDING..." : "ADD TO QUOTE"} disabled={isLoading} classes={"!mt-0 !p-0 !h-[70px] !text-[14px]"} />
         </div>
       </div>
     </div>

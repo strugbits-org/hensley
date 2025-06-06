@@ -3,9 +3,8 @@ import { fetchCareersPageData } from "@/services/careers";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
-export default async function Page({params}) {
+export default async function Page() {
   const data = await fetchCareersPageData();
-
 
   try {
     return (

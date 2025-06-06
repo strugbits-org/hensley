@@ -50,8 +50,6 @@ export const lightboxActions = {
         lightboxState.addToCartModal = data;
     },
     resetAddToCartModal: () => {
-        console.log("resetAddToCartModal");
-
         lightboxState.addToCartModal.open = false;
         setTimeout(() => {
             lightboxState.addToCartModal = {
