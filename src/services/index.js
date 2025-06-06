@@ -256,3 +256,23 @@ export const fetchBannerData = async () => {
     logError(`Error fetching banner data: ${error.message}`, error);
   }
 };
+
+
+export const fetchContactPageData = async () => {
+    try {
+        const [contactFormData] = await Promise.all([
+            queryCollection({ dataCollectionId: "ContactForm" }),
+        ]);
+
+        if (!Array.isArray(contactFormData.items)) {
+            throw new Error(`ContactForm response does not contain items array`);
+        }
+
+        return {
+            contactFormData: contactFormData.items,
+        };
+
+    } catch (error) {
+        logError(`Error fetching contact form data: ${error.message}`, error);
+    }
+};

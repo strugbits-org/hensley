@@ -21,7 +21,6 @@ export const POST = async (req) => {
         }
       ],
     };
-    console.log("body.includeProducts", body.includeProducts);
     
     if (body.includeProducts) {
       payload.includeReferencedItems = ["product"];

@@ -12,13 +12,13 @@ export const ModalsWrapper = ({ data }) => {
     const { lightboxes, basicLightBoxDetails, addToCartModal } = useSnapshot(lightboxState);
     const { contact, login, forgotPassword } = lightboxes;
 
-    const { branches } = data;
+    const { branches, contactFormData } = data;
 
     return (
         <>
             <BasicLightBox data={basicLightBoxDetails} onClose={() => lightboxActions.resetBasicLightBoxDetails()} />
             <AddToCartLightBox data={addToCartModal} onClose={() => lightboxActions.resetAddToCartModal()} />
-            <ContactFormLightbox locationsData={branches} isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
+            <ContactFormLightbox locationsData={branches} data={contactFormData} isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
             <LoginModal isOpen={login} onClose={() => lightboxActions.hideLightBox("login")} />
             <ForgotPasswordModal isOpen={forgotPassword} onClose={() => lightboxActions.hideLightBox("forgotPassword")} />
         </>

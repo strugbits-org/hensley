@@ -5,8 +5,6 @@ import { notFound } from "next/navigation";
 
 export default async function Page({params}) {
   const data = await fetchCareersPageData();
-
-
   try {
     return (
         <Careers data={data}/>
