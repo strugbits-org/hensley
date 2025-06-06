@@ -32,7 +32,7 @@ export const AddToCartLightBox = ({ data, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="transform overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
+                            <DialogPanel className="transform sm:px-[20px] px-[20px] overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
                                 <AddToCart data={data} onClose={onClose} />
                             </DialogPanel>
                         </TransitionChild>
