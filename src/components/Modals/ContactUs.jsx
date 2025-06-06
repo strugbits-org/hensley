@@ -124,23 +124,36 @@ const TextareaField = ({
     );
 };
 
-const AddressBlock = ({ title, lines }) => (
-    <div className='font-haasRegular uppercase text-[14px] leading-[18px]'>
-        <p><b>{title}</b></p>
-        {lines.map((line, idx) => (
-            <p key={idx}>{line}</p>
-        ))}
-    </div>
-);
+const AddressBlock = ({ title, description }) => {
+    const splitDesc = description
+    const lines = splitDesc.split('\n');
+    return (
+        <div className='font-haasRegular uppercase text-[14px] leading-[18px]'>
+            <p><b>{title}</b></p>
+            {lines.map((line, idx) => (
+                <p key={idx}>{line}</p>
+            ))}
+        </div>)
+}
 
-const FormHeading = () => (
-    <h3 className='w-full text-secondary-alt uppercase font-recklessRegular text-[45px] leading-[40px]'>
-        send your <br /> message
-    </h3>
-);
+const FormHeading = ({ title }) => {
+    const words = title.split(" ");
+    const firstLine = words.slice(0, 2).join(" ");
+    const secondLine = words.slice(2).join(" ");
 
-const ContactUs = ({ classes, content }) => {
-    // Default content structure
+    return (
+        <h3 className="w-full text-secondary-alt uppercase font-recklessRegular text-[45px] leading-[40px]">
+            {firstLine}
+            <br />
+            {secondLine}
+        </h3>
+    );
+};
+
+
+const ContactUs = ({ data, locationsData, classes, content, zIndex=true }) => {
+
+
     const defaultContent = {
         header: {
             title: "send your message",
@@ -156,11 +169,11 @@ const ContactUs = ({ classes, content }) => {
             }
         },
         labels: {
-            firstName: "First Name",
-            lastName: "Last Name",
-            phone: "Phone",
-            email: "Email",
-            message: "Message"
+            firstName: data[0]?.firstNameLabel,
+            lastName: data[0]?.lastNameLabel,
+            phone: data[0]?.phoneLabel,
+            email: data[0]?.emailLabel,
+            message: data[0]?.messageLabel
         },
         buttons: {
             submit: "send message",
@@ -202,9 +215,6 @@ const ContactUs = ({ classes, content }) => {
     const onSubmit = async (data) => {
         setIsSubmitting(true);
         try {
-            //   await submitContactForm(data);
-            console.log("Contact form submitted:", data);
-
 
             setTimeout(() => {
                 reset();
@@ -270,21 +280,23 @@ const ContactUs = ({ classes, content }) => {
     };
 
     return (
-        <div className={`${classes} w-full flex justify-center items-center lg:py-[80px] z-[9999] relative lg:w-[762px]`}>
+        <div className={`${classes} w-full flex justify-center items-center lg:py-[80px] ${zIndex && 'z-[9999]'} relative lg:w-[762px]`}>
             <form onSubmit={handleSubmit(onSubmit)} className='h-full w-full bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[12px] px-[36px] pt-[50px] pb-[55px]'>
 
                 {/* Top Section */}
                 <div className='w-full flex flex-col sm:flex-row justify-between gap-y-[31px] gap-x-[12px]'>
-                    <FormHeading />
+                    <FormHeading title={data[0]?.title} />
                     <div className='w-full flex lg:gap-x-[31px] sm:gap-x-[63px] justify-between sm:justify-start '>
-                        <AddressBlock
-                            title={formContent.header.addresses.sanFrancisco.title}
-                            lines={formContent.header.addresses.sanFrancisco.lines}
-                        />
-                        <AddressBlock
-                            title={formContent.header.addresses.northBay.title}
-                            lines={formContent.header.addresses.northBay.lines}
-                        />
+
+                        {locationsData.map((dt, index) => (
+                            <>
+                                <AddressBlock
+                                    key={index}
+                                    title={dt.title}
+                                    description={dt.description}
+                                />
+                            </>
+                        ))}
                     </div>
                 </div>
 
@@ -299,8 +311,8 @@ const ContactUs = ({ classes, content }) => {
                         disabled={isSubmitting}
                         className={`group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-[#2c2216] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
-                        <span className='lg:hidden block font-haasLight uppercase text-[16px] hover:border-secondary-alt group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
-                            {isSubmitting ? formContent.buttons.submitting : formContent.buttons.submit}
+                        <span className='font-haasLight uppercase text-[16px] hover:border-secondary-alt group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
+                            {isSubmitting ? formContent.buttons.submitting : data[0]?.submitButtonLabel}
                         </span>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
