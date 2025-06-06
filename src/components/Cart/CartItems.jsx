@@ -316,7 +316,7 @@ const CartCollection = () => {
     )
 }
 
-const CartNormal = ({ data, actions = {}, readOnly = false }) => {
+const CartNormal = ({ data, actions = {}, readOnly = false, buttonEnable = false }) => {
 
     console.log("data", data);
 
@@ -386,6 +386,18 @@ const CartNormal = ({ data, actions = {}, readOnly = false }) => {
                     </tbody>
                 </table>
                 <span className='lg:block hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] mr-[100px]'>{formattedPrice}</span>
+
+                {buttonEnable && <button className='bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                    add to cart
+                    <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
+                        <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
+                            <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
+                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
+                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="#2c2216" stroke-miterlimit="10" stroke-width="1" />
+                            </g>
+                        </g>
+                    </svg>
+                </button>}
             </div>
             {!readOnly && (
                 <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>
