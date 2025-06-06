@@ -259,20 +259,20 @@ export const fetchBannerData = async () => {
 
 
 export const fetchContactPageData = async () => {
-    try {
-        const [contactFormData] = await Promise.all([
-            queryCollection({ dataCollectionId: "ContactForm" }),
-        ]);
+  try {
+    const [contactFormData] = await Promise.all([
+      queryCollection({ dataCollectionId: "ContactForm" }),
+    ]);
 
-        if (!Array.isArray(contactFormData.items)) {
-            throw new Error(`ContactForm response does not contain items array`);
-        }
-
-        return {
-            contactFormData: contactFormData.items,
-        };
-
-    } catch (error) {
-        logError(`Error fetching contact form data: ${error.message}`, error);
+    if (!Array.isArray(contactFormData.items)) {
+      throw new Error(`ContactForm response does not contain items array`);
     }
+
+    return {
+      contactFormData: contactFormData.items,
+    };
+
+  } catch (error) {
+    logError(`Error fetching contact form data: ${error.message}`, error);
+  }
 };

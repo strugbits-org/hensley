@@ -151,7 +151,7 @@ const FormHeading = ({ title }) => {
 };
 
 
-const ContactUs = ({ data, locationsData, classes, content, zIndex=true }) => {
+const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => {
 
 
     const defaultContent = {

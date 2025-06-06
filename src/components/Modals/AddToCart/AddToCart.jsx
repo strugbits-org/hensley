@@ -99,7 +99,7 @@ const AddToCart = ({ data, onClose }) => {
     setIsLoading(true);
     try {
       const product_id = product._id;
-      const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+      const size = product?.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
       const cartData = {
         lineItems: [
           {
@@ -147,7 +147,7 @@ const AddToCart = ({ data, onClose }) => {
   };
 
   return (
-    <div className='w-[850px] sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
+    <div className='sm:w-[850px] w-[600px] max-sm:h-[700px] hide-scrollbar sm:mt-0 mt-[50px] overflow-y-scroll  sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
       <AddToCartSlider data={data} isOpen={data.open} />
       <div className=' h-full sm:w-[55%] w-full py-[20px] pr-[20px] '>
         <div className='w-full flex flex-col gap-y-[15px]'>

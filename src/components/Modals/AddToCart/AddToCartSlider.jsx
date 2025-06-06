@@ -57,7 +57,7 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center" }) => {
                     </div>
                 ))}
             </div>
-            {instanceRef.current && (
+            {(mediaItems && mediaItems.length > 1) && (instanceRef.current && (
                 <>
                     <button
                         onClick={(e) =>
@@ -82,7 +82,7 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center" }) => {
                         <MdOutlineChevronRight className="w-[20px] h-[20px]" />
                     </button>
                 </>
-            )}
+            ))}
         </div>
     )
 }
