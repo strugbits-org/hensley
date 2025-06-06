@@ -60,7 +60,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                 {lineItems.map(({ product, size }) => {
                                                     const data = product;
                                                     return (
-                                                        <CartNormal key={data._id} data={{ ...data, size }} readOnly={true} />
+                                                        <CartNormal key={data._id} data={{ ...data, size }} readOnly={true} buttonEnable={true}/>
                                                     );
                                                 })}
                                             </div>
