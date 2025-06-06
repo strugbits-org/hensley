@@ -134,7 +134,7 @@ export const fetchMatchedProducts = async (id) => {
         const data = response.items[0].matchProducts.filter(item => typeof item !== "string");
         return data;
     } catch (error) {
-        logError(`Error fetching matched products: ${error.message}`, error);
+        // logError(`Error fetching matched products: ${error.message}`, error);
     }
 }
 
@@ -201,7 +201,7 @@ export const fetchSavedProductData = async (includeProducts = false, retries = 3
             const authToken = await getAuthToken();
             if (!authToken) return [];
 
-            const payload = {};            
+            const payload = {};
 
             if (includeProducts) {
                 payload.includeProducts = true;

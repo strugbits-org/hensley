@@ -5,10 +5,7 @@ import { Testimonials } from '../common/Testimonials'
 import PortfolioSlider from '../common/PortfolioSlider'
 
 const Careers = ({ data }) => {
-
   const { heroSectionData, howWeDoItData, whoWorksCareersPageData, lastSectionCareersPageData, jobsData } = data;
-
-  console.log("heroSectoin,", heroSectionData);
 
   return (
     <>

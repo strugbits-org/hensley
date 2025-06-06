@@ -1,8 +1,13 @@
 import React, { useMemo } from 'react';
-import { formatDateForQuote, formatTotalPrice } from '@/utils';
+import { calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, logError } from '@/utils';
 import { FiArrowUpRight } from "react-icons/fi";
+import { lightboxActions } from '@/store/lightboxStore';
+import { AddProductToCart } from '@/services/cart/CartApis';
+import { useCookies } from 'react-cookie';
 
 export const QuoteItem = ({ quote, handleViewClick }) => {
+    const [cookies, setCookie] = useCookies(["cartQuantity"]);
+
     const totalPrice = useMemo(() =>
         quote.lineItems.reduce((total, { product }) =>
             total + (product.price?.amount || product.price) * product.quantity, 0
@@ -12,9 +17,66 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
     const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
     const date = useMemo(() => formatDateForQuote(quote.eventDate), [quote.eventDate]);
 
-    const handleOrderAgainClick = () => {
-        // Add order again functionality here
-        console.log('Order again clicked for quote:', quote._id);
+    const handleOrderAgainClick = async () => {
+        try {
+            const products = [];
+            for (const item of quote?.lineItems || []) {
+                const productData = item.product;
+
+                try {
+                    let catalogReference = productData?.catalogReference;
+                    if (!catalogReference) {
+                        const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+                        const { customTextFields = [], productId } = productData;
+                        const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
+                            acc[title] = value;
+                            return acc;
+                        }, {});
+                        customTextFieldsData.size = item.size;
+                        catalogReference = {
+                            appId,
+                            catalogItemId: productId,
+                            options: {
+                                customTextFields: customTextFieldsData,
+                            },
+                        };
+                    }
+
+                    const product = {
+                        catalogReference: catalogReference,
+                        quantity: productData.quantity,
+                    };
+
+                    products.push(product);
+                } catch (error) {
+                    logError(error);
+                }
+            }
+
+            const cartData = {
+                lineItems: products,
+            };
+
+            await AddProductToCart(cartData);
+            const newItems = calculateTotalCartQuantity(cartData.lineItems);
+            const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+            setCookie("cartQuantity", total, { path: "/" });
+            lightboxActions.setBasicLightBoxDetails({
+                title: "Added to Cart",
+                description: "Products added to cart successfully",
+                buttonText: "View Cart",
+                buttonLink: "/cart",
+                open: true,
+            })
+        } catch (error) {
+            logError("Error while adding products to cart:", error);
+            lightboxActions.setBasicLightBoxDetails({
+                title: "Something went wrong",
+                description: "Error while adding products to cart",
+                buttonText: "Try Again",
+                open: true,
+            })
+        }
     };
 
     return (

@@ -37,8 +37,6 @@ export const Details = ({ data }) => {
         setChecked(event.target.checked);
     };
 
-    //   console.log("Product data:", productData);
-
     const setAdditionalInfoSections = () => {
         if (product.productSetItem) {
             const productInfoSection = [

@@ -15,10 +15,6 @@ function SavedProducts() {
         heading: "SAVED PRODUCTS",
     }
 
-    function handleAddToCart() {
-        console.log("Product added to cart!");
-    }
-
     const fetchSavedProducts = async () => {
         try {
             const savedProducts = await fetchSavedProductData(true);
@@ -51,7 +47,6 @@ function SavedProducts() {
                                 <SecondaryProductCard
                                     key={productData._id}
                                     data={productData}
-                                    onAddToCart={handleAddToCart}
                                     type="listing"
                                     savedProducts={savedProducts}
                                     setSavedProducts={setSavedProducts}

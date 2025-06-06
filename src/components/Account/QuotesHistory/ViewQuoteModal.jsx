@@ -5,7 +5,7 @@ import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/re
 import { Fragment, useMemo } from 'react';
 
 export const ViewQuoteModal = ({ data, onClose }) => {
-    if (!data) return;
+    if (!data) return null;
     const totalPrice = useMemo(() =>
         data.lineItems.reduce((total, { product }) =>
             total + (product.price?.amount || product.price) * product.quantity, 0
@@ -60,7 +60,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                 {lineItems.map(({ product, size }) => {
                                                     const data = product;
                                                     return (
-                                                        <CartNormal key={data._id} data={{ ...data, size }} readOnly={true} buttonEnable={true}/>
+                                                        <CartNormal key={data._id || data.id} data={{ ...data, size }} readOnly={true} showAddToCart={true} />
                                                     );
                                                 })}
                                             </div>
