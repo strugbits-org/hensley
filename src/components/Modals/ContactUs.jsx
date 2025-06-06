@@ -1,22 +1,54 @@
 "use client";
 import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { logError } from '@/utils';
+import { lightboxActions } from "@/store/lightboxStore";
 
-const InputField = ({ id, label, placeholder, classes, borderColor = 'black', type = "text" }) => {
+// Validation schema
+const schema = yup.object({
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
+    phone: yup.string().required('Phone number is required'),
+    email: yup.string().email('Email is invalid').required('Email is required'),
+    message: yup.string().required('Message is required'),
+}).required();
+
+// Form structure
+const FORM_STRUCTURE = {
+    personalInfo: ['firstName', 'lastName', 'phone', 'email'],
+    messageInfo: ['message']
+};
+
+// Field configurations
+const FIELD_CONFIGS = {
+    firstName: { type: 'text', placeholder: 'Name', borderColor: 'secondary-alt' },
+    lastName: { type: 'text', placeholder: 'Name', borderColor: 'black' },
+    phone: { type: 'tel', placeholder: '+1 (415) 000-00000', borderColor: 'black' },
+    email: { type: 'email', placeholder: 'exemplo@myemail.com', borderColor: 'black' },
+    message: { type: 'textarea', placeholder: 'Write your message', borderColor: 'secondary-alt' }
+};
+
+const InputField = ({
+    id,
+    label,
+    placeholder,
+    classes,
+    borderColor = 'black',
+    type = "text",
+    register,
+    error,
+    disabled = false
+}) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [isEmpty, setIsEmpty] = useState(false);
 
-    const handleBlur = (e) => {
+    const handleBlur = () => {
         setIsFocused(false);
-        if (!e.target.value.trim()) {
-            setIsEmpty(true);
-        } else {
-            setIsEmpty(false);
-        }
     };
 
     const handleFocus = () => {
         setIsFocused(true);
-        setIsEmpty(false);
     };
 
     return (
@@ -30,35 +62,39 @@ const InputField = ({ id, label, placeholder, classes, borderColor = 'black', ty
                 placeholder={placeholder}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
+                disabled={disabled}
+                {...register}
                 className={`
-                    w-full placeholder-secondary font-haasLight p-3 rounded-sm
-                    border-b 
-                    ${isEmpty ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
-                    ${!isEmpty && 'hover:border-b-2'}
-                    outline-none transition-all duration-300
-                `}
+          w-full placeholder-secondary font-haasLight p-3 rounded-sm
+          border-b 
+          ${error ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
+          ${!error && 'hover:border-b-2'}
+          outline-none transition-all duration-300
+          ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}
+        `}
             />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
     );
 };
 
-
-const TextareaField = ({ id, label, placeholder, borderColor = 'black' }) => {
+const TextareaField = ({
+    id,
+    label,
+    placeholder,
+    borderColor = 'black',
+    register,
+    error,
+    disabled = false
+}) => {
     const [isFocused, setIsFocused] = useState(false);
-    const [isEmpty, setIsEmpty] = useState(false);
 
-    const handleBlur = (e) => {
+    const handleBlur = () => {
         setIsFocused(false);
-        if (!e.target.value.trim()) {
-            setIsEmpty(true);
-        } else {
-            setIsEmpty(false);
-        }
     };
 
     const handleFocus = () => {
         setIsFocused(true);
-        setIsEmpty(false);
     };
 
     return (
@@ -72,14 +108,18 @@ const TextareaField = ({ id, label, placeholder, borderColor = 'black' }) => {
                 placeholder={placeholder}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
+                disabled={disabled}
+                {...register}
                 className={`
-                    w-full placeholder-secondary font-haasLight p-3 rounded-sm
-                    border-b 
-                    ${isEmpty ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
-                    ${!isEmpty && 'hover:border-b-2'}
-                    outline-none transition-all duration-300
-                `}
-            ></textarea>
+          w-full placeholder-secondary font-haasLight p-3 rounded-sm
+          border-b 
+          ${error ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
+          ${!error && 'hover:border-b-2'}
+          outline-none transition-all duration-300
+          ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}
+        `}
+            />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
     );
 };
@@ -99,50 +139,175 @@ const FormHeading = () => (
     </h3>
 );
 
-const ContactUs = ({ classes }) => {
+const ContactUs = ({ classes, content }) => {
+    // Default content structure
+    const defaultContent = {
+        header: {
+            title: "send your message",
+            addresses: {
+                sanFrancisco: {
+                    title: "San Francisco/Monterey",
+                    lines: ["Bay area", "180 Whill Place", "BRISBANE, CA 94005", "650.692.7007"]
+                },
+                northBay: {
+                    title: "North Bay",
+                    lines: ["(By Appointment)", "ST HELENA, CA 94574", "650.692.7007"]
+                }
+            }
+        },
+        labels: {
+            firstName: "First Name",
+            lastName: "Last Name",
+            phone: "Phone",
+            email: "Email",
+            message: "Message"
+        },
+        buttons: {
+            submit: "send message",
+            submitting: "sending...",
+        },
+        messages: {
+            success: {
+                title: "MESSAGE SENT SUCCESSFULLY!",
+                description: "Thank you for contacting us. We will get back to you within 24 hours.",
+                buttonText: "Continue"
+            },
+            error: {
+                title: "MESSAGE FAILED TO SEND",
+                description: "There was an error sending your message. Please try again later.",
+                buttonText: "Try Again"
+            }
+        }
+    };
+
+    // Use provided content or fall back to defaults
+    const formContent = { ...defaultContent, ...content };
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const {
+        register,
+        handleSubmit,
+        reset,
+        formState: { errors },
+    } = useForm({
+        resolver: yupResolver(schema),
+        defaultValues: {
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: ''
+        }
+    });
+
+    const onSubmit = async (data) => {
+        setIsSubmitting(true);
+        try {
+            //   await submitContactForm(data);
+            console.log("Contact form submitted:", data);
+
+
+            setTimeout(() => {
+                reset();
+                lightboxActions.setBasicLightBoxDetails({
+                    title: formContent.messages.success.title,
+                    description: formContent.messages.success.description,
+                    buttonText: formContent.messages.success.buttonText,
+                    buttonLink: "/",
+                    disableClose: true,
+                    open: true,
+                });
+                setIsSubmitting(false);
+            }, 2000);
+        } catch (error) {
+            logError(error);
+            setTimeout(() => {
+                lightboxActions.setBasicLightBoxDetails({
+                    title: formContent.messages.error.title,
+                    description: formContent.messages.error.description,
+                    buttonText: formContent.messages.error.buttonText,
+                    buttonLink: "",
+                    disableClose: false,
+                    open: true,
+                });
+                setIsSubmitting(false);
+            }, 2000);
+        }
+    };
+
+    const renderField = ({ fieldId, gridClass = '' }) => {
+        const config = FIELD_CONFIGS[fieldId];
+        const error = errors[fieldId]?.message;
+
+        if (config.type === 'textarea') {
+            return (
+                <TextareaField
+                    key={fieldId}
+                    id={fieldId}
+                    label={formContent.labels[fieldId]}
+                    placeholder={config.placeholder}
+                    borderColor={config.borderColor}
+                    register={register(fieldId)}
+                    error={error}
+                    disabled={isSubmitting}
+                />
+            );
+        }
+
+        return (
+            <InputField
+                key={fieldId}
+                id={fieldId}
+                label={formContent.labels[fieldId]}
+                placeholder={config.placeholder}
+                type={config.type}
+                borderColor={config.borderColor}
+                classes={gridClass}
+                register={register(fieldId)}
+                error={error}
+                disabled={isSubmitting}
+            />
+        );
+    };
+
     return (
         <div className={`${classes} w-full flex justify-center items-center lg:py-[80px] z-[9999] relative lg:w-[762px]`}>
-            <form className=' h-full w-full bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[12px] px-[36px] pt-[50px] pb-[55px]'>
+            <form onSubmit={handleSubmit(onSubmit)} className='h-full w-full bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[12px] px-[36px] pt-[50px] pb-[55px]'>
 
                 {/* Top Section */}
                 <div className='w-full flex flex-col sm:flex-row justify-between gap-y-[31px] gap-x-[12px]'>
                     <FormHeading />
                     <div className='w-full flex lg:gap-x-[31px] sm:gap-x-[63px] justify-between sm:justify-start '>
                         <AddressBlock
-                            title="San Francisco/Monterey"
-                            lines={["Bay area", "180 Whill Place", "BRISBANE, CA 94005", "650.692.7007"]}
+                            title={formContent.header.addresses.sanFrancisco.title}
+                            lines={formContent.header.addresses.sanFrancisco.lines}
                         />
                         <AddressBlock
-                            title="North Bay"
-                            lines={["(By Appointment)", "ST HELENA, CA 94574", "650.692.7007"]}
+                            title={formContent.header.addresses.northBay.title}
+                            lines={formContent.header.addresses.northBay.lines}
                         />
                     </div>
                 </div>
 
                 {/* Form Fields */}
                 <div className="w-full grid sm:grid-cols-2 grid-cols-1 pt-[77px] sm:gap-x-[24px] sm:gap-y-[31px] gap-y-[32px]">
-                    <InputField id="firstName" label="First Name" placeholder="Name" borderColor="secondary-alt" />
-                    <InputField id="lastName" label="Last Name" placeholder="Name" />
-                    <InputField id="phone" label="Phone" placeholder="+1 (415) 000-00000" />
-                    <InputField id="email" label="Email" placeholder="exemplo@myemail.com" />
-                    <TextareaField id="message" label="Message" placeholder="Write your message" borderColor="secondary-alt" />
+                    {FORM_STRUCTURE.personalInfo.map((fieldId) => renderField({ fieldId }))}
+                    {FORM_STRUCTURE.messageInfo.map((fieldId) => renderField({ fieldId }))}
 
                     {/* Submit Button */}
-                    <button className='group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-[#2c2216]'>
-                        <span className='lg:block hidden font-haasLight uppercase text-[16px] hover:border-secondary-alt  group-hover:[letter-spacing:8px]
-                        transition-all duration-300
-                        tracking-[5px] group-hover:font-haasBold
-                        group-hover:text-primary'>Sign in</span>
-                        <span className='lg:hidden block font-haasLight uppercase text-[16px] hover:border-secondary-alt  group-hover:[letter-spacing:8px]
-                        transition-all duration-300
-                        tracking-[5px] group-hover:font-haasBold
-                        group-hover:text-primary'>send message</span>
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className={`group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-[#2c2216] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    >
+                        <span className='lg:hidden block font-haasLight uppercase text-[16px] hover:border-secondary-alt group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
+                            {isSubmitting ? formContent.buttons.submitting : formContent.buttons.submit}
+                        </span>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="19.877"
                             height="19.67"
                             viewBox="0 0 19.877 19.67"
-                            className='ml-2 transition-all duration-300 stroke-[#2c2216]  group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
+                            className='ml-2 transition-all duration-300 stroke-[#2c2216] group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
                         >
                             <g transform="translate(9.835 0.5) rotate(45)">
                                 <path

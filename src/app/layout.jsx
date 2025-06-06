@@ -74,6 +74,8 @@ export default async function RootLayout({ children }) {
     fetchHomePageDetails()
   ]);
 
+  const { branches } = footerData;
+
   return (
     <html lang="en" className={`${neueHaasDisplayRegular.variable} ${neueHaasDisplayLight.variable} ${neueHaasDisplayMedium.variable} ${neueHaasDisplayBold.variable} ${recklessNeueRegular.variable} ${recklessNeueBold.variable} ${recklessNeueLight.variable} ${recklessNeueMedium.variable}`}>
       <body className={`antialiased`} >
@@ -85,7 +87,7 @@ export default async function RootLayout({ children }) {
         </main>
         <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
-        <ModalsWrapper />
+        <ModalsWrapper data={{ branches }} />
         <SpeedInsights />
         <Loader />
         <Toaster position="top-center"

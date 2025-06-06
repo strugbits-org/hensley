@@ -1,3 +1,5 @@
+"use client";
+
 export const NewsLetter = ({ data }) => {
   const { newsletterPlaceholder, newsletterButtonLabel, newsletterHeading, newsletterDescription } = data;
   return (

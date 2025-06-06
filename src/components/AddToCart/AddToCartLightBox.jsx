@@ -22,7 +22,7 @@ export const AddToCartLightBox = ({ data, onClose }) => {
                 </TransitionChild>
 
                 <div className="fixed inset-0 overflow-y-auto">
-                    <div className="flex min-h-full items-center justify-center ">
+                    <div className="flex items-center justify-center h-full">
                         <TransitionChild
                             as={Fragment}
                             enter="ease-out duration-300"
@@ -32,7 +32,7 @@ export const AddToCartLightBox = ({ data, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="transform overflow-hidden h-screen text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
+                            <DialogPanel className="transform overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
                                 <AddToCart data={data} onClose={onClose} />
                             </DialogPanel>
                         </TransitionChild>

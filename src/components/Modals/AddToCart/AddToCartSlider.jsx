@@ -5,7 +5,10 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import AddToCartCard from './AddToCartCard';
 
-export const AddToCartSlider = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false }) => {
+export const AddToCartSlider = ({ data, loop = true, origin = "center", classes }) => {
+console.log("data", data);
+
+    const mediaItems = data.product.mediaItems;
 
     const sliderInstance = useRef();
 
@@ -44,7 +47,9 @@ export const AddToCartSlider = ({ data, pageDetails, loop = true, origin = "cent
                     <div
                         className={`keen-slider__slide  flex flex-col px-2`}
                     >
-                        <AddToCartCard />
+                        {data.map((item, index) => (
+                            <AddToCartCard />
+                        ))}
                     </div>
                     <button
                         onClick={() => sliderInstance.current?.prev()}
