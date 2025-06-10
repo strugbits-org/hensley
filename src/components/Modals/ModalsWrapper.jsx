@@ -8,15 +8,17 @@ import { AddToCartLightBox } from '../AddToCart/AddToCartLightBox';
 import { LoginModal } from './LoginModal';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
 
-export const ModalsWrapper = () => {
-    const { lightboxes, basicLightBoxDetails } = useSnapshot(lightboxState);
-    const { contact, addToCart, login, forgotPassword } = lightboxes;
+export const ModalsWrapper = ({ data }) => {
+    const { lightboxes, basicLightBoxDetails, addToCartModal } = useSnapshot(lightboxState);
+    const { contact, login, forgotPassword } = lightboxes;
+
+    const { branches, contactFormData } = data;
 
     return (
         <>
             <BasicLightBox data={basicLightBoxDetails} onClose={() => lightboxActions.resetBasicLightBoxDetails()} />
-            <ContactFormLightbox isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
-            <AddToCartLightBox isOpen={addToCart} onClose={() => lightboxActions.hideLightBox("addToCart")} />
+            <AddToCartLightBox data={addToCartModal} onClose={() => lightboxActions.resetAddToCartModal()} />
+            <ContactFormLightbox locationsData={branches} data={contactFormData} isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
             <LoginModal isOpen={login} onClose={() => lightboxActions.hideLightBox("login")} />
             <ForgotPasswordModal isOpen={forgotPassword} onClose={() => lightboxActions.hideLightBox("forgotPassword")} />
         </>

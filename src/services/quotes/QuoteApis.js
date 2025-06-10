@@ -36,7 +36,7 @@ export const createPriceQuote = async ({ lineItems, quoteDetails }) => {
   }
 };
 
-export const getAllQuotes = async () => {
+export const fetchAllQuotes = async () => {
   try {
     const authToken = await getAuthToken();
     const response = await fetch(`${baseUrl}/api/quote/getAllQuotes`, {

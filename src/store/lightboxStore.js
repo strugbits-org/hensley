@@ -3,7 +3,6 @@ import { proxy } from 'valtio';
 export const lightboxState = proxy({
     lightboxes: {
         contact: false,
-        addToCart: false,
         login: false,
         forgotPassword: false
     },
@@ -15,6 +14,10 @@ export const lightboxState = proxy({
         buttonLink: '',
         type: 'info',
         disableClose: false
+    },
+    addToCartModal: {
+        open: false,
+        product: null
     }
 });
 
@@ -43,10 +46,23 @@ export const lightboxActions = {
             }
         }, 500);
     },
+    setAddToCartModal: (data) => {
+        lightboxState.addToCartModal = data;
+    },
+    resetAddToCartModal: () => {
+        lightboxState.addToCartModal.open = false;
+        setTimeout(() => {
+            lightboxState.addToCartModal = {
+                open: false,
+                product: null
+            }
+        }, 500);
+    },
     hideAllLightBoxes: () => {
         for (const key in lightboxState.lightboxes) {
             lightboxState.lightboxes[key] = false;
         };
         lightboxActions.resetBasicLightBoxDetails();
+        lightboxActions.resetAddToCartModal();
     }
 };

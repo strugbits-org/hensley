@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import parse from 'html-react-parser';
 
-export default function ProductDescription({ text }) {
+export default function ProductDescription({ text, maxChars = 200 }) {
     const [expanded, setExpanded] = useState(false);
-    const maxChars = 200;
-
     const isLong = text.length > maxChars;
     const displayedText = expanded ? text : text.slice(0, maxChars) + (isLong ? '...' : '');
 
     return (
         <div className='w-full flex flex-col gap-y-[15px]'>
-            <h2 className='text-[16px] text-secondary-alt font-haasLight block'>Description</h2>
-            <div className='text-[16px] text-secondary-alt font-haasLight block'>
+            <h2 className='uppercase text-[16px] text-secondary-alt font-haasLight block'>Description</h2>
+            <div className='uppercase text-[16px] text-secondary-alt font-haasLight block'>
                 {parse(displayedText)}
             </div>
             {isLong && (

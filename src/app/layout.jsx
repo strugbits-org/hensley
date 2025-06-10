@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import localFont from 'next/font/local';
-import { fetchFooterData, fetchHeaderData, fetchHomePageDetails, fetchInstagramFeed, fetchMarketsData, fetchTentsData } from "@/services";
+import { fetchFooterData, fetchHeaderData, fetchHomePageDetails, fetchInstagramFeed, fetchMarketsData, fetchTentsData, fetchContactPageData } from "@/services";
 import InstagramFeed from "@/components/common/InstagramFeed";
 import Loader from "@/components/common/Loader";
 import LoaderProvider from "@/components/common/providers/LoaderProvider";
@@ -64,15 +64,21 @@ export default async function RootLayout({ children }) {
     tentsData,
     footerData,
     instagramFeed,
-    homePageDetails
+    homePageDetails,
+    contactFormData
+    
   ] = await Promise.all([
     fetchHeaderData(),
     fetchMarketsData(),
     fetchTentsData(),
     fetchFooterData(),
     fetchInstagramFeed(),
-    fetchHomePageDetails()
+    fetchHomePageDetails(),
+    fetchContactPageData()
   ]);
+
+  const { branches } = footerData;
+
 
   return (
     <html lang="en" className={`${neueHaasDisplayRegular.variable} ${neueHaasDisplayLight.variable} ${neueHaasDisplayMedium.variable} ${neueHaasDisplayBold.variable} ${recklessNeueRegular.variable} ${recklessNeueBold.variable} ${recklessNeueLight.variable} ${recklessNeueMedium.variable}`}>
@@ -85,7 +91,7 @@ export default async function RootLayout({ children }) {
         </main>
         <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
-        <ModalsWrapper />
+        <ModalsWrapper data={{ branches, contactFormData }} />
         <SpeedInsights />
         <Loader />
         <Toaster position="top-center"

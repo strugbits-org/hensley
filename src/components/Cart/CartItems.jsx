@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import image from '@/assets/small-tent.png';
 import { PrimaryImage } from '../common/PrimaryImage';
-import { formatDescriptionLines, formatTotalPrice } from '@/utils';
+import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
+import { lightboxActions } from '@/store/lightboxStore';
+import { AddProductToCart } from '@/services/cart/CartApis';
+import { useCookies } from 'react-cookie';
 
 const INFO_HEADERS = [
     'Product',
@@ -316,21 +319,83 @@ const CartCollection = () => {
     )
 }
 
-const CartNormal = ({ data, actions = {}, readOnly = false }) => {
+const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
     const { removeProduct, handleQuantityChange, updateProducts } = actions;
-    const formattedDescription = formatDescriptionLines(data.descriptionLines);
-    const price = data.fullPrice.amount * data.quantity;
+    const [cookies, setCookie] = useCookies(["cartQuantity"]);
+    const [isLoading, setIsLoading] = useState(false);
+    const productName = data?.productName?.original || data?.name;
+
+    const productSize = () => {
+        if (!data.descriptionLines) return data.size;
+        const formattedDescription = formatDescriptionLines(data.descriptionLines);
+        return formattedDescription.find(x => x.title === "size")?.value;
+    }
+    const price = (data?.price?.amount || data.price) * data.quantity;
     const formattedPrice = formatTotalPrice(price);
 
     const productInfoSection = [
         {
-            product: data.productName.original,
-            price: data.fullPrice.amount,
-            size: formattedDescription.find(x => x.title === "size")?.value,
-            formattedPrice: data.fullPrice.formattedAmount,
+            product: productName,
+            price: data?.price?.amount || data?.price,
+            size: productSize(),
+            formattedPrice: data?.fullPrice?.formattedAmount || formatTotalPrice(data.price),
             _id: data._id
         }
     ]
+
+    const handleAddToCart = async () => {
+        try {
+            setIsLoading(true);
+            let catalogReference = data?.catalogReference;
+            if (!catalogReference) {
+                const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+                const { customTextFields = [], productId } = data;
+                const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
+                    acc[title] = value;
+                    return acc;
+                }, {});
+                customTextFieldsData.size = data.size;
+                catalogReference = {
+                    appId,
+                    catalogItemId: productId,
+                    options: {
+                        customTextFields: customTextFieldsData,
+                    },
+                };
+            }
+
+            const product = {
+                catalogReference: catalogReference,
+                quantity: data.quantity,
+            };
+
+            const cartData = {
+                lineItems: [product],
+            };
+
+            await AddProductToCart(cartData);
+            const newItems = calculateTotalCartQuantity(cartData.lineItems);
+            const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+            setCookie("cartQuantity", total, { path: "/" });
+            lightboxActions.setBasicLightBoxDetails({
+                title: "Added to Cart",
+                description: "Products added to cart successfully",
+                buttonText: "View Cart",
+                buttonLink: "/cart",
+                open: true,
+            })
+        } catch (error) {
+            logError("Error while adding products to cart:", error);
+            lightboxActions.setBasicLightBoxDetails({
+                title: "Something went wrong",
+                description: "Error while adding products to cart",
+                buttonText: "Try Again",
+                open: true,
+            })
+        } finally {
+            setIsLoading(false);
+        }
+    }
 
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative items-center'>
@@ -340,7 +405,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false }) => {
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data.image} alt={data.productName.original} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>
@@ -350,13 +415,13 @@ const CartNormal = ({ data, actions = {}, readOnly = false }) => {
                  text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
                 lg:mb-[27px]
-                '>{data.productName.original}</span>
+                '>{productName}</span>
 
                     <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
                 lg:mb-[27px]
                 mr-[100px]
-                '>{data.price.amount}</span>
+                '>{data.price.amount || data.price}</span>
                 </div>
                 <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] ">
                     <thead>
@@ -376,6 +441,18 @@ const CartNormal = ({ data, actions = {}, readOnly = false }) => {
                     </tbody>
                 </table>
                 <span className='lg:block hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] mr-[100px]'>{formattedPrice}</span>
+
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='break-keep bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                    <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
+                        <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
+                            <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
+                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                            </g>
+                        </g>
+                    </svg>
+                </button>}
             </div>
             {!readOnly && (
                 <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>

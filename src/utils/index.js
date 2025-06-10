@@ -275,3 +275,21 @@ export function isValidEmail(email) {
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     return emailRegex.test(email);
 }
+
+
+export const formatDateForQuote = (d) => {
+    const date = new Date(d);
+
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', { month: 'long' });
+    const year = date.getFullYear();
+
+    const getOrdinal = (n) => {
+        if (n % 10 === 1 && n % 100 !== 11) return 'st';
+        if (n % 10 === 2 && n % 100 !== 12) return 'nd';
+        if (n % 10 === 3 && n % 100 !== 13) return 'rd';
+        return 'th';
+    };
+
+    return `${month} ${day}${getOrdinal(day)}, ${year}`;
+}

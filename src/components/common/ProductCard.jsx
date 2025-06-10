@@ -4,11 +4,16 @@ import { CopyIcon } from './helpers/CopyIcon';
 import { copyToClipboard } from '@/utils';
 import { CustomLink } from './CustomLink';
 import { SaveProductButton } from './SaveProductButton';
+import { lightboxActions } from '@/store/lightboxStore';
 
-
-function ProductCard({ data, onAddToCart, type = 'listing', savedProducts = [], setSavedProducts }) {
+function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts }) {
     const { product } = data;
     const { name } = product;
+
+    const handleAddToCart = () => {
+        lightboxActions.setAddToCartModal({ open: true, product });        
+    };
+
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
             <CustomLink to={`/product/${product.slug}`} className={`h-full overflow-hidden flex justify-center items-center p-10 ${type === 'listing' ? 'bg-white' : ''}`}>
@@ -46,7 +51,7 @@ function ProductCard({ data, onAddToCart, type = 'listing', savedProducts = [], 
 
                     <button
                         className="w-full 2xl:w-auto min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary px-4 py-3 gap-x-7"
-                        onClick={onAddToCart}
+                        onClick={handleAddToCart}
                     >
                         <span className="uppercase font-haasRegular text-[12px]">add to cart</span>
                         <svg className='rotate-45 size-3 group-hover:scale-125 transition-all duration-300 ease-in-out' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.665 10.367">

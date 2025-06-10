@@ -22,7 +22,7 @@ function InstagramFeed({ data, details }) {
 
   const pathname = usePathname();
   const isPrivateRoute = privateRoutes.includes(pathname);
-  if (isPrivateRoute) return;
+  if (isPrivateRoute) return null;
 
   const sliderInstance = useRef();
 

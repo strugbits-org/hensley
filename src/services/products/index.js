@@ -134,7 +134,7 @@ export const fetchMatchedProducts = async (id) => {
         const data = response.items[0].matchProducts.filter(item => typeof item !== "string");
         return data;
     } catch (error) {
-        logError(`Error fetching matched products: ${error.message}`, error);
+        // logError(`Error fetching matched products: ${error.message}`, error);
     }
 }
 
@@ -193,7 +193,7 @@ export const fetchProductPageData = async (slug) => {
     }
 }
 
-export const fetchSavedProductData = async (retries = 3, delay = 1000) => {
+export const fetchSavedProductData = async (includeProducts = false, retries = 3, delay = 1000) => {
     const retryDelay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     for (let attempt = 1; attempt <= retries; attempt++) {
@@ -201,12 +201,19 @@ export const fetchSavedProductData = async (retries = 3, delay = 1000) => {
             const authToken = await getAuthToken();
             if (!authToken) return [];
 
+            const payload = {};
+
+            if (includeProducts) {
+                payload.includeProducts = true;
+            }
+
             const response = await fetch(`${baseUrl}/api/product/getSavedProducts`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: authToken,
                 },
+                body: JSON.stringify(payload),
                 cache: "no-store",
             });
 

@@ -89,7 +89,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
 
         if (item.type === "slug" || (item?.useSlugForMobile && isMobile)) {
             redirectWithLoader(item.slug);
-            toggleMobileMenu();
+            if (isMobile) toggleMobileMenu();
         } else if (item.type === "lightbox") {
             lightboxActions.showLightBox(item.lightbox);
         }

@@ -189,7 +189,7 @@ export const SignupForm = ({ content }) => {
             <PrimaryImage fit='fit' url={showPassword ? "https://static.wixstatic.com/shapes/0e0ac5_e14dd77953084aec9c7994033fda7882.svg" : "https://static.wixstatic.com/shapes/0e0ac5_130c9cc93100439b8627738cde9c26c7.svg"} />
           </button>
         )}
-        {/* {error && <p className="text-red-500 text-sm mt-1">{error}</p>} */}
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </div>
     );
   };

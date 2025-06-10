@@ -9,8 +9,9 @@ import heroImage from "@/assets/Atrium 5-X2.png";
 import leftArrow from "@/assets/icons/leftArrow.svg";
 import arrow from "@/assets/icons/arrow.svg";
 import rightArrow from "../../assets/icons/rightArrow.svg";
+import { PrimaryImage } from "./PrimaryImage";
 
-function PortfolioSlider({ display, tab = false, cardCss }) {
+function  PortfolioSlider({ data, display, tab = false, cardCss }) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderInstance = useRef(null);
 
@@ -43,33 +44,7 @@ function PortfolioSlider({ display, tab = false, cardCss }) {
     []
   );
 
-  const data = [
-    {
-      image: heroImage,
-      heading: "OUR CULTURE",
-      para: "WITH OUR COMPANY ROOTS ESTABLISHED IN SAN FRANCISCO, THE MULTI-CULTURAL SPIRIT OF THIS CITY IS DEEPLY ENGRAINED IN OUR DNA. WE BELIEVE IN A DIVERSITY OF THOUGHT AND A RICH VARIETY OF VOICES. IT’S WHAT MAKES US STRONGER, MORE CREATIVE, AND ULTIMATELY MORE SUCCESSFUL; INSPIRING EXCITING, INNOVATIVE SOLUTIONS. WE REALIZE, WITH OUR TEAM AND OUR WORK, WE HAVE THE ABILITY TO DELIVER AN EXPERIENCE FOR A GLOBALIST WORLD; ONE THAT RESONATES WITH A WIDER AUDIENCE OF PEOPLE.",
-    },
-    {
-      image: heroImage,
-      heading: "INNOVATION",
-      para: "WITH OUR COMPANY ROOTS ESTABLISHED IN SAN FRANCISCO, THE MULTI-CULTURAL SPIRIT OF THIS CITY IS DEEPLY ENGRAINED IN OUR DNA. WE BELIEVE IN A DIVERSITY OF THOUGHT AND A RICH VARIETY OF VOICES. IT’S WHAT MAKES US STRONGER, MORE CREATIVE, AND ULTIMATELY MORE SUCCESSFUL; INSPIRING EXCITING, INNOVATIVE SOLUTIONS. WE REALIZE, WITH OUR TEAM AND OUR WORK, WE HAVE THE ABILITY TO DELIVER AN EXPERIENCE FOR A GLOBALIST WORLD; ONE THAT RESONATES WITH A WIDER AUDIENCE OF PEOPLE.",
-    },
-    {
-      image: heroImage,
-      heading: "COMMUNITY",
-      para: "WITH OUR COMPANY ROOTS ESTABLISHED IN SAN FRANCISCO, THE MULTI-CULTURAL SPIRIT OF THIS CITY IS DEEPLY ENGRAINED IN OUR DNA. WE BELIEVE IN A DIVERSITY OF THOUGHT AND A RICH VARIETY OF VOICES. IT’S WHAT MAKES US STRONGER, MORE CREATIVE, AND ULTIMATELY MORE SUCCESSFUL; INSPIRING EXCITING, INNOVATIVE SOLUTIONS. WE REALIZE, WITH OUR TEAM AND OUR WORK, WE HAVE THE ABILITY TO DELIVER AN EXPERIENCE FOR A GLOBALIST WORLD; ONE THAT RESONATES WITH A WIDER AUDIENCE OF PEOPLE.",
-    },
-    {
-      image: heroImage,
-      heading: "GROWTH",
-      para: "WITH OUR COMPANY ROOTS ESTABLISHED IN SAN FRANCISCO, THE MULTI-CULTURAL SPIRIT OF THIS CITY IS DEEPLY ENGRAINED IN OUR DNA. WE BELIEVE IN A DIVERSITY OF THOUGHT AND A RICH VARIETY OF VOICES. IT’S WHAT MAKES US STRONGER, MORE CREATIVE, AND ULTIMATELY MORE SUCCESSFUL; INSPIRING EXCITING, INNOVATIVE SOLUTIONS. WE REALIZE, WITH OUR TEAM AND OUR WORK, WE HAVE THE ABILITY TO DELIVER AN EXPERIENCE FOR A GLOBALIST WORLD; ONE THAT RESONATES WITH A WIDER AUDIENCE OF PEOPLE.",
-    },
-    {
-      image: heroImage,
-      heading: "INTEGRITY",
-      para: "WITH OUR COMPANY ROOTS ESTABLISHED IN SAN FRANCISCO, THE MULTI-CULTURAL SPIRIT OF THIS CITY IS DEEPLY ENGRAINED IN OUR DNA. WE BELIEVE IN A DIVERSITY OF THOUGHT AND A RICH VARIETY OF VOICES. IT’S WHAT MAKES US STRONGER, MORE CREATIVE, AND ULTIMATELY MORE SUCCESSFUL; INSPIRING EXCITING, INNOVATIVE SOLUTIONS. WE REALIZE, WITH OUR TEAM AND OUR WORK, WE HAVE THE ABILITY TO DELIVER AN EXPERIENCE FOR A GLOBALIST WORLD; ONE THAT RESONATES WITH A WIDER AUDIENCE OF PEOPLE.",
-    },
-  ];
+ 
 
   return (
     <>
@@ -95,11 +70,9 @@ function PortfolioSlider({ display, tab = false, cardCss }) {
             >
 
               <div className="h-[425px] relative">
-                <Image
-                  className="h-full w-full object-cover"
-                  src={dt.image}
-                  alt={dt.heading}
-                />
+                
+               <PrimaryImage timeout={0} url={dt.image} customClasses={"h-full w-full object-cover "}  />
+                
                 <Image
                   src={arrow}
                   alt="Arrow"
@@ -108,19 +81,19 @@ function PortfolioSlider({ display, tab = false, cardCss }) {
               </div>
               <div>
                 <h3 className="text-secondary-alt text-[25px] leading-[22px] lg:text-[50px] lg:leading-[40px] xl:text-[70px] xl:leading-[60px] lg:max-w-[139px] md:text-5xl font-recklessRegular mt-[20px] mb-[20px]">
-                  {dt.heading}
+                  {dt.title}
                 </h3>
                 {isActive ? (
                   <p className="text-secondary-alt max-w-[600px] text-[14px] leading-[18px] lg:text-[16px] lg:leading-[20px] md:text-sm font-haasRegular lg:mt-[24px]">
-                    {dt.para}
+                    {dt.content}
                   </p>
                 ) : (
                   <>
                   <p className="lg:block hidden text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
-                    {tab ? dt.para : "+SEE MORE"}
+                    {tab ? dt.content : "+SEE MORE"}
                   </p>
                   <p className="lg:hidden text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
-                    {dt.para}
+                    {dt.content}
                   </p>
                   </>
                 )}

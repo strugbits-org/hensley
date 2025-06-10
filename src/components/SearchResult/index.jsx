@@ -331,7 +331,7 @@ const SearchResult = () => {
     return (
         <>
             <OurMarkets />
-            <RelatedProducts />
+            {/* <RelatedProducts /> */}
             <HensleyNews data={blogsData} pageDetails={{ hensleyNewsTitle: "Products featured in this PROJECT entry:" }} />
             <TentTypes />
             <RelatedProjects />

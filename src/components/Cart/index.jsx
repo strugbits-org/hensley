@@ -1,7 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from 'react'
-import { CartCollection, CartNormal, CartTent } from './CartItems'
-import CartHeading from './CartHeading'
+import { CartNormal } from './CartItems'
 import PriceDisplay from './PriceDisplay'
 import { AddToQuote } from './AddtoQuoteButton'
 import { CustomLink } from '../common/CustomLink'
@@ -122,7 +121,7 @@ const Cart = () => {
           <PriceDisplay totalPrice={totalPrice} />
         </div>
         <div className='lg:w-[70%] border'>
-          <CartHeading />
+          <h2 className='text-[90px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
           {cartItems.map((item, index) => (
             <CartNormal key={index} data={item} actions={{ handleQuantityChange, removeProduct, updateProducts }} />
           ))}

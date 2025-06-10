@@ -1,10 +1,16 @@
 "use client"
 import React, { useRef, useState } from 'react';
 import SectionTitle from '../common/SectionTitle';
+import { convertToHTML } from '@/utils/renderRichText';
 
-const CareerOppurtunities = () => {
+const CareerOppurtunities = ({ data }) => {
+
+    const { subtitle, title, buttonLabel, detail, video } = data;
+
     const videoRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [showFullText, setShowFullText] = useState(false);
+
 
     const handlePlay = () => {
         const video = videoRef.current;
@@ -17,14 +23,27 @@ const CareerOppurtunities = () => {
         }
     };
 
+    const getWixVideoUrl = (wixVideoUri) => {
+        const match = wixVideoUri.match(/wix:video:\/\/v1\/([a-zA-Z0-9_]+)/);
+        return match
+            ? `https://video.wixstatic.com/video/${match[1]}/1080p/mp4/file.mp4`
+            : wixVideoUri; // fallback if not a wix:video URI
+    };
+
+
+    const detailText = detail?.replace(/\n+/g, ' ').trim();
+    const shortSummary = detailText.split('. ').slice(0, 2).join('. ') + '.';
+    const displayedText = showFullText ? detailText : shortSummary;
+
+
     return (
         <div>
             <div className='flex flex-col gap-x-[48px] pt-[48px] pb-[56px]'>
-                <SectionTitle text={"put our clients & employees first"} classes={"lg:!text-[140px] lg:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] !leading-[35px] border-none"} />
+                <SectionTitle text={title} classes={"lg:!text-[140px] lg:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] !leading-[35px] border-none"} />
                 <div className='w-full text-center '>
                     <button className='group sm:w-[656px] w-[95%] relative bg-primary lg:h-[130px] h-[90px] my-[33px] group transition-all duration-300 hover:bg-[#2c2216]'>
                         <span className='font-haasLight uppercase text-[16px] hover:border-secondary-alt  group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
-                            Access our job board
+                            {buttonLabel}
                         </span>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +66,7 @@ const CareerOppurtunities = () => {
                     <div className="lg:h-[875px] sm:h-[408px] h-[263px] relative">
                         <video
                             ref={videoRef}
-                            src="https://video.wixstatic.com/video/ef8565_cab2a045f0f9495590d678089c6fc2d6/1080p/mp4/file.mp4"
+                            src={getWixVideoUrl(video)}
                             controls
                             loop
                             muted
@@ -91,21 +110,27 @@ const CareerOppurtunities = () => {
 
                     <div className="w-full flex justify-between mt-[12px] lg:gap-x-[12px] sm:gap-x-[15px] gap-y-[12px] sm:flex-row flex-col">
                         <h3 className="text-[35px] leading-[30px] lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[30px] text-secondary-alt uppercase font-recklessRegular">
-                            career <br /> opportunities
+                            {/* career <br /> opportunities */}
+                            {
+                                subtitle && (
+                                    <>
+                                        {subtitle.split(' ')[0]} <br /> {subtitle.split(' ')[1]}
+                                    </>
+                                )
+                            }
                         </h3>
                         <div className='max-w-[550px] sm:w-[360px]'>
                             <p className="sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt">
-                                Hensley Event Resources is united in superior customer satisfaction &
-                                in how the work that we do empowers our employees to build rewarding
-                                careers.
-
-                                At Hensley Event Resources, we offer our employees a competitive
-                                program of benefits & a company culture based on the core values of
-                                inspiration, excellence and integrity.
+                                {displayedText}
                             </p>
-                            <button className="uppercase bg-transparent text-[16px] leading-[20px] text-secondary-alt font-haasRegular mt-[24px]">
-                                see More +
+
+                            <button
+                                className="uppercase bg-transparent text-[16px] leading-[20px] text-secondary-alt font-haasRegular mt-[24px]"
+                                onClick={() => setShowFullText(prev => !prev)}
+                            >
+                                {showFullText ? 'See Less -' : 'See More +'}
                             </button>
+
                         </div>
                     </div>
                 </div>
