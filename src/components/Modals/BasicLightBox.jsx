@@ -9,7 +9,7 @@ export const BasicLightBox = ({ data, onClose }) => {
 
     return (
         <Transition appear show={open && title !== ''} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={disableClose ? () => { } : onClose}>
+            <Dialog as="div" className="relative z-[9999999999]" onClose={disableClose ? () => { } : onClose}>
                 <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"

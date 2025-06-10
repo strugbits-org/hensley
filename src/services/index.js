@@ -269,7 +269,7 @@ export const fetchContactPageData = async () => {
     }
 
     return {
-      contactFormData: contactFormData.items,
+      contactFormData: contactFormData.items[0],
     };
 
   } catch (error) {

@@ -7,7 +7,6 @@ export default async function Page() {
   try {
     const data = await fetchContactPageData();
 
-
     return (
       <Contact data={data}/>
     );

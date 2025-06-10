@@ -5,29 +5,30 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { logError } from '@/utils';
 import { lightboxActions } from "@/store/lightboxStore";
+import { postForm } from '@/services/forms';
 
 // Validation schema
 const schema = yup.object({
-    firstName: yup.string().required('First name is required'),
-    lastName: yup.string().required('Last name is required'),
-    phone: yup.string().required('Phone number is required'),
-    email: yup.string().email('Email is invalid').required('Email is required'),
-    message: yup.string().required('Message is required'),
+    first_name_abae: yup.string().required('First name is required'),
+    last_name_d97c: yup.string().required('Last name is required'),
+    phone_4c77: yup.string().required('Phone number is required'),
+    email_5139: yup.string().email('Email is invalid').required('Email is required'),
+    long_answer_3524: yup.string().required('Message is required'),
 }).required();
 
 // Form structure
 const FORM_STRUCTURE = {
-    personalInfo: ['firstName', 'lastName', 'phone', 'email'],
-    messageInfo: ['message']
+    personalInfo: ['first_name_abae', 'last_name_d97c', 'phone_4c77', 'email_5139'],
+    messageInfo: ['long_answer_3524']
 };
 
 // Field configurations
 const FIELD_CONFIGS = {
-    firstName: { type: 'text', placeholder: 'Name', borderColor: 'secondary-alt' },
-    lastName: { type: 'text', placeholder: 'Name', borderColor: 'black' },
-    phone: { type: 'tel', placeholder: '+1 (415) 000-00000', borderColor: 'black' },
-    email: { type: 'email', placeholder: 'exemplo@myemail.com', borderColor: 'black' },
-    message: { type: 'textarea', placeholder: 'Write your message', borderColor: 'secondary-alt' }
+    first_name_abae: { type: 'text', placeholder: 'Name', borderColor: 'secondary-alt' },
+    last_name_d97c: { type: 'text', placeholder: 'Name', borderColor: 'black' },
+    phone_4c77: { type: 'tel', placeholder: '+1 (415) 000-00000', borderColor: 'black' },
+    email_5139: { type: 'email', placeholder: 'exemplo@myemail.com', borderColor: 'black' },
+    long_answer_3524: { type: 'textarea', placeholder: 'Write your message', borderColor: 'secondary-alt' }
 };
 
 const InputField = ({
@@ -169,11 +170,11 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
             }
         },
         labels: {
-            firstName: data[0]?.firstNameLabel,
-            lastName: data[0]?.lastNameLabel,
-            phone: data[0]?.phoneLabel,
-            email: data[0]?.emailLabel,
-            message: data[0]?.messageLabel
+            firstName: data?.firstNameLabel,
+            lastName: data?.lastNameLabel,
+            phone: data?.phoneLabel,
+            email: data?.emailLabel,
+            message: data?.messageLabel
         },
         buttons: {
             submit: "send message",
@@ -205,25 +206,26 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
     } = useForm({
         resolver: yupResolver(schema),
         defaultValues: {
-            firstName: '',
-            lastName: '',
-            email: '',
-            phone: ''
+            first_name_abae: '',
+            last_name_d97c: '',
+            phone_4c77: '',
+            email_5139: '',
+            long_answer_3524: '',
         }
     });
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
-        try {
 
+        try {
+            await postForm("contact", data);
             setTimeout(() => {
                 reset();
+                lightboxActions.hideLightBox("contact");
                 lightboxActions.setBasicLightBoxDetails({
                     title: formContent.messages.success.title,
                     description: formContent.messages.success.description,
                     buttonText: formContent.messages.success.buttonText,
-                    buttonLink: "/",
-                    disableClose: true,
                     open: true,
                 });
                 setIsSubmitting(false);
@@ -235,8 +237,6 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
                     title: formContent.messages.error.title,
                     description: formContent.messages.error.description,
                     buttonText: formContent.messages.error.buttonText,
-                    buttonLink: "",
-                    disableClose: false,
                     open: true,
                 });
                 setIsSubmitting(false);
@@ -285,17 +285,15 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
 
                 {/* Top Section */}
                 <div className='w-full flex flex-col sm:flex-row justify-between gap-y-[31px] gap-x-[12px]'>
-                    <FormHeading title={data[0]?.title} />
+                    <FormHeading title={data?.title} />
                     <div className='w-full flex lg:gap-x-[31px] sm:gap-x-[63px] justify-between sm:justify-start '>
 
                         {locationsData.map((dt, index) => (
-                            <>
-                                <AddressBlock
-                                    key={index}
-                                    title={dt.title}
-                                    description={dt.description}
-                                />
-                            </>
+                            <AddressBlock
+                                key={index}
+                                title={dt.title}
+                                description={dt.description}
+                            />
                         ))}
                     </div>
                 </div>
@@ -312,7 +310,7 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
                         className={`group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-[#2c2216] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         <span className='font-haasLight uppercase text-[16px] hover:border-secondary-alt group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
-                            {isSubmitting ? formContent.buttons.submitting : data[0]?.submitButtonLabel}
+                            {isSubmitting ? formContent.buttons.submitting : data?.submitButtonLabel}
                         </span>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
