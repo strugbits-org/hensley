@@ -21,6 +21,7 @@ export default function SliderComponent({ data, classes, pageDetails }) {
         slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 10, origin: "center" },
       },
       "(max-width: 768px)": {
+        loop:true,
         slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 8, origin: "center" },
       },
     },

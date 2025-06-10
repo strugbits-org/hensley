@@ -111,7 +111,13 @@ const CareerOppurtunities = ({ data }) => {
                     <div className="w-full flex justify-between mt-[12px] lg:gap-x-[12px] sm:gap-x-[15px] gap-y-[12px] sm:flex-row flex-col">
                         <h3 className="text-[35px] leading-[30px] lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[30px] text-secondary-alt uppercase font-recklessRegular">
                             {/* career <br /> opportunities */}
-                            {subtitle}
+                            {
+                                subtitle && (
+                                    <>
+                                        {subtitle.split(' ')[0]} <br /> {subtitle.split(' ')[1]}
+                                    </>
+                                )
+                            }
                         </h3>
                         <div className='max-w-[550px] sm:w-[360px]'>
                             <p className="sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt">

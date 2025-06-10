@@ -8,8 +8,8 @@ export default function ProductDescription({ text, maxChars = 200 }) {
 
     return (
         <div className='w-full flex flex-col gap-y-[15px]'>
-            <h2 className='text-[16px] text-secondary-alt font-haasLight block'>Description</h2>
-            <div className='text-[16px] text-secondary-alt font-haasLight block'>
+            <h2 className='uppercase text-[16px] text-secondary-alt font-haasLight block'>Description</h2>
+            <div className='uppercase text-[16px] text-secondary-alt font-haasLight block'>
                 {parse(displayedText)}
             </div>
             {isLong && (
