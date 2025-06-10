@@ -15,9 +15,9 @@ const ProductSlider_tab = ({ product }) => {
   const sliderConfig = useMemo(() => ({
     loop: true,
     slides: {
-      perView: 2.4,
+      perView: product.length >= 3 ? 2.4 : 2,
       spacing: 10,
-      origin: 'center',
+      origin: product.length >= 3 ? 'center' : 'auto',
     },
     breakpoints: {
       "(max-width: 768px)": {

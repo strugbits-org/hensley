@@ -8,8 +8,6 @@ const Careers = ({ data }) => {
 
   const { heroSectionData, howWeDoItData, whoWorksCareersPageData, lastSectionCareersPageData, jobsData } = data;
 
-  console.log("heroSectoin,", heroSectionData);
-
   return (
     <>
       <CareerOppurtunities data={heroSectionData} />

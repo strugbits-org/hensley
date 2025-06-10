@@ -96,7 +96,9 @@ const JobBoard = ({ data, jobs }) => {
 
       <div className='flex flex-col gap-x-[48px] 
        sm:pt-[175px] sm:pb-[223px]
-       pt-[129px] pb-[113px]
+       justify-center
+       items-center
+       pt-[50px] pb-[113px]
        '>
         <SectionTitle text={title} classes={"lg:!text-[140px] lg:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] !leading-[35px] border-none"} />
         <div className='w-full text-center '>
