@@ -135,9 +135,9 @@ export const ProductListing = ({ data }) => {
     }, []);
 
     return (
-        <div className='lg:px-[24px] px-[12px]'>
+        <div className='flex flex-col items-center lg:px-[24px] px-[12px]'>
             {/* Title Section */}
-            <div className='relative flex flex-col justify-center pt-[55px] pb-[23px] lg:gap-y-0 gap-y-[10px]'>
+            <div className='w-full relative flex flex-col justify-center pt-[55px] pb-[23px] lg:gap-y-0 gap-y-[10px]'>
                 <h4 className='uppercase text-center color-secondary-alt lg:font-recklessRegular font-recklessLight lg:text-[35px]'>{selectedCategory?.name}</h4>
 
                 <div className='relative lg:block flex flex-col justify-center items-center lg:gap-y-0 gap-y-[10px]'>
@@ -153,7 +153,9 @@ export const ProductListing = ({ data }) => {
                 </div>
             </div>
 
-            <ul className='w-full max-w-[1886px] grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2
+            <hr className='border my-8 w-full' />
+
+            <ul className='w-full grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2
       lg:gap-x-[31px] sm:gap-x-[12px] gap-x-[10px]
       lg:gap-y-[20px] sm:gap-y-[12px] gap-y-[20px]'>
                 {products.map((productData, index) => {

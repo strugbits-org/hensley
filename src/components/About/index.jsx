@@ -4,21 +4,21 @@ import MeetFamily from "./MeetFamily"
 import HowWeDoITSection from "./HowWeDoITSection"
 import SliderComponent from "../common/SliderComponent"
 
-export const About = ({data}) => {
-    const {heroSectionData,howWeDoItData,dreamTeamData,familySectionData,portfolioData} = data
+export const About = ({ data }) => {
+    const { heroSectionData, howWeDoItData, dreamTeamData, familySectionData, portfolioData } = data
     const pageDetails = {
         buttonLabelPortfolioSlider: "View Portfolio",
     }
-   
+
     return (
         <>
-            <HeroSection heroSectionData={heroSectionData}/>
-            <HowWeDoITSection data={howWeDoItData}/>
+            <HeroSection heroSectionData={heroSectionData} />
+            <HowWeDoITSection data={howWeDoItData} />
             <div className="h-screen lg:mt-[100px] lg:pl-[15px] lg:pr-[15px] border">
                 <SliderComponent data={portfolioData} pageDetails={pageDetails} />
             </div>
-            <DreamTeam dreamTeamData={dreamTeamData}/>
-            <MeetFamily data={familySectionData}/>
+            <DreamTeam dreamTeamData={dreamTeamData} />
+            <MeetFamily data={familySectionData} />
         </>
     )
 }

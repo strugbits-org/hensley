@@ -12,8 +12,8 @@ function SecondaryProductCard({ data, savedProducts, setSavedProducts, type = 'l
     };
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-[5px] pb-0 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
-            <div className={`h-full overflow-hidden flex justify-center items-center  ${type === 'listing' ? 'bg-white' : ''}`}>
-                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={" w-full aspect-[0.849] object-contain transition-transform duration-300 group-hover:scale-105"} />
+            <div className={`h-full overflow-hidden flex justify-center items-center p-4  ${type === 'listing' ? 'bg-white' : ''}`}>
+                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
             <div className="max-w-full flex gap-2 py-[7px] justify-between items-center max-lg:flex-col">

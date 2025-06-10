@@ -35,7 +35,7 @@ function SavedProducts() {
     return (
         <div className='MyAccount w-full max-lg:mb-[85px] '>
             <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
-                <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[85px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.heading}</h2>
+                <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.heading}</h2>
             </div>
             <div className='pl-[23px] pr-[18px] pt-[23px] pb-[96px] max-lg:p-3 max-md:pt-[30px]'>
                 <div className='grid grid-cols-5 max-2xl:grid-cols-3 max-lg:grid-cols-3 max-md:grid-cols-2 gap-x-6 max-lg:gap-x-3 max-md:gap-x-[10px] gap-y-5 max-lg:gap-y-3 border-none border-0 border-transparent'>

@@ -125,7 +125,7 @@ const TextareaField = ({
     );
 };
 
-const AddressBlock = ({ title, description }) => {
+const AddressBlock = ({ title, description = "" }) => {
     const splitDesc = description
     const lines = splitDesc.split('\n');
     return (
@@ -137,7 +137,7 @@ const AddressBlock = ({ title, description }) => {
         </div>)
 }
 
-const FormHeading = ({ title }) => {
+const FormHeading = ({ title = "" }) => {
     const words = title.split(" ");
     const firstLine = words.slice(0, 2).join(" ");
     const secondLine = words.slice(2).join(" ");

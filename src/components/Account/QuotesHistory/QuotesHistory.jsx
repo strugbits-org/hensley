@@ -52,7 +52,7 @@ function QuotesHistory() {
                             No Quotes Found
                         </div>
                     ) : (
-                        <div className='quotes-list space-y-0 mb-40' role="list">
+                        <div className='quotes-list space-y-0 mb-10' role="list">
                             {quotesData.slice(0, pageLimit).map((quote) => (
                                 <QuoteItem
                                     key={quote._id}
@@ -66,7 +66,7 @@ function QuotesHistory() {
                     {showLoadMore && (
                         <button
                             onClick={handleAutoSeeMore}
-                            className={`mt-[39px] w-full h-[150px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center mb-20`}
+                            className={`w-full h-[150px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center mb-20`}
                             aria-label="Load more quotes"
                         >
                             <span className='font-haasLight uppercase text-sm leading-[30px] group-hover:font-haasBold'>

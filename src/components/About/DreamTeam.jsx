@@ -5,7 +5,7 @@ import SectionTitle from "../common/SectionTitle";
 import { PrimaryImage } from '../common/PrimaryImage';
 
 function DreamTeam({ dreamTeamData = [] }) {
-  const pageSize = 12;
+  const pageSize = dreamTeamData.length;
   const [pageLimit, setPageLimit] = useState(pageSize);
 
   const handleLoadMore = () => {

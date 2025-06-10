@@ -97,7 +97,7 @@ const FormField = React.memo(({ fieldKey, field, register, error, isSubmitting, 
         type={config.type}
         {...register(fieldKey)}
         placeholder={field}
-        className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white focus:outline-none shadow-sm text-secondary-alt placeholder-secondary max-md:text-sm ${error ? 'border-b-red-500' : ''
+        className={`uppercase w-full border-b font-haasLight border-secondary-alt p-3 bg-white focus:outline-none shadow-sm text-secondary-alt placeholder-secondary max-md:text-sm ${error ? 'border-b-red-500' : ''
           } ${readOnly ? 'bg-gray-50 cursor-not-allowed' : ''}`}
         disabled={isSubmitting}
         readOnly={readOnly}
@@ -223,34 +223,34 @@ export const MyAccount = ({ content }) => {
 
   return (
     <div className='MyAccount w-full max-lg:mb-[85px]'>
-      <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0'>
-        <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[85px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px]'>
+      <div className='heading w-full py-[51px] max-lg:py-[20px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:border-b-0'>
+        <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px]'>
           {pageContent.heading}
         </h2>
       </div>
 
-      <div className='py-[86px] px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>
+      <div className='py-[86px] max-lg:py-0 px-6'>
         <div className='max-w-[924px] w-full mx-auto'>
           <div className='flex justify-between items-center max-lg:flex-col gap-y-[7px]'>
             <div className='flex flex-col gap-y-[7px] max-md:gap-0'>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs'>
+              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs uppercase'>
                 {pageContent.description}
               </p>
-              <p className='text-base font-haasBold leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs'>
+              <p className='lg:my-2 text-base font-haasBold leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs uppercase'>
                 {pageContent.accountTitle}
               </p>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs'>
+              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt max-lg:text-center max-md:text-xs uppercase'>
                 {pageContent.accountSubtitle}
               </p>
             </div>
             <div className='flex flex-col gap-y-[7px] max-md:gap-0'>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs'>
-                {pageContent.loginEmailText} <br className='max-lg:hidden' />
-                <b className='text-base font-haasBold leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs'>
+              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs uppercase'>
+                {pageContent.loginEmailText}
+                <b className='lg:block lg:mt-2 lg:underline text-base font-haasBold leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs uppercase'>
                   {email}
                 </b>
               </p>
-              <p className='text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs'>
+              <p className='lg:mt-2 text-base font-haasRegular leading-[16px] text-secondary-alt text-right max-lg:text-center max-md:text-xs uppercase'>
                 {pageContent.loginEmailNote}
               </p>
             </div>
@@ -262,7 +262,7 @@ export const MyAccount = ({ content }) => {
           >
             {formFields}
 
-            <div className='flex justify-between w-full max-lg:flex-col max-lg:justify-center max-lg:items-center'>
+            <div className='flex justify-between w-full max-lg:flex-col max-lg:justify-center max-lg:items-center gap-4'>
               <button
                 type="button"
                 className={`w-[292px] max-lg:max-w-[491px] max-lg:w-full h-[60px] text-sm font-haasRegular tracking-widest border border-[#2C2216] max-lg:mb-[13px] transition-opacity duration-200 ${!hasChanges || isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'

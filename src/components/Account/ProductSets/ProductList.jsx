@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react'
-import React, { useState } from 'react'
 import Image from 'next/image';
 import image from '@/assets/product-set-1.png'
 
@@ -59,7 +58,7 @@ const ProductCards = () => {
             </div>
             <div className='w-full text-left flex flex-col gap-y-[10px]'>
                 <span className='font-haasRegular text-secondary-alt uppercase text-[20px] block'>
-                    {product.title}
+                    Product
                 </span>
                 <span className='
                 font-haasRegular
