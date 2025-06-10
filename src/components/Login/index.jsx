@@ -86,9 +86,9 @@ const InputField = ({
                     </button>
                 )}
             </div>
-            {/* {hasError && (
+            {hasError && (
                 <p className="text-red-500 text-sm mt-1 font-haasLight">{error}</p>
-            )} */}
+            )}
         </div>
     );
 };

@@ -13,7 +13,7 @@ export const fetchAboutPageData = async () => {
       portfolioData,
     ] = await Promise.all([
       queryCollection({ dataCollectionId: "HeroSectionAboutPage" }),
-      queryCollection({ dataCollectionId: "DREAMTEAM" }),
+      queryCollection({ dataCollectionId: "DREAMTEAM", sortKey: "order" }),
       queryCollection({ dataCollectionId: "FamilySection" }),
       queryCollection({ dataCollectionId: "HowWeDoIt" }),
       queryCollection({ dataCollectionId: "PortfolioCollection" }),
