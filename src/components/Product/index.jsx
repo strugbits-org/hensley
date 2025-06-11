@@ -4,9 +4,9 @@ import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { calculateTotalCartQuantity, formatTotalPrice, logError } from '@/utils';
+import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
-import { AddProductToCart } from '@/services/cart/CartApis';
+import { AddProductToCart, getProductsCart, removeProductFromCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
 import { fetchSavedProductData } from '@/services/products';
@@ -57,14 +57,14 @@ export const Product = ({ data }) => {
   const [cartQuantity, setCartQuantity] = useState(1);
   const [isUpdatingCart, setIsUpdatingCart] = useState(false);
   const [savedProducts, setSavedProducts] = useState([]);
+  const [productInCart, setProductInCart] = useState();
 
   const redirectWithLoader = useRedirectWithLoader();
 
   const { productData, productCollectionData } = data;
   const { product } = productData;
 
-  const isProductCollection = productCollectionData?.length > 0;
-
+  const isProductCollection = productData?.isProductCollection || false;
 
   useMemo(() => {
     if (!isProductCollection) {
@@ -125,29 +125,67 @@ export const Product = ({ data }) => {
   const handleAddToCart = async () => {
     setIsUpdatingCart(true);
     try {
-      const product_id = product._id;
-      const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
-      const cartData = {
-        lineItems: [
-          {
-            catalogReference: {
-              appId: "215238eb-22a5-4c36-9e7b-e7c08025e04e",
-              catalogItemId: product_id,
-              options: {
-                customTextFields: {
-                  size: size,
-                },
-              },
+      const productId = product._id;
+      const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+      let lineItems = [];
+
+      if (isProductCollection) {
+        let setData;
+
+        if (productInCart) {
+          // Update existing cart item
+          const descriptionLines = formatDescriptionLines(productInCart.descriptionLines);
+          const existingSet = descriptionLines.find(x => x.title === "Set")?.value;
+
+          setData = productSetItems.map((item) => {
+            const existingItem = existingSet.split("; ").find((field) => field.includes(item.product));
+            const oldQuantity = existingItem ? parseInt(existingItem.split("~")[3]) : 0;
+            return `${item.product}~${item.size}~${item.price}~${oldQuantity + parseInt(item.quantity)}`;
+          }).join("; ");
+
+          await removeProductFromCart([productInCart._id]);
+        } else {
+          // Create new cart item
+          setData = productSetItems.map((item) =>
+            `${item.product}~${item.size}~${item.price}~${item.quantity}`
+          ).join("; ");
+        }
+
+        lineItems = [{
+          catalogReference: {
+            appId,
+            catalogItemId: productId,
+            options: {
+              customTextFields: { "Set": setData }
             },
-            quantity: cartQuantity,
           },
-        ],
-      };
+          quantity: 1,
+        }];
+      } else {
+        // Single product
+        const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+
+        lineItems = [{
+          catalogReference: {
+            appId,
+            catalogItemId: productId,
+            options: {
+              customTextFields: { size }
+            },
+          },
+          quantity: cartQuantity,
+        }];
+      }
+
+      const cartData = { lineItems };
 
       await AddProductToCart(cartData);
+
+      // Update cart quantity cookie
       const newItems = calculateTotalCartQuantity(cartData.lineItems);
-      const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      const total = (cookies.cartQuantity || 0) + newItems;
       setCookie("cartQuantity", total, { path: "/" });
+
       redirectWithLoader("/cart");
     } catch (error) {
       logError("Error while adding item to cart:", error);
@@ -196,7 +234,20 @@ export const Product = ({ data }) => {
     }
   };
 
+  const fetchCartItems = async () => {
+    try {
+      if (!isProductCollection) return;
+      const productId = product._id;
+      const cart = await getProductsCart();
+      const existingItem = cart.lineItems.find((item) => item.catalogReference.catalogItemId === productId);
+      setProductInCart(existingItem);
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
+    }
+  };
+
   useEffect(() => {
+    fetchCartItems();
     fetchSavedProducts();
   }, []);
 
@@ -244,7 +295,7 @@ export const Product = ({ data }) => {
           <ProductDescription text={product.description} />
         </div>
 
-        <AddToCartButton text={isUpdatingCart ? "Adding..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
+        <AddToCartButton text={isUpdatingCart ? "Please wait..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
         <SaveProductButton
           key={product.id}
           productData={productData}

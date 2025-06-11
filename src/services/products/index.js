@@ -7,7 +7,7 @@ const baseUrl = process.env.BASE_URL;
 export const fetchProductsByCategory = async (id) => {
     try {
         const response = await queryCollection({
-            dataCollectionId: "ProductsSearchContent",
+            dataCollectionId: "FullProductData",
             includeReferencedItems: ["product"],
             hasSome: [
                 {
@@ -45,14 +45,15 @@ export const fetchCategoriesData = async () => {
     }
 }
 
-export const fetchProductData = async (id) => {
+export const fetchProductData = async (slug) => {
     try {
         const response = await queryCollection({
-            dataCollectionId: "ProductsSearchContent",
+            dataCollectionId: "FullProductData",
+            includeReferencedItems: ["product"],
             eq: [
                 {
-                    key: "product",
-                    value: id
+                    key: "slug",
+                    value: slug
                 }
             ]
         });
@@ -138,52 +139,25 @@ export const fetchMatchedProducts = async (id) => {
     }
 }
 
-export const fetchProductId = async (slug) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "Stores/Products",
-            eq: [
-                {
-                    key: "slug",
-                    value: slug
-                }
-            ]
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items[0];
-    } catch (error) {
-        logError(`Error fetching product ID: ${error.message}`, error);
-    }
-}
-
 export const fetchProductPageData = async (slug) => {
     try {
-        const product = await fetchProductId(slug);
-        const productId = product._id;
+        const productData = await fetchProductData(slug);
+        if (!productData || !productData.product) {
+            throw new Error("Product data not found");
+        }
+        const productId = productData.product._id;
         const [
-            productData,
             productCollectionData,
             featuredProjectsData,
             matchedProducts
         ] = await Promise.all([
-            fetchProductData(productId),
             fetchProductCollectionData(productId),
             fetchFeaturedProjects(productId),
             fetchMatchedProducts(productId)
         ]);
 
-        if (!productData) {
-            throw new Error(`Response does not contain items array`);
-        }
-
         return {
-            productData: {
-                ...productData,
-                product
-            },
+            productData,
             productCollectionData,
             featuredProjectsData,
             matchedProducts

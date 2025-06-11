@@ -13,7 +13,7 @@ export const POST = async (req) => {
     const body = await req.json();
 
     const payload = {
-      dataCollectionId: "ProductsSearchContent",
+      dataCollectionId: "FullProductData",
       hasSome: [
         {
           key: "members",

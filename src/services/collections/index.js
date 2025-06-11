@@ -100,7 +100,7 @@ export const fetchProductBannersData = async () => {
 export const fetchSortedProducts = async ({ collectionIds, limit = 12, skip = 0, sortIndex }) => {
     try {
         const payload = {
-            dataCollectionId: "ProductsSearchContent",
+            dataCollectionId: "FullProductData",
             includeReferencedItems: ["product", "mainCategory"],
             hasSome: [
                 {

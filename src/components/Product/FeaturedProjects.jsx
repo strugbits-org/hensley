@@ -7,8 +7,6 @@ import FeaturedCard from './FeaturedCard';
 
 export const FeatuedProjects = ({ data, pageDetails, loop = true, origin = "center" }) => {
 
-    console.log("--featured projects data--",data);
-
     const { featuredProjectTitle } = pageDetails;
     const sliderInstance = useRef();
     const [sliderRef] = useKeenSlider(

@@ -14,7 +14,7 @@ function Sidebar() {
         "userTokens",
     ]);
     const router = useRouter();
-    const { firstName, lastName } = useUserData();
+    const { firstName } = useUserData();
 
     const handleLogOut = () => {
         loaderActions.show();
@@ -64,10 +64,10 @@ function Sidebar() {
     ]
 
     return (
-        <div className='sidebar lg:h-screen lg:sticky top-[90px] w-[317px] max-lg:w-full max-lg:p-3  border-r border-r-black'>
+        <div className='sidebar lg:h-screen lg:sticky top-[90px] w-[317px] max-lg:w-full max-lg:p-3'>
             <div className='innerSidebar bg-[#F0DEA2] w-full h-full py-[61px] pl-[64px] max-lg:py-6 max-lg:pl-6'>
                 <h2 className='text-[45px] font-recklessRegular uppercase leading-[42px] max-lg:hidden break-words'>Hello,<br />
-                    {firstName ? (firstName + " " + lastName) : ""}</h2>
+                    {firstName ? firstName : ""}</h2>
                 <div className='sidebarLinks flex flex-col max-lg:flex-row max-lg:flex-wrap gap-[24.8px] max-lg:gap-0 max-lg:gap-y-7 mt-[70px] max-lg:mt-0'>
                     {links.map((link) => link.action ? <button key={link.name} className='inline-flex font-haasRegular text-sm text-black max-lg:w-1/3 max-md:w-1/2' onClick={link.action}>{link.icon} {link.name}</button> : (
                         <CustomLink key={link.name} to={link.href} className='font-haasRegular text-sm text-black max-lg:w-1/3 max-md:w-1/2'>{link.icon} {link.name}</CustomLink>
