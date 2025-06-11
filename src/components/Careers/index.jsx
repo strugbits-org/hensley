@@ -13,7 +13,7 @@ const Careers = ({ data }) => {
       <CareerOppurtunities data={heroSectionData} />
       <Testimonials data={whoWorksCareersPageData} pageDetails={{ testimonialsTitle: "who works" }} />
       <PortfolioSlider data={howWeDoItData} tab={true} display={true} cardCss={'border border-primary-border'} />
-      <JobBoard data={lastSectionCareersPageData} jobs={jobsData}/>
+      <JobBoard data={lastSectionCareersPageData} jobs={jobsData} />
 
     </>
   )
