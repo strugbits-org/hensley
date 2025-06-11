@@ -1,6 +1,5 @@
 'use client'
 import React, { useState } from 'react'
-import React, { useState } from 'react'
 import Image from 'next/image';
 import image from '@/assets/product-set-1.png'
 
@@ -40,7 +39,7 @@ const InputField = ({ id, label, placeholder, classes, borderColor = 'black', ty
         </div>
     );
 };
-;
+
 
 const Buttons = ({ text, classes }) => {
     return (
@@ -51,15 +50,15 @@ const Buttons = ({ text, classes }) => {
 }
 
 
-const ProductCards = () => {
+const ProductCards = ({ data, toggle }) => {
     return (
-        <div className='w-full flex gap-y-[10px] gap-x-[20px] py-[15px] px-[15px] cursor-pointer border hover:bg-primary transform transition-all duration-30'>
+        <div className='w-full flex gap-y-[10px] gap-x-[20px] py-[15px] px-[15px] cursor-pointer border hover:bg-primary transform transition-all duration-30' onClick={() => { toggle() }}>
             <div className=' bg-white w-[100px] h-[90px] '>
-                <Image src={image} className='h-full w-full object-contain' />
+                <Image src={image} alt='testing' className='h-full w-full object-contain' />
             </div>
             <div className='w-full text-left flex flex-col gap-y-[10px]'>
                 <span className='font-haasRegular text-secondary-alt uppercase text-[20px] block'>
-                    {product.title}
+                    {data.title}
                 </span>
                 <span className='
                 font-haasRegular
@@ -88,14 +87,14 @@ const ProductList = ({ toggle, data, setCurrentProd, addProdToggle }) => {
     return (
         <div className='w-full flex flex-col justify-center items-center text-center py-[50px] gap-y-[40px]'>
             <span className='block font-haasRegular uppercase text-[25px] text-secondary-alt'>manage your sets below</span>
-            <button onClick={()=>{addProdToggle()}} className='tracking-[3px] hover:tracking-[5px] hover:bg-primary hover:font-haasBold transform transition-all duration-300 border border-secondary-alt h-[45px] lg:w-[292px] w-full text-secondary-alt uppercase text-[12px] font-haasRegular'>
+            <button onClick={() => { addProdToggle() }} className='tracking-[3px] hover:tracking-[5px] hover:bg-primary hover:font-haasBold transform transition-all duration-300 border border-secondary-alt h-[45px] lg:w-[292px] w-full text-secondary-alt uppercase text-[12px] font-haasRegular'>
                 create a new set
             </button>
-            <InputField id="oldPassword" placeholder="SEARCH SETS" borderColor="secondary-alt" classes={"self-start w-[280px]"} />
-            <ProductCards />
-            <ProductCards />
-            <ProductCards />
-            <ProductCards />
+            <InputField id="search" placeholder="SEARCH SETS" borderColor="secondary-alt" classes={"self-start w-[280px]"} />
+
+            {data.map((dt) => (
+                <ProductCards data={dt} toggle={toggle} />
+            ))}
         </div>
     );
 };
