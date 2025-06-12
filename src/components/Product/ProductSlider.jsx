@@ -19,7 +19,7 @@ const SLIDER_CONFIG = {
     vertical: true,
     slides: {
       perView: 6,
-      spacing: 5,
+      spacing: 26,
     },
   },
 };
@@ -122,7 +122,7 @@ export default function ProductSlider({ product }) {
   }
 
   return (
-    <div className="lg:flex hidden w-full h-[937px] gap-x-[24px] justify-between">
+    <div className="lg:flex hidden w-full h-full gap-x-[24px] justify-between">
       {/* Main Slider */}
       <div
         ref={sliderRef}

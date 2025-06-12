@@ -5,7 +5,7 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import FeaturedCard from './FeaturedCard';
 
-export const FeatuedProjects = ({ data, pageDetails, loop = true, origin = "center" }) => {
+export const FeatuedProjects = ({ data, pageDetails, loop = true, origin = "center", classes }) => {
 
     console.log("--featured projects data--",data);
 
@@ -39,7 +39,7 @@ export const FeatuedProjects = ({ data, pageDetails, loop = true, origin = "cent
     );
 
     return (
-        data && data.length > 0 && <div className='w-full py-20 bg-primary lg:py-6'>
+        data && data.length > 0 && <div className={`w-full py-20 bg-primary lg:py-6 ${classes}`}>
             <div className='sm:px-0 px-[12px] flex items-center flex-col '>
                 <SectionTitle text={featuredProjectTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
             </div>
