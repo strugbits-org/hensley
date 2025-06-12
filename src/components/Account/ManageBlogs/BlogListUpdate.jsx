@@ -183,7 +183,7 @@ const BlogListUpdate = ({ toggle, data, currentProd }) => {
             </div>
 
             <div className='w-full flex justify-center items-center'>
-                <button className='w-[400px] tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[280px] text-secondary-alt uppercase text-[14px] font-haasRegular'>
+                <button className='w-[400px] tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[400px] text-secondary-alt uppercase text-[14px] font-haasRegular'>
                     Save
                 </button>
             </div>

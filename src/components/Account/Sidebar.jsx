@@ -55,7 +55,17 @@ function Sidebar() {
                     <path d="M3 9.009a6.01 6.01 0 0 1 6.01-6.01H12a6.01 6.01 0 0 1 6.01 5.982h.943c1.15 0 2.047.896 2.047 2.047v3.962A6.01 6.01 0 0 1 14.99 21H9.01A6.01 6.01 0 0 1 3 14.99zm6.01-4.01A4.01 4.01 0 0 0 5 9.01v5.981A4.01 4.01 0 0 0 9.01 19h5.98A4.01 4.01 0 0 0 19 14.99V11h-1c-1.076 0-2-.924-2-2 0-2.214-1.786-4-4-4zM8 9a1 1 0 0 1 1-1h3.5a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1m1 5a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2z" fill="#262116" data-color="1"></path>
                 </g>
             </svg>,
-            href:'/manage-blogs'
+            href: '/manage-blogs'
+        },
+        {
+            name: 'Product Sorting',
+            icon: <svg className='inline mr-4' data-bbox="0 44.46 490 401.08" stroke="#2c2216" viewBox="0 0 490 490" xmlns="http://www.w3.org/2000/svg" width="17.921" height="15.897" data-type="ugc">
+                <g>
+                    <path d="M85.877 154.014v274.295h45.829V154.014l48.791 67.199 37.087-26.943L108.792 44.46 0 194.27l37.087 26.943z" fill="#2c2216"></path>
+                    <path d="M404.13 335.988V61.691h-45.829V335.99l-48.798-67.203-37.087 26.943 108.8 149.81L490 295.715l-37.087-26.913z" fill="#2c2216"></path>
+                </g>
+            </svg>,
+             href: '/product-sorting'
         },
         {
             name: "Change Password", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="16.987" height="21.62" viewBox="0 0 16.987 21.62">

@@ -5,12 +5,10 @@ import BlogListUpdate from './BlogListUpdate';
 
 function ManageBlogs() {
     const [open, setOpen] = useState(false);
-    const [addProdOpen, setAddProdOpen] = useState(false);
-    const [currentProd, setCurrentProd] = useState('');
 
     // Toggle functions
     const toggle = () => setOpen(prev => !prev);
-    const addProdToggle = () => setAddProdOpen(prev => !prev);
+    
 
     const data = {
         heading: "Manage Blogs",
