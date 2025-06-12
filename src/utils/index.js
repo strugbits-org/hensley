@@ -146,7 +146,7 @@ export const findSortIndexByCategory = (data, categoryId) => {
 };
 
 export const formatTotalPrice = (price) => {
-    return '$' + price.toFixed(2);
+    return '$' + price?.toFixed(2) || '$0.00';
 }
 
 
@@ -218,9 +218,12 @@ export function formatLineItemsForQuote(lineItems) {
     let counter = 0;
 
     for (const item of lineItems || []) {
-        const { productName, price, quantity, customTextFields } = item;
+        const { productName, price, quantity, descriptionLines } = item;
+        const formattedDescriptionLines = formatDescriptionLines(descriptionLines);
+        const productCollection = formattedDescriptionLines.find(x => x.title === "Set")?.value;
+        const isTentOrCover = formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
-        if (!customTextFields?.length) {
+        if (!productCollection && !isTentOrCover) {
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
@@ -231,11 +234,10 @@ export function formatLineItemsForQuote(lineItems) {
             continue;
         }
 
-        const isSet = customTextFields.find(f => f.title === "Set");
-        const isTentOrCover = customTextFields.find(f => f.title === "TENT TYPE" || f.title === "POOLCOVER");
-
-        if (isSet) {
-            const setItems = isSet.value.split("; ");
+        if (productCollection) {
+            const setItems = productCollection.split("; ");
+            console.log("setItems", setItems);
+            
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
@@ -246,7 +248,7 @@ export function formatLineItemsForQuote(lineItems) {
 
             for (const setItem of setItems) {
                 const [setName, size, setPrice, setQuantity] = setItem.split("~").map(v => v.trim());
-                const description = size && size !== "—" ? `${size} | SET OF ${name}` : `SET OF ${name}`;
+                const description = size && size !== "—" ? `${size} | SET OF ${productName.original}` : `SET OF ${productName.original}`;
                 const existing = formattedCartData.find(i => i.name === `${setName} - ` && i.description === description);
 
                 if (existing) {

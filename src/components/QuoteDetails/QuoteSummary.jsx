@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { formatTotalPrice } from '@/utils';
-import { CartNormal } from '../Cart/CartItems';
+import { calculateCartTotalPrice, formatDescriptionLines, formatTotalPrice } from '@/utils';
+import { CartNormal, CartCollection } from '../Cart/CartItems';
+import { CartTent } from './CartItems';
 
 const QuoteSummary = ({ data }) => {
 
   const [totalPrice, setTotalPrice] = useState(0);
-
   useEffect(() => {
-    const total = data.lineItems.reduce((accumulator, item) => {
-      const product = item.product;
-      return accumulator + (product.fullPrice.amount * product.quantity);
-    }, 0);
+    const total = calculateCartTotalPrice(data.lineItems.map(item => item.product));
     setTotalPrice(formatTotalPrice(total));
   }, [data]);
 
@@ -42,12 +39,30 @@ const QuoteSummary = ({ data }) => {
         </div>
       </div>
       <div className='lg:w-[70%] border'>
+
         {data.lineItems.map((item, index) => {
           const product = item.product;
-          return (
-            <CartNormal key={index} data={product} readOnly={true} />
-          )})}
-        {data.lineItems.length === 0 && <div className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>Your cart is empty</div>}
+          const descriptionLines = formatDescriptionLines(product.descriptionLines);
+          const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+          const isTentItem = false;
+
+          if (productCollection) {
+            const productSetItems = productCollection.split("; ");
+            const lineItemData = { ...product, productSetItems };
+            return (
+              <CartCollection key={index} data={lineItemData} readOnly={true} />
+            )
+          } else if (isTentItem) {
+            return (
+              <CartTent key={index} data={product} readOnly={true} />
+            )
+          } else {
+            return (
+              <CartNormal key={index} data={product} readOnly={true} />
+            )
+          };
+        })}
+        {data.lineItems.length === 0 && <div className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>No Items</div>}
       </div>
     </div>
   )

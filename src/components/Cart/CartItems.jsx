@@ -426,7 +426,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                     </table>
                 </div>
 
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='break-keep bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
                     <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
@@ -453,6 +453,9 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
 }
 
 const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
+
+    console.log("data", data);
+    
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
@@ -575,7 +578,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                 </table>
                 <span className='lg:block hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] mr-[100px]'>{formattedPrice}</span>
 
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='break-keep bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
                     <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">

@@ -1,20 +1,15 @@
 "use client"
-import { CartNormal } from '@/components/Cart/CartItems';
-import { formatDateForQuote, formatTotalPrice } from '@/utils';
+import { CartCollection, CartNormal, CartTent } from '@/components/Cart/CartItems';
+import { calculateCartTotalPrice, formatDateForQuote, formatDescriptionLines, formatTotalPrice } from '@/utils';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment, useMemo } from 'react';
 
 export const ViewQuoteModal = ({ data, onClose }) => {
     if (!data) return null;
-    const totalPrice = useMemo(() =>
-        data.lineItems.reduce((total, { product }) =>
-            total + (product.price?.amount || product.price) * product.quantity, 0
-        ), [data.lineItems]
-    );
+    const totalPrice = useMemo(() => calculateCartTotalPrice(data.lineItems.map(item => item.product)));
 
     const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
     const date = useMemo(() => formatDateForQuote(data.eventDate), [data.eventDate]);
-    const lineItems = data?.lineItems || [];
     return (
         <Transition appear show={data !== undefined && data !== null} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -57,11 +52,33 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                 </div>
                                             </div>
                                             <div className=''>
-                                                {lineItems.map(({ product, size }) => {
+                                                {/* {lineItems.map(({ product, size }) => {
                                                     const data = product;
                                                     return (
                                                         <CartNormal key={data._id || data.id} data={{ ...data, size }} readOnly={true} showAddToCart={true} />
                                                     );
+                                                })} */}
+                                                {data.lineItems.map((item, index) => {
+                                                    const product = item.product;
+                                                    const descriptionLines = formatDescriptionLines(product.descriptionLines);
+                                                    const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+                                                    const isTentItem = false;
+
+                                                    if (productCollection) {
+                                                        const productSetItems = productCollection.split("; ");
+                                                        const lineItemData = { ...product, productSetItems };
+                                                        return (
+                                                            <CartCollection key={index} data={lineItemData} readOnly={true} showAddToCart={true} />
+                                                        )
+                                                    } else if (isTentItem) {
+                                                        return (
+                                                            <CartTent key={index} data={product} readOnly={true} />
+                                                        )
+                                                    } else {
+                                                        return (
+                                                            <CartNormal key={index} data={product} readOnly={true} showAddToCart={true} />
+                                                        )
+                                                    };
                                                 })}
                                             </div>
                                         </div>
