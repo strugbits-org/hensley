@@ -149,7 +149,7 @@ const AddToCart = ({ data, onClose }) => {
   return (
     <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px]  sm:mt-0   sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
       <AddToCartSlider data={data} isOpen={data.open} />
-      <div className='h-full sm:w-[55%] w-full py-[20px] pr-[20px]  relative'>
+      <div className='h-full sm:w-[55%] w-full py-[20px] pr-[20px] relative'>
         <div className='w-full flex flex-col gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
           <div className='w-full flex justify-between relative '>
             <span className='
@@ -169,7 +169,7 @@ const AddToCart = ({ data, onClose }) => {
 
             </button>
           </div>
-          <div className='w-full flex gap-x-[20px] sm:justify-end justify-center '>
+          <div className='w-full flex gap-x-[20px] sm:justify-end justify-start '>
             <span
               className='
         text-[25px]
