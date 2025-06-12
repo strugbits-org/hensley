@@ -16,7 +16,7 @@ const INFO_HEADERS = [
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly }) => (
+const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
     <div className="border-b border-black pb-1 flex items-center justify-center gap-x-[30px] font-haasRegular">
         {!readOnly ? (
             <>
@@ -35,7 +35,6 @@ const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly
                     max={QUANTITY_LIMITS.MAX}
                     value={quantity}
                     onInput={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN, true)}
-                    onBlur={(e) => updateProducts(parseInt(e.target.value) || QUANTITY_LIMITS.MIN)}
                     aria-label="Quantity"
                 />
                 <button
@@ -58,7 +57,7 @@ const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly
     </div>
 );
 
-const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQuantityChange, readOnly }) => {
+const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, readOnly }) => {
     return productInfoSection.map((item, index) => (
         <tr key={`item-${index}`}>
             <td className="py-2 font-semibold">{item.product}</td>
@@ -67,7 +66,6 @@ const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQ
             <td className="font-haasRegular">
                 <QuantityControls
                     quantity={quantity || item.quantity}
-                    updateProducts={(value) => updateProducts(item._id, value)}
                     onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id || item.product, isDisabled)}
                     readOnly={readOnly}
                 />
@@ -313,7 +311,7 @@ const _CartCollection = () => {
     )
 }
 const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
-    const { removeProduct, handleQuantityChange, updateProducts } = actions;
+    const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -423,7 +421,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                             </tr>
                         </thead>
                         <tbody>
-                            {renderTableRows({ handleQuantityChange, updateProducts, productInfoSection: productInfoSection, readOnly })}
+                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly })}
                         </tbody>
                     </table>
                 </div>
@@ -455,7 +453,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
 }
 
 const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
-    const { removeProduct, handleQuantityChange, updateProducts } = actions;
+    const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
     const productName = data?.productName?.original || data?.name;
@@ -572,7 +570,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                         </tr>
                     </thead>
                     <tbody>
-                        {renderTableRows({ handleQuantityChange, updateProducts, quantity: data.quantity, productInfoSection: productInfoSection, readOnly })}
+                        {renderTableRows({ handleQuantityChange, quantity: data.quantity, productInfoSection: productInfoSection, readOnly })}
                     </tbody>
                 </table>
                 <span className='lg:block hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] mr-[100px]'>{formattedPrice}</span>

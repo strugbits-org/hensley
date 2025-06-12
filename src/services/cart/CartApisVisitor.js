@@ -102,3 +102,20 @@ export const removeProductFromCartVisitor = async (cartId, lineItemIds) => {
   }
 };
 
+export const updateProductInCartVisitor = async (cartId, id, productData) => {
+  try {
+    const payload = { cartId, id, productData }
+    const response = await fetch(`${baseUrl}/api/cart-visitor/update`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};

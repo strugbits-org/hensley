@@ -169,8 +169,40 @@ export const mapProductSetItems = (data) => {
 };
 
 export const calculateTotalCartQuantity = (lineItems) => {
-    return lineItems.reduce((total, currentItem) => total + currentItem.quantity, 0);
-}
+    const totalQuantity = lineItems.reduce((total, currentItem) => {
+        const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+
+        if (!productCollection) return total + currentItem.quantity;
+        const collectionQuantity = productCollection.split('; ').reduce((acc, item) => {
+            const [, , , quantity] = item.split('~');
+            return acc + parseInt(quantity, 10);
+        }, 0);
+
+        return total + collectionQuantity;
+    }, 0);
+    return totalQuantity;
+};
+
+export const calculateCartTotalPrice = (lineItems) => {
+    const totalPrice = lineItems.reduce((total, currentItem) => {
+        const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+
+        if (!productCollection) {
+            return total + ((currentItem?.price?.amount || currentItem.price) * currentItem.quantity);
+        }
+
+        const collectionTotalPrice = productCollection.split('; ').reduce((acc, item) => {
+            const [, , price, quantity] = item.split('~');
+            return acc + (parseFloat(price) * parseInt(quantity, 10));
+        }, 0);
+        return total + collectionTotalPrice;
+    }, 0);
+
+    return totalPrice;
+};
+
 
 export const formatDescriptionLines = (items) => {
     return items.reduce((acc, item) => {
