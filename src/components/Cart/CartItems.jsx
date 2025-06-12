@@ -357,9 +357,6 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
 }
 
 const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
-
-    console.log("data", data);
-    
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);

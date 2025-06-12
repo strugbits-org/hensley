@@ -188,7 +188,7 @@ export const calculateTotalCartQuantity = (lineItems) => {
 export const calculateCartTotalPrice = (lineItems) => {
     const totalPrice = lineItems.reduce((total, currentItem) => {
         const fallbackSetValue = currentItem?.catalogReference?.options?.customTextFields?.Set || currentItem?.customTextFields?.find(x => x.title === "Set")?.value;
-        
+
         const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
         const productCollection = descriptionLines.find(x => x.title === "Set")?.value || fallbackSetValue;
 
@@ -208,7 +208,7 @@ export const calculateCartTotalPrice = (lineItems) => {
 
 
 export const formatDescriptionLines = (items) => {
-    if(!items) return [];
+    if (!items) return [];
     return items.reduce((acc, item) => {
         const title = item.name?.translated || item.name?.original;
         const value = item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
@@ -240,8 +240,6 @@ export function formatLineItemsForQuote(lineItems) {
 
         if (productCollection) {
             const setItems = productCollection.split("; ");
-            console.log("setItems", setItems);
-
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
@@ -331,3 +329,26 @@ export const formatDateForQuote = (d) => {
 
     return `${month} ${day}${getOrdinal(day)}, ${year}`;
 }
+
+export const getAdditionalInfoSection = (sections, title) => {
+  const html = sections.find(item => item.title.toUpperCase() === title)?.description || "";
+
+  if (typeof window === "undefined") {
+    return parse(html);
+  }
+
+  const doc = new DOMParser().parseFromString(html, "text/html");
+
+  doc.querySelectorAll("strong").forEach((strong) => {
+    const br = document.createElement("br");
+    strong.parentNode?.insertBefore(br, strong.nextSibling);
+  });
+
+  const cleaned = doc.body.innerHTML
+    .replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/(<br\s*\/?>\s*){2,}/gi, "<br />")
+    .trim();
+
+  return parse(cleaned);
+};
