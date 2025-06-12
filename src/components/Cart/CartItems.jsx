@@ -58,8 +58,8 @@ const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly
 const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQuantityChange, readOnly }) => {
     return productInfoSection.map((item, index) => (
         <tr key={`item-${index}`}>
-            <td className="py-2 font-semibold">{item.product}</td>
-            <td className="font-haasRegular text-center">{item.size}</td>
+            <td className="py-2 font-semibold lg:block hidden">{item.product}</td>
+            <td className="font-haasRegular text-center ">{item.size}</td>
             <td className="text-center font-haasRegular">{item.formattedPrice}</td>
             <td className="font-haasRegular">
                 <QuantityControls
@@ -343,7 +343,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, buttonEnable = false
     ]
 
     return (
-        <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative items-center'>
+        <div className='sm:border-t border-b border-primary-border px-[15px] py-[14px] w-full gap-x-[39px] relative items-center'>
             <div className='
             h-[104px]
             w-[104px]
@@ -368,7 +368,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, buttonEnable = false
                 mr-[100px]
                 '>{data.price.amount || data.price}</span>
                 </div>
-                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] ">
+                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] xl:pr-[30px] lg:pr-[50px] ">
                     <thead>
                         <tr className="text-xs uppercase text-gray-500">
                             {INFO_HEADERS.map((title, index) => (
@@ -385,7 +385,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, buttonEnable = false
                         {renderTableRows({ handleQuantityChange, updateProducts, quantity: data.quantity, productInfoSection: productInfoSection, readOnly })}
                     </tbody>
                 </table>
-                <span className='lg:block hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] mr-[100px]'>{formattedPrice}</span>
+                <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
 
                 {buttonEnable && <button className='bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
                     add to cart
