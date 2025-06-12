@@ -176,7 +176,7 @@ const Cart = () => {
         <div className='lg:w-[70%] border'>
           <h2 className='text-[90px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
           {cartItems.map((item, index) => {
-            const descriptionLines = formatDescriptionLines(item.descriptionLines);
+            const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
             const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
             const isTentItem = false;
 

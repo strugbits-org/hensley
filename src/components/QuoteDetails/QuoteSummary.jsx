@@ -42,7 +42,7 @@ const QuoteSummary = ({ data }) => {
 
         {data.lineItems.map((item, index) => {
           const product = item.product;
-          const descriptionLines = formatDescriptionLines(product.descriptionLines);
+          const descriptionLines = product.descriptionLines ? formatDescriptionLines(product.descriptionLines) : product.customTextFields;
           const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
           const isTentItem = false;
 

@@ -170,8 +170,9 @@ export const mapProductSetItems = (data) => {
 
 export const calculateTotalCartQuantity = (lineItems) => {
     const totalQuantity = lineItems.reduce((total, currentItem) => {
+        const fallbackSetValue = currentItem?.catalogReference?.options?.customTextFields?.Set || currentItem?.customTextFields?.find(x => x.title === "Set")?.value;
         const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
-        const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value || fallbackSetValue;
 
         if (!productCollection) return total + currentItem.quantity;
         const collectionQuantity = productCollection.split('; ').reduce((acc, item) => {
@@ -186,8 +187,10 @@ export const calculateTotalCartQuantity = (lineItems) => {
 
 export const calculateCartTotalPrice = (lineItems) => {
     const totalPrice = lineItems.reduce((total, currentItem) => {
+        const fallbackSetValue = currentItem?.catalogReference?.options?.customTextFields?.Set || currentItem?.customTextFields?.find(x => x.title === "Set")?.value;
+        
         const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
-        const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value || fallbackSetValue;
 
         if (!productCollection) {
             return total + ((currentItem?.price?.amount || currentItem.price) * currentItem.quantity);
@@ -205,6 +208,7 @@ export const calculateCartTotalPrice = (lineItems) => {
 
 
 export const formatDescriptionLines = (items) => {
+    if(!items) return [];
     return items.reduce((acc, item) => {
         const title = item.name?.translated || item.name?.original;
         const value = item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
@@ -237,7 +241,7 @@ export function formatLineItemsForQuote(lineItems) {
         if (productCollection) {
             const setItems = productCollection.split("; ");
             console.log("setItems", setItems);
-            
+
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,

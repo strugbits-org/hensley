@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, logError } from '@/utils';
+import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, logError } from '@/utils';
 import { FiArrowUpRight } from "react-icons/fi";
 import { lightboxActions } from '@/store/lightboxStore';
 import { AddProductToCart } from '@/services/cart/CartApis';
@@ -7,14 +7,9 @@ import { useCookies } from 'react-cookie';
 
 export const QuoteItem = ({ quote, handleViewClick }) => {
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
-
-    const totalPrice = useMemo(() =>
-        quote.lineItems.reduce((total, { product }) =>
-            total + (product.price?.amount || product.price) * product.quantity, 0
-        ), [quote.lineItems]
-    );
-
+    const totalPrice = useMemo(() => calculateCartTotalPrice(quote.lineItems.map(item => item.product)));
     const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
+
     const date = useMemo(() => formatDateForQuote(quote.eventDate), [quote.eventDate]);
 
     const handleOrderAgainClick = async () => {
