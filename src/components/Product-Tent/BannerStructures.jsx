@@ -9,7 +9,6 @@ const BannerStructures = ({ data }) => {
     const info = getAdditionalInfoSection(additionalInfoSections, "INFO");
     const pros = getAdditionalInfoSection(additionalInfoSections, "PROS");
     const cons = getAdditionalInfoSection(additionalInfoSections, "CONS");
-    console.log("additionalInfoSections", additionalInfoSections);
 
     return (
         <div className='w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] sm:h-[950px] bg-cover bg-no-repeat bg-top ' style={{ backgroundImage: `url(${generateImageURL({ wix_url: tent.mainMedia })})` }}>

@@ -80,145 +80,42 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, r
     ));
 };
 
-const CartTent = () => {
+const CartTent = ({ data, descriptionLines, actions = {}, showAddToCart = false }) => {
+    const { removeProduct } = actions;
+
+    const productName = data?.productName?.original || data?.name;
+
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
-            <div className='
-            h-[104px]
-            w-[104px]
-           bg-white
-            '>
-                <Image src={image} className='h-full w-full object-contain' />
+            <div className='h-[104px] w-[104px] bg-white'>
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='flex lg:flex-row flex-col lg:items-center'>
                 <div>
                     <span className='block text-[16px] text-secondary-alt font-haasLight uppercase'>Product</span>
-                    <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase
-                lg:mt-[21px]
-                lg:mb-[27px]
-                '>structure</span>
-                    <div className='grid sm:grid-cols-2 grid-cols-1 gap-x-[26px]'>
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >Event Name</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >SI & BIEL WEDDING</span>
-                        </div>
-
-                        <div>
-
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >Event Date</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                
-                '
-                            >02/27/2024</span>
-                        </div>
-
-
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >Removal Date</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >02/27/2024</span>
-                        </div>
-
-
-
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >NUMBER OF GUESTS</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >220</span>
-                        </div>
-
-
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >ARE TH INSTALL/ REMOVAL DATES FLEXIBLE?</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >yes</span>
-                        </div>
-
-
+                    <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
+                    <div className='grid sm:grid-cols-2 grid-cols-1 gap-x-[26px] gap-y-[4px]'>
+                        {descriptionLines.map(({ title, value }) => (
+                            <div key={title}>
+                                <span className='text-[12px] text-secondary-alt font-haasBold uppercase mr-[20px]'>{title}</span>
+                                <span className='text-[12px] text-secondary-alt font-haasLight uppercase'>{value}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
-                <div className='w-[280px] '>
-                    <span className='block text-[12px] font-haasBold uppercase text-secondary-alt'>PLEASE PROVIDE ANY OTHER ADDICIONAL INFO</span>
-                    <span className='block text-[12px] font-haasLight uppercase'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel diam est. Mauris mattis lacinia tellus, luctus accumsan libero euismod in. Aenean sagittis nibh odio, id vulputate mi ornare sit amet. In vitae sapien nec lorem vehicula ultrices sodales vitae lectus. Sed felis arcu, pretium eu mi sed, venenatis vulputate dui. Vivamus hendrerit velit et arcu placerat faucibus. Mauris ante dui, fringilla consectetur tortor nec, </span>
-                </div>
             </div>
-            <button className='absolute right-[24px]  sm:top-[50px] top-[15px]'>
+
+            <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[50px] top-[15px]'>
                 <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
                     <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
                         <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
                         <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
                     </g>
                 </svg>
-
             </button>
         </div>
-    )
-}
+    );
+};
 
 const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
     const { removeProduct, handleQuantityChange } = actions;

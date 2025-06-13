@@ -9,8 +9,6 @@ import ProductSlider_tab from './ProductSlider_tab';
 import { AddToQuoteForm } from './AddToQuoteForm';
 
 const ProductTent = ({ productData }) => {
-  console.log("productData", productData);
-
   const { tent, gallery } = productData;
 
   return (
