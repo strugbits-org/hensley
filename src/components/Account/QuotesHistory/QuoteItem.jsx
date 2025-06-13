@@ -20,7 +20,7 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
     return (
         <article className='quote-item border-b first:border-t border-[#E0D6CA]' role="listitem">
             {/* Desktop Layout */}
-            <div className='hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center py-[35px] max-lg:py-5'>
+            <div className='hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-y-4 gap-x-4 xl:gap-x-[100px] items-center py-[35px] max-lg:py-5'>
                 <div className='quote-location'>
                     <h3 className='font-recklessRegular text-xl text-wrap m-0'>
                         {quote.eventDescriptionPo}

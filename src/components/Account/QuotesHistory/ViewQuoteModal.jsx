@@ -44,7 +44,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                             <DialogPanel className="transform overflow-hidden text-left align-middle transition-all relative">
                                 <div className='h-screen max-w-[1288px] flex justify-center items-center mx-auto '>
                                     <div >
-                                        <div className='bg-white w-full flex flex-col gap-y-[20px] py-[30px] px-[24px] h-[800px] overflow-y-scroll hide-scrollbar'>
+                                        <div className='bg-white w-full flex flex-col lg:gap-y-[20px] gap-y-[50px] py-[30px] px-[24px] h-[800px] overflow-y-scroll hide-scrollbar'>
                                             <div className='heading w-full  flex justify-center items-center flex-col max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
                                                 <p className='font-haasLight text-base uppercase'>{date}</p>
                                                 <h2 className='uppercase text-[140px] text-secondary-alt font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.eventDescriptionPo}</h2>
@@ -60,9 +60,40 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                 {lineItems.map(({ product, size }) => {
                                                     const data = product;
                                                     return (
-                                                        <CartNormal key={data._id} data={{ ...data, size }} readOnly={true} buttonEnable={true}/>
+                                                        <CartNormal key={data._id} data={{ ...data, size }} readOnly={true} buttonEnable={true} />
                                                     );
                                                 })}
+                                                <div className='w-full flex flex-col gap-y-[24px] justify-center items-center'>
+                                                    <button
+                                                        className={`mt-[39px] w-full h-[150px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center`}
+                                                        aria-label="Load more quotes"
+                                                    >
+                                                        <span className='font-haasRegular uppercase text-sm leading-[30px] group-hover:font-haasBold'>
+                                                            Add all items to cart
+                                                        </span>
+                                                        <svg
+                                                            className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-[#2c2216] group-hover:text-white hidden max-lg:block'
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 10.665 10.367"
+                                                            aria-hidden="true"
+                                                        >
+                                                            <g id="Group_2072" data-name="Group 2072" transform="translate(-13.093 0.385)">
+                                                                <path id="Path_3283" data-name="Path 3283" d="M0,0H9.867V9.867" transform="translate(13.39 0.115)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
+                                                                <line id="Line_14" data-name="Line 14" x1="9.822" y2="9.27" transform="translate(13.436 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
+                                                            </g>
+                                                        </svg>
+                                                    </button>
+
+                                                     <button
+                                                        className={` w-full h-[150px] max-lg:h-[90px] bg-transparent border border-primary-border tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center `}
+                                                        aria-label="Load more quotes"
+                                                    >
+                                                        <span className='font-haasRegular uppercase text-sm leading-[30px] group-hover:font-haasBold'>
+                                                            back to quotes
+                                                        </span>
+                                                        
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
