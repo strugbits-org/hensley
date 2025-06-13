@@ -252,14 +252,15 @@ export const Product = ({ data }) => {
   }, []);
 
   return (
-    <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] min-h-[937px]'>
+    <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]'>
+
       <div className='xl:w-1/2'>
         <ProductSlider product={product} />
         <ProductSlider_tab product={product} />
       </div>
 
       <div className='xl:w-1/2 flex flex-col items-center relative'>
-        <div className='lg:max-w-[656px] sm:max-w-[492px] h-full'>
+        <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
           <span className='text-secondary-alt lg:text-[16px] text-[12px] uppercase font-haasLight'>
             RENTALS/ Product(Item)
           </span>
@@ -295,7 +296,7 @@ export const Product = ({ data }) => {
           <ProductDescription text={product.description} />
         </div>
 
-        <AddToCartButton text={isUpdatingCart ? "Please wait..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
+        <AddToCartButton classes={'lg:!h-[200px] lg:!mt-3'} text={isUpdatingCart ? "Please wait..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
         <SaveProductButton
           key={product.id}
           productData={productData}

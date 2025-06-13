@@ -7,10 +7,12 @@ const PriceDisplay = ({ totalPrice }) => {
 
   return (
     <>
-      <div className='lg:block hidden'>
+      <div className='lg:block h-full hidden'>
         <span className='
-        text-[50px]
-        leading-[55px]
+        xl:text-[50px]
+        xl:leading-[55px]
+        lg:text-[30px]
+
         font-haasLight
         block
         uppercase
@@ -20,7 +22,8 @@ const PriceDisplay = ({ totalPrice }) => {
         </span>
         <span className='
         font-recklessBold
-        text-[90px]
+        xl:text-[80px]
+        lg:text-[50px]
         uppercase
         mt-[20px]
         block

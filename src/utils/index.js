@@ -6,6 +6,7 @@ import { contacts } from "@wix/crm";
 import { submissions } from "@wix/forms";
 import parse from 'html-react-parser';
 import { generateImageURL, generateImageURLAlternate } from "./generateImageURL";
+import * as cheerio from "cheerio";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
 
@@ -333,22 +334,17 @@ export const formatDateForQuote = (d) => {
 export const getAdditionalInfoSection = (sections, title) => {
   const html = sections.find(item => item.title.toUpperCase() === title)?.description || "";
 
-  if (typeof window === "undefined") {
-    return parse(html);
-  }
+  const $ = cheerio.load(html);
 
-  const doc = new DOMParser().parseFromString(html, "text/html");
-
-  doc.querySelectorAll("strong").forEach((strong) => {
-    const br = document.createElement("br");
-    strong.parentNode?.insertBefore(br, strong.nextSibling);
+  $("strong").each((_, el) => {
+    $(el).after("<br />");
   });
 
-  const cleaned = doc.body.innerHTML
-    .replace(/&nbsp;/g, " ")
+  const cleaned = $("body").html()
+    ?.replace(/&nbsp;/g, " ")
     .replace(/\s+/g, " ")
     .replace(/(<br\s*\/?>\s*){2,}/gi, "<br />")
     .trim();
 
-  return parse(cleaned);
+  return parse(cleaned || "");
 };

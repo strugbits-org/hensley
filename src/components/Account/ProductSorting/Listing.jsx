@@ -128,7 +128,7 @@ const Listing = () => {
 
                 <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                     <SortableContext items={items.map((item) => item.id)} strategy={rectSortingStrategy}>
-                        <div className='w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-[12px]'>
+                        <div className='w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-[12px]'>
                             {items.map((item, index) => (
                                 <Card
                                     key={item.id}

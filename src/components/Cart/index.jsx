@@ -169,13 +169,14 @@ const Cart = () => {
 
   return (
     <>
-      <div className='w-full min-h-screen flex lg:flex-row flex-col'>
-        <div className='lg:w-[30%] border lg:pl-[24px] py-[36px] lg:pr-[95px]'>
+      <div className='w-full h-[700px] flex lg:flex-row flex-col'>
+        <div className='lg:w-[35%] sm:border border-primary-border lg:pl-[24px] py-[36px] lg:pr-[95px]'>
           <PriceDisplay totalPrice={totalPrice} />
         </div>
-        <div className='lg:w-[70%] border'>
-          <h2 className='text-[90px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
-          {cartItems.map((item, index) => {
+        <div className='lg:w-[65%] border border-primary-border overflow-y-scroll hide-scrollbar'>
+          <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
+          <div className='flex flex-col '>
+            {cartItems.map((item, index) => {
             const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
             const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
             const isTentItem = false;
@@ -196,13 +197,14 @@ const Cart = () => {
               )
             };
           })}
+          </div>
           {!isLoading && cartItems.length === 0 && <>
             <div className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>Your cart is empty</div>
           </>}
         </div>
       </div>
       <CustomLink to={"/quote-request"}>
-        <AddToQuote text={"request to quote"} />
+        <AddToQuote classes={'!mt-0'} text={"request to quote"} />
       </CustomLink>
     </>
   )

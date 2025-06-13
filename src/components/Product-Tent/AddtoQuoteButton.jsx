@@ -1,9 +1,9 @@
 import React from 'react'
 
-export const AddToQuote = ({ text, classes }) => {
+export const AddToQuote = ({ text, classes, handleClick, type = 'button', disabled = false }) => {
     return (
 
-        <button className={`
+        <button onClick={handleClick} disabled={disabled} type={type} className={`
         lg:w-full lg:h-[150px] 
         lg:mt-[60px]
         sm:mt-[40px]
