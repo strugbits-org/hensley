@@ -119,3 +119,10 @@ body {
 .custom-date-picker .air-datepicker-cell.-disabled- {
   @apply text-primary-alt;
 }
+
+.form-label {
+  @apply block text-[16px] leading-[19px] font-haasBold uppercase text-secondary-alt mb-2;
+}
+.form-input {
+  @apply w-full border-b font-haasLight border-secondary-alt p-3 bg-primary-alt text-secondary-alt placeholder-secondary shadow-sm rounded-sm focus:outline-none;
+}

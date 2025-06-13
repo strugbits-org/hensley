@@ -147,10 +147,10 @@ const AddToCart = ({ data, onClose }) => {
   };
 
   return (
-    <div className='sm:w-[850px] w-[600px] max-sm:h-[700px] hide-scrollbar sm:mt-0 mt-[50px] overflow-y-scroll  sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
+    <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px]  sm:mt-0   sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
       <AddToCartSlider data={data} isOpen={data.open} />
-      <div className=' h-full sm:w-[55%] w-full py-[20px] pr-[20px] '>
-        <div className='w-full flex flex-col gap-y-[15px]'>
+      <div className='h-full sm:w-[55%] w-full py-[20px] pr-[20px] relative'>
+        <div className='w-full flex flex-col gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
           <div className='w-full flex justify-between relative '>
             <span className='
             text-[35px]
@@ -169,7 +169,7 @@ const AddToCart = ({ data, onClose }) => {
 
             </button>
           </div>
-          <div className='w-full flex gap-x-[20px] justify-end '>
+          <div className='w-full flex gap-x-[20px] sm:justify-end justify-start '>
             <span
               className='
         text-[25px]
@@ -203,10 +203,12 @@ const AddToCart = ({ data, onClose }) => {
               {renderTableRows()}
             </tbody>
           </table>
-          <ProductDescription maxChars={130} text={product.description} />
-
-          <AddToQuoteButton onClick={handleAddToCart} text={isLoading ? "ADDING..." : "ADD TO QUOTE"} disabled={isLoading} classes={"!mt-0 !p-0 !h-[70px] !text-[14px]"} />
+          <div className='py-[10px] '>
+            <ProductDescription maxChars={130} text={product.description} />
+          </div>
         </div>
+          <AddToQuoteButton classes={"lg:!h-[80px] lg:!mt-0 !mt-0 !text-[14px] "} onClick={handleAddToCart} text={isLoading ? "ADDING..." : "ADD TO QUOTE"} disabled={isLoading}  />
+
       </div>
     </div>
   )

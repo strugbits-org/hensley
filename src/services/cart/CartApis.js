@@ -55,7 +55,7 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
 export const AddProductToCart = async (productData) => {
   try {
     const authToken = await getAuthToken();
-    
+
     const memberTokens = await getMemberTokens();
     const payload = {
       memberTokens,
@@ -155,3 +155,38 @@ export const removeProductFromCart = async (lineItemIds) => {
   }
 };
 
+export const updateProductInCart = async (id, productData) => {
+  try {
+    const authToken = await getAuthToken();
+
+    const memberTokens = await getMemberTokens();
+    const payload = {
+      memberTokens,
+      id,
+      productData,
+    };
+
+    if (!authToken) {
+      const cartId = await getCartId();
+      const response = AddProductToCartVisitor(cartId, id, productData);
+      return response;
+    }
+
+    const response = await fetch(`${baseUrl}/api/cart/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: authToken,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};

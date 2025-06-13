@@ -6,6 +6,7 @@ import { contacts } from "@wix/crm";
 import { submissions } from "@wix/forms";
 import parse from 'html-react-parser';
 import { generateImageURL, generateImageURLAlternate } from "./generateImageURL";
+import * as cheerio from "cheerio";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
 
@@ -146,7 +147,7 @@ export const findSortIndexByCategory = (data, categoryId) => {
 };
 
 export const formatTotalPrice = (price) => {
-    return '$' + price.toFixed(2);
+    return '$' + price?.toFixed(2) || '$0.00';
 }
 
 
@@ -169,10 +170,46 @@ export const mapProductSetItems = (data) => {
 };
 
 export const calculateTotalCartQuantity = (lineItems) => {
-    return lineItems.reduce((total, currentItem) => total + currentItem.quantity, 0);
-}
+    const totalQuantity = lineItems.reduce((total, currentItem) => {
+        const fallbackSetValue = currentItem?.catalogReference?.options?.customTextFields?.Set || currentItem?.customTextFields?.find(x => x.title === "Set")?.value;
+        const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value || fallbackSetValue;
+
+        if (!productCollection) return total + currentItem.quantity;
+        const collectionQuantity = productCollection.split('; ').reduce((acc, item) => {
+            const [, , , quantity] = item.split('~');
+            return acc + parseInt(quantity, 10);
+        }, 0);
+
+        return total + collectionQuantity;
+    }, 0);
+    return totalQuantity;
+};
+
+export const calculateCartTotalPrice = (lineItems) => {
+    const totalPrice = lineItems.reduce((total, currentItem) => {
+        const fallbackSetValue = currentItem?.catalogReference?.options?.customTextFields?.Set || currentItem?.customTextFields?.find(x => x.title === "Set")?.value;
+
+        const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value || fallbackSetValue;
+
+        if (!productCollection) {
+            return total + ((currentItem?.price?.amount || currentItem.price) * currentItem.quantity);
+        }
+
+        const collectionTotalPrice = productCollection.split('; ').reduce((acc, item) => {
+            const [, , price, quantity] = item.split('~');
+            return acc + (parseFloat(price) * parseInt(quantity, 10));
+        }, 0);
+        return total + collectionTotalPrice;
+    }, 0);
+
+    return totalPrice;
+};
+
 
 export const formatDescriptionLines = (items) => {
+    if (!items) return [];
     return items.reduce((acc, item) => {
         const title = item.name?.translated || item.name?.original;
         const value = item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
@@ -186,9 +223,12 @@ export function formatLineItemsForQuote(lineItems) {
     let counter = 0;
 
     for (const item of lineItems || []) {
-        const { productName, price, quantity, customTextFields } = item;
+        const { productName, price, quantity, descriptionLines } = item;
+        const formattedDescriptionLines = formatDescriptionLines(descriptionLines);
+        const productCollection = formattedDescriptionLines.find(x => x.title === "Set")?.value;
+        const isTentOrCover = formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
-        if (!customTextFields?.length) {
+        if (!productCollection && !isTentOrCover) {
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
@@ -199,11 +239,8 @@ export function formatLineItemsForQuote(lineItems) {
             continue;
         }
 
-        const isSet = customTextFields.find(f => f.title === "Set");
-        const isTentOrCover = customTextFields.find(f => f.title === "TENT TYPE" || f.title === "POOLCOVER");
-
-        if (isSet) {
-            const setItems = isSet.value.split("; ");
+        if (productCollection) {
+            const setItems = productCollection.split("; ");
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
@@ -214,7 +251,7 @@ export function formatLineItemsForQuote(lineItems) {
 
             for (const setItem of setItems) {
                 const [setName, size, setPrice, setQuantity] = setItem.split("~").map(v => v.trim());
-                const description = size && size !== "—" ? `${size} | SET OF ${name}` : `SET OF ${name}`;
+                const description = size && size !== "—" ? `${size} | SET OF ${productName.original}` : `SET OF ${productName.original}`;
                 const existing = formattedCartData.find(i => i.name === `${setName} - ` && i.description === description);
 
                 if (existing) {
@@ -235,7 +272,7 @@ export function formatLineItemsForQuote(lineItems) {
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
-                description: generateDescriptionForQuote(customTextFields, isTentOrCover.title === "POOLCOVER"),
+                description: generateDescriptionForQuote(formattedDescriptionLines, isTentOrCover.title === "POOLCOVER"),
                 price: price.amount,
                 quantity
             });
@@ -293,3 +330,21 @@ export const formatDateForQuote = (d) => {
 
     return `${month} ${day}${getOrdinal(day)}, ${year}`;
 }
+
+export const getAdditionalInfoSection = (sections, title) => {
+  const html = sections.find(item => item.title.toUpperCase() === title)?.description || "";
+
+  const $ = cheerio.load(html);
+
+  $("strong").each((_, el) => {
+    $(el).after("<br />");
+  });
+
+  const cleaned = $("body").html()
+    ?.replace(/&nbsp;/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/(<br\s*\/?>\s*){2,}/gi, "<br />")
+    .trim();
+
+  return parse(cleaned || "");
+};

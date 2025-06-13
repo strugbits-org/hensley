@@ -14,7 +14,7 @@ export const GET = async (req, context) => {
     const memberId = authenticatedUserData.memberId;
 
     const wixClient = await createWixClient();
-    const productsData = await wixClient.items.query("ProductsSearchContent").eq("product", id).hasSome("members", [memberId]).find();
+    const productsData = await wixClient.items.query("FullProductData").eq("product", id).hasSome("members", [memberId]).find();
 
     let product = productsData.items[0];
     let membersData = product.members;
@@ -23,7 +23,7 @@ export const GET = async (req, context) => {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    await wixClient.items.update("ProductsSearchContent", {
+    await wixClient.items.update("FullProductData", {
       ...product,
       members: membersData.filter((member) => member !== memberId),
     });

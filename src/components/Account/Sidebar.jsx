@@ -14,7 +14,7 @@ function Sidebar() {
         "userTokens",
     ]);
     const router = useRouter();
-    const { firstName, lastName } = useUserData();
+    const { firstName } = useUserData();
 
     const handleLogOut = () => {
         loaderActions.show();
@@ -50,6 +50,25 @@ function Sidebar() {
                 <path id="Path_13185" data-name="Path 13185" d="M11.909,3a7.955,7.955,0,0,0-8.177,7.947H2.151a.437.437,0,0,0-.309.751L4.306,14.17a.437.437,0,0,0,.627,0L7.4,11.7a.441.441,0,0,0-.318-.751H5.5a6.179,6.179,0,0,1,6.269-6.181,6.259,6.259,0,0,1,6.093,6.093,6.185,6.185,0,0,1-6.181,6.269A6.089,6.089,0,0,1,7.9,15.821.883.883,0,0,0,6.8,17.207a7.822,7.822,0,0,0,4.874,1.687,7.955,7.955,0,0,0,7.947-8.177A8.041,8.041,0,0,0,11.909,3Zm-.45,4.415a.667.667,0,0,0-.662.662v3.25a.893.893,0,0,0,.433.759l2.755,1.634a.663.663,0,0,0,.68-1.139l-2.543-1.51v-3a.665.665,0,0,0-.662-.653Z" transform="translate(-1.708 -2.997)" fill="#2c2216" />
             </svg>, href: '/quotes-history'
         },
+        {
+            name: 'Manage Blogs',
+            icon: <svg className='inline mr-4' data-bbox="3 2.999 18 18.001" viewBox="0 0 24 24" width="17.921" height="15.897" xmlns="http://www.w3.org/2000/svg" data-type="color">
+                <g>
+                    <path d="M3 9.009a6.01 6.01 0 0 1 6.01-6.01H12a6.01 6.01 0 0 1 6.01 5.982h.943c1.15 0 2.047.896 2.047 2.047v3.962A6.01 6.01 0 0 1 14.99 21H9.01A6.01 6.01 0 0 1 3 14.99zm6.01-4.01A4.01 4.01 0 0 0 5 9.01v5.981A4.01 4.01 0 0 0 9.01 19h5.98A4.01 4.01 0 0 0 19 14.99V11h-1c-1.076 0-2-.924-2-2 0-2.214-1.786-4-4-4zM8 9a1 1 0 0 1 1-1h3.5a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1m1 5a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2z" fill="#262116" data-color="1"></path>
+                </g>
+            </svg>,
+            href: '/manage-blogs'
+        },
+        {
+            name: 'Product Sorting',
+            icon: <svg className='inline mr-4' data-bbox="0 44.46 490 401.08" stroke="#2c2216" viewBox="0 0 490 490" xmlns="http://www.w3.org/2000/svg" width="17.921" height="15.897" data-type="ugc">
+                <g>
+                    <path d="M85.877 154.014v274.295h45.829V154.014l48.791 67.199 37.087-26.943L108.792 44.46 0 194.27l37.087 26.943z" fill="#2c2216"></path>
+                    <path d="M404.13 335.988V61.691h-45.829V335.99l-48.798-67.203-37.087 26.943 108.8 149.81L490 295.715l-37.087-26.913z" fill="#2c2216"></path>
+                </g>
+            </svg>,
+             href: '/product-sorting'
+        },
         // {
         //     name: "Change Password", icon: <svg className='inline mr-4' xmlns="http://www.w3.org/2000/svg" width="16.987" height="21.62" viewBox="0 0 16.987 21.62">
         //         <path id="bb6196a7966cbba769f079f8f7532554" d="M11.949,2A4.647,4.647,0,0,0,7.316,6.633V9.722A2.275,2.275,0,0,0,5,12.038v4.633a6.96,6.96,0,0,0,13.744,1.544H18.9a2.8,2.8,0,0,0,2.162-.927,3.049,3.049,0,0,0,.927-2.162,2.922,2.922,0,0,0-.927-2.162,3.247,3.247,0,0,0-2.162-.927,2.275,2.275,0,0,0-2.316-2.316V6.633A4.647,4.647,0,0,0,11.949,2Zm8.03,12.046a1.493,1.493,0,0,1,0,2.162,1.7,1.7,0,0,1-1.622.386,1.543,1.543,0,0,1-.541-2.548,1.681,1.681,0,0,1,.618-.386.979.979,0,0,1,.463-.077A1.524,1.524,0,0,1,19.98,14.046Zm-2.625-2.008V12.5a4.283,4.283,0,0,0-.618.463,2.507,2.507,0,0,0-.772,1.39h-7.1a.73.73,0,0,0-.772.772v1.544a.772.772,0,0,0,1.544,0V15.9h1.544v.772a.772.772,0,0,0,1.544,0V15.9h3.166A3.575,3.575,0,0,0,17.2,17.752a5.314,5.314,0,0,1-5.251,4.324,5.561,5.561,0,0,1-3.861-1.544,5.427,5.427,0,0,1-1.544-3.861V12.038a.73.73,0,0,1,.772-.772h9.266A.73.73,0,0,1,17.354,12.038ZM8.861,9.722V6.633a3.089,3.089,0,1,1,6.177,0V9.722Z" transform="translate(-5 -2)" fill="#2c2216" />
@@ -64,10 +83,10 @@ function Sidebar() {
     ]
 
     return (
-        <div className='sidebar lg:h-screen lg:sticky top-[90px] w-[317px] max-lg:w-full max-lg:p-3  border-r border-r-black'>
+        <div className='sidebar lg:h-screen lg:sticky top-[90px] w-[317px] max-lg:w-full max-lg:p-3'>
             <div className='innerSidebar bg-[#F0DEA2] w-full h-full py-[61px] pl-[64px] max-lg:py-6 max-lg:pl-6'>
                 <h2 className='text-[45px] font-recklessRegular uppercase leading-[42px] max-lg:hidden break-words'>Hello,<br />
-                    {firstName ? (firstName + " " + lastName) : ""}</h2>
+                    {firstName ? firstName : ""}</h2>
                 <div className='sidebarLinks flex flex-col max-lg:flex-row max-lg:flex-wrap gap-[24.8px] max-lg:gap-0 max-lg:gap-y-7 mt-[70px] max-lg:mt-0'>
                     {links.map((link) => link.action ? <button key={link.name} className='inline-flex font-haasRegular text-sm text-black max-lg:w-1/3 max-md:w-1/2' onClick={link.action}>{link.icon} {link.name}</button> : (
                         <CustomLink key={link.name} to={link.href} className='font-haasRegular text-sm text-black max-lg:w-1/3 max-md:w-1/2'>{link.icon} {link.name}</CustomLink>

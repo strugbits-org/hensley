@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Image from 'next/image'
 import image from '@/assets/small-tent.png';
 import { PrimaryImage } from '../common/PrimaryImage';
@@ -16,7 +16,7 @@ const INFO_HEADERS = [
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly }) => (
+const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
     <div className="border-b border-black pb-1 flex items-center justify-center gap-x-[30px] font-haasRegular">
         {!readOnly ? (
             <>
@@ -26,7 +26,9 @@ const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly
                     disabled={quantity <= QUANTITY_LIMITS.MIN}
                     aria-label="Decrease quantity"
                 >
-                    -
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1">
+                        <line id="Line_460" data-name="Line 460" x1="15" transform="translate(15 0.5) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                    </svg>
                 </button>
                 <input
                     className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
@@ -35,7 +37,6 @@ const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly
                     max={QUANTITY_LIMITS.MAX}
                     value={quantity}
                     onInput={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN, true)}
-                    onBlur={(e) => updateProducts(parseInt(e.target.value) || QUANTITY_LIMITS.MIN)}
                     aria-label="Quantity"
                 />
                 <button
@@ -44,7 +45,11 @@ const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly
                     disabled={quantity >= QUANTITY_LIMITS.MAX}
                     aria-label="Increase quantity"
                 >
-                    +
+                    <svg id="Group_3960" data-name="Group 3960" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">
+                        <line id="Line_1" data-name="Line 1" y2="15" transform="translate(7.5 15) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                        <line id="Line_2" data-name="Line 2" x1="15" transform="translate(15 7.5) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                    </svg>
+
                 </button></>
         ) : (
             <input
@@ -58,17 +63,16 @@ const QuantityControls = ({ quantity, onQuantityChange, updateProducts, readOnly
     </div>
 );
 
-const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQuantityChange, readOnly }) => {
+const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, readOnly }) => {
     return productInfoSection.map((item, index) => (
         <tr key={`item-${index}`}>
-            <td className="py-2 font-semibold">{item.product}</td>
-            <td className="font-haasRegular text-center">{item.size}</td>
+            <td className="py-2 font-semibold lg:block hidden">{item.product}</td>
+            <td className="font-haasRegular text-center ">{item.size}</td>
             <td className="text-center font-haasRegular">{item.formattedPrice}</td>
-            <td className="font-haasRegular">
+            <td className="font-haasRegular w-[114px]">
                 <QuantityControls
-                    quantity={quantity}
-                    updateProducts={(value) => updateProducts(item._id, value)}
-                    onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id, isDisabled)}
+                    quantity={quantity || item.quantity}
+                    onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id || item.product, isDisabled)}
                     readOnly={readOnly}
                 />
             </td>
@@ -76,251 +80,190 @@ const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQ
     ));
 };
 
-const CartTent = () => {
+const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, showAddToCart = false }) => {
+    const { removeProduct } = actions;
+
+    const productName = data?.productName?.original || data?.name;
+
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
-            <div className='
-            h-[104px]
-            w-[104px]
-           bg-white
-            '>
-                <Image src={image} className='h-full w-full object-contain' />
+            <div className='h-[104px] w-[104px] bg-white'>
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='flex lg:flex-row flex-col lg:items-center'>
                 <div>
                     <span className='block text-[16px] text-secondary-alt font-haasLight uppercase'>Product</span>
-                    <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase
-                lg:mt-[21px]
-                lg:mb-[27px]
-                '>structure</span>
-                    <div className='grid sm:grid-cols-2 grid-cols-1 gap-x-[26px]'>
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >Event Name</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >SI & BIEL WEDDING</span>
-                        </div>
-
-                        <div>
-
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >Event Date</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                
-                '
-                            >02/27/2024</span>
-                        </div>
-
-
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >Removal Date</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >02/27/2024</span>
-                        </div>
-
-
-
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >NUMBER OF GUESTS</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >220</span>
-                        </div>
-
-
-                        <div>
-                            <span
-                                className='
-                text-[12px]
-                text-secondary-alt
-                font-haasBold
-                uppercase
-                mr-[20px]
-                '
-                            >ARE TH INSTALL/ REMOVAL DATES FLEXIBLE?</span>
-                            <span className='
-                text-[12px]
-                text-secondary-alt
-                font-haasLight
-                uppercase
-                '
-                            >yes</span>
-                        </div>
-
-
+                    <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
+                    <div className='grid sm:grid-cols-2 grid-cols-1 gap-x-[26px] gap-y-[4px]'>
+                        {descriptionLines.map(({ title, value }) => (
+                            <div key={title}>
+                                <span className='text-[12px] text-secondary-alt font-haasBold uppercase mr-[20px]'>{title}</span>
+                                <span className='text-[12px] text-secondary-alt font-haasLight uppercase'>{value}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
-                <div className='w-[280px] '>
-                    <span className='block text-[12px] font-haasBold uppercase text-secondary-alt'>PLEASE PROVIDE ANY OTHER ADDICIONAL INFO</span>
-                    <span className='block text-[12px] font-haasLight uppercase'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel diam est. Mauris mattis lacinia tellus, luctus accumsan libero euismod in. Aenean sagittis nibh odio, id vulputate mi ornare sit amet. In vitae sapien nec lorem vehicula ultrices sodales vitae lectus. Sed felis arcu, pretium eu mi sed, venenatis vulputate dui. Vivamus hendrerit velit et arcu placerat faucibus. Mauris ante dui, fringilla consectetur tortor nec, </span>
-                </div>
             </div>
-            <button className='absolute right-[24px]  sm:top-[50px] top-[15px]'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                    <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                        <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                        <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                    </g>
-                </svg>
 
-            </button>
+            {!readOnly && (
+                <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[50px] top-[15px]'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
+                        <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
+                            <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                            <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                        </g>
+                    </svg>
+                </button>
+            )}
         </div>
-    )
-}
+    );
+};
 
-const CartCollection = () => {
+const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
+    const { removeProduct, handleQuantityChange } = actions;
+    const [cookies, setCookie] = useCookies(["cartQuantity"]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const productName = data?.productName?.original || data?.name;
+
+    const productInfoSection = data.productSetItems.map(item => {
+        const set = item.split("~");
+        const price = parseInt(set[2]);
+        const quantity = parseInt(set[3]);
+
+        return {
+            product: set[0],
+            size: set[1],
+            price,
+            quantity,
+            formattedPrice: formatTotalPrice(price),
+        }
+    });
+
+    const price = useMemo(() =>
+        productInfoSection.reduce((acc, { price, quantity }) => acc + (price * quantity), 0),
+        [productInfoSection]
+    );
+    const formattedPrice = formatTotalPrice(price);
+
+    const handleAddToCart = async () => {
+        try {
+            setIsLoading(true);
+            let catalogReference = data?.catalogReference;
+            if (!catalogReference) {
+                const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+                const { customTextFields = [], productId } = data;
+                const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
+                    acc[title] = value;
+                    return acc;
+                }, {});
+                customTextFieldsData.size = data.size;
+                catalogReference = {
+                    appId,
+                    catalogItemId: productId,
+                    options: {
+                        customTextFields: customTextFieldsData,
+                    },
+                };
+            }
+
+            const product = {
+                catalogReference: catalogReference,
+                quantity: data.quantity,
+            };
+
+            const cartData = {
+                lineItems: [product],
+            };
+
+            await AddProductToCart(cartData);
+            const newItems = calculateTotalCartQuantity(cartData.lineItems);
+            const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+            setCookie("cartQuantity", total, { path: "/" });
+            lightboxActions.setBasicLightBoxDetails({
+                title: "Added to Cart",
+                description: "Products added to cart successfully",
+                buttonText: "View Cart",
+                buttonLink: "/cart",
+                open: true,
+            })
+        } catch (error) {
+            logError("Error while adding products to cart:", error);
+            lightboxActions.setBasicLightBoxDetails({
+                title: "Something went wrong",
+                description: "Error while adding products to cart",
+                buttonText: "Try Again",
+                open: true,
+            })
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
             <div className='
             h-[104px]
             w-[104px]
+            min-w-[50px]
            bg-white
             '>
-                <Image src={image} className='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
-            <div className='w-full '>
-                <div className='sm:flex hidden justify-between items-center sm:h-[104px]'>
-                    <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase
-                lg:mt-[21px]
-                lg:mb-[27px]
-                '>romana collection</span>
-
-                    <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase
-                lg:mt-[21px]
-                lg:mb-[27px]
-                mr-[100px]
-                '>rs 210</span>
-                    <button className='absolute right-[24px] top-[50px]'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                            <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                                <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                                <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                            </g>
-                        </svg>
-
-                    </button>
-                </div>
-
-
-                <div className='sm:hidden flex-col '>
-                    <span className='block 
-                    sm:text-[16px]
-                    text-[20px]
-                    text-secondary-alt font-haasRegular uppercase
-                lg:mt-[21px]
-                sm:mb-[27px]
-                '>romana collection</span>
-
-                    <span className='block 
-                    sm:text-[16px]
-                    text-[20px]
-                     text-secondary-alt font-haasRegular uppercase
-                lg:mt-[21px]
-                sm:mb-[27px]
-                mr-[100px]
-                '>rs 210</span>
-                    <button className='absolute right-[24px] sm:top-[50px] top-[15px]'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                            <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                                <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                                <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                            </g>
-                        </svg>
-
-                    </button>
-                </div>
-                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px]">
-                    <thead>
-                        <tr className="text-xs max-lg:hidden uppercase text-gray-500 border-b border-black">
-                            <td className="pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt">Product</td>
-                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt">Size</td>
-                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt">Price</td>
-                            <td className="pb-2 w-1/4 text-center text-[16px] uppercase font-haasLight text-secondary-alt">Quantity</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {[
-                            { product: 'CHARGER', size: '-', price: '$5.80' },
-                            { product: 'DINNER PLATE', size: '11"', price: '$2.65' },
-                            { product: 'DINNER PLATE', size: '9"', price: '$2.65' },
-                            { product: 'RICE BOWL', size: '-', price: '$2.65' },
-                            { product: 'B&B', size: '-', price: '$2.65' },
-                            { product: 'MUG', size: '-', price: '$2.65' },
-                            { product: 'SERVING BOWL', size: '9"', price: '$10.80' },
-                            { product: 'SERVING PLATTER', size: '12"', price: '$15.75' },
-                        ].map((item, index) => (
-                            <tr key={index}>
-                                <td className="py-2 font-semibold lg:block hidden border-b ">{item.product}</td>
-                                <td className="text-center border-b">{item.size}</td>
-                                <td className="text-center border-b ">{item.price}</td>
-                                <td className="border-b border-black">
-                                    <div className="flex items-center justify-between ">
-                                        <button className="text-xl font-light">−</button>
-                                        <span className="font-bold">02</span>
-                                        <button className="text-xl font-light">+</button>
-                                    </div>
-                                </td>
+            <div className='w-full lg:flex justify-between items-center'>
+                <div className='w-full flex flex-col'>
+                    <div className='sm:flex justify-between items-center sm:h-[104px]'>
+                        <span className='block lg:text-[16px] text-[20px] font-medium text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
+                        <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px] mr-[100px]'>{formattedPrice}</span>
+                    </div>
+                    <table className="lg:max-w-[766px] max-w-full w-full text-left border-separate border-spacing-y-[15px] ">
+                        <thead>
+                            <tr className="text-xs uppercase text-gray-500">
+                                {INFO_HEADERS.map((title, index) => (
+                                    <th
+                                        key={title}
+                                        className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}
+                                    >
+                                        {title}
+                                    </th>
+                                ))}
                             </tr>
+                        </thead>
+                        <tbody>
+                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly })}
+                        </tbody>
+                    </table>
+                </div>
 
-                        ))}
-                    </tbody>
-                </table>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                    <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
+                        <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
+                            <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
+                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                            </g>
+                        </g>
+                    </svg>
+                </button>
+                }
             </div>
-
+            {!readOnly && (
+                <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
+                        <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
+                            <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                            <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                        </g>
+                    </svg>
+                </button>
+            )}
         </div>
     )
 }
 
 const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
-    const { removeProduct, handleQuantityChange, updateProducts } = actions;
+    const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
     const productName = data?.productName?.original || data?.name;
@@ -398,7 +341,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
     }
 
     return (
-        <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative items-center'>
+        <div className='sm:border-t border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex '>
             <div className='
             h-[104px]
             w-[104px]
@@ -423,9 +366,9 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                 mr-[100px]
                 '>{data.price.amount || data.price}</span>
                 </div>
-                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] ">
+                <table className="max-lg:border-b max-lg:mb-4 border-primary-border lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left lg:border-separate lg:border-spacing-y-[15px] border-spacing-y-[12px] xl:pr-[30px] lg:pr-[50px] ">
                     <thead>
-                        <tr className="text-xs uppercase text-gray-500">
+                        <tr className="text-xs uppercase text-gray-500 ">
                             {INFO_HEADERS.map((title, index) => (
                                 <th
                                     key={title}
@@ -437,12 +380,12 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                         </tr>
                     </thead>
                     <tbody>
-                        {renderTableRows({ handleQuantityChange, updateProducts, quantity: data.quantity, productInfoSection: productInfoSection, readOnly })}
+                        {renderTableRows({ handleQuantityChange, quantity: data.quantity, productInfoSection: productInfoSection, readOnly })}
                     </tbody>
                 </table>
-                <span className='lg:block hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] mr-[100px]'>{formattedPrice}</span>
+                <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
 
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='break-keep bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center'>
                     <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
