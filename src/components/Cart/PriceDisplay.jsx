@@ -31,7 +31,7 @@ const PriceDisplay = ({ totalPrice }) => {
         '>{totalPrice}</span>
       </div>
 
-      <div className='lg:hidden w-full text-center flex flex-col gap-y-[15px] py-[34px]'>
+      <div className='lg:hidden w-full text-center flex flex-col gap-y-[15px] sm:py-[34px] py-[10px]'>
         <span className='block 
         text-[65px]
         leading-[55px]

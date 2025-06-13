@@ -61,7 +61,7 @@ const renderTableRows = ({ productInfoSection, updateProducts, quantity, handleQ
             <td className="py-2 font-semibold lg:block hidden">{item.product}</td>
             <td className="font-haasRegular text-center ">{item.size}</td>
             <td className="text-center font-haasRegular">{item.formattedPrice}</td>
-            <td className="font-haasRegular">
+            <td className="font-haasRegular w-[114px]">
                 <QuantityControls
                     quantity={quantity}
                     updateProducts={(value) => updateProducts(item._id, value)}
@@ -343,7 +343,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, buttonEnable = false
     ]
 
     return (
-        <div className='sm:border-t border-b border-primary-border px-[15px] py-[14px] w-full gap-x-[39px] relative items-center'>
+        <div className='sm:border-t border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex '>
             <div className='
             h-[104px]
             w-[104px]
@@ -368,9 +368,9 @@ const CartNormal = ({ data, actions = {}, readOnly = false, buttonEnable = false
                 mr-[100px]
                 '>{data.price.amount || data.price}</span>
                 </div>
-                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] xl:pr-[30px] lg:pr-[50px] ">
+                <table className="max-lg:border-b max-lg:mb-4 border-primary-border lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left lg:border-separate lg:border-spacing-y-[15px] border-spacing-y-[12px] xl:pr-[30px] lg:pr-[50px] ">
                     <thead>
-                        <tr className="text-xs uppercase text-gray-500">
+                        <tr className="text-xs uppercase text-gray-500 ">
                             {INFO_HEADERS.map((title, index) => (
                                 <th
                                     key={title}

@@ -122,7 +122,7 @@ const Cart = () => {
         </div>
         <div className='lg:w-[65%] border border-primary-border overflow-y-scroll hide-scrollbar'>
           <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
-          <div className='flex flex-col '>
+          <div className='flex flex-col'>
             {cartItems.map((item, index) => (
             <CartNormal key={index} data={item} actions={{ handleQuantityChange, removeProduct, updateProducts }} />
           ))}
