@@ -26,7 +26,9 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
                     disabled={quantity <= QUANTITY_LIMITS.MIN}
                     aria-label="Decrease quantity"
                 >
-                    -
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1">
+                        <line id="Line_460" data-name="Line 460" x1="15" transform="translate(15 0.5) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                    </svg>
                 </button>
                 <input
                     className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
@@ -43,7 +45,11 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
                     disabled={quantity >= QUANTITY_LIMITS.MAX}
                     aria-label="Increase quantity"
                 >
-                    +
+                    <svg id="Group_3960" data-name="Group 3960" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">
+                        <line id="Line_1" data-name="Line 1" y2="15" transform="translate(7.5 15) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                        <line id="Line_2" data-name="Line 2" x1="15" transform="translate(15 7.5) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                    </svg>
+
                 </button></>
         ) : (
             <input
@@ -63,7 +69,7 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, r
             <td className="py-2 font-semibold lg:block hidden">{item.product}</td>
             <td className="font-haasRegular text-center ">{item.size}</td>
             <td className="text-center font-haasRegular">{item.formattedPrice}</td>
-            <td className="font-haasRegular">
+            <td className="font-haasRegular w-[114px]">
                 <QuantityControls
                     quantity={quantity || item.quantity}
                     onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id || item.product, isDisabled)}
@@ -435,7 +441,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
     }
 
     return (
-        <div className='sm:border-t border-b border-primary-border px-[15px] py-[14px] w-full gap-x-[39px] relative'>
+        <div className='sm:border-t border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex '>
             <div className='
             h-[104px]
             w-[104px]
@@ -460,9 +466,9 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                 mr-[100px]
                 '>{data.price.amount || data.price}</span>
                 </div>
-                <table className="lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left border-separate border-spacing-y-[15px] xl:pr-[30px] lg:pr-[50px] ">
+                <table className="max-lg:border-b max-lg:mb-4 border-primary-border lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left lg:border-separate lg:border-spacing-y-[15px] border-spacing-y-[12px] xl:pr-[30px] lg:pr-[50px] ">
                     <thead>
-                        <tr className="text-xs uppercase text-gray-500">
+                        <tr className="text-xs uppercase text-gray-500 ">
                             {INFO_HEADERS.map((title, index) => (
                                 <th
                                     key={title}
@@ -479,7 +485,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                 </table>
                 <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
 
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center'>
                     <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">

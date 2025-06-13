@@ -169,7 +169,7 @@ const Cart = () => {
 
   return (
     <>
-      <div className='w-full h-[700px] flex lg:flex-row flex-col'>
+      <div className='w-full h-[75vh] flex lg:flex-row flex-col'>
         <div className='lg:w-[35%] sm:border border-primary-border lg:pl-[24px] py-[36px] lg:pr-[95px]'>
           <PriceDisplay totalPrice={totalPrice} />
         </div>
@@ -177,30 +177,32 @@ const Cart = () => {
           <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
           <div className='flex flex-col '>
             {cartItems.map((item, index) => {
-            const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
-            const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-            const isTentItem = false;
+              const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
+              const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+              const isTentItem = false;
 
-            if (productCollection) {
-              const productSetItems = productCollection.split("; ");
-              const data = { ...item, productSetItems };
-              return (
-                <CartCollection key={index} data={data} actions={{ handleQuantityChange: (value, id, disabled) => handleCollectionQuantityChange(data, value, id, disabled), removeProduct }} />
-              )
-            } else if (isTentItem) {
-              return (
-                <CartTent key={index} data={item} actions={{ handleQuantityChange, removeProduct }} />
-              )
-            } else {
-              return (
-                <CartNormal key={index} data={item} actions={{ handleQuantityChange, removeProduct }} />
-              )
-            };
-          })}
+              if (productCollection) {
+                const productSetItems = productCollection.split("; ");
+                const data = { ...item, productSetItems };
+                return (
+                  <CartCollection key={index} data={data} actions={{ handleQuantityChange: (value, id, disabled) => handleCollectionQuantityChange(data, value, id, disabled), removeProduct }} />
+                )
+              } else if (isTentItem) {
+                return (
+                  <CartTent key={index} data={item} actions={{ handleQuantityChange, removeProduct }} />
+                )
+              } else {
+                return (
+                  <CartNormal key={index} data={item} actions={{ handleQuantityChange, removeProduct }} />
+                )
+              };
+            })}
           </div>
           {!isLoading && cartItems.length === 0 && <>
             <div className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>Your cart is empty</div>
           </>}
+
+          <div className='spacer h-10'></div>
         </div>
       </div>
       <CustomLink to={"/quote-request"}>

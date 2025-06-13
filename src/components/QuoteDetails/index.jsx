@@ -119,7 +119,7 @@ export const QuoteDetails = ({ data, content }) => {
         {/* Header */}
         <div className="w-full border-secondary-alt">
           <div className="container mx-auto max-w-5xl px-4 py-12 font-['neue-haas-display'] text-center">
-            <h1 className="text-[90px] leading-[85px] font-['reckless-neue-regular'] text-secondary-alt mb-5">
+            <h1 className="lg:text-[90px] lg:leading-[85px] sm:text-[65px] sm:leading-[60px] text-[35px] leading-[30px] font-['reckless-neue-regular'] text-secondary-alt mb-5">
               {formContent.header.title}
             </h1>
             <p className="text-[30px] leading-[30px] text-secondary-alt font-recklessRegular uppercase mt-[27px] mb-[30px]">
@@ -168,13 +168,13 @@ export const QuoteDetails = ({ data, content }) => {
             <h2 className="text-3xl font-recklessRegular text-center text-secondary-alt mb-8">
               {formContent.sections.eventDetails}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {FORM_STRUCTURE.eventDetails.slice(0, 3).map((fieldId) =>
-                renderField(fieldId, fieldId === 'eventDescriptionPo' ? 'md:col-span-2' : '')
+                renderField(fieldId)
               )}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {FORM_STRUCTURE.eventDetails.slice(3).map((fieldId) => renderField(fieldId))}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {FORM_STRUCTURE.eventDetails.slice(3).map((fieldId) => renderField(fieldId, fieldId === 'eventDescriptionPo' ? 'lg:col-span-2' : ''))}
             </div>
           </div>
         </div>
@@ -185,10 +185,10 @@ export const QuoteDetails = ({ data, content }) => {
             <h2 className="text-3xl font-recklessRegular text-center text-secondary-alt mb-8">
               {formContent.sections.billingDetails}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               {FORM_STRUCTURE.billingDetails.slice(0, 3).map((fieldId) => renderField(fieldId))}
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               {FORM_STRUCTURE.billingDetails.slice(3, 6).map((fieldId) => renderField(fieldId))}
             </div>
           </div>
@@ -197,7 +197,7 @@ export const QuoteDetails = ({ data, content }) => {
         {/* Special Instructions */}
         <div className="w-full border-b border-primary-border">
           <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6">
               {FORM_STRUCTURE.specialInstructions.map((fieldId) =>
                 renderSpecialInstructionsField(fieldId)
               )}
@@ -211,7 +211,7 @@ export const QuoteDetails = ({ data, content }) => {
             <h2 className="text-3xl font-['reckless-neue-regular'] text-center text-secondary-alt mb-8">
               {formContent.sections.orderBy}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {FORM_STRUCTURE.orderBy.map((fieldId) => renderField(fieldId))}
             </div>
           </div>

@@ -2,8 +2,9 @@ import useUserData from '@/hooks/useUserData';
 import React from 'react'
 
 const PriceDisplay = ({ totalPrice }) => {
-  const { firstName } = useUserData();
-  const name = firstName ? `${firstName}, ` : '';
+  const { firstName, lastName } = useUserData();
+
+  const name = firstName && lastName ? `${firstName} ${lastName},` : '';
 
   return (
     <>
