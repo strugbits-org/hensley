@@ -56,7 +56,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                     const product = item.product;
                                                     const descriptionLines = product.descriptionLines ? formatDescriptionLines(product.descriptionLines) : product.customTextFields;
                                                     const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-                                                    const isTentItem = false;
+                                                    const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE")?.value;
 
                                                     if (productCollection) {
                                                         const productSetItems = productCollection.split("; ");
@@ -66,7 +66,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                         )
                                                     } else if (isTentItem) {
                                                         return (
-                                                            <CartTent key={index} data={product} readOnly={true} />
+                                                            <CartTent key={index} data={product} descriptionLines={descriptionLines} readOnly={true} />
                                                         )
                                                     } else {
                                                         return (
@@ -95,14 +95,14 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                         </svg>
                                                     </button>
 
-                                                     <button
+                                                    <button
                                                         className={` w-full h-[150px] max-lg:h-[90px] bg-transparent border border-primary-border tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center `}
                                                         aria-label="Load more quotes"
                                                     >
                                                         <span className='font-haasRegular uppercase text-sm leading-[30px] group-hover:font-haasBold'>
                                                             back to quotes
                                                         </span>
-                                                        
+
                                                     </button>
                                                 </div>
                                             </div>

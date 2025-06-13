@@ -80,7 +80,7 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, r
     ));
 };
 
-const CartTent = ({ data, descriptionLines, actions = {}, showAddToCart = false }) => {
+const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, showAddToCart = false }) => {
     const { removeProduct } = actions;
 
     const productName = data?.productName?.original || data?.name;
@@ -105,14 +105,16 @@ const CartTent = ({ data, descriptionLines, actions = {}, showAddToCart = false 
                 </div>
             </div>
 
-            <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[50px] top-[15px]'>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                    <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                        <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                        <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                    </g>
-                </svg>
-            </button>
+            {!readOnly && (
+                <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[50px] top-[15px]'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
+                        <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
+                            <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                            <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+                        </g>
+                    </svg>
+                </button>
+            )}
         </div>
     );
 };
@@ -243,7 +245,8 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                             </g>
                         </g>
                     </svg>
-                </button>}
+                </button>
+                }
             </div>
             {!readOnly && (
                 <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>
