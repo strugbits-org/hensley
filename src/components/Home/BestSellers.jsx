@@ -73,6 +73,7 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center",
                                     data={productData}
                                     savedProducts={savedProducts}
                                     setSavedProducts={setSavedProducts}
+                                    btnClass="border border-black"
                                 />
                             </div>
                         );

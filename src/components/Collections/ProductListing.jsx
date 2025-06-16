@@ -31,7 +31,7 @@ const useDebounce = (callback, delay) => {
 function Listing({ data }) {
   const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData } = data;
   let bannerIndex = -1;
-  const pageSize = 12;
+  const pageSize = 16;
 
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
