@@ -17,7 +17,6 @@ const ProductTent = ({ productData }) => {
   const fetchSavedProducts = async () => {
     try {
       const savedProducts = await fetchSavedProductData();
-      console.log("Saved Products:", savedProducts);
 
       setSavedProducts(savedProducts);
     } catch (error) {

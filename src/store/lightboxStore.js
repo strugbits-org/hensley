@@ -18,7 +18,7 @@ export const lightboxState = proxy({
     },
     addToCartModal: {
         open: false,
-        product: null
+        productData: null
     }
 });
 
@@ -55,7 +55,7 @@ export const lightboxActions = {
         setTimeout(() => {
             lightboxState.addToCartModal = {
                 open: false,
-                product: null
+                productData: null
             }
         }, 500);
     },

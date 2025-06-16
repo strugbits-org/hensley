@@ -126,14 +126,9 @@ const TextareaField = ({
 };
 
 const AddressBlock = ({ title, description = "" }) => {
-    const splitDesc = description
-    const lines = splitDesc.split('\n');
     return (
         <div className='font-haasRegular uppercase text-[14px] leading-[18px]'>
             <p><b>{title}</b></p>
-            {/* {lines.map((line, idx) => (
-                <p key={idx}>{line}</p>
-            ))} */}
             <p>{description}</p>
         </div>)
 }

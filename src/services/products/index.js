@@ -1,6 +1,8 @@
+"use server";
 import { logError, mapProductSetItems } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { getAuthToken } from "../auth";
+import { getProductsCart } from "../cart/CartApis";
 
 const baseUrl = process.env.BASE_URL;
 
@@ -42,6 +44,27 @@ export const fetchCategoriesData = async () => {
         return response.items;
     } catch (error) {
         logError(`Error fetching category data: ${error.message}`, error);
+    }
+}
+
+export const fetchProductsByIds = async (ids) => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "FullProductData",
+            hasSome: [
+                {
+                    key: "product",
+                    values: ids
+                }
+            ]
+        });
+        if (!Array.isArray(response.items)) {
+            throw new Error(`Response does not contain items array`);
+        }
+
+        return response.items;
+    } catch (error) {
+        logError(`Error fetching product data: ${error.message}`, error);
     }
 }
 
@@ -120,22 +143,42 @@ export const fetchMatchedProducts = async (id) => {
     try {
         const response = await queryCollection({
             dataCollectionId: "MATCHITWITH",
-            includeReferencedItems: ["matchProducts"],
-            eq: [
-                {
-                    key: "product",
-                    value: id
-                }
-            ],
+            includeReferencedItems: ["matchProducts", "productData"],
+            eq: [{ key: "product", value: id }],
         });
-        if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Response does not contain items array`);
+
+        // Early return if no items found
+        if (!response?.items?.length) {
+            return [];
         }
 
-        const data = response.items[0].matchProducts.filter(item => typeof item !== "string");
-        return data;
+        // Filter out string items and early return if empty
+        const matchProducts = response.items[0].matchProducts?.filter(item =>
+            item && typeof item === "object" && item._id
+        );
+
+        if (!matchProducts?.length) {
+            return [];
+        }
+
+        // Extract IDs and fetch products
+        const productIds = matchProducts.map(item => item._id);
+        const products = await fetchProductsByIds(productIds);
+
+        
+        
+        // Create a Map for O(1) lookup instead of find() for each item
+        const matchProductsMap = new Map(
+            matchProducts.map(product => [product._id, product])
+        );
+        // Merge products with match data
+        return products.map(product => ({
+            ...product,
+            product: matchProductsMap.get(product.product)
+        }));
+
     } catch (error) {
-        // logError(`Error fetching matched products: ${error.message}`, error);
+        return [];
     }
 }
 
@@ -259,5 +302,16 @@ export const unSaveProduct = async (id) => {
     } catch (error) {
         logError("Error removing product:", error);
         throw new Error(error.message);
+    }
+};
+
+export const checkProductInCart = async (productId, isProductCollection = false) => {
+    try {
+        if (!isProductCollection) return false;
+        const cart = await getProductsCart();
+        const existingItem = cart.lineItems.find((item) => item.catalogReference.catalogItemId === productId);
+        return existingItem || false;
+    } catch (error) {
+        logError("Error fetching cart items:", error);
     }
 };

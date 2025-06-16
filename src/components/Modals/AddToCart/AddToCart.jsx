@@ -1,13 +1,15 @@
 "use client"
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteButton } from './AddtoQuoteButton'
 import ProductDescription from '@/components/common/helpers/ProductDescription'
 import { QuantityControls } from '@/components/Product'
-import { calculateTotalCartQuantity, formatTotalPrice } from '@/utils'
-import { AddProductToCart } from '@/services/cart/CartApis'
+import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils'
+import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
 import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
+import Loading from '@/app/loading'
+import { checkProductInCart, fetchProductCollectionData } from '@/services/products'
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -18,16 +20,19 @@ const INFO_HEADERS = [
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
 const AddToCart = ({ data, onClose }) => {
-  const { product } = data;
-  const isProductCollection = false;
+  const { productData } = data;
+  const { product, isProductCollection = false } = productData;
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+  const [productInCart, setProductInCart] = useState();
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
-
   const productInfoSection = useMemo(() => {
-    if (isProductCollection) return [];
+    if (isProductCollection) {
+      return [];
+    }
 
     const productSize = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
     return [{ size: productSize, formattedPrice: product.formattedPrice }];
@@ -53,10 +58,10 @@ const AddToCart = ({ data, onClose }) => {
     if (isProductCollection) {
       return productSetItems.map((item, index) => (
         <tr key={`${item.product}-${index}`}>
-          <td className="py-2 font-semibold border-b border-black">{item.product}</td>
-          <td className="border-b border-black font-haasRegular text-center">{item.size}</td>
-          <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
-          <td className="border-b border-black font-haasRegular">
+          <td className="text-sm py-2 font-bold border-b border-black">{item.product}</td>
+          <td className="text-sm border-b border-black font-haasRegular text-center">{item.size}</td>
+          <td className="text-sm text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+          <td className="text-sm border-b border-black font-haasRegular">
             <QuantityControls
               quantity={item.quantity}
               onQuantityChange={(value) => handleQuantityChange(value, item.id)}
@@ -81,6 +86,7 @@ const AddToCart = ({ data, onClose }) => {
   };
 
   const handleQuantityChange = useCallback((value, itemId) => {
+    if (isLoading) return;
     const numValue = typeof value === 'string' ? parseInt(value) || QUANTITY_LIMITS.MIN : value;
     if (numValue < QUANTITY_LIMITS.MIN || numValue > QUANTITY_LIMITS.MAX) return;
 
@@ -93,43 +99,68 @@ const AddToCart = ({ data, onClose }) => {
     } else {
       setCartQuantity(numValue);
     }
-  }, [isProductCollection]);
+  }, [isProductCollection, isLoading]);
 
   const handleAddToCart = async () => {
-    setIsLoading(true);
     try {
-      const product_id = product._id;
-      const size = product?.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
-      const cartData = {
-        lineItems: [
-          {
-            catalogReference: {
-              appId: "215238eb-22a5-4c36-9e7b-e7c08025e04e",
-              catalogItemId: product_id,
-              options: {
-                customTextFields: {
-                  size: size,
-                },
-              },
+      setIsLoading(true);
+      const productId = product._id;
+      const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+      let lineItems = [];
+
+      if (isProductCollection) {
+        let setData;
+
+        if (productInCart) {
+          const descriptionLines = formatDescriptionLines(productInCart.descriptionLines);
+          const existingSet = descriptionLines.find(x => x.title === "Set")?.value;
+
+          setData = productSetItems.map((item) => {
+            const existingItem = existingSet.split("; ").find((field) => field.includes(item.product));
+            const oldQuantity = existingItem ? parseInt(existingItem.split("~")[3]) : 0;
+            return `${item.product}~${item.size}~${item.price}~${oldQuantity + parseInt(item.quantity)}`;
+          }).join("; ");
+
+          await removeProductFromCart([productInCart._id]);
+        } else {
+          setData = productSetItems.map((item) =>
+            `${item.product}~${item.size}~${item.price}~${item.quantity}`
+          ).join("; ");
+        }
+
+        lineItems = [{
+          catalogReference: {
+            appId,
+            catalogItemId: productId,
+            options: {
+              customTextFields: { "Set": setData }
             },
-            quantity: cartQuantity,
           },
-        ],
-      };
+          quantity: 1,
+        }];
+      } else {
+        const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+
+        lineItems = [{
+          catalogReference: {
+            appId,
+            catalogItemId: productId,
+            options: {
+              customTextFields: { size }
+            },
+          },
+          quantity: cartQuantity,
+        }];
+      }
+
+      const cartData = { lineItems };
 
       await AddProductToCart(cartData);
+
       const newItems = calculateTotalCartQuantity(cartData.lineItems);
       const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
       setCookie("cartQuantity", total, { path: "/" });
-
       setTimeout(() => {
-        lightboxActions.resetAddToCartModal();
-        lightboxActions.setBasicLightBoxDetails({
-          title: "Cart Updated",
-          description: "Product has been added to your cart",
-          buttonText: "Continue Shopping",
-          open: true,
-        });
         setIsLoading(false);
       }, 500);
     } catch (error) {
@@ -146,9 +177,55 @@ const AddToCart = ({ data, onClose }) => {
     }
   };
 
+  const setInitialData = async () => {
+    try {
+      if (!isProductCollection) return;
+
+      setIsLoadingCollections(true);
+      const productId = product._id;
+
+      const collectionData = await fetchProductCollectionData(productId);
+
+      if (!collectionData) return;
+
+      const items = collectionData.map(set => ({
+        id: set.product._id,
+        product: set.product.name,
+        size: set.product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—",
+        formattedPrice: set.product.formattedPrice,
+        price: set.product.price,
+        quantity: set.quantity
+      }));
+
+      setProductSetItems(items);
+      setIsLoadingCollections(false);
+
+      checkProductInCart(productId, isProductCollection)
+        .then(existInCart => {
+          setProductInCart(existInCart);
+        })
+        .catch(error => {
+          logError("Error while checking product in cart", error);
+        });
+
+    } catch (error) {
+      logError("Error while fetching product data", error);
+      setIsLoadingCollections(false);
+    }
+  };
+
+  useEffect(() => {
+    setInitialData();
+  }, [isProductCollection]);
+
   return (
-    <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px]  sm:mt-0   sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
-      <AddToCartSlider data={data} isOpen={data.open} />
+    <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
+      {isLoadingCollections && (
+        <div className='absolute inset-x-4 inset-y-0 bg-secondary-alt opacity-30 z-[999] flex justify-center items-center'>
+          <Loading custom={true} classes='absolute' />
+        </div>
+      )}
+      <AddToCartSlider data={productData} isOpen={data.open} />
       <div className='h-full sm:w-[55%] w-full py-[20px] pr-[20px] relative'>
         <div className='w-full flex flex-col gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
           <div className='w-full flex justify-between relative '>
@@ -207,7 +284,7 @@ const AddToCart = ({ data, onClose }) => {
             <ProductDescription maxChars={130} text={product.description} />
           </div>
         </div>
-          <AddToQuoteButton classes={"lg:!h-[80px] lg:!mt-0 !mt-0 !text-[14px] "} onClick={handleAddToCart} text={isLoading ? "ADDING..." : "ADD TO QUOTE"} disabled={isLoading}  />
+        <AddToQuoteButton classes={"lg:!h-[80px] lg:!mt-0 !mt-0 !text-[14px] "} onClick={handleAddToCart} text={isLoading ? "PLEASE WAIT..." : "ADD TO QUOTE"} disabled={isLoading} />
 
       </div>
     </div>

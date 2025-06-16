@@ -9,7 +9,7 @@ import { SaveProductButton } from '../common/SaveProductButton';
 import { AddProductToCart, getProductsCart, removeProductFromCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
-import { fetchSavedProductData } from '@/services/products';
+import { checkProductInCart, fetchSavedProductData } from '@/services/products';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -225,30 +225,21 @@ export const Product = ({ data }) => {
     ));
   };
 
-  const fetchSavedProducts = async () => {
+  const setInitialData = async () => {
     try {
-      const savedProducts = await fetchSavedProductData();
+      const [savedProducts, existInCart] = await Promise.all([
+        fetchSavedProductData(),
+        checkProductInCart(product._id, isProductCollection)
+      ]);
       setSavedProducts(savedProducts);
+      setProductInCart(existInCart);
     } catch (error) {
-      logError("Error while fetching Saved Product", error);
-    }
-  };
-
-  const fetchCartItems = async () => {
-    try {
-      if (!isProductCollection) return;
-      const productId = product._id;
-      const cart = await getProductsCart();
-      const existingItem = cart.lineItems.find((item) => item.catalogReference.catalogItemId === productId);
-      setProductInCart(existingItem);
-    } catch (error) {
-      console.error("Error fetching cart items:", error);
+      logError("Error while fetching product data", error);
     }
   };
 
   useEffect(() => {
-    fetchCartItems();
-    fetchSavedProducts();
+    setInitialData();
   }, []);
 
   return (

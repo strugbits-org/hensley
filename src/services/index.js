@@ -209,7 +209,7 @@ export const fetchBestSellers = async (slug = '/') => {
   try {
     const response = await queryCollection({
       dataCollectionId: "BestSellers",
-      includeReferencedItems: ["product"],
+      includeReferencedItems: ["product", "productData"],
       eq: [
         {
           key: "slug",
@@ -223,7 +223,13 @@ export const fetchBestSellers = async (slug = '/') => {
       throw new Error(`Response does not contain items array`);
     }
 
-    return response.items;
+    const data = response.items.map(item => {
+      return {
+        ...item.productData,
+        product: item.product,
+      }
+    });
+    return data;
   } catch (error) {
     logError(`Error fetching best sellers data: ${error.message}`, error);
   }

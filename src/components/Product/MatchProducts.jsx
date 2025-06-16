@@ -51,7 +51,7 @@ export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide  flex flex-col px-2`}
+                                className={`keen-slider__slide flex flex-col px-2`}
                             >
                                 <MatchedProductCard
                                     type='slider'
