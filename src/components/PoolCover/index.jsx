@@ -1,610 +1,89 @@
 'use client'
-import React from 'react'
-import { Details } from './Details'
-import TentGallery from './TentGallery'
-import { HensleyNews } from '../common/HensleyNews'
-import { BestSellers } from '../Home/BestSellers'
+import React, { useEffect, useState } from 'react';
+import { PrimaryImage } from '../common/PrimaryImage';
+import parse from 'html-react-parser';
+import { fetchSavedProductData } from '@/services/products';
+import { SaveProductButton } from '../common/SaveProductButton';
+import BannerStructures from '../Product-Tent/BannerStructures';
+import ProductSlider from '../Product/ProductSlider';
+import ProductSlider_tab from '../Product/ProductSlider_tab';
+import { AddToQuoteForm } from './AddToQuoteForm';
 
+const ProductPoolCover = ({ productData }) => {
+  const { covers, mediagallery } = productData;
+  const [savedProducts, setSavedProducts] = useState([]);
 
+  const fetchSavedProducts = async () => {
+    try {
+      const savedProducts = await fetchSavedProductData();
 
-const blogsData = [{
-        author: {
-            loginEmail: 'susan@hensleyeventresources.com',
-            email: null,
-            privacyStatus: 'PUBLIC',
-            _id: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            _createdDate: new Date('2024-10-22T22:36:26.000Z'),
-            aboutPlain: null,
-            profilePhoto: 'https://static.wixstatic.com/media/626075_3e4cffe359e9465db416ab0e5324a40e~mv2.png',
-            aboutRich: null,
-            _updatedDate: new Date('2024-10-22T22:36:25.859Z'),
-            slug: 'susan',
-            lastName: 'Kidwell',
-            firstName: 'Susan',
-            activityStatus: 'ACTIVE',
-            lastLoginDate: new Date('2024-10-22T22:36:26.000Z'),
-            status: 'APPROVED',
-            contactId: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            coverPhoto: null,
-            phone: null,
-            nickname: 'Susan Kidwell'
-        },
-        _id: 'ef654119-bb58-459d-ba01-ca48ed3546b5',
-        _owner: '57e77db9-0069-4eef-a0eb-ca4f8c6de7f7',
-        _createdDate: new Date('2024-10-22T17:01:42.112Z'),
-        'link-manage-blogs-1-slug': '/posts/hilltop-wedding-ceremony-behind-the-scenes',
-        _updatedDate: new Date('2025-05-20T15:58:38.558Z'),
-        slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-        markets: [/* your market objects here */],
-        blogId: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-        studios: [/* your studio objects here */],
-        titleAndDescription: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation~Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-        blogRef: {
-            author: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            mainCategory: '6683fbba7ece979a55e42597',
-            viewCount: 13,
-            excerpt: 'Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-            timeToRead: 3,
-            _id: '6717da180680d658d102f60b',
-            tags: [/* your tags here */],
-            uuid: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-            featured: false,
-            translationId: null,
-            slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-            coverImage: 'wix:image://v1/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg#originWidth=3282&originHeight=1500',
-            plainContent: `Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds ...
-    [full content here]`,
-            commentCount: 0,
-            language: 'en',
-            publishedDate: new Date('2024-10-22T17:01:36.188Z'),
-            pinned: false,
-            categories: [/* your categories here */],
-            richContent: {/* your rich content object here */ },
-            postPageUrl: '/post/hilltop-wedding-ceremony-behind-the-scenes',
-            coverImageDisplayed: true,
-            title: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation',
-            lastPublishedDate: new Date('2025-05-20T15:58:31.918Z'),
-            internalId: '6717da180680d658d102f60b',
-            relatedPosts: [/* related posts array here */],
-            hashtags: [],
-            likeCount: 0
-        },
-        publishDate: new Date('2024-10-22T17:01:36.188Z')
-    },
-    {
-        author: {
-            loginEmail: 'susan@hensleyeventresources.com',
-            email: null,
-            privacyStatus: 'PUBLIC',
-            _id: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            _createdDate: new Date('2024-10-22T22:36:26.000Z'),
-            aboutPlain: null,
-            profilePhoto: 'https://static.wixstatic.com/media/626075_3e4cffe359e9465db416ab0e5324a40e~mv2.png',
-            aboutRich: null,
-            _updatedDate: new Date('2024-10-22T22:36:25.859Z'),
-            slug: 'susan',
-            lastName: 'Kidwell',
-            firstName: 'Susan',
-            activityStatus: 'ACTIVE',
-            lastLoginDate: new Date('2024-10-22T22:36:26.000Z'),
-            status: 'APPROVED',
-            contactId: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            coverPhoto: null,
-            phone: null,
-            nickname: 'Susan Kidwell'
-        },
-        _id: 'ef654119-bb58-459d-ba01-ca48ed3546b5',
-        _owner: '57e77db9-0069-4eef-a0eb-ca4f8c6de7f7',
-        _createdDate: new Date('2024-10-22T17:01:42.112Z'),
-        'link-manage-blogs-1-slug': '/posts/hilltop-wedding-ceremony-behind-the-scenes',
-        _updatedDate: new Date('2025-05-20T15:58:38.558Z'),
-        slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-        markets: [/* your market objects here */],
-        blogId: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-        studios: [/* your studio objects here */],
-        titleAndDescription: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation~Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-        blogRef: {
-            author: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            mainCategory: '6683fbba7ece979a55e42597',
-            viewCount: 13,
-            excerpt: 'Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-            timeToRead: 3,
-            _id: '6717da180680d658d102f60b',
-            tags: [/* your tags here */],
-            uuid: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-            featured: false,
-            translationId: null,
-            slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-            coverImage: 'wix:image://v1/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg#originWidth=3282&originHeight=1500',
-            plainContent: `Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds ...
-    [full content here]`,
-            commentCount: 0,
-            language: 'en',
-            publishedDate: new Date('2024-10-22T17:01:36.188Z'),
-            pinned: false,
-            categories: [/* your categories here */],
-            richContent: {/* your rich content object here */ },
-            postPageUrl: '/post/hilltop-wedding-ceremony-behind-the-scenes',
-            coverImageDisplayed: true,
-            title: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation',
-            lastPublishedDate: new Date('2025-05-20T15:58:31.918Z'),
-            internalId: '6717da180680d658d102f60b',
-            relatedPosts: [/* related posts array here */],
-            hashtags: [],
-            likeCount: 0
-        },
-        publishDate: new Date('2024-10-22T17:01:36.188Z')
-    },
-    {
-        author: {
-            loginEmail: 'susan@hensleyeventresources.com',
-            email: null,
-            privacyStatus: 'PUBLIC',
-            _id: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            _createdDate: new Date('2024-10-22T22:36:26.000Z'),
-            aboutPlain: null,
-            profilePhoto: 'https://static.wixstatic.com/media/626075_3e4cffe359e9465db416ab0e5324a40e~mv2.png',
-            aboutRich: null,
-            _updatedDate: new Date('2024-10-22T22:36:25.859Z'),
-            slug: 'susan',
-            lastName: 'Kidwell',
-            firstName: 'Susan',
-            activityStatus: 'ACTIVE',
-            lastLoginDate: new Date('2024-10-22T22:36:26.000Z'),
-            status: 'APPROVED',
-            contactId: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            coverPhoto: null,
-            phone: null,
-            nickname: 'Susan Kidwell'
-        },
-        _id: 'ef654119-bb58-459d-ba01-ca48ed3546b5',
-        _owner: '57e77db9-0069-4eef-a0eb-ca4f8c6de7f7',
-        _createdDate: new Date('2024-10-22T17:01:42.112Z'),
-        'link-manage-blogs-1-slug': '/posts/hilltop-wedding-ceremony-behind-the-scenes',
-        _updatedDate: new Date('2025-05-20T15:58:38.558Z'),
-        slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-        markets: [/* your market objects here */],
-        blogId: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-        studios: [/* your studio objects here */],
-        titleAndDescription: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation~Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-        blogRef: {
-            author: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            mainCategory: '6683fbba7ece979a55e42597',
-            viewCount: 13,
-            excerpt: 'Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-            timeToRead: 3,
-            _id: '6717da180680d658d102f60b',
-            tags: [/* your tags here */],
-            uuid: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-            featured: false,
-            translationId: null,
-            slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-            coverImage: 'wix:image://v1/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg#originWidth=3282&originHeight=1500',
-            plainContent: `Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds ...
-    [full content here]`,
-            commentCount: 0,
-            language: 'en',
-            publishedDate: new Date('2024-10-22T17:01:36.188Z'),
-            pinned: false,
-            categories: [/* your categories here */],
-            richContent: {/* your rich content object here */ },
-            postPageUrl: '/post/hilltop-wedding-ceremony-behind-the-scenes',
-            coverImageDisplayed: true,
-            title: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation',
-            lastPublishedDate: new Date('2025-05-20T15:58:31.918Z'),
-            internalId: '6717da180680d658d102f60b',
-            relatedPosts: [/* related posts array here */],
-            hashtags: [],
-            likeCount: 0
-        },
-        publishDate: new Date('2024-10-22T17:01:36.188Z')
-    },
-    {
-        author: {
-            loginEmail: 'susan@hensleyeventresources.com',
-            email: null,
-            privacyStatus: 'PUBLIC',
-            _id: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            _createdDate: new Date('2024-10-22T22:36:26.000Z'),
-            aboutPlain: null,
-            profilePhoto: 'https://static.wixstatic.com/media/626075_3e4cffe359e9465db416ab0e5324a40e~mv2.png',
-            aboutRich: null,
-            _updatedDate: new Date('2024-10-22T22:36:25.859Z'),
-            slug: 'susan',
-            lastName: 'Kidwell',
-            firstName: 'Susan',
-            activityStatus: 'ACTIVE',
-            lastLoginDate: new Date('2024-10-22T22:36:26.000Z'),
-            status: 'APPROVED',
-            contactId: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            coverPhoto: null,
-            phone: null,
-            nickname: 'Susan Kidwell'
-        },
-        _id: 'ef654119-bb58-459d-ba01-ca48ed3546b5',
-        _owner: '57e77db9-0069-4eef-a0eb-ca4f8c6de7f7',
-        _createdDate: new Date('2024-10-22T17:01:42.112Z'),
-        'link-manage-blogs-1-slug': '/posts/hilltop-wedding-ceremony-behind-the-scenes',
-        _updatedDate: new Date('2025-05-20T15:58:38.558Z'),
-        slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-        markets: [/* your market objects here */],
-        blogId: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-        studios: [/* your studio objects here */],
-        titleAndDescription: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation~Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-        blogRef: {
-            author: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            mainCategory: '6683fbba7ece979a55e42597',
-            viewCount: 13,
-            excerpt: 'Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-            timeToRead: 3,
-            _id: '6717da180680d658d102f60b',
-            tags: [/* your tags here */],
-            uuid: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-            featured: false,
-            translationId: null,
-            slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-            coverImage: 'wix:image://v1/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg#originWidth=3282&originHeight=1500',
-            plainContent: `Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds ...
-    [full content here]`,
-            commentCount: 0,
-            language: 'en',
-            publishedDate: new Date('2024-10-22T17:01:36.188Z'),
-            pinned: false,
-            categories: [/* your categories here */],
-            richContent: {/* your rich content object here */ },
-            postPageUrl: '/post/hilltop-wedding-ceremony-behind-the-scenes',
-            coverImageDisplayed: true,
-            title: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation',
-            lastPublishedDate: new Date('2025-05-20T15:58:31.918Z'),
-            internalId: '6717da180680d658d102f60b',
-            relatedPosts: [/* related posts array here */],
-            hashtags: [],
-            likeCount: 0
-        },
-        publishDate: new Date('2024-10-22T17:01:36.188Z')
-    },
-    {
-        author: {
-            loginEmail: 'susan@hensleyeventresources.com',
-            email: null,
-            privacyStatus: 'PUBLIC',
-            _id: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            _createdDate: new Date('2024-10-22T22:36:26.000Z'),
-            aboutPlain: null,
-            profilePhoto: 'https://static.wixstatic.com/media/626075_3e4cffe359e9465db416ab0e5324a40e~mv2.png',
-            aboutRich: null,
-            _updatedDate: new Date('2024-10-22T22:36:25.859Z'),
-            slug: 'susan',
-            lastName: 'Kidwell',
-            firstName: 'Susan',
-            activityStatus: 'ACTIVE',
-            lastLoginDate: new Date('2024-10-22T22:36:26.000Z'),
-            status: 'APPROVED',
-            contactId: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            coverPhoto: null,
-            phone: null,
-            nickname: 'Susan Kidwell'
-        },
-        _id: 'ef654119-bb58-459d-ba01-ca48ed3546b5',
-        _owner: '57e77db9-0069-4eef-a0eb-ca4f8c6de7f7',
-        _createdDate: new Date('2024-10-22T17:01:42.112Z'),
-        'link-manage-blogs-1-slug': '/posts/hilltop-wedding-ceremony-behind-the-scenes',
-        _updatedDate: new Date('2025-05-20T15:58:38.558Z'),
-        slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-        markets: [/* your market objects here */],
-        blogId: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-        studios: [/* your studio objects here */],
-        titleAndDescription: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation~Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-        blogRef: {
-            author: 'da5da524-14b7-4392-8d96-c6bff8074e05',
-            mainCategory: '6683fbba7ece979a55e42597',
-            viewCount: 13,
-            excerpt: 'Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds  Transforming a rugged hilltop into an elegant wedding...',
-            timeToRead: 3,
-            _id: '6717da180680d658d102f60b',
-            tags: [/* your tags here */],
-            uuid: 'a0668c87-77ae-41da-8d59-e59f5fade913',
-            featured: false,
-            translationId: null,
-            slug: 'hilltop-wedding-ceremony-behind-the-scenes',
-            coverImage: 'wix:image://v1/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg/339f77_884d2a18b83d4475aef9f2460602d6e6~mv2.jpg#originWidth=3282&originHeight=1500',
-            plainContent: `Where Dreams Meet Terrain: Crafting a Hilltop Wedding Ceremony Above the Clouds ...
-    [full content here]`,
-            commentCount: 0,
-            language: 'en',
-            publishedDate: new Date('2024-10-22T17:01:36.188Z'),
-            pinned: false,
-            categories: [/* your categories here */],
-            richContent: {/* your rich content object here */ },
-            postPageUrl: '/post/hilltop-wedding-ceremony-behind-the-scenes',
-            coverImageDisplayed: true,
-            title: 'A Hilltop Ceremony Above the Clouds: Behind the Scenes of a Wedding Transformation',
-            lastPublishedDate: new Date('2025-05-20T15:58:31.918Z'),
-            internalId: '6717da180680d658d102f60b',
-            relatedPosts: [/* related posts array here */],
-            hashtags: [],
-            likeCount: 0
-        },
-        publishDate: new Date('2024-10-22T17:01:36.188Z')
-    },
-    ]
+      setSavedProducts(savedProducts);
+    } catch (error) {
+      logError("Error while fetching Saved Product", error);
+    }
+  };
 
-    const bestSellers = [
-         {
-    orderNumber: 1,
-    _id: '9d09ea5b-4cfe-4b2f-ab8c-6f6f0837f109',
-    _owner: '0e0ac59a-ee22-4893-94f5-fe2986338ea7',
-    slug: '/',
-    product: {
-      seoData: null,
-      inStock: true,
-      weight: 0,
-      name: 'BISHOP NATURAL - HIGHBOY TABLE',
-      sku: 'TBBISHOPHBNAT',
-      formattedDiscountedPrice: '$141.75',
-      'link-copy-of-tent-slug': '/pool-covers/bishop-natural-highboy-table',
-      productOptions: {},
-      mainMedia: 'wix:image://v1/339f77_ffe78b2bf916403a90ecd49b23ef6989~mv2.jpg/file.jpg#originWidth=3043&originHeight=4565',
-      description: '<p>The Bishop Natural Highboy Table features a stunning natural wood finish with a pedestal base, ideal for cocktail hours, receptions, and standing gatherings. Its rustic yet refined design adds warmth and elegance to any event space.</p>',
-      _id: '12f5f9f5-bf04-3c0e-da0f-33f3b7a53a95',
-      discountedPrice: 141.75,
-      'link-products-slug': '/product/bishop-natural-highboy-table',
-      formattedPrice: '$141.75',
-      price: 141.75,
-      quantityInStock: null,
-      collections: null,
-      inventoryItem: 'ed0a060a-40fb-c3f1-25f0-cc0c485ac56a',
-      formattedPricePerUnit: null,
-      slug: 'bishop-natural-highboy-table',
-      productType: 'physical',
-      brand: null,
-      ribbons: [],
-      pricePerUnitData: null,
-      mediaItems: [Array],
-      trackInventory: false,
-      customTextFields: [],
-      pricePerUnit: null,
-      ribbon: '',
-      currency: 'USD',
-      productPageUrl: '/product-page/bishop-natural-highboy-table',
-      numericId: '1731518719671000',
-      manageVariants: false,
-      'link-products-slug-2': '/tent/bishop-natural-highboy-table',
-      discount: [Object],
-      additionalInfoSections: [Array],
-    }
-  },
-  {
-    orderNumber: 2,
-    _id: '5d792637-83f1-4787-beb4-97f8ee2c3765',
-    _owner: '0e0ac59a-ee22-4893-94f5-fe2986338ea7',
-    slug: '/',
-    product: {
-      seoData: null,
-      inStock: true,
-      weight: 0,
-      name: 'COUNTRY PEAR - LINEN',
-      sku: '',
-      formattedDiscountedPrice: '$45.00',
-      'link-copy-of-tent-slug': '/pool-covers/country-pear',
-      productOptions: {},
-      mainMedia: 'wix:image://v1/339f77_04ab507cafa14fca83ccd98e3c091f73~mv2.jpg/file.jpg#originWidth=2573&originHeight=3860',
-      description: '<p>Fresh pear-green linen, ideal for natural and organic table settings.</p>',
-      _id: '758749e4-9dc7-d946-7016-2b821d97a4d5',
-      discountedPrice: 45,
-      'link-products-slug': '/product/country-pear',
-      formattedPrice: '$45.00',
-      price: 45,
-      quantityInStock: null,
-      collections: null,
-      inventoryItem: '8a78b61b-6238-26b9-8fe9-d47de2685b2a',
-      formattedPricePerUnit: null,
-      slug: 'country-pear',
-      productType: 'physical',
-      brand: null,
-      ribbons: [],
-      pricePerUnitData: null,
-      mediaItems: [Array],
-      trackInventory: false,
-      customTextFields: [],
-      pricePerUnit: null,
-      ribbon: '',
-      currency: 'USD',
-      productPageUrl: '/product-page/country-pear',
-      numericId: '1733171910148000',
-      manageVariants: false,
-      'link-products-slug-2': '/tent/country-pear',
-      discount: [Object],
-      additionalInfoSections: [],
-    }
-  },
-   {
-    orderNumber: 2,
-    _id: '5d792637-83f1-4787-beb4-97f8ee2c3765',
-    _owner: '0e0ac59a-ee22-4893-94f5-fe2986338ea7',
-    slug: '/',
-    product: {
-      seoData: null,
-      inStock: true,
-      weight: 0,
-      name: 'COUNTRY PEAR - LINEN',
-      sku: '',
-      formattedDiscountedPrice: '$45.00',
-      'link-copy-of-tent-slug': '/pool-covers/country-pear',
-      productOptions: {},
-      mainMedia: 'wix:image://v1/339f77_04ab507cafa14fca83ccd98e3c091f73~mv2.jpg/file.jpg#originWidth=2573&originHeight=3860',
-      description: '<p>Fresh pear-green linen, ideal for natural and organic table settings.</p>',
-      _id: '758749e4-9dc7-d946-7016-2b821d97a4d5',
-      discountedPrice: 45,
-      'link-products-slug': '/product/country-pear',
-      formattedPrice: '$45.00',
-      price: 45,
-      quantityInStock: null,
-      collections: null,
-      inventoryItem: '8a78b61b-6238-26b9-8fe9-d47de2685b2a',
-      formattedPricePerUnit: null,
-      slug: 'country-pear',
-      productType: 'physical',
-      brand: null,
-      ribbons: [],
-      pricePerUnitData: null,
-      mediaItems: [Array],
-      trackInventory: false,
-      customTextFields: [],
-      pricePerUnit: null,
-      ribbon: '',
-      currency: 'USD',
-      productPageUrl: '/product-page/country-pear',
-      numericId: '1733171910148000',
-      manageVariants: false,
-      'link-products-slug-2': '/tent/country-pear',
-      discount: [Object],
-      additionalInfoSections: [],
-    }
-  },
-   {
-    orderNumber: 2,
-    _id: '5d792637-83f1-4787-beb4-97f8ee2c3765',
-    _owner: '0e0ac59a-ee22-4893-94f5-fe2986338ea7',
-    slug: '/',
-    product: {
-      seoData: null,
-      inStock: true,
-      weight: 0,
-      name: 'COUNTRY PEAR - LINEN',
-      sku: '',
-      formattedDiscountedPrice: '$45.00',
-      'link-copy-of-tent-slug': '/pool-covers/country-pear',
-      productOptions: {},
-      mainMedia: 'wix:image://v1/339f77_04ab507cafa14fca83ccd98e3c091f73~mv2.jpg/file.jpg#originWidth=2573&originHeight=3860',
-      description: '<p>Fresh pear-green linen, ideal for natural and organic table settings.</p>',
-      _id: '758749e4-9dc7-d946-7016-2b821d97a4d5',
-      discountedPrice: 45,
-      'link-products-slug': '/product/country-pear',
-      formattedPrice: '$45.00',
-      price: 45,
-      quantityInStock: null,
-      collections: null,
-      inventoryItem: '8a78b61b-6238-26b9-8fe9-d47de2685b2a',
-      formattedPricePerUnit: null,
-      slug: 'country-pear',
-      productType: 'physical',
-      brand: null,
-      ribbons: [],
-      pricePerUnitData: null,
-      mediaItems: [Array],
-      trackInventory: false,
-      customTextFields: [],
-      pricePerUnit: null,
-      ribbon: '',
-      currency: 'USD',
-      productPageUrl: '/product-page/country-pear',
-      numericId: '1733171910148000',
-      manageVariants: false,
-      'link-products-slug-2': '/tent/country-pear',
-      discount: [Object],
-      additionalInfoSections: [],
-    }
-  },
-   {
-    orderNumber: 2,
-    _id: '5d792637-83f1-4787-beb4-97f8ee2c3765',
-    _owner: '0e0ac59a-ee22-4893-94f5-fe2986338ea7',
-    slug: '/',
-    product: {
-      seoData: null,
-      inStock: true,
-      weight: 0,
-      name: 'COUNTRY PEAR - LINEN',
-      sku: '',
-      formattedDiscountedPrice: '$45.00',
-      'link-copy-of-tent-slug': '/pool-covers/country-pear',
-      productOptions: {},
-      mainMedia: 'wix:image://v1/339f77_04ab507cafa14fca83ccd98e3c091f73~mv2.jpg/file.jpg#originWidth=2573&originHeight=3860',
-      description: '<p>Fresh pear-green linen, ideal for natural and organic table settings.</p>',
-      _id: '758749e4-9dc7-d946-7016-2b821d97a4d5',
-      discountedPrice: 45,
-      'link-products-slug': '/product/country-pear',
-      formattedPrice: '$45.00',
-      price: 45,
-      quantityInStock: null,
-      collections: null,
-      inventoryItem: '8a78b61b-6238-26b9-8fe9-d47de2685b2a',
-      formattedPricePerUnit: null,
-      slug: 'country-pear',
-      productType: 'physical',
-      brand: null,
-      ribbons: [],
-      pricePerUnitData: null,
-      mediaItems: [Array],
-      trackInventory: false,
-      customTextFields: [],
-      pricePerUnit: null,
-      ribbon: '',
-      currency: 'USD',
-      productPageUrl: '/product-page/country-pear',
-      numericId: '1733171910148000',
-      manageVariants: false,
-      'link-products-slug-2': '/tent/country-pear',
-      discount: [Object],
-      additionalInfoSections: [],
-    }
-  },
-   {
-    orderNumber: 2,
-    _id: '5d792637-83f1-4787-beb4-97f8ee2c3765',
-    _owner: '0e0ac59a-ee22-4893-94f5-fe2986338ea7',
-    slug: '/',
-    product: {
-      seoData: null,
-      inStock: true,
-      weight: 0,
-      name: 'COUNTRY PEAR - LINEN',
-      sku: '',
-      formattedDiscountedPrice: '$45.00',
-      'link-copy-of-tent-slug': '/pool-covers/country-pear',
-      productOptions: {},
-      mainMedia: 'wix:image://v1/339f77_04ab507cafa14fca83ccd98e3c091f73~mv2.jpg/file.jpg#originWidth=2573&originHeight=3860',
-      description: '<p>Fresh pear-green linen, ideal for natural and organic table settings.</p>',
-      _id: '758749e4-9dc7-d946-7016-2b821d97a4d5',
-      discountedPrice: 45,
-      'link-products-slug': '/product/country-pear',
-      formattedPrice: '$45.00',
-      price: 45,
-      quantityInStock: null,
-      collections: null,
-      inventoryItem: '8a78b61b-6238-26b9-8fe9-d47de2685b2a',
-      formattedPricePerUnit: null,
-      slug: 'country-pear',
-      productType: 'physical',
-      brand: null,
-      ribbons: [],
-      pricePerUnitData: null,
-      mediaItems: [Array],
-      trackInventory: false,
-      customTextFields: [],
-      pricePerUnit: null,
-      ribbon: '',
-      currency: 'USD',
-      productPageUrl: '/product-page/country-pear',
-      numericId: '1733171910148000',
-      manageVariants: false,
-      'link-products-slug-2': '/tent/country-pear',
-      discount: [Object],
-      additionalInfoSections: [],
-    }
-  },
-    ]
+  useEffect(() => {
+    fetchSavedProducts();
+  }, []);
 
-const PoolCover = () => {
   return (
-   <>
-   <Details />
-   <TentGallery />
-   <BestSellers classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={bestSellers} pageDetails={{bestSellerTitle:"Match it with"}} buttonHide={true}/>
-   <HensleyNews data={blogsData} pageDetails={{ hensleyNewsTitle: "Products featured in this PROJECT entry:" }} />
-   </>
+    <>
+      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] min-h-[937px] '>
+        <div className='xl:w-1/2 '>
+          <ProductSlider product={covers} />
+          <ProductSlider_tab product={covers} />
+        </div>
+        <div className='xl:w-1/2 flex flex-col items-center relative'>
+          <div className='lg:max-w-[656px] sm:max-w-[492px] h-full'>
+            <span className='text-secondary-alt 
+            lg:text-[16px]
+            text-[12px]
+            uppercase font-haasLight'>Home/corporate</span>
+            <h3 className='uppercase text-secondary-alt font-recklessRegular 
+            lg:text-[90px] 
+            lg:leading-[85px]
+            text-[35px]
+            leading-[30px]
+            '>{productData?.title}</h3>
+
+            <div className="font-haasRegular lg:text-[16px] lg:leading-[19px] text-[14px] leading-[17px] text-secondary-alt">
+              {parse(covers?.description || '')}
+            </div>
+            <AddToQuoteForm productData={covers} />
+          </div>
+          <SaveProductButton
+            key={productData._id}
+            productData={{ ...productData.productData, product: covers }}
+            savedProducts={savedProducts}
+            setSavedProducts={setSavedProducts}
+          />
+        </div>
+      </div>
+      <div className='w-full min-h-screen bg-secondary-alt pt-[75px] px-[24px]'>
+        <BannerStructures title={productData.title} data={productData.covers} />
+        <div className="w-full grid gap-[24px] mt-6 lg:grid-cols-[2fr_1fr] grid-cols-1">
+          {mediagallery.map((item, index) => {
+            const position = index % 3;
+            const colSpanClass =
+              position === 0 ? 'col-span-1' :
+                position === 1 ? 'col-span-1' :
+                  'col-span-2';
+
+            return (
+              <div key={index} className={`${colSpanClass}`}>
+                <PrimaryImage url={item.src} alt={`covers-${index}`} customClasses="w-full h-full object-cover" />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* <div className='w-full flex justify-center items-center'>
+          <DownloadButton text="DOWNLOAD MASTERCLASS TENTING 101" classes={"lg:!w-[656px] sm:!w-[492px]"} iconTrue={"true"} />
+        </div> */}
+      </div>
+    </>
   )
 }
 
-export default PoolCover
+export default ProductPoolCover;

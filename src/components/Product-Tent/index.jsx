@@ -5,10 +5,10 @@ import parse from 'html-react-parser';
 import BannerStructures from './BannerStructures';
 // import { DownloadButton } from './DownloadButton';
 import ProductSlider from '../Product/ProductSlider';
-import ProductSlider_tab from './ProductSlider_tab';
 import { AddToQuoteForm } from './AddToQuoteForm';
 import { fetchSavedProductData } from '@/services/products';
 import { SaveProductButton } from '../common/SaveProductButton';
+import ProductSlider_tab from '../Product/ProductSlider_tab';
 
 const ProductTent = ({ productData }) => {
   const { tent, gallery } = productData;
@@ -62,7 +62,7 @@ const ProductTent = ({ productData }) => {
         </div>
       </div>
       <div className='w-full min-h-screen bg-secondary-alt pt-[75px] px-[24px]'>
-        <BannerStructures data={productData} />
+        <BannerStructures title={productData?.title} data={productData?.tent} />
         <div className="w-full grid gap-[24px] mt-6 lg:grid-cols-[2fr_1fr] grid-cols-1">
           {gallery.map((item, index) => {
             const position = index % 3;

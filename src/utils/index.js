@@ -332,19 +332,20 @@ export const formatDateForQuote = (d) => {
 }
 
 export const getAdditionalInfoSection = (sections, title) => {
-  const html = sections.find(item => item.title.toUpperCase() === title)?.description || "";
+    const html = sections.find(item => item.title.toUpperCase() === title)?.description;
+    if (!html) return "";
 
-  const $ = cheerio.load(html);
+    const $ = cheerio.load(html);
 
-  $("strong").each((_, el) => {
-    $(el).after("<br />");
-  });
+    $("strong").each((_, el) => {
+        $(el).after("<br />");
+    });
 
-  const cleaned = $("body").html()
-    ?.replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .replace(/(<br\s*\/?>\s*){2,}/gi, "<br />")
-    .trim();
+    const cleaned = $("body").html()
+        ?.replace(/&nbsp;/g, " ")
+        .replace(/\s+/g, " ")
+        .replace(/(<br\s*\/?>\s*){2,}/gi, "<br />")
+        .trim();
 
-  return parse(cleaned || "");
+    return parse(cleaned) || "";
 };
