@@ -59,7 +59,7 @@ function InstagramFeed({ data, details }) {
         text={instaFeedHeading}
         classes={"py-[40px] hidden lg:block border-b border-primary-border"}
       />
-      <div className="p-6">
+      <div className="p-6 ">
         <div className="flex flex-col w-full border">
           <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border border-b-0 px-8 lg:pt-[30px] pb-[40px] pt-[131px] ">
             <h3 className="lg:hidden block text-secondary-alt text-[55px] max-w-[280px] font-recklessRegular leading-[50px] text-center uppercase">
@@ -78,7 +78,7 @@ function InstagramFeed({ data, details }) {
             </CustomLink>
           </div>
           <div>
-            <div ref={sliderRef} className="keen-slider mt-[20px] ">
+            <div ref={sliderRef} className="keen-slider mt-[20px] pb-[85px] ">
               {data.map((dt, index) => {
                 return (
                   <CustomLink
