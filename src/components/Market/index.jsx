@@ -19,7 +19,7 @@ export const MarketPage = ({ data }) => {
             <HowWeDoIt data={howWeDoItData} pageDetails={marketPageDetails} />
             <Banner data={bannerData} />
             <BestSellers data={bestSellers} pageDetails={marketPageDetails} loop={false} origin="start" />
-            <Testimonials data={testimonials} pageDetails={marketPageDetails} />
+            <Testimonials cardClasses={'lg:hover:bg-primary'} data={testimonials} pageDetails={marketPageDetails} />
             <MarketSection data={otherMarketsData} pageDetails={marketPageDetails} />
             <HensleyNews data={blogsData} pageDetails={marketPageDetails} loop={false} origin="start" />
         </>

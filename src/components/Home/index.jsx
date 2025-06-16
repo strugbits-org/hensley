@@ -17,7 +17,7 @@ export const HomePage = ({ data }) => {
             <OurProjects data={portfolioData} pageDetails={homePageDetails} />
             <Banner data={bannerData} />
             <BestSellers data={bestSellers} pageDetails={homePageDetails} />
-            <Testimonials data={testimonials} pageDetails={homePageDetails} />
+            <Testimonials cardClasses={'lg:hover:bg-primary'} data={testimonials} pageDetails={homePageDetails} />
             <MarketSection data={marketsData} pageDetails={homePageDetails} />
             <HensleyNews data={blogsData} pageDetails={homePageDetails} />
         </>
