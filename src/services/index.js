@@ -54,7 +54,7 @@ export const fetchHeaderData = async () => {
 
 export const fetchMarketsData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"] });
+    const response = await queryCollection({ dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"], sortKey: "orderNumber" });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
@@ -91,7 +91,7 @@ export const fetchFooterData = async () => {
       queryCollection({ dataCollectionId: "FooterCollection" }),
       queryCollection({ dataCollectionId: "SocialLinks" }),
       queryCollection({ dataCollectionId: "FooterNavigation" }),
-      queryCollection({ dataCollectionId: "Branches" }),
+      queryCollection({ dataCollectionId: "Branches", sortKey: "orderNumber" }),
     ]);
 
     if (!Array.isArray(footerData.items) || !Array.isArray(footerNaviationData.items)) {
