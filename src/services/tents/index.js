@@ -6,7 +6,7 @@ export const fetchTentData = async (slug) => {
     try {
         const response = await queryCollection({
             dataCollectionId: "TentsCollection",
-            includeReferencedItems: ["tent"],
+            includeReferencedItems: ["tent", "productData"],
             eq: [
                 {
                     key: "slug",

@@ -170,11 +170,11 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
             }
         },
         labels: {
-            firstName: data?.firstNameLabel,
-            lastName: data?.lastNameLabel,
-            phone: data?.phoneLabel,
-            email: data?.emailLabel,
-            message: data?.messageLabel
+            first_name_abae: data?.firstNameLabel,
+            last_name_d97c: data?.lastNameLabel,
+            phone_4c77: data?.phoneLabel,
+            email_5139: data?.emailLabel,
+            long_answer_3524: data?.messageLabel
         },
         buttons: {
             submit: "send message",
