@@ -31,9 +31,9 @@ const CareerOppurtunities = ({ data }) => {
     };
 
 
-    const detailText = detail?.replace(/\n+/g, ' ').trim();
-    const shortSummary = detailText.split('. ').slice(0, 2).join('. ') + '.';
-    const displayedText = showFullText ? detailText : shortSummary;
+    const paragraphs = detail?.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    const shortSummary = paragraphs?.join(' ').split('. ').slice(0, 2).join('. ') + '.';
+
 
 
     return (
@@ -119,10 +119,18 @@ const CareerOppurtunities = ({ data }) => {
                                 )
                             }
                         </h3>
-                        <div className='max-w-[550px] sm:w-[360px]'>
-                            <p className="sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt">
-                                {displayedText}
-                            </p>
+                        <div className='max-w-[608px] lg:w-[608px] sm:w-[360px]'>
+                            {showFullText ? (
+                                <div className="uppercase sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt space-y-4">
+                                    {paragraphs.map((p, i) => (
+                                        <p key={i}>{p}</p>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="uppercase sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt">
+                                    {shortSummary}
+                                </p>
+                            )}
 
                             <button
                                 className="uppercase bg-transparent text-[16px] leading-[20px] text-secondary-alt font-haasRegular hover:font-haasBold mt-[24px]"
