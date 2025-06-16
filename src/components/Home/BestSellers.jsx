@@ -55,9 +55,9 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center",
     }, []);
 
     return (
-        <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-6`}>
+        <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-[85px]`}>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={bestSellerTitle} classes={`!text-primary lg:py-[40px] py-[20px] md:mt-6 lg:mt-0 ${headingClasses}`} />
+                <SectionTitle text={bestSellerTitle} classes={`!text-primary py-[20px] md:mt-6 lg:mt-0 ${headingClasses}`} />
                 {!buttonHide && <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>}
             </div>
             <div className="p-6">

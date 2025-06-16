@@ -9,8 +9,10 @@ function NewsCard({ data }) {
     const { title, coverImage } = blogRef;
 
     return (
-        <div className="relative group border border-primary-border pb-6">
-            <PrimaryImage alt={title} url={coverImage} customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
+        <div className="relative group border cursor-pointer border-primary-border pb-6">
+            <div className='overflow-hidden'>
+                <PrimaryImage alt={title} url={coverImage} customClasses={"h-full w-full min-h-[528px] max-h-[528px] object-cover transition-transform duration-300 group-hover:scale-105"} />
+            </div>
 
             <div className='w-full flex gap-1 p-6 pb-0'>
                 <div className='grow'>

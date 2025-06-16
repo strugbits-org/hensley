@@ -40,9 +40,9 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center" 
 
     return (
         <div className='w-full py-20 lg:py-6'>
-            <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
-                <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
+            <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col lg:border-b max-lg:border border-primary-border'>
+                <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
+                <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
             </div>
             <div className="p-6">
                 <div ref={sliderRef} className="keen-slider">
