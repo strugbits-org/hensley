@@ -8,7 +8,7 @@ import { lightboxActions } from '@/store/lightboxStore';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { loaderActions } from '@/store/loaderStore';
 
-function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts }) {
+function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts, btnClass }) {
     const { product } = data;
     const { name } = product;
     const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
@@ -29,7 +29,7 @@ function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProdu
                 <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full  transition-transform duration-300 group-hover:scale-105"} />
             </CustomLink>
 
-            <div className="max-w-full flex-wrap pt-2 lg:pt-6 lg:pb-2">
+            <div className="flex max-w-full flex-wrap pl-[23px] lg:gap-y-[15px] pt-2 lg:pt-6 ">
                 <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular">
                     {name}
                 </h2>
@@ -59,7 +59,7 @@ function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProdu
                     </div>
 
                     <button
-                        className="w-full border border-black 2xl:w-auto min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary px-4 py-3 gap-x-7"
+                        className={`${btnClass} w-full 2xl:w-auto min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary px-4 py-3 gap-x-7`}
                         onClick={handleAddToCart}
                     >
                         <span className="uppercase font-haasRegular text-[12px]">add to cart</span>

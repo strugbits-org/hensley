@@ -150,7 +150,6 @@ const FormHeading = ({ title = "" }) => {
 
 const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => {
 
-
     const defaultContent = {
         header: {
             title: "send your message",
