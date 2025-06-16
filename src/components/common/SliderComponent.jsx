@@ -9,6 +9,10 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "./CustomLink";
 
 export default function SliderComponent({ data, classes, pageDetails }) {
+
+
+  console.log("The Data is--: ",data);
+
   const { buttonLabelPortfolioSlider } = pageDetails;
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -67,7 +71,7 @@ export default function SliderComponent({ data, classes, pageDetails }) {
                 <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] max-w-[340px] lg:max-w-[600px] lg:text-left text-center text-white font-recklessLight mb-8">
                   {portfolioRef?.title || displayedTitle}
                 </h2>
-                <CustomLink to={`/project/${portfolioRef?.slug}`}>
+                <CustomLink to={`/project/${portfolioRef?.slug || slide?.slug}`}>
                   <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
                     {buttonLabelPortfolioSlider}
                   </PrimaryButton>
