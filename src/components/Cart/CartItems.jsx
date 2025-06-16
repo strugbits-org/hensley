@@ -84,6 +84,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     const { removeProduct } = actions;
 
     const productName = data?.productName?.original || data?.name;
+    const systemFields = ["POOLCOVER"];
 
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
@@ -95,7 +96,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
                     <span className='block text-[16px] text-secondary-alt font-haasLight uppercase'>Product</span>
                     <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
                     <div className='grid sm:grid-cols-2 grid-cols-1 gap-x-[26px] gap-y-[4px]'>
-                        {descriptionLines.map(({ title, value }) => (
+                        {descriptionLines.map(({ title, value }) => systemFields.includes(title) ? null : (
                             <div key={title}>
                                 <span className='text-[12px] text-secondary-alt font-haasBold uppercase mr-[20px]'>{title}</span>
                                 <span className='text-[12px] text-secondary-alt font-haasLight uppercase'>{value}</span>
