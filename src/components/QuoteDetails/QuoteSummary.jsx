@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { calculateCartTotalPrice, formatDescriptionLines, formatTotalPrice } from '@/utils';
-import { CartNormal, CartCollection } from '../Cart/CartItems';
-import { CartTent } from './CartItems';
+import { CartNormal, CartCollection, CartTent } from '../Cart/CartItems';
 import PriceDisplay from './PriceDisplay';
 
 const QuoteSummary = ({ data }) => {
@@ -42,7 +41,7 @@ const QuoteSummary = ({ data }) => {
           const product = item.product;
           const descriptionLines = product.descriptionLines ? formatDescriptionLines(product.descriptionLines) : product.customTextFields;
           const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-          const isTentItem = false;
+          const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE")?.value;
 
           if (productCollection) {
             const productSetItems = productCollection.split("; ");
@@ -52,7 +51,7 @@ const QuoteSummary = ({ data }) => {
             )
           } else if (isTentItem) {
             return (
-              <CartTent key={index} data={product} readOnly={true} />
+              <CartTent key={index} data={product} descriptionLines={descriptionLines} readOnly={true} />
             )
           } else {
             return (

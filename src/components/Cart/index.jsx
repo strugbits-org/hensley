@@ -176,24 +176,24 @@ const Cart = () => {
         <div className='lg:w-[65%] border border-primary-border overflow-y-scroll hide-scrollbar'>
           <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
           <div className='flex flex-col '>
-            {cartItems.map((item, index) => {
+            {cartItems.map((item) => {
               const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
               const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-              const isTentItem = false;
+              const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE")?.value;
 
               if (productCollection) {
                 const productSetItems = productCollection.split("; ");
                 const data = { ...item, productSetItems };
                 return (
-                  <CartCollection key={index} data={data} actions={{ handleQuantityChange: (value, id, disabled) => handleCollectionQuantityChange(data, value, id, disabled), removeProduct }} />
+                  <CartCollection key={item._id} data={data} actions={{ handleQuantityChange: (value, id, disabled) => handleCollectionQuantityChange(data, value, id, disabled), removeProduct }} />
                 )
               } else if (isTentItem) {
                 return (
-                  <CartTent key={index} data={item} actions={{ handleQuantityChange, removeProduct }} />
+                  <CartTent key={item._id} data={item} descriptionLines={descriptionLines} actions={{ removeProduct }} />
                 )
               } else {
                 return (
-                  <CartNormal key={index} data={item} actions={{ handleQuantityChange, removeProduct }} />
+                  <CartNormal key={item._id} data={item} actions={{ handleQuantityChange, removeProduct }} />
                 )
               };
             })}

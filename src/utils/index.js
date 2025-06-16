@@ -272,7 +272,7 @@ export function formatLineItemsForQuote(lineItems) {
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
-                description: generateDescriptionForQuote(customTextFields, isTentOrCover.title === "POOLCOVER"),
+                description: generateDescriptionForQuote(formattedDescriptionLines, isTentOrCover.title === "POOLCOVER"),
                 price: price.amount,
                 quantity
             });

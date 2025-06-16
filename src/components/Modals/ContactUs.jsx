@@ -24,8 +24,8 @@ const FORM_STRUCTURE = {
 
 // Field configurations
 const FIELD_CONFIGS = {
-    first_name_abae: { type: 'text', placeholder: 'Name', borderColor: 'secondary-alt' },
-    last_name_d97c: { type: 'text', placeholder: 'Name', borderColor: 'black' },
+    first_name_abae: { type: 'text', placeholder: 'John', borderColor: 'secondary-alt' },
+    last_name_d97c: { type: 'text', placeholder: 'Doe', borderColor: 'black' },
     phone_4c77: { type: 'tel', placeholder: '+1 (415) 000-00000', borderColor: 'black' },
     email_5139: { type: 'email', placeholder: 'exemplo@myemail.com', borderColor: 'black' },
     long_answer_3524: { type: 'textarea', placeholder: 'Write your message', borderColor: 'secondary-alt' }
@@ -66,7 +66,7 @@ const InputField = ({
                 disabled={disabled}
                 {...register}
                 className={`
-          w-full placeholder-secondary font-haasLight p-3 rounded-sm
+          w-full placeholder-secondary font-haasLight p-3 rounded-sm placeholder:uppercase
           border-b 
           ${error ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
           ${!error && 'hover:border-b-2'}
@@ -112,7 +112,7 @@ const TextareaField = ({
                 disabled={disabled}
                 {...register}
                 className={`
-          w-full placeholder-secondary font-haasLight p-3 rounded-sm
+          w-full placeholder-secondary font-haasLight p-3 rounded-sm placeholder:uppercase
           border-b 
           ${error ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
           ${!error && 'hover:border-b-2'}
@@ -131,9 +131,10 @@ const AddressBlock = ({ title, description = "" }) => {
     return (
         <div className='font-haasRegular uppercase text-[14px] leading-[18px]'>
             <p><b>{title}</b></p>
-            {lines.map((line, idx) => (
+            {/* {lines.map((line, idx) => (
                 <p key={idx}>{line}</p>
-            ))}
+            ))} */}
+            <p>{description}</p>
         </div>)
 }
 
@@ -169,11 +170,11 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
             }
         },
         labels: {
-            firstName: data?.firstNameLabel,
-            lastName: data?.lastNameLabel,
-            phone: data?.phoneLabel,
-            email: data?.emailLabel,
-            message: data?.messageLabel
+            first_name_abae: data?.firstNameLabel,
+            last_name_d97c: data?.lastNameLabel,
+            phone_4c77: data?.phoneLabel,
+            email_5139: data?.emailLabel,
+            long_answer_3524: data?.messageLabel
         },
         buttons: {
             submit: "send message",
