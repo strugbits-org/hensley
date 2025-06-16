@@ -1,13 +1,12 @@
 import searchIcon from '@/assets/icons/search-light.svg';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { loaderActions } from '@/store/loaderStore';
+import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 
 export const SearchModal = ({ closeModal, isActive }) => {
     const inputRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState('');
-    const router = useRouter();
+  const redirectWithLoader = useRedirectWithLoader();
 
     useEffect(() => {
         if (isActive && inputRef.current) {
@@ -22,16 +21,16 @@ export const SearchModal = ({ closeModal, isActive }) => {
     };
 
     const handleSearch = () => {
-        loaderActions.show();
-        router.push(`/search?query=${searchTerm}`);
+        redirectWithLoader(`/search-results?query=${searchTerm}`);
+        closeModal();
     };
 
     if (!isActive) return null;
 
-
     return (
         <div className='search-modal z-10'>
-            <div
+            <form
+                onSubmit={handleSearch}
                 className="lg:hidden flex flex-col items-center justify-start pb-4"
                 role="dialog"
                 aria-modal="true"
@@ -56,13 +55,14 @@ export const SearchModal = ({ closeModal, isActive }) => {
                 </div>
 
                 <button
+                    type='submit'
                     onClick={handleSearch}
                     className="w-full bg-secondary-alt text-primary text-[18px] font-haasRegular uppercase py-[17px] mt-3 tracking-[3px] hover:tracking-[6px] transition-all duration-300 ease-in-out"
                     aria-label="Search"
                 >
                     SEARCH
                 </button>
-            </div>
+            </form>
 
             <div
                 className="relative px-6 w-full lg:h-32 bg-primary hidden lg:flex flex-col sm:flex-row items-center border-b-2 border-secondary-alt"
