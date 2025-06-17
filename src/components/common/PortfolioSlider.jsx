@@ -11,8 +11,15 @@ import arrow from "@/assets/icons/arrow.svg";
 import rightArrow from "../../assets/icons/rightArrow.svg";
 import { PrimaryImage } from "./PrimaryImage";
 
-function  PortfolioSlider({ data, display, tab = false, cardCss }) {
+function PortfolioSlider({ data, display, tab = false, cardCss }) {
+
+
+
+  console.log("The data iss: ",data);
+
+
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [expandedSlide, setExpandedSlide] = useState(null);
   const sliderInstance = useRef(null);
 
   const [sliderRef] = useKeenSlider(
@@ -44,7 +51,14 @@ function  PortfolioSlider({ data, display, tab = false, cardCss }) {
     []
   );
 
- 
+  const handleSeeMore = (index) => {
+    setExpandedSlide(index);
+    setTimeout(() => {
+      sliderInstance.current?.next();
+    }); 
+  };
+
+
 
   return (
     <>
@@ -65,14 +79,14 @@ function  PortfolioSlider({ data, display, tab = false, cardCss }) {
           return (
             <div
               key={index}
-              className={`${cardCss} keen-slider__slide border border-white flex flex-col p-[20px] 
+              className={`${cardCss} cursor-pointer keen-slider__slide border border-white flex flex-col p-[20px] 
     sm:min-h-[680px] ${tab || 'lg:h-min'}`}
             >
 
               <div className="h-[425px] relative">
-                
-               <PrimaryImage timeout={0} url={dt.image} customClasses={"h-full w-full object-cover "}  />
-                
+
+                <PrimaryImage timeout={0} url={dt.image} customClasses={"h-full w-full object-cover "} />
+
                 <Image
                   src={arrow}
                   alt="Arrow"
@@ -84,17 +98,17 @@ function  PortfolioSlider({ data, display, tab = false, cardCss }) {
                   {dt.title}
                 </h3>
                 {isActive ? (
-                  <p className="text-secondary-alt max-w-[600px] text-[14px] leading-[18px] lg:text-[16px] lg:leading-[20px] md:text-sm font-haasRegular lg:mt-[24px]">
+                  <p className="uppercase text-secondary-alt max-w-[600px] text-[14px] leading-[18px] lg:text-[16px] lg:leading-[20px] md:text-sm font-haasRegular lg:mt-[24px]">
                     {dt.content}
                   </p>
                 ) : (
                   <>
-                  <p className="lg:block hidden text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
-                    {tab ? dt.content : "+SEE MORE"}
-                  </p>
-                  <p className="lg:hidden text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
-                    {dt.content}
-                  </p>
+                    <p onClick={()=>{handleSeeMore(index)}} className="lg:block hidden text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
+                      {tab ? dt.content : "+SEE MORE"}
+                    </p>
+                    <p className="uppercase lg:hidden text-secondary-alt text-[16px] font-haasRegular w-[600px] leading-[20px]">
+                      {dt.content}
+                    </p>
                   </>
                 )}
               </div>

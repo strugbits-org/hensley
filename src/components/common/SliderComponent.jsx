@@ -9,6 +9,10 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "./CustomLink";
 
 export default function SliderComponent({ data, classes, pageDetails }) {
+
+
+  console.log("The Data is--: ", data);
+
   const { buttonLabelPortfolioSlider } = pageDetails;
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -21,7 +25,7 @@ export default function SliderComponent({ data, classes, pageDetails }) {
         slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 10, origin: "center" },
       },
       "(max-width: 768px)": {
-        loop:true,
+        loop: true,
         slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 8, origin: "center" },
       },
     },
@@ -67,7 +71,7 @@ export default function SliderComponent({ data, classes, pageDetails }) {
                 <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] max-w-[340px] lg:max-w-[600px] lg:text-left text-center text-white font-recklessLight mb-8">
                   {portfolioRef?.title || displayedTitle}
                 </h2>
-                <CustomLink to={`/project/${portfolioRef?.slug}`}>
+                <CustomLink to={`/project/${portfolioRef?.slug || slide?.slug}`}>
                   <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
                     {buttonLabelPortfolioSlider}
                   </PrimaryButton>
@@ -77,16 +81,35 @@ export default function SliderComponent({ data, classes, pageDetails }) {
               {/* Arrows */}
               <button
                 onClick={() => sliderInstance.current?.prev()}
-                className="absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
+                className="hover:border border-black absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
               >
-                <MdOutlineChevronLeft className="size-[20px]" />
+                {/* <MdOutlineChevronLeft className="size-[20px]" /> */}
+                <svg
+                  className="scale-x-[-1]"
+                  data-bbox="0.354 0.352 8.156 16.312"
+                  viewBox="0 0 9.217 17.019"
+                  height="17.019"
+                  width="9.217"
+                  xmlns="http://www.w3.org/2000/svg"
+                  data-type="ugc"
+                >
+                  <g>
+                    <path stroke="#2c2216" fill="none" d="M.354.352 8.51 8.508.354 16.664"></path>
+                  </g>
+                </svg>
+
               </button>
 
               <button
                 onClick={() => sliderInstance.current?.next()}
-                className="absolute top-1/2 right-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
+                className={`absolute top-1/2 right-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full ${currentSlide == data.length - 1 ? 'bg-[#D3D3D3]' : 'bg-white hover:border border-black'} shadow-md lg:flex items-center justify-center hidden z-20`}
               >
-                <MdOutlineChevronRight className="size-[20px]" />
+                {/* <MdOutlineChevronRight className="size-[20px]" /> */}
+                <svg data-bbox="0.354 0.352 8.156 16.312" viewBox="0 0 9.217 17.019" height="17.019" width="9.217" xmlns="http://www.w3.org/2000/svg" data-type="ugc">
+                  <g>
+                    <path stroke="#2c2216" fill="none" d="M.354.352 8.51 8.508.354 16.664"></path>
+                  </g>
+                </svg>
               </button>
 
               <span className="lg:block hidden absolute bottom-[48px] left-[48px] text-white font-recklessRegular text-[35px]">

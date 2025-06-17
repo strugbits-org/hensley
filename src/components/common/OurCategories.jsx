@@ -14,7 +14,7 @@ function OurCategories({ data, pageDetails, classes }) {
   return (
     <div className={`mb-20 md:mb-40 lg:mb-0 ${classes}`}>
       <div className='w-full sm:px-0 px-[12px]'>
-        <SectionTitle text={ourCategoriesTitle} classes="py-[40px] md:mt-6 lg:mt-0 border-t border-b" />
+        <SectionTitle text={ourCategoriesTitle} classes="py-[40px] md:mt-6 lg:mt-0 border-t border-b border-primary-border " />
       </div>
       <div className="w-full lg:px-[24px] px-[12px] grid sm:grid-cols-2 grid-cols-1 lg:gap-4 lg:py-[24px] sm:gap-y-[12px] sm:gap-x-[12px] gap-y-[30px] lg:mt-0 mt-[12px]">
         {data.map((item, index) => {
@@ -24,7 +24,7 @@ function OurCategories({ data, pageDetails, classes }) {
           return (
             <CustomLink to={isTent ? `/types-of-tents` : `/collections/${category.slug}`}
               key={category._id}
-              className={`cursor-pointer group border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out ${item.rtl && 'lg:flex-row-reverse'
+              className={`cursor-pointer group border border-primary-border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out ${item.rtl && 'lg:flex-row-reverse'
                 } lg:h-[474px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
             >
               {/* Image */}
