@@ -1,4 +1,5 @@
 import { createWixClient, logError } from ".";
+import Fuse from 'fuse.js';
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -26,6 +27,12 @@ async function retryAsyncOperation(operation, retries = 3, initialDelayMs = 1000
   throw lastError;
 }
 
+const correctSearchTerm = async (searchTerm, keywords) => {
+  const fuse = new Fuse(keywords, { threshold: 0.4 });
+  const result = fuse.search(searchTerm);
+  return result.length ? result[0].item : searchTerm;
+};
+
 const queryCollection = async (payload) => {
   if (!payload?.dataCollectionId) {
     return { error: "Missing dataCollectionId", status: 400 };
@@ -47,6 +54,10 @@ const queryCollection = async (payload) => {
       sortKey,
       isNotEmpty,
       startsWith = [],
+      search,
+      searchPrefix,
+      correctionEnabled,
+      searchType,
       not,
       log = false
     } = payload;
@@ -109,6 +120,24 @@ const queryCollection = async (payload) => {
         ? dataQuery.descending(sortKey)
         : dataQuery.ascending(sortKey);
     }
+
+    if (search?.length === 2) {
+      let words = search[1].split(/\s+/).filter(Boolean);
+      if (correctionEnabled) {
+        const productKeywordsData = await queryCollection({ "dataCollectionId": "ProductKeywords" });
+        const productKeywords = productKeywordsData.items[0]?.keywords || [];
+        words = await Promise.all(words.map(word => correctSearchTerm(word, productKeywords)));
+      }
+      let newQuery = words.slice(1).reduce((query, word) =>
+        query.contains(search[0], searchPrefix ? searchPrefix + word : word || ""),
+        dataQuery
+      );
+
+      dataQuery = dataQuery.contains(search[0], searchPrefix ? searchPrefix + words[0] : words[0] || "");
+      if (words.length > 1) {
+        dataQuery = searchType === "or" ? dataQuery.or(newQuery) : dataQuery.and(newQuery);
+      }
+    };
 
     // Apply limit unless "infinite"
     const useInfiniteScroll = limit === "infinite";
