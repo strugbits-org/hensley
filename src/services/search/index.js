@@ -36,7 +36,7 @@ export const searchTents = async (query) => {
                     key: "productSetItem",
                     value: true
                 }
-            ]
+            ],
         });
 
         return response.items;
@@ -67,7 +67,7 @@ export const searchProjects = async (query) => {
     try {
         const response = await queryCollection({
             dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ["portfolioRef", "markets", "studios"],
+            includeReferencedItems: ["portfolioRef", "markets", "studios", "author"],
             contains: ["titleAndDescription", query],
             sortKey: "order",
             ne: [

@@ -6,9 +6,12 @@ import { Suspense } from "react";
 export default async function Page() {
   try {
     return (
-      <Suspense>
-        <SearchResult />
-      </Suspense>
+      <>
+        <div className='h-[130px]'></div>
+        <Suspense>
+          <SearchResult />
+        </Suspense>
+      </>
     );
   } catch (error) {
     logError("Error fetching quote request form data:", error);

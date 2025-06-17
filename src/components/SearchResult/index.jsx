@@ -4,9 +4,10 @@ import OurMarkets from './OurMarkets'
 import RelatedProducts from './RelatedProducts'
 import TentTypes from './TentTypes'
 import RelatedProjects from './RelatedProjects'
-import { HensleyNews } from '../common/HensleyNews'
 import { useSearchParams } from 'next/navigation'
 import { searchData } from '@/services/search'
+import { loaderActions } from '@/store/loaderStore';
+import { HensleyNewsSearch } from '../common/HensleyNewsSearch';
 
 const SearchResult = () => {
 
@@ -14,18 +15,20 @@ const SearchResult = () => {
     const [blogsData, setBlogsData] = useState([]);
     const [projectsData, setProjectsData] = useState([]);
     const [tentsData, setTentsData] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const searchParams = useSearchParams();
 
     const setInitialValues = async () => {
         const query = searchParams.get('query');
         const data = await searchData(query);
-        console.log("The data is-: ",data);
         const { markets, tents, projects, blogs } = data;
         setMarketsData(markets);
         setBlogsData(blogs);
         setProjectsData(projects);
         setTentsData(tents);
+        loaderActions.hide();
+        setLoading(false);
     };
 
     useEffect(() => {
@@ -34,11 +37,14 @@ const SearchResult = () => {
 
     return (
         <>
-            <OurMarkets data={marketsData} />
+            {!marketsData.length && !blogsData.length && !projectsData.length && !tentsData.length && (
+                <div className='h-screen flex justify-center items-center'><span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>{loading ? `Searching for results...` : "No results found"}</span></div>
+            )}
+            {marketsData.length > 0 && <OurMarkets data={marketsData} />}
             {/* <RelatedProducts /> */}
-            <HensleyNews data={blogsData} pageDetails={{ hensleyNewsTitle: "POSTS RELATED TO YOUR SEARCH" }} />
-            {/* <TentTypes /> */}
-            {/* <RelatedProjects /> */}
+            {tentsData.length > 0 && <TentTypes data={tentsData} />}
+            {blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: "POSTS RELATED TO YOUR SEARCH" }} />}
+            {projectsData.length > 0 && <RelatedProjects data={projectsData} />}
         </>
     )
 }

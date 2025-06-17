@@ -2,11 +2,15 @@ import searchIcon from '@/assets/icons/search-light.svg';
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { PrimaryImage } from '../common/PrimaryImage';
 
 export const SearchModal = ({ closeModal, isActive }) => {
     const inputRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState('');
-  const redirectWithLoader = useRedirectWithLoader();
+    const redirectWithLoader = useRedirectWithLoader();
+    const pathname = usePathname();
+    const params = useSearchParams();
 
     useEffect(() => {
         if (isActive && inputRef.current) {
@@ -25,7 +29,15 @@ export const SearchModal = ({ closeModal, isActive }) => {
         closeModal();
     };
 
-    if (!isActive) return null;
+    useEffect(() => {
+      if(pathname === '/search-results') {
+        const term = params.get('query') || '';
+        setSearchTerm(term);
+      };
+    }, [])
+    
+
+    if (!isActive && pathname !== '/search-results') return null;
 
     return (
         <div className='search-modal z-10'>
@@ -89,16 +101,12 @@ export const SearchModal = ({ closeModal, isActive }) => {
                         aria-label="Search input"
                     />
                     <button
-                        className="ml-4 sm:ml-6 bg-secondary-alt size-16 sm:size-20 lg:size-24 outline-none border-0 flex justify-center items-center hover:scale-110 focus:scale-110 transition-all duration-300 ease-in-out"
+                        className="group ml-4 sm:ml-6 bg-secondary-alt size-16 sm:size-20 lg:size-24 outline-none border-0 flex justify-center items-center hover:scale-110 focus:scale-110 transition-all duration-300 ease-in-out"
                         onClick={handleSearch}
                         aria-label="Search"
                     >
-                        <Image
-                            src={searchIcon}
-                            className="w-6 sm:w-8 lg:w-10"
-                            alt=""
-                            aria-hidden="true"
-                        />
+                        <PrimaryImage customClasses='group-hover:hidden transition duration-300' url={"https://static.wixstatic.com/shapes/0e0ac5_8e76d2cbe028479b94e053c1631e7ecb.svg"} />
+                        <PrimaryImage customClasses='group-hover:block hidden transition duration-300' url={"https://static.wixstatic.com/shapes/0e0ac5_0fa1116dde02428ab409430bcd46815c.svg"} />
                     </button>
                 </div>
             </div>

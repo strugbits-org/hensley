@@ -7,7 +7,7 @@ import searchIcon from '@/assets/icons/search.svg';
 import userIcon from '@/assets/icons/user.svg';
 import cartIcon from '@/assets/icons/cart.svg';
 import { CustomLink } from '../common/CustomLink';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { SubCategoriesModal } from '../Modals/SubCategoriesModal';
 import { MarketTentModal } from '../Modals/MarketTentModal';
@@ -258,12 +258,12 @@ export const Header = ({ data, marketsData, tentsData }) => {
                     ) : null}
 
                     {/* Search Modal */}
-                    {searchModal && (
+                    <Suspense>
                         <SearchModal
                             isActive={searchModal}
                             closeModal={() => setSearchModal(false)}
                         />
-                    )}
+                    </Suspense>
                 </div>
 
                 <div className="relative">

@@ -43,7 +43,7 @@ export const HeaderMobileMenu = ({
         <div className={`z-10 lg:hidden fixed inset-y-0 right-0 w-full transform transition-transform duration-500 ease-in-out ${transitionClass}`}>
             <div className="h-full flex flex-col bg-primary-alt shadow-xl">
                 <div className="relative flex-1 px-3 overflow-y-auto hide-scrollbar">
-                    {!searchModal ? (
+                    {!searchModal && (
                         <div className="bg-white mb-3 min-h-[98.5vh] flex flex-col">
                             <div className="h-[5.375rem] bg-primary-alt"></div>
                             <div className="nav-container relative px-2 pt-24 pb-3 grow">
@@ -102,9 +102,8 @@ export const HeaderMobileMenu = ({
                                 )}
                             </div>
                         </div>
-                    ) : (
-                        <SearchModal isMobileMenu isActive={searchModal} closeModal={() => setSearchModal(false)} />
                     )}
+                    <SearchModal isMobileMenu isActive={searchModal} closeModal={() => setSearchModal(false)} />
                 </div>
             </div>
         </div>
