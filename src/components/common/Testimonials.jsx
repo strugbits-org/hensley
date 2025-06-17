@@ -55,12 +55,12 @@ export const Testimonials = ({ data, pageDetails, lgPreview = 1.4, cardClasses, 
         <div className='w-full mb-20'>
             <div className='sm:px-0 px-[12px] flex items-center flex-col'>
                 <SectionTitle
-                    text={data[0]?.sectionTitle}
+                    text={data[0]?.sectionTitle || 'what people say'}
                     classes="py-[40px] border-t border-b border-black lg:!mt-0 lg:border-none"
                 />
 
             </div>
-            <div className="p-6 border border-primary-border">
+            <div className="p-6 border-t border-primary-border">
                 <div ref={sliderRef} className={`${sliderClasses} keen-slider lg:pl-32`}>
                     {data.map((testimonial, index) => {
                         return (
