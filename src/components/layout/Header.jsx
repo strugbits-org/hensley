@@ -231,7 +231,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                                     <li key={title} className="h-full flex justify-center items-center relative group">
                                         <button
                                             key={title}
-                                            className="uppercase h-full w-full text-secondary-alt text-xs font-haasRegular tracking-normal hover:tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                                            className="uppercase h-full w-full text-secondary-alt text-xs font-haasRegular tracking-[2px] hover:tracking-[3px] transition-[letter-spacing] duration-300 ease-in-out text-center"
                                             onClick={() => handleSubMenuClick(item)}
                                         >
                                             {title}

@@ -8,7 +8,7 @@ import Loading from '@/app/loading'
 import { searchProducts } from '@/services/search'
 import { logError } from '@/utils'
 
-const RelatedProducts = ({ data, term, pageSize }) => {
+const RelatedProducts = ({ data, term, pageSize, savedProducts, setSavedProducts }) => {
     const [loading, setLoading] = useState(false);
     const [searchCompleted, setSearchCompleted] = useState(false);
     const [products, setProducts] = useState([]);
@@ -43,7 +43,12 @@ const RelatedProducts = ({ data, term, pageSize }) => {
             <SectionTitle text="PRODUCTS RELATED TO YOUR SEARCH" classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />
             <div className='w-full h-full grid grid-cols-6 max-2xl:grid-cols-4 max-lg:grid-cols-3 max-md:grid-cols-2 gap-x-[24px] gap-y-[20px]'>
                 {products.map((item, index) => (
-                    <SecondaryProductCard key={index} data={item} />
+                    <SecondaryProductCard
+                        key={index}
+                        data={item}
+                        savedProducts={savedProducts}
+                        setSavedProducts={setSavedProducts}
+                    />
                 ))}
             </div>
             <div className='w-full flex justify-center items-center'>

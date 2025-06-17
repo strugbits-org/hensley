@@ -1,105 +1,59 @@
 'use client'
 import React from 'react'
 import SectionTitle from '../common/SectionTitle'
-import Image from 'next/image'
-import image from '@/assets/blog-1.png'
-import FilterCardSubCategories from '../common/FilterCardSubCategories'
+import { PrimaryImage } from '../common/PrimaryImage'
+import { CustomLink } from '../common/CustomLink'
+import { formatDate } from '@/utils'
+import { Tag } from '../common/helpers/Tag'
 
-const Buttons = ({ text, classes }) => {
-    return (
-        <>
-            <button className={`${classes} border uppercase bg-white font-haasLight text-[10px] leading-[15px] p-1`}>{text}</button>
-        </>
-    )
-}
+const EventHighLight = ({ data, handleFilterChange }) => {
 
-const EventHighLight = () => {
+    if (!data) return;
+
+    const { slug, author, blogRef, markets, studios } = data;
     return (
-        <div className='w-full'>
+        <div className='w-full group'>
             <SectionTitle
                 text="HENSLEY NEWS"
-                classes={
-                    "lg:bg-primary-alt pt-[36px] pb-[44px]"
-                }
+                classes={"lg:bg-primary-alt pt-[36px] pb-[44px]"}
             />
             <div className='w-full border p-[24px] gap-x-[24px] flex lg:flex-row flex-col '>
-                <div className='lg:w-1/2'>
-                    <Image src={image} className='h-full w-full' />
+                <div className='lg:w-1/2 overflow-hidden'>
+                    <PrimaryImage url={blogRef.coverImage} alt={blogRef.title} customClasses="h-full w-full min-h-[528px] max-h-[528px] object-cover transition-transform duration-300 group-hover:scale-105" />
                 </div>
                 <div className='lg:w-1/2  flex flex-row lg:flex-col gap-x-[20px] lg:px-0 max-lg:py-[40px] lg:gap-y-[15px] relative '>
                     <div className=' max-lg:w-1/2  flex flex-col gap-y-[15px]'>
-                        <div className='w-full flex gap-x-[10px] justify-between'>
-                            <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-                inline
-                '>wedding</span>
-                            <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-              inline
-                '>DEC 28, 2023 – Treasure Island</span>
+                        <div className='w-full flex gap-x-[10px] justify-end'>
+                            <span className='font-haasRegular uppercase text-[12px] text-secondary-altinline'>{author?.nickname || author?.firstName || author?.lastName} - {formatDate(blogRef.publishedDate)}</span>
                         </div>
 
-                        <span className='
-                uppercase
-                text-secondary-alt
-                lg:text-[60px]
-                lg:leading-[55px]
-                sm:text-[35px]
-                sm:leading-[32px]
-                text-[25px]
-                leading-[23px]
-                font-recklessRegular
-                block
-                '>
-                            EXPERT TIPS FOR CREATING A SPECTACULAR HOLIDAY EVENT IN A CUSTOM TENT
+                        <span className='uppercase text-secondary-alt lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[32px] text-[25px] leading-[23px] font-recklessRegular block '>
+                            {blogRef.title}
                         </span>
 
-                        <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-                text-left
-                lg:block
-                 hidden
-                '>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sit amet ligula lorem. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam elementum mauris a semper consectetur. Cras et congue neque. Praesent iaculis, magna sit amet facilisis iaculis, risus nisi vestibulum dolor, viverra maximus nunc sem nec velit. Fusce ornare massa sit amet eros pulvinar, eget interdum dui semper. Morbi nulla nunc, consectetur ut efficitur eget, tristique nec tortor. Praesent dolor neque, porttitor vel tellus et, semper venenatis odio. Phasellus magna ipsum, auctor eu nibh vel, volutpat blandit turpis.</span>
-                
-                    <div className='w-full flex flex-wrap gap-x-[10px] gap-y-[10px]'>
-                        <Buttons text="corporate" classes={"!bg-transparent border border-black"} />
-                        <Buttons text="event design and production" />
-                        <Buttons text="+3 Studios" />
+                        <span className='font-haasRegular uppercase text-[12px] text-secondary-alt text-left lg:block hidden'>{blogRef.excerpt}</span>
+                        <ul className="flex gap-2 flex-wrap">
+                            {markets.map((market, index) => (
+                                <Tag onClick={() => handleFilterChange(market._id)} key={index} text={market.category} />
+                            ))}
+                            {studios.map((studio, index) => (
+                                <React.Fragment key={index}>
+                                    {index < 2 && (
+                                        <Tag onClick={() => handleFilterChange(studio._id)} text={studio.name} />
+                                    )}
+                                </React.Fragment>
+                            ))}
+                            {studios.length > 2 ? (
+                                <Tag text={`+${studios.length - 2} studios`} />
+                            ) : null}
+                        </ul>
                     </div>
 
+                    <div className='max-lg:w-1/2 lg:justify-end h-full text-right flex flex-col gap-y-[15px] '>
+                        <p className='font-haasRegular uppercase text-[12px] text-secondary-alt text-left lg:hidden block '>{blogRef.excerpt}</p>
+                        <CustomLink to={`/posts/${slug}`} className='font-haasRegular text-[12px] leading-[20px] uppercase text-secondary-alt text-left'>+ READ MORE</CustomLink>
                     </div>
 
-
-                    <div className=' max-lg:w-1/2 lg:justify-end h-full text-right flex flex-col gap-y-[15px] '>
-                        <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-                text-left
-                lg:hidden
-                block
-                '>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sit amet ligula lorem. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam elementum mauris a semper consectetur. Cras et congue neque. Praesent iaculis, magna sit amet facilisis iaculis, risus nisi vestibulum dolor, viverra maximus nunc sem nec velit. Fusce ornare massa sit amet eros pulvinar, eget interdum dui semper. Morbi nulla nunc, consectetur ut efficitur eget, tristique nec tortor. Praesent dolor neque, porttitor vel tellus et, semper venenatis odio. Phasellus magna ipsum, auctor eu nibh vel, volutpat blandit turpis.</span>
-                       <button className='
-                    font-haasRegular
-                    text-[12px]
-                    leading-[20px]
-                    uppercase
-                    text-secondary-alt
-                    text-left
-                    
-                    '>+ READ MORE</button>
-                    </div>
-             
                 </div>
             </div>
 
@@ -107,4 +61,4 @@ const EventHighLight = () => {
     )
 }
 
-export default EventHighLight
+export default EventHighLight;
