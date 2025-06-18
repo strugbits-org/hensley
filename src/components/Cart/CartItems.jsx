@@ -27,7 +27,7 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
                     aria-label="Decrease quantity"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1">
-                        <line id="Line_460" data-name="Line 460" x1="15" transform="translate(15 0.5) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                        <line id="Line_460" data-name="Line 460" x1="15" transform="translate(15 0.5) rotate(180)" fill="none" stroke="#000" strokeWidth="1" />
                     </svg>
                 </button>
                 <input
@@ -46,8 +46,8 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
                     aria-label="Increase quantity"
                 >
                     <svg id="Group_3960" data-name="Group 3960" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">
-                        <line id="Line_1" data-name="Line 1" y2="15" transform="translate(7.5 15) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
-                        <line id="Line_2" data-name="Line 2" x1="15" transform="translate(15 7.5) rotate(180)" fill="none" stroke="#000" stroke-width="1" />
+                        <line id="Line_1" data-name="Line 1" y2="15" transform="translate(7.5 15) rotate(180)" fill="none" stroke="#000" strokeWidth="1" />
+                        <line id="Line_2" data-name="Line 2" x1="15" transform="translate(15 7.5) rotate(180)" fill="none" stroke="#000" strokeWidth="1" />
                     </svg>
 
                 </button></>
@@ -84,6 +84,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     const { removeProduct } = actions;
 
     const productName = data?.productName?.original || data?.name;
+    const systemFields = ["POOLCOVER"];
 
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
@@ -95,7 +96,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
                     <span className='block text-[16px] text-secondary-alt font-haasLight uppercase'>Product</span>
                     <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
                     <div className='grid sm:grid-cols-2 grid-cols-1 gap-x-[26px] gap-y-[4px]'>
-                        {descriptionLines.map(({ title, value }) => (
+                        {descriptionLines.map(({ title, value }) => systemFields.includes(title) ? null : (
                             <div key={title}>
                                 <span className='text-[12px] text-secondary-alt font-haasBold uppercase mr-[20px]'>{title}</span>
                                 <span className='text-[12px] text-secondary-alt font-haasLight uppercase'>{value}</span>

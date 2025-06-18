@@ -31,17 +31,17 @@ const CareerOppurtunities = ({ data }) => {
     };
 
 
-    const detailText = detail?.replace(/\n+/g, ' ').trim();
-    const shortSummary = detailText.split('. ').slice(0, 2).join('. ') + '.';
-    const displayedText = showFullText ? detailText : shortSummary;
+    const paragraphs = detail?.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+    const shortSummary = paragraphs?.join(' ').split('. ').slice(0, 2).join('. ') + '.';
+
 
 
     return (
         <div>
-            <div className='flex flex-col gap-x-[48px] pt-[48px] pb-[56px]'>
-                <SectionTitle text={title} classes={"lg:!text-[140px] lg:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] !leading-[35px] border-none"} />
+            <div className='flex flex-col gap-x-[48px] pt-[48px] pb-[56px] lg:px-0 sm:px-[60px]'>
+                <SectionTitle text={title} classes={"lg:!text-[140px] xl:!px-[200px] lg:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] !leading-[35px] border-none"} />
                 <div className='w-full text-center '>
-                    <button className='group sm:w-[656px] w-[95%] relative bg-primary lg:h-[130px] h-[90px] my-[33px] group transition-all duration-300 hover:bg-[#2c2216]'>
+                    {/* <button className='group sm:w-[656px] w-[95%] relative bg-primary lg:h-[130px] h-[90px] my-[33px] group transition-all duration-300 hover:bg-[#2c2216]'>
                         <span className='font-haasLight uppercase text-[16px] hover:border-secondary-alt  group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
                             {buttonLabel}
                         </span>
@@ -57,11 +57,11 @@ const CareerOppurtunities = ({ data }) => {
                                 <line x1="13.202" y2="13.202" fill="none" strokeMiterlimit="10" strokeWidth="1" />
                             </g>
                         </svg>
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
-            <div className='w-full flex flex-col justify-center items-center border-t border-b'>
+            <div className='w-full flex flex-col justify-center items-center border-t border-b border-primary-border'>
                 <div className="lg:w-[80%] w-[95%] py-[24px] relative">
                     <div className="lg:h-[875px] sm:h-[408px] h-[263px] relative">
                         <video
@@ -119,13 +119,21 @@ const CareerOppurtunities = ({ data }) => {
                                 )
                             }
                         </h3>
-                        <div className='max-w-[550px] sm:w-[360px]'>
-                            <p className="sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt">
-                                {displayedText}
-                            </p>
+                        <div className='max-w-[608px] lg:w-[608px] sm:w-[360px]'>
+                            {showFullText ? (
+                                <div className="uppercase sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt space-y-4">
+                                    {paragraphs.map((p, i) => (
+                                        <p key={i}>{p}</p>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="uppercase sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt">
+                                    {shortSummary}
+                                </p>
+                            )}
 
                             <button
-                                className="uppercase bg-transparent text-[16px] leading-[20px] text-secondary-alt font-haasRegular mt-[24px]"
+                                className="uppercase bg-transparent text-[16px] leading-[20px] text-secondary-alt font-haasRegular hover:font-haasBold mt-[24px]"
                                 onClick={() => setShowFullText(prev => !prev)}
                             >
                                 {showFullText ? 'See Less -' : 'See More +'}

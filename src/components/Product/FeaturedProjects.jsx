@@ -5,7 +5,7 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import FeaturedCard from './FeaturedCard';
 
-export const FeatuedProjects = ({ data, pageDetails, loop = true, origin = "center", classes }) => {
+export const FeaturedProjects = ({ data, pageDetails, loop = true, origin = "center", classes }) => {
 
     const { featuredProjectTitle } = pageDetails;
     const sliderInstance = useRef();

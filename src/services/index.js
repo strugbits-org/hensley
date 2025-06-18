@@ -54,7 +54,7 @@ export const fetchHeaderData = async () => {
 
 export const fetchMarketsData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"] });
+    const response = await queryCollection({ dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"], sortKey: "orderNumber" });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
@@ -68,7 +68,7 @@ export const fetchMarketsData = async () => {
 
 export const fetchTentsData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "TentsCollection", includeReferencedItems: ["tent"] });
+    const response = await queryCollection({ dataCollectionId: "TentsCollection", includeReferencedItems: ["tent","productData"] });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
@@ -91,7 +91,7 @@ export const fetchFooterData = async () => {
       queryCollection({ dataCollectionId: "FooterCollection" }),
       queryCollection({ dataCollectionId: "SocialLinks" }),
       queryCollection({ dataCollectionId: "FooterNavigation" }),
-      queryCollection({ dataCollectionId: "Branches" }),
+      queryCollection({ dataCollectionId: "Branches", sortKey: "orderNumber" }),
     ]);
 
     if (!Array.isArray(footerData.items) || !Array.isArray(footerNaviationData.items)) {
@@ -205,11 +205,114 @@ export const fetchBlogsData = async () => {
   }
 };
 
+export const fetchFeaturedBlogs = async (productId) => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "ManageBlogs",
+            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
+            ne: [
+                {
+                    key: "isHidden",
+                    value: true
+                }
+            ],
+            hasSome: [
+                {
+                    key: "storeProducts",
+                    values: [productId]
+                }
+            ],
+            sortKey: "publishDate",
+            sortOrder: "desc",
+        });
+
+        if (!Array.isArray(response.items) || response.items.length === 0) {
+            throw new Error(`Selected blog not found`);
+        }
+
+        return response.items;
+    } catch (error) {
+        logError(`Error fetching other blogs: ${error.message}`, error);
+    }
+}
+
+
+
+export const fetchFeaturedProjects = async (id) => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "PortfolioCollection",
+            includeReferencedItems: ["portfolioRef"],
+            ne: [
+                {
+                    key: "isHidden",
+                    value: true
+                }
+            ],
+            hasSome: [
+                {
+                    key: "storeProducts",
+                    values: [id]
+                }
+            ],
+            sortKey: "order"
+        });
+        if (!Array.isArray(response.items)) {
+            throw new Error(`Response does not contain items array`);
+        }
+
+        return response.items;
+    } catch (error) {
+        logError(`Error fetching featured projects: ${error.message}`, error);
+    }
+}
+
+
+export const fetchTentsWithProjectsAndBlogs = async () => {
+  try {
+    // Step 1: Fetch all tents
+    const tents = await fetchTentsData();
+    if (!Array.isArray(tents)) throw new Error("Tents not found");
+
+    // Step 2: For each tent, fetch related featured projects and blogs
+    const results = await Promise.all(
+      tents.map(async (item) => {
+        const tentData = item;
+
+        // Parallel fetching of related content
+        const [featuredProjects, blogs] = await Promise.all([
+          fetchFeaturedProjects(item.tent?._id),
+         fetchFeaturedBlogs(item.tent?._id), 
+        ]);
+
+        return {
+          tentData,
+          portfolio:featuredProjects,
+          blogs,
+        };
+      })
+    );
+
+    return results;
+  } catch (error) {
+    logError(`Error fetching tents with projects and blogs: ${error.message}`, error);
+  }
+};
+
+
+
+
+// --------------------------------------------------------------------------
+
+
+
+
+
 export const fetchBestSellers = async (slug = '/') => {
   try {
     const response = await queryCollection({
       dataCollectionId: "BestSellers",
-      includeReferencedItems: ["product"],
+      includeReferencedItems: ["product", "productData"],
       eq: [
         {
           key: "slug",
@@ -223,7 +326,13 @@ export const fetchBestSellers = async (slug = '/') => {
       throw new Error(`Response does not contain items array`);
     }
 
-    return response.items;
+    const data = response.items.map(item => {
+      return {
+        ...item.productData,
+        product: item.product,
+      }
+    });
+    return data;
   } catch (error) {
     logError(`Error fetching best sellers data: ${error.message}`, error);
   }

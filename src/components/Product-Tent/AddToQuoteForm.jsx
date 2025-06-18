@@ -4,7 +4,7 @@ import { AddToQuote } from './AddtoQuoteButton';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { calculateTotalCartQuantity, formatDateNumeric, logError } from '@/utils';
+import { formatDateNumeric, logError } from '@/utils';
 import AirDatepicker from 'air-datepicker';
 import localeEn from 'air-datepicker/locale/en';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';

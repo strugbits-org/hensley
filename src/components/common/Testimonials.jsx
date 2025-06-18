@@ -5,8 +5,7 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import { TestimonialCard } from './TestimonialCard';
 
-export const Testimonials = ({ data, pageDetails }) => {
-    const { testimonialsTitle } = pageDetails;
+export const Testimonials = ({ data, pageDetails, lgPreview = 1.4, cardClasses, sliderClasses, imageExp = true, titleClass = '' }) => {
     const sliderInstance = useRef();
     const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -25,9 +24,12 @@ export const Testimonials = ({ data, pageDetails }) => {
                     slides: { perView: 2, spacing: 10 },
                 },
                 "(min-width: 1025px)": {
-                    slides: { perView: 1.4, spacing: 10 },
+                    slides: { perView: lgPreview, spacing: 10 },
+                    origin: 'center'
                 },
             },
+            slides: { perView: lgPreview, spacing: 10 }, // <- This sets default for non-breakpoint widths
+            origin: "center",
             created(slider) {
                 sliderInstance.current = slider;
             },
@@ -48,18 +50,22 @@ export const Testimonials = ({ data, pageDetails }) => {
 
     return (
         <div className='w-full mb-20'>
-            <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={testimonialsTitle} classes="py-[40px] lg:border-none md:mt-6 lg:mt-0 border-t border-b" />
+            <div className='sm:px-0 px-[12px] py-[20px] flex items-center flex-col'>
+                <SectionTitle
+                    text={data[0]?.sectionTitle || 'what people say'}
+                    classes="py-[40px] lg:!mt-0 "
+                />
+
             </div>
-            <div className="p-6">
-                <div ref={sliderRef} className="keen-slider lg:pl-32">
+            <div className="p-6 border-t border-b border-primary-border">
+                <div ref={sliderRef} className={`${sliderClasses} keen-slider lg:pl-32`}>
                     {data.map((testimonial, index) => {
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide flex transition-[opacity] duration-300 ease-in-out ${isBeforeActive(index) ? "invisible" : ""}`}
+                                className={`keen-slider__slide flex justify-center transition-[opacity] duration-300 ease-in-out ${isBeforeActive(index) ? "invisible" : ""}`}
                             >
-                                <TestimonialCard data={testimonial} classes={"lg:!min-h-[499px] lg:!h-full !h-max"} />
+                                <TestimonialCard imageExp={imageExp} data={testimonial} classes={`lg:!min-h-[499px] lg:!h-full !h-max ${cardClasses}`} titleClass={titleClass} />
                             </div>
                         );
                     })}

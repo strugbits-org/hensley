@@ -2,7 +2,7 @@ import React from 'react'
 import SectionTitle from './SectionTitle'
 import { MarketCard } from './MarketCard'
 
-export const MarketSection = ({ data, pageDetails }) => {
+export const MarketSection = ({ data, pageDetails, classes }) => {
   
   const { marketsTitle } = pageDetails
   return (
@@ -12,7 +12,7 @@ export const MarketSection = ({ data, pageDetails }) => {
       </div>
       <div className='w-full flex flex-col lg:flex-row items-center justify-center gap-6 p-6 pb-20'>
         {data.map((item, index) => (
-          <MarketCard key={index} data={item} size={"large"} />
+          <MarketCard classes={classes} key={index} data={item} size={"large"} />
         ))}
       </div>
     </div>

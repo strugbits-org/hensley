@@ -7,8 +7,9 @@ import "./styles.css"
 import image from '@/assets/tent-page-1.png'
 import Image from "next/image"
 import { PrimaryImage } from '../common/PrimaryImage'
+import { generateImageURL } from '@/utils/generateImageURL'
 
-const TentTypesSlider = () => {
+const TentTypesSlider = ({ data }) => {
     const [currentSlide, setCurrentSlide] = useState(0)
     const [loaded, setLoaded] = useState(false)
 
@@ -22,7 +23,7 @@ const TentTypesSlider = () => {
             spacing: 15,
             origin: 'center',
         },
-     
+
         slideChanged(slider) {
             setCurrentSlide(slider.track.details.rel)
         },
@@ -34,8 +35,13 @@ const TentTypesSlider = () => {
     return (
         <>
             <div ref={sliderRef} className="lg:!hidden block keen-slider !h-[492px]">
-                {[...Array(totalSlides)].map((_, idx) => {
-                    const isActive = currentSlide % totalSlides === idx
+                {data.map((item, idx) => {
+                    const isActive = currentSlide % data.length === idx
+
+                    const { tent } = item;
+                    const imageURL = generateImageURL({ wix_url: tent?.mainMedia });
+
+
                     return (
                         <div key={idx} className="keen-slider__slide relative">
                             {/* <Image
@@ -44,7 +50,7 @@ const TentTypesSlider = () => {
                 className="h-full w-full object-contain"
               /> */}
                             <div className='w-full h-full border px-[12px] py-[12px]' >
-                                <div className='w-full h-full bg-no-repeat bg-center px-[21px] py-[24px]' style={{ backgroundImage: `url(${image.src})` }}>
+                                <div className='w-full h-full bg-no-repeat bg-center px-[21px] py-[24px]' style={{ backgroundImage: `url(${imageURL})` }}>
                                     <div className='border-b  border-white pb-[17px] w-full'>
                                         <h3 className='w-full break-words 
                              text-[35px]
@@ -59,6 +65,7 @@ const TentTypesSlider = () => {
                         </div>
                     )
                 })}
+
             </div>
 
         </>

@@ -1,7 +1,19 @@
 import { MarketPage } from "@/components/Market";
+import { fetchMarketsData } from "@/services";
 import { fetchSelectedMarketData } from "@/services/market";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  try {
+    const marketsData = await fetchMarketsData();
+    const paths = marketsData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
+    return paths;
+  } catch (error) {
+    logError("Error generating static params(market page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {

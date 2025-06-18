@@ -31,7 +31,7 @@ const useDebounce = (callback, delay) => {
 function Listing({ data }) {
   const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData } = data;
   let bannerIndex = -1;
-  const pageSize = 12;
+  const pageSize = 16;
 
   const [isLoading, setIsLoading] = useState(true);
   const [products, setProducts] = useState([]);
@@ -115,13 +115,6 @@ function Listing({ data }) {
     setIsLoading(false);
   }, [sortedProducts, productBannersData]);
 
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   const fetchSavedProducts = async () => {
     try {
       const savedProducts = await fetchSavedProductData();
@@ -133,6 +126,10 @@ function Listing({ data }) {
 
   useEffect(() => {
     fetchSavedProducts();
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   return (

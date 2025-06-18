@@ -1,5 +1,5 @@
 import { Product } from "@/components/Product";
-import { FeatuedProjects } from "@/components/Product/FeaturedProjects";
+import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import { fetchProductPageData } from "@/services/products";
 import { logError } from "@/utils";
@@ -19,7 +19,7 @@ export default async function Page({ params }) {
       <>
         <Product data={data} />
         <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="start" />
-        <FeatuedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
+        <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Projects featured in this Product entry:" }} loop={false} origin="start" />
       </>
     );
   } catch (error) {

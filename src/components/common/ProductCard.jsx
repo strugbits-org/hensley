@@ -5,22 +5,31 @@ import { copyToClipboard } from '@/utils';
 import { CustomLink } from './CustomLink';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
+import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import { loaderActions } from '@/store/loaderStore';
 
-function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts }) {
+function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts, btnClass }) {
     const { product } = data;
     const { name } = product;
+    const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
+    const redirectWithLoader = useRedirectWithLoader();
 
     const handleAddToCart = () => {
-        lightboxActions.setAddToCartModal({ open: true, product });        
+        if (isTent) {
+            loaderActions.show();
+            redirectWithLoader(`/tent/${product.slug}`);
+            return;
+        };
+        lightboxActions.setAddToCartModal({ open: true, productData: data });
     };
 
     return (
-        <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
+        <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between max-lg:h-full h-[620px] ${type !== 'listing' ? 'bg-primary-alt col-span-1.5 md:col-span-2' : ''}`}>
             <CustomLink to={`/product/${product.slug}`} className={`h-full overflow-hidden flex justify-center items-center p-10 ${type === 'listing' ? 'bg-white' : ''}`}>
-                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"} />
+                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full  transition-transform duration-300 group-hover:scale-105"} />
             </CustomLink>
 
-            <div className="max-w-full flex-wrap pt-2 lg:pt-6 lg:pb-2">
+            <div className="flex max-w-full flex-wrap pl-[23px] lg:gap-y-[15px] pt-2 lg:pt-6 ">
                 <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular">
                     {name}
                 </h2>
@@ -50,7 +59,7 @@ function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProdu
                     </div>
 
                     <button
-                        className="w-full 2xl:w-auto min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary px-4 py-3 gap-x-7"
+                        className={`${btnClass} w-full 2xl:w-auto min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary px-4 py-3 gap-x-7`}
                         onClick={handleAddToCart}
                     >
                         <span className="uppercase font-haasRegular text-[12px]">add to cart</span>

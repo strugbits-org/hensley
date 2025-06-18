@@ -56,7 +56,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                     const product = item.product;
                                                     const descriptionLines = product.descriptionLines ? formatDescriptionLines(product.descriptionLines) : product.customTextFields;
                                                     const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-                                                    const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE")?.value;
+                                                    const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
                                                     if (productCollection) {
                                                         const productSetItems = productCollection.split("; ");

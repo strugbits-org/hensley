@@ -6,7 +6,7 @@ export const fetchTentData = async (slug) => {
     try {
         const response = await queryCollection({
             dataCollectionId: "TentsCollection",
-            includeReferencedItems: ["tent"],
+            includeReferencedItems: ["tent", "productData"],
             eq: [
                 {
                     key: "slug",
@@ -25,6 +25,8 @@ export const fetchTentData = async (slug) => {
         logError(`Error fetching tents data: ${error.message}`, error);
     }
 };
+
+
 
 export const fetchTentPageData = async (slug) => {
     try {
@@ -48,5 +50,36 @@ export const fetchTentPageData = async (slug) => {
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);
+    }
+}
+
+export const fetchFeaturedBlogs = async (productId) => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "ManageBlogs",
+            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
+            ne: [
+                {
+                    key: "isHidden",
+                    value: true
+                }
+            ],
+            hasSome: [
+                {
+                    key: "storeProducts",
+                    values: [productId]
+                }
+            ],
+            sortKey: "publishDate",
+            sortOrder: "desc",
+        });
+
+        if (!Array.isArray(response.items) || response.items.length === 0) {
+            throw new Error(`Selected blog not found`);
+        }
+
+        return response.items;
+    } catch (error) {
+        logError(`Error fetching other blogs: ${error.message}`, error);
     }
 }

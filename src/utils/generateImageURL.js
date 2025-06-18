@@ -72,7 +72,7 @@ export const formatProductImageURL = (url) => {
 };
 
 export const generateVideoURL = (videoSRC) => {
-  
+
   if (videoSRC && videoSRC.startsWith("wix:video://v1/")) {
     const videoID = videoSRC.replace('wix:video://v1/', '').split('/')[0];
     return `https://video.wixstatic.com/video/${videoID}/file`;
@@ -92,3 +92,7 @@ export const generateSVGURL = (wix_url) => {
   return wixImageURL + splitUrl[splitUrl.length - 2];
 
 }
+
+export const generateImageURLById = ({
+  id
+}) => generateImageURL({ wix_url: `wix:image://v1/${id}`, fit: "fit" });

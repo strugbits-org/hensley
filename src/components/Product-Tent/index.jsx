@@ -1,15 +1,32 @@
 'use client'
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PrimaryImage } from '../common/PrimaryImage';
 import parse from 'html-react-parser';
 import BannerStructures from './BannerStructures';
 // import { DownloadButton } from './DownloadButton';
 import ProductSlider from '../Product/ProductSlider';
-import ProductSlider_tab from './ProductSlider_tab';
 import { AddToQuoteForm } from './AddToQuoteForm';
+import { fetchSavedProductData } from '@/services/products';
+import { SaveProductButton } from '../common/SaveProductButton';
+import ProductSlider_tab from '../Product/ProductSlider_tab';
 
 const ProductTent = ({ productData }) => {
   const { tent, gallery } = productData;
+  const [savedProducts, setSavedProducts] = useState([]);
+
+  const fetchSavedProducts = async () => {
+    try {
+      const savedProducts = await fetchSavedProductData();
+
+      setSavedProducts(savedProducts);
+    } catch (error) {
+      logError("Error while fetching Saved Product", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSavedProducts();
+  }, []);
 
   return (
     <>
@@ -36,14 +53,16 @@ const ProductTent = ({ productData }) => {
             </div>
             <AddToQuoteForm productData={tent} />
           </div>
-          <div className="lg:flex hidden group/cart absolute right-[24px] top-[23px] border border-black rounded-full w-[56px] h-[56px] items-center justify-center shrink-0 cursor-pointer">
-            <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg" alt="Cart Icon" customClasses={"block group-hover/cart:hidden"} />
-            <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg" alt="Cart Icon" customClasses={"hidden group-hover/cart:block"} />
-          </div>
+          <SaveProductButton
+            key={productData._id}
+            productData={{ ...productData.productData, product: tent }}
+            savedProducts={savedProducts}
+            setSavedProducts={setSavedProducts}
+          />
         </div>
       </div>
       <div className='w-full min-h-screen bg-secondary-alt pt-[75px] px-[24px]'>
-        <BannerStructures data={productData} />
+        <BannerStructures title={productData?.title} data={productData?.tent} />
         <div className="w-full grid gap-[24px] mt-6 lg:grid-cols-[2fr_1fr] grid-cols-1">
           {gallery.map((item, index) => {
             const position = index % 3;

@@ -1,78 +1,35 @@
 import React from 'react'
-import image from '@/assets/blog-detail-1.png'
+import { generateImageURL } from '@/utils/generateImageURL';
+import { formatDate } from '@/utils';
+import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
 
-const Buttons = ({ text, classes }) => {
-    return (
-        <>
-            <button className={`${classes} border uppercase bg-white font-haasLight text-[10px] leading-[15px] p-1`}>{text}</button>
-        </>
-    )
-}
+const EventHighLight = ({ data }) => {
+    if (!data) return;
 
-const EventHighLight = () => {
+    const { author, blogRef, markets, studios } = data;
+
+    const imageURL = generateImageURL({ wix_url: blogRef.coverImage });
     return (
         <div className='px-[24px] w-full'>
             <div className='w-full border-b py-[24px]'>
-                <div className='w-full h-[609px] bg-no-repeat bg-center' style={{ backgroundImage: `url(${image.src})` }}></div>
+                <div className='w-full h-[609px] bg-no-repeat bg-center' style={{ backgroundImage: `url(${imageURL})` }}></div>
             </div>
             <div className='flex lg:flex-row flex-col gap-x-[182px] lg:px-0 sm:px-[70px] px-[20px] py-[40px] justify-between relative'>
                 <div className='lg:w-1/2 flex flex-col gap-y-[15px]'>
-                    <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-                block
-                '>wedding</span>
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt block '>{markets[0]?.category || ""}</span>
 
-                    <span className='
-                uppercase
-                text-secondary-alt
-                lg:text-[60px]
-                lg:leading-[55px]
-                sm:text-[35px]
-                sm:leading-[32px]
-                text-[25px]
-                leading-[23px]
-                font-recklessRegular
-                block
+                    <span className='uppercase text-secondary-alt lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[32px] text-[25px] leading-[23px] font-recklessRegular block
                 '>
-                        EXPERT TIPS FOR CREATING A SPECTACULAR HOLIDAY EVENT IN A CUSTOM TENT
+                        {blogRef.title}
                     </span>
 
-                      <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-                lg:hidden
-                block
-                '>DEC 28, 2023 – Treasure Island</span>
-                    <div className='w-full flex gap-x-[10px]'>
-                        <Buttons text="corporate" classes={"!bg-transparent border border-black"} />
-                        <Buttons text="event design and production" />
-                        <Buttons text="+3 Studios" />
-                    </div>
-                   
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:hidden block '> {formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}</span>
+                    <MarketsStudiosTags markets={markets} studios={studios} count={2} />
+
                 </div>
                 <div className='lg:w-1/2 text-right flex flex-col gap-y-[15px] '>
-                    <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-                lg:block
-                hidden
-                '>DEC 28, 2023 – Treasure Island</span>
-                    <span className='
-                font-haasRegular
-                uppercase
-                text-[12px]
-                text-secondary-alt
-                text-left
-                block
-                max-lg:mt-[60px]
-                '>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum sit amet ligula lorem. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nullam elementum mauris a semper consectetur. Cras et congue neque. Praesent iaculis, magna sit amet facilisis iaculis, risus nisi vestibulum dolor, viverra maximus nunc sem nec velit. Fusce ornare massa sit amet eros pulvinar, eget interdum dui semper. Morbi nulla nunc, consectetur ut efficitur eget, tristique nec tortor. Praesent dolor neque, porttitor vel tellus et, semper venenatis odio. Phasellus magna ipsum, auctor eu nibh vel, volutpat blandit turpis.</span>
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:block hidden '>{formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}</span>
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt text-left block max-lg:mt-[60px] '>{blogRef.excerpt}</span>
                 </div>
 
                 <svg
