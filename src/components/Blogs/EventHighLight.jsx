@@ -4,9 +4,9 @@ import SectionTitle from '../common/SectionTitle'
 import { PrimaryImage } from '../common/PrimaryImage'
 import { CustomLink } from '../common/CustomLink'
 import { formatDate } from '@/utils'
-import { Tag } from '../common/helpers/Tag'
+import { MarketsStudiosTags } from './MarketsStudiosTags'
 
-const EventHighLight = ({ data, handleFilterChange }) => {
+const EventHighLight = ({ data, handleFilterChange, selectedTags }) => {
 
     if (!data) return;
 
@@ -32,21 +32,7 @@ const EventHighLight = ({ data, handleFilterChange }) => {
                         </span>
 
                         <span className='font-haasRegular uppercase text-[12px] text-secondary-alt text-left lg:block hidden'>{blogRef.excerpt}</span>
-                        <ul className="flex gap-2 flex-wrap">
-                            {markets.map((market, index) => (
-                                <Tag onClick={() => handleFilterChange(market._id)} key={index} text={market.category} />
-                            ))}
-                            {studios.map((studio, index) => (
-                                <React.Fragment key={index}>
-                                    {index < 2 && (
-                                        <Tag onClick={() => handleFilterChange(studio._id)} text={studio.name} />
-                                    )}
-                                </React.Fragment>
-                            ))}
-                            {studios.length > 2 ? (
-                                <Tag text={`+${studios.length - 2} studios`} />
-                            ) : null}
-                        </ul>
+                        <MarketsStudiosTags markets={markets} studios={studios} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />
                     </div>
 
                     <div className='max-lg:w-1/2 lg:justify-end h-full text-right flex flex-col gap-y-[15px] '>

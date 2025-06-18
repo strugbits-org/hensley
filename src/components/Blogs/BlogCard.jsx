@@ -1,10 +1,10 @@
 import React from 'react';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { formatDate } from '@/utils';
-import { Tag } from '../common/helpers/Tag';
 import { CustomLink } from '../common/CustomLink';
+import { MarketsStudiosTags } from './MarketsStudiosTags';
 
-function BlogCard({ data }) {
+function BlogCard({ data, handleFilterChange, selectedTags }) {
     const { slug, author, blogRef, markets, studios } = data;
 
     const arrowImageUrl = "https://static.wixstatic.com/media/0e0ac5_87d58241be704c008a2500d6691fb318~mv2.png";
@@ -40,21 +40,7 @@ function BlogCard({ data }) {
                     {formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}
                 </p>
 
-                <ul className="flex gap-2 flex-wrap">
-                    {markets.map((market, index) => (
-                        <Tag key={index} text={market.category} />
-                    ))}
-                    {studios.map((studio, index) => (
-                        <React.Fragment key={index}>
-                            {index < 1 && (
-                                <Tag text={studio.name} />
-                            )}
-                        </React.Fragment>
-                    ))}
-                    {studios.length > 1 && (
-                        <Tag text={`+${studios.length - 1} studios`} />
-                    )}
-                </ul>
+                <MarketsStudiosTags markets={markets} studios={studios} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />
             </div>
         </div>
     );

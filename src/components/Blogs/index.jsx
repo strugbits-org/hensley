@@ -70,7 +70,7 @@ const Blogs = ({ data }) => {
 
     return (
         <div className="w-full">
-            {featuredBlog && <EventHighLight data={featuredBlog} handleFilterChange={handleFilterChange} />}
+            {featuredBlog && <EventHighLight data={featuredBlog} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />}
 
             <div className="w-full bg-primary-border py-5">
                 <FilterCardSubCategories
@@ -85,6 +85,7 @@ const Blogs = ({ data }) => {
                     <BlogCard
                         key={item._id || item.id || index}
                         data={item}
+                        handleFilterChange={handleFilterChange}
                         selectedTags={selectedTags}
                     />
                 ))}
