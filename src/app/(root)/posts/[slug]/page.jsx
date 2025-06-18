@@ -1,7 +1,18 @@
 import BlogDetails from "@/components/BlogDetails";
-import { fetchPostPageData } from "@/services/blogs";
+import { fetchBlogs, fetchPostPageData } from "@/services/blogs";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  try {
+    const blogData = await fetchBlogs();
+    const paths = blogData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
+    return paths;
+  } catch (error) {
+    logError("Error generating static params(blog page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {

@@ -2,6 +2,23 @@ import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { fetchFeaturedProjects, fetchMatchedProducts } from "../products";
 
+export const fetchPoolCovers = async () => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "PoolCovers",
+            includeReferencedItems: ["covers", "productData"],
+        });
+
+        if (!Array.isArray(response.items)) {
+            throw new Error(`Response does not contain items array`);
+        }
+
+        return response.items;
+    } catch (error) {
+        logError(`Error fetching covers data: ${error.message}`, error);
+    }
+};
+
 export const fetchPoolCoverData = async (slug) => {
     try {
         const response = await queryCollection({

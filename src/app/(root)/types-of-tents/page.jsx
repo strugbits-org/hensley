@@ -8,13 +8,10 @@ export default async function Page({ params }) {
   try {
 
     const projectandblog = await fetchTentsWithProjectsAndBlogs();
-    console.log("response is the--: ",projectandblog);
 
     const [tents] = await Promise.all([
       fetchTentsData(),
     ]);
-
-    console.log("--Tents is--",tents);
 
     const data = {
       tents,

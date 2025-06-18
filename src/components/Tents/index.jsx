@@ -1,15 +1,11 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import TentsTypes from './TentsTypes'
 import BannerStructures from './BannerStructures'
 import OurProjects from '../Collections/OurProjects'
-import { HensleyNews } from '../common/HensleyNews'
-import { searchOtherData } from '@/services/search'
-import { Button } from './Button'
 import { DownloadButton } from './DownloadButton'
-import { fetchFeaturedBlogs } from '@/services/tents'
-import { FeatuedProjects } from '../Product/FeaturedProjects'
+import { FeaturedProjects } from '../Product/FeaturedProjects'
 
 const Tents = ({ data }) => {
 
@@ -24,7 +20,7 @@ const Tents = ({ data }) => {
                     <>
                         <BannerStructures title={item?.tentData?.productData?.title} data={item?.tentData?.tent} />
                         <OurProjects data={item.portfolio} />
-                        <FeatuedProjects data={item?.blogs} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
+                        <FeaturedProjects data={item?.blogs} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
 
                     </>
                 )
