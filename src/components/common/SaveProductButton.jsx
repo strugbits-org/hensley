@@ -3,7 +3,7 @@ import { PrimaryImage } from './PrimaryImage';
 import { toast } from 'sonner';
 import { saveProduct, unSaveProduct } from '@/services/products';
 
-export const SaveProductButton = ({ productData, savedProducts, setSavedProducts }) => {
+export const SaveProductButton = ({ productData, savedProducts, setSavedProducts, type = "primary" }) => {
     const [isUpdating, setIsUpdating] = useState(false);
 
     const isProductSaved = savedProducts.some(savedProduct => savedProduct._id === productData._id);
@@ -45,7 +45,7 @@ export const SaveProductButton = ({ productData, savedProducts, setSavedProducts
 
     return (
         <div
-            className={`lg:flex hidden group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full w-[56px] h-[56px] items-center justify-center shrink-0 cursor-pointer transition-colors ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`lg:flex hidden group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full items-center justify-center shrink-0 cursor-pointer transition-colors ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''} ${type === 'primary' ? 'w-[56px] h-[56px]' : 'w-[36px] h-[36px]'}`}
             onClick={handleSaveToggle}
             role="button"
             aria-label={isProductSaved ? "Remove from saved products" : "Save product"}
@@ -54,13 +54,13 @@ export const SaveProductButton = ({ productData, savedProducts, setSavedProducts
             <PrimaryImage
                 url={isProductSaved ? savedUrl : unSavedUrl}
                 alt={isProductSaved ? "Saved Icon" : "Not Saved Icon"}
-                customClasses={`block ${isUpdating ? '' : 'group-hover/cart:hidden'}`}
+                customClasses={`block ${isUpdating ? '' : 'group-hover/cart:hidden'} ${type === 'primary' ? 'w-[13px] h-[20px]' : 'w-[8px] h-[12px]'}`}
             />
 
             <PrimaryImage
                 url={isProductSaved ? unSavedUrl : savedUrl}
                 alt={isProductSaved ? "Not Saved Icon" : "Saved Icon"}
-                customClasses={`hidden ${isUpdating ? '' : 'group-hover/cart:block'}`}
+                customClasses={`hidden ${isUpdating ? '' : 'group-hover/cart:block'} ${type === 'primary' ? 'w-[13px] h-[20px]' : 'w-[8px] h-[12px]'}`}
             />
         </div>
     );

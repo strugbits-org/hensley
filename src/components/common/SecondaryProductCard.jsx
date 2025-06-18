@@ -4,8 +4,9 @@ import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { loaderActions } from '@/store/loaderStore';
+import { CustomLink } from './CustomLink';
 
-function SecondaryProductCard({ data, savedProducts, setSavedProducts, type = 'listing' }) {
+function SecondaryProductCard({ data, savedProducts = [], setSavedProducts, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
     const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
@@ -21,9 +22,9 @@ function SecondaryProductCard({ data, savedProducts, setSavedProducts, type = 'l
     };
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-[5px] pb-0 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
-            <div className={`h-full overflow-hidden flex justify-center items-center p-4  ${type === 'listing' ? 'bg-white' : ''}`}>
+            <CustomLink to={`/product/${product.slug}`} className={`h-full overflow-hidden flex justify-center items-center p-4  ${type === 'listing' ? 'bg-white' : ''}`}>
                 <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
-            </div>
+            </CustomLink>
 
             <div className="max-w-full flex gap-2 py-[7px] justify-between items-center max-lg:flex-col">
                 <h2 className="uppercase lg:text-[12px] lg:leading-[12px] text-secondary-alt font-haasRegular max-lg:w-full max-lg:text-xs max-w-sm">
@@ -49,6 +50,7 @@ function SecondaryProductCard({ data, savedProducts, setSavedProducts, type = 'l
                 productData={data}
                 savedProducts={savedProducts}
                 setSavedProducts={setSavedProducts}
+                type={"secondary"}
             />
         </div>
     );

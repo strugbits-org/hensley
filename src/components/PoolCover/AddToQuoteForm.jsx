@@ -50,10 +50,6 @@ export const AddToQuoteForm = ({ productData }) => {
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
-
-        console.log("data", data);
-
-
         try {
             const productId = productData._id;
             const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";

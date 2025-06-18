@@ -80,7 +80,7 @@ export const PrimaryImage = ({
     return (
         <>
             {useNextImage && src && height && width ?
-                <Image ref={ref} src={src} quality={q} loading={"eager"} height={height} width={width} className={customClasses} {...attributes} alt={alt} />
+                <Image ref={ref} src={src} quality={q} priority={true} loading={"eager"} height={height} width={width} className={customClasses} {...attributes} alt={alt} />
                 : <img
                     ref={ref}
                     src={src || fallbackImage.src}

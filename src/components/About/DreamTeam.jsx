@@ -7,9 +7,6 @@ import { PrimaryImage } from '../common/PrimaryImage';
 function DreamTeam({ dreamTeamData = [] }) {
   const pageSize = dreamTeamData.length;
   const [pageLimit, setPageLimit] = useState(pageSize);
-
-  console.log("Teams: ", dreamTeamData);
-
   const handleLoadMore = () => {
     setPageLimit((prev) => prev + pageSize);
   };

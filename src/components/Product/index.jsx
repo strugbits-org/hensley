@@ -6,7 +6,7 @@ import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
 import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
-import { AddProductToCart, getProductsCart, removeProductFromCart } from '@/services/cart/CartApis';
+import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
 import { checkProductInCart, fetchSavedProductData } from '@/services/products';

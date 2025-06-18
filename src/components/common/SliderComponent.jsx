@@ -10,9 +10,6 @@ import { CustomLink } from "./CustomLink";
 
 export default function SliderComponent({ data, classes, pageDetails }) {
 
-
-  console.log("The Data is--: ", data);
-
   const { buttonLabelPortfolioSlider } = pageDetails;
 
   const [currentSlide, setCurrentSlide] = useState(0);

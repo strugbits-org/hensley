@@ -2,14 +2,15 @@ import React from 'react';
 import { PrimaryImage } from './PrimaryImage';
 import { formatDate } from '@/utils';
 import { Tag } from './helpers/Tag';
+import { CustomLink } from './CustomLink';
 
-function NewsCard({ data }) {
+function NewsCard({ data, classes }) {
 
     const { blogRef, author, slug, markets, studios } = data;
     const { title, coverImage } = blogRef;
 
     return (
-        <div className="relative group border cursor-pointer border-primary-border pb-6">
+        <CustomLink to={`/posts/${slug}`} className={`relative group border cursor-pointer border-primary-border pb-6 ${classes}`}>
             <div className='overflow-hidden'>
                 <PrimaryImage alt={title} url={coverImage} customClasses={"h-full w-full min-h-[528px] max-h-[528px] object-cover transition-transform duration-300 group-hover:scale-105"} />
             </div>
@@ -37,17 +38,17 @@ function NewsCard({ data }) {
                     ))}
                     {studios.map((studio, index) => (
                         <React.Fragment key={index}>
-                            {index < 1 && (
+                            {index < 2 && (
                                 <Tag text={studio.name} />
                             )}
                         </React.Fragment>
                     ))}
-                    {studios.length > 1 ? (
-                        <Tag text={`+${studios.length - 1} studios`} />
+                    {studios.length > 2 ? (
+                        <Tag text={`+${studios.length - 2} studios`} />
                     ) : null}
                 </ul>
             </div>
-        </div>
+        </CustomLink>
     );
 }
 

@@ -13,11 +13,6 @@ import { PrimaryImage } from "./PrimaryImage";
 
 function PortfolioSlider({ data, display, tab = false, cardCss }) {
 
-
-
-  console.log("The data iss: ",data);
-
-
   const [currentSlide, setCurrentSlide] = useState(0);
   const [expandedSlide, setExpandedSlide] = useState(null);
   const sliderInstance = useRef(null);
