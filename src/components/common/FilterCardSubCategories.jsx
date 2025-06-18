@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { PrimaryImage } from './PrimaryImage';
 
-const FilterCardSubCategories = ({ data, handleFilterChange, selectedTags }) => {
+const FilterCardSubCategories = ({ data, handleFilterChange, selectedTags, isPortfolio = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { categories = [], markets = [], studios = [] } = data;
 
@@ -10,7 +10,7 @@ const FilterCardSubCategories = ({ data, handleFilterChange, selectedTags }) => 
   }, []);
 
   const sections = useMemo(() => [
-    { items: categories, key: 'label' },
+    { items: categories, key: isPortfolio ? 'title' : 'label' },
     { title: 'MARKETS', items: markets, key: 'category' },
     { title: 'STUDIOS', items: studios, key: 'name' }
   ], [categories, markets, studios]);
@@ -29,7 +29,7 @@ const FilterCardSubCategories = ({ data, handleFilterChange, selectedTags }) => 
               <button
                 className="text-[18px] lg:text-[20px] text-secondary-alt uppercase font-recklessRegular hover:opacity-70 transition-opacity"
               >
-                {item[section.key]}
+                {item[section.key || section.portfolioKey]}
               </button>
             </li>
           )

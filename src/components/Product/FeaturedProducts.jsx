@@ -64,7 +64,7 @@ export const FeaturedProducts = ({ data, pageDetails, loop = true, origin = "cen
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide  flex flex-col px-2`}
+                                className={`keen-slider__slide flex flex-col px-2`}
                             >
                                 <ProductCard
                                     type='slider'

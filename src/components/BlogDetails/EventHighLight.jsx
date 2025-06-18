@@ -6,7 +6,7 @@ import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
 const EventHighLight = ({ data }) => {
     if (!data) return;
 
-    const { slug, author, blogRef, markets, studios } = data;
+    const { author, blogRef, markets, studios } = data;
 
     const imageURL = generateImageURL({ wix_url: blogRef.coverImage });
     return (

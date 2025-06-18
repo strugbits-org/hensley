@@ -64,10 +64,6 @@ const Blogs = ({ data }) => {
         setPageLimit(PAGE_SIZE);
     }, [selectedTags, PAGE_SIZE]);
 
-    if (!data?.blogs?.length) {
-        return <div className="w-full p-8 text-center">No blogs available</div>;
-    }
-
     return (
         <div className="w-full">
             {featuredBlog && <EventHighLight data={featuredBlog} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />}

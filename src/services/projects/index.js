@@ -2,13 +2,12 @@
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 
-export const fetchBlogs = async () => {
+export const fetchProjects = async () => {
     try {
         const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', 'blogCategories'],
-            sortKey: "publishDate",
-            sortOrder: "desc",
+            dataCollectionId: "PortfolioCollection",
+            includeReferencedItems: ['portfolioRef', 'markets', 'studios', 'portfolioCategories'],
+            sortKey: "order",
             limit: "infinite",
             ne: [
                 {
@@ -19,7 +18,7 @@ export const fetchBlogs = async () => {
         });
         return response.items;
     } catch (error) {
-        logError(`Error searching blogs: ${error.message}`, error);
+        logError(`Error searching projects: ${error.message}`, error);
         return [];
     }
 }
@@ -27,7 +26,7 @@ export const fetchBlogs = async () => {
 export const fetchCategoriesMarketsAndStudios = async () => {
     try {
         const [categories, markets, studios] = await Promise.all([
-            queryCollection({ dataCollectionId: "Blog/Categories", limit: "infinite" }),
+            queryCollection({ dataCollectionId: "Portfolio/Collections", limit: "infinite" }),
             queryCollection({ dataCollectionId: "Markets", limit: "infinite" }),
             queryCollection({ dataCollectionId: "Studios", limit: "infinite" })
         ]);
@@ -42,23 +41,23 @@ export const fetchCategoriesMarketsAndStudios = async () => {
     }
 }
 
-export const fetchBlogPageData = async () => {
+export const fetchPortfolioPageData = async () => {
     try {
-        const [categoriesMarketStudios, blogs] = await Promise.all([
+        const [categoriesMarketStudios, projects] = await Promise.all([
             fetchCategoriesMarketsAndStudios(),
-            fetchBlogs()
+            fetchProjects()
         ]);
-        return { categoriesMarketStudios, blogs };
+        return { categoriesMarketStudios, projects };
     } catch (error) {
-        logError(`Error fetching blog page data: ${error.message}`, error);
+        logError(`Error fetching projects page data: ${error.message}`, error);
     }
 }
 
-export const fetchSelectedBlog = async (slug) => {
+export const fetchSelectedProject = async (slug) => {
     try {
         const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
+            dataCollectionId: "PortfolioCollection",
+            includeReferencedItems: ['portfolioRef', 'markets', 'studios', "storeProducts"],
             eq: [
                 {
                     key: "slug",
@@ -74,20 +73,20 @@ export const fetchSelectedBlog = async (slug) => {
         });
 
         if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Selected blog not found`);
+            throw new Error(`Selected project not found`);
         }
 
         return response.items[0];
     } catch (error) {
-        logError(`Error fetching selected blog: ${error.message}`, error);
+        logError(`Error fetching selected projects=: ${error.message}`, error);
     }
 }
 
-export const fetchOtherBlogs = async (slug) => {
+export const fetchOtherProjects = async (slug) => {
     try {
         const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
+            dataCollectionId: "PortfolioCollection",
+            includeReferencedItems: ['portfolioRef', 'markets', 'studios', "storeProducts"],
             ne: [
                 {
                     key: "slug",
@@ -100,28 +99,27 @@ export const fetchOtherBlogs = async (slug) => {
                     value: true
                 }
             ],
-            sortKey: "publishDate",
-            sortOrder: "desc",
+            sortKey: "order",
         });
 
         if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Selected blog not found`);
+            throw new Error(`Selected projects not found`);
         }
 
         return response.items;
     } catch (error) {
-        logError(`Error fetching other blogs: ${error.message}`, error);
+        logError(`Error fetching other projects: ${error.message}`, error);
     }
 }
 
-export const fetchPostPageData = async (slug) => {
+export const fetchProjectPageData = async (slug) => {
     try {
-        const [blog, otherBlogs] = await Promise.all([
-            fetchSelectedBlog(slug),
-            fetchOtherBlogs(slug)
+        const [project, otherProjects] = await Promise.all([
+            fetchSelectedProject(slug),
+            fetchOtherProjects(slug)
         ]);
-        return { blog, otherBlogs };
+        return { project, otherProjects };
     } catch (error) {
-        logError(`Error fetching blog page data: ${error.message}`, error);
+        logError(`Error fetching project page data: ${error.message}`, error);
     }
 }
