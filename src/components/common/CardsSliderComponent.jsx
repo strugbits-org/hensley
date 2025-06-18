@@ -30,15 +30,16 @@ function TabletCardsSlider({ data, cardCss }) {
         },
         "(min-width: 1025px)": {
           loop: true,
-          slides: { perView: 2.5, spacing: 15 },
+          slides: { perView: 3, spacing: 30, origin: 'auto' },
+          origin: 'auto'
         },
       },
       created(slider) {
         sliderInstance.current = slider;
       },
       slideChanged(slider) {
-                setCurrentSlide(slider.track.details.rel);
-            },
+        setCurrentSlide(slider.track.details.rel);
+      },
     },
     []
   );
@@ -60,7 +61,7 @@ function TabletCardsSlider({ data, cardCss }) {
         return (
           <div
             key={index}
-            className={`${cardCss}  group keen-slider__slide border border-white flex flex-col p-[20px] sm:min-h-[680px] ${isBeforeActive(index) ? "invisible" : ""} `}
+            className={`${cardCss} max-w-[596px] w-full group keen-slider__slide border border-white flex flex-col p-[20px] sm:min-h-[680px] ${isBeforeActive(index) ? "invisible" : ""} `}
           >
             <div className="h-[425px] relative overflow-hidden">
               <PrimaryImage url={slide.image} customClasses={"h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"} alt={slide.heading} />
@@ -73,7 +74,7 @@ function TabletCardsSlider({ data, cardCss }) {
                 transition-all duration-300 ease-in-out
                 "
               /> */}
-              <div className="arrow block ">
+              <div className="arrow block border border-black">
                 <PrimaryImage
                   url={"https://static.wixstatic.com/shapes/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"}
                   alt="Arrow"

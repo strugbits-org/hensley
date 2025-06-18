@@ -6,10 +6,10 @@ const HowWeDoIt = ({ data, pageDetails }) => {
     const { howWeDoItTitle } = pageDetails;
 
     return (
-        <div className='bg-primary w-full'>
+        <div className='bg-primary w-full '>
             <SectionTitle
                 text={howWeDoItTitle}
-                classes={"md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:block"} />
+                classes={"border-t border-primary-border md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:block"} />
             <CardsSliderComponent data={data} tablet={true} />
         </div>
     )

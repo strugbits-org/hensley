@@ -18,7 +18,7 @@ export const HomePage = ({ data }) => {
             <Banner data={bannerData} />
             <BestSellers data={bestSellers} pageDetails={homePageDetails} />
             <Testimonials cardClasses={'lg:hover:bg-primary'} data={testimonials} pageDetails={homePageDetails} />
-            <MarketSection data={marketsData} pageDetails={homePageDetails} />
+            <MarketSection classes={"border !border-secondary"} data={marketsData} pageDetails={homePageDetails} />
             <HensleyNews data={blogsData} pageDetails={homePageDetails} />
         </>
     )

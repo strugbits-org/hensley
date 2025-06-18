@@ -39,7 +39,7 @@ const CareerOppurtunities = ({ data }) => {
     return (
         <div>
             <div className='flex flex-col gap-x-[48px] pt-[48px] pb-[56px] lg:px-0 sm:px-[60px]'>
-                <SectionTitle text={title} classes={"lg:!text-[140px] lg:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] !leading-[35px] border-none"} />
+                <SectionTitle text={title} classes={"lg:!text-[140px] xl:!px-[200px] lg:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] !leading-[35px] border-none"} />
                 <div className='w-full text-center '>
                     {/* <button className='group sm:w-[656px] w-[95%] relative bg-primary lg:h-[130px] h-[90px] my-[33px] group transition-all duration-300 hover:bg-[#2c2216]'>
                         <span className='font-haasLight uppercase text-[16px] hover:border-secondary-alt  group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
@@ -61,7 +61,7 @@ const CareerOppurtunities = ({ data }) => {
                 </div>
             </div>
 
-            <div className='w-full flex flex-col justify-center items-center border-t border-b'>
+            <div className='w-full flex flex-col justify-center items-center border-t border-b border-primary-border'>
                 <div className="lg:w-[80%] w-[95%] py-[24px] relative">
                     <div className="lg:h-[875px] sm:h-[408px] h-[263px] relative">
                         <video
