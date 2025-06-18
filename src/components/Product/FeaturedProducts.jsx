@@ -1,16 +1,17 @@
 "use client";
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
-import { PrimaryButton } from '../common/PrimaryButton'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
-import NewsCard from './NewsCard';
+import ProductCard from '../common/ProductCard';
+import { fetchSavedProductData } from '@/services/products';
 
-export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center", titleType = "primary" }) => {
-    const { hensleyNewsTitle } = pageDetails;
+export const FeaturedProducts = ({ data, pageDetails, loop = true, origin = "center", classes }) => {
+
+    const { featuredProjectTitle } = pageDetails;
+    const [savedProducts, setSavedProducts] = useState([]);
 
     const sliderInstance = useRef();
-
     const [sliderRef] = useKeenSlider(
         {
             loop: loop,
@@ -38,28 +39,40 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
         []
     );
 
-    return (
-        <div className='w-full py-20 lg:py-6'>
-            <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col lg:border-b max-lg:border border-primary-border'>
-                {titleType === "primary" ? (
-                    <>
-                        <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
-                        <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
-                    </>
-                ) : (
-                    <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
-                )}
+    const fetchSavedProducts = async () => {
+        try {
+            const savedProducts = await fetchSavedProductData();
+            setSavedProducts(savedProducts);
+        } catch (error) {
+            logError("Error while fetching Saved Product", error);
+        }
+    };
 
+    useEffect(() => {
+        fetchSavedProducts();
+    }, []);
+
+
+    return (
+        data && data.length > 0 && <div className={`w-full py-20 bg-primary lg:py-6 ${classes}`}>
+            <div className='sm:px-0 px-[12px] flex items-center flex-col '>
+                <SectionTitle text={featuredProjectTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
             </div>
-            <div className="p-6">
-                <div ref={sliderRef} className="keen-slider">
-                    {data.map((item, index) => {
+            <div className="p-6 bg-[#F4F1EC] bg-primary">
+                <div ref={sliderRef} className="keen-slider ">
+                    {data.map((productData, index) => {
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide flex px-2`}
+                                className={`keen-slider__slide  flex flex-col px-2`}
                             >
-                                <NewsCard data={item} />
+                                <ProductCard
+                                    type='slider'
+                                    data={productData}
+                                    savedProducts={savedProducts}
+                                    setSavedProducts={setSavedProducts}
+                                    btnClass="border border-black"
+                                />
                             </div>
                         );
                     })}

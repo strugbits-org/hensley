@@ -1,7 +1,7 @@
 import React from 'react'
 import { Tag } from '../common/helpers/Tag';
 
-export const MarketsStudiosTags = ({ markets = [], studios = [], handleFilterChange, selectedTags = [] }) => {
+export const MarketsStudiosTags = ({ markets = [], studios = [], handleFilterChange, selectedTags = [], count = 3 }) => {
     const allItems = [
         ...markets.map(market => ({ ...market, type: 'market', displayText: market.category })),
         ...studios.map(studio => ({ ...studio, type: 'studio', displayText: studio.name }))
@@ -25,7 +25,7 @@ export const MarketsStudiosTags = ({ markets = [], studios = [], handleFilterCha
 
     return (
         <ul className="flex gap-2 flex-wrap">
-            {sortedItems.slice(0, 3).map((studio) => (
+            {sortedItems.slice(0, count).map((studio) => (
                 <Tag
                     key={studio._id}
                     active={selectedTags.includes(studio._id)}
@@ -33,8 +33,8 @@ export const MarketsStudiosTags = ({ markets = [], studios = [], handleFilterCha
                     text={studio.displayText}
                 />
             ))}
-            {sortedItems.length > 3 && (
-                <Tag text={`+${sortedItems.length - 3} studios`} />
+            {sortedItems.length > count && (
+                <Tag text={`+${sortedItems.length - count} studios`} />
             )}
         </ul>
     );

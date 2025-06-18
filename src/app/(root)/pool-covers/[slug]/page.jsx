@@ -1,5 +1,5 @@
 import ProductPoolCover from "@/components/PoolCover";
-import { FeatuedProjects } from "@/components/Product/FeaturedProjects";
+import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import { fetchPoolCoverPageData } from "@/services/poolcover";
 import { logError } from "@/utils";
@@ -19,7 +19,7 @@ export default async function Page({ params }) {
       <>
         <ProductPoolCover productData={productData} />
         <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="start" />
-        <FeatuedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
+        <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
       </>
     );
   } catch (error) {
