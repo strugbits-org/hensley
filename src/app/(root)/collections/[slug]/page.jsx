@@ -1,7 +1,17 @@
 import { CollectionPage } from "@/components/Collections";
-import { fetchSelectedCollectionData } from "@/services/collections";
+import { fetchCollectionPagePaths, fetchSelectedCollectionData } from "@/services/collections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  try {
+    const collectionsPaths = await fetchCollectionPagePaths();
+    return collectionsPaths;
+  } catch (error) {
+    logError("Error generating static params(tent page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {

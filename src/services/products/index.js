@@ -165,8 +165,8 @@ export const fetchMatchedProducts = async (id) => {
         const productIds = matchProducts.map(item => item._id);
         const products = await fetchProductsByIds(productIds);
 
-        
-        
+
+
         // Create a Map for O(1) lookup instead of find() for each item
         const matchProductsMap = new Map(
             matchProducts.map(product => [product._id, product])
@@ -315,3 +315,20 @@ export const checkProductInCart = async (productId, isProductCollection = false)
         logError("Error fetching cart items:", error);
     }
 };
+
+export const fetchProductPaths = async () => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "FullProductData",
+            limit: "infinite",
+            extendedLimit: 1000
+        });
+        if (!Array.isArray(response.items)) {
+            throw new Error(`Response does not contain items array`);
+        }
+
+        return response.items.map(x => ({ slug: x.slug.trim().replace("/", "") }));
+    } catch (error) {
+        logError(`Error fetching products by category: ${error.message}`, error);
+    }
+}

@@ -2,8 +2,8 @@
 import { findSortIndexByCategory, logError } from "@/utils";
 import { fetchCategoriesData } from "../products";
 import { fetchOurCategoriesData } from "..";
-import queryCollection from "@/utils/fetchFunction";
 import { fetchCategoriesSortStructure, fetchProductBannersData, fetchSortedProducts, fetchSubcategoriesData } from "../collections";
+import queryCollection from "@/utils/fetchFunction";
 
 export const fetchSelectedCategoryData = async (slug) => {
     try {
@@ -21,7 +21,7 @@ export const fetchSelectedCategoryData = async (slug) => {
 
         const subCategoriesData = await fetchSubcategoriesData(selectedCategory._id);
         const subCategories = subCategoriesData?.subcategories || [];
-        
+
         const collectionIds = [selectedCategory._id, ...subCategories.map(item => item._id)];
         const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory._id);
 
@@ -48,3 +48,25 @@ export const fetchSelectedCategoryData = async (slug) => {
         logError(`Error fetching selected collection data: ${error.message}`, error);
     }
 }
+
+export const fetchSubCategoryPagePaths = async () => {
+    try {
+        const collectionsData = await queryCollection({
+            dataCollectionId: "HeaderMegaMenu",
+            includeReferencedItems: ["category"],
+            isEmpty: "redirection",
+        });
+
+        const extractSlug = (item, property) => {
+            const slug = item[property]?.slug;
+            return slug ? { slug: slug.trim().replace("/", "") } : null;
+        };
+
+        const params = collectionsData.items.map(item => extractSlug(item, 'category')).filter(Boolean);
+
+        return params;
+    } catch (error) {
+        logError(`Error fetching sub category page params: ${error.message}`, error);
+        return []; // Return empty array on error instead of undefined
+    }
+};

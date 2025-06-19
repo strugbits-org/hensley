@@ -77,12 +77,11 @@ const InputField = ({
                 {togglePassWord && (
                     <button
                         type="button"
-                        className={`absolute right-4 top-1/2 -translate-y-1/2 transition-opacity duration-200 ${disabled ? 'cursor-not-allowed' : ''
-                            }`}
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 transition-opacity duration-200 ${disabled ? 'cursor-not-allowed' : ''}`}
                         onClick={onToggle}
                         disabled={disabled}
                     >
-                        <PrimaryImage fit='fit' url={showPassword ? "https://static.wixstatic.com/shapes/0e0ac5_e14dd77953084aec9c7994033fda7882.svg" : "https://static.wixstatic.com/shapes/0e0ac5_130c9cc93100439b8627738cde9c26c7.svg"} />
+                        <img className="size-6" src={showPassword ? "https://static.wixstatic.com/shapes/0e0ac5_e14dd77953084aec9c7994033fda7882.svg" : "https://static.wixstatic.com/shapes/0e0ac5_130c9cc93100439b8627738cde9c26c7.svg"} />
                     </button>
                 )}
             </div>

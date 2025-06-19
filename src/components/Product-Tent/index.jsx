@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { PrimaryImage } from '../common/PrimaryImage';
-import parse from 'html-react-parser';
 import BannerStructures from './BannerStructures';
 // import { DownloadButton } from './DownloadButton';
 import ProductSlider from '../Product/ProductSlider';
@@ -9,7 +8,6 @@ import { AddToQuoteForm } from './AddToQuoteForm';
 import { fetchSavedProductData } from '@/services/products';
 import { SaveProductButton } from '../common/SaveProductButton';
 import ProductSlider_tab from '../Product/ProductSlider_tab';
-import { AddToCartButton } from '../Product/AddtoQuoteButton';
 
 const ProductTent = ({ productData }) => {
   const { tent, gallery } = productData;
@@ -37,24 +35,7 @@ const ProductTent = ({ productData }) => {
           <ProductSlider_tab product={tent} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
-          <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
-            <span className='text-secondary-alt 
-            lg:text-[16px]
-            text-[12px]
-            uppercase font-haasLight'>Home/corporate</span>
-            <h3 className='uppercase text-secondary-alt font-recklessRegular 
-            lg:text-[90px] 
-            lg:leading-[85px]
-            text-[35px]
-            leading-[30px]
-            '>{productData?.title}</h3>
-
-            <div className="font-haasRegular lg:text-[16px] lg:leading-[19px] text-[14px] leading-[17px] text-secondary-alt">
-              {parse(tent?.description || '')}
-            </div>
-            <AddToQuoteForm productData={tent} />
-          </div>
-          <AddToCartButton classes={'lg:!h-[200px] lg:!mt-3'} text={"Add to Quote"} />
+          <AddToQuoteForm title={productData?.title} productData={tent} />
           <SaveProductButton
             key={productData._id}
             productData={{ ...productData.productData, product: tent }}

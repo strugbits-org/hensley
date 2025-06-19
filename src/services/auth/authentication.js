@@ -69,7 +69,7 @@ export const forgotPassword = async (userData) => {
         const data = await response.json();
         return data;
     } catch (error) {
-        logError(error);
+        logError(error.message);
         throw new Error(error.message);
     }
 };

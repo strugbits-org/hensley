@@ -130,3 +130,39 @@ export const fetchSortedProducts = async ({ collectionIds, limit = 12, skip = 0,
         logError(`Error fetching sorted products data: ${error.message}`, error);
     }
 };
+
+export const fetchCollectionPagePaths = async () => {
+    try {
+        const tentId = "d27f504d-05a2-ec30-c018-cc403e815bfa";
+
+        const [collectionsData, customCollectionsData] = await Promise.all([
+            queryCollection({
+                dataCollectionId: "OurCategories",
+                includeReferencedItems: ["categories"],
+                ne: [{ key: "categories", value: tentId }]
+            }),
+            queryCollection({
+                dataCollectionId: "HeaderMegaMenu",
+                includeReferencedItems: ["category"],
+                eq: [{ key: "redirection", value: "/collections" }]
+            }),
+        ]);
+
+        // Extract slugs with a single helper function
+        const extractSlug = (item, property) => {
+            const slug = item[property]?.slug;
+            return slug ? { slug: slug.trim().replace("/", "") } : null;
+        };
+
+        // Process both collections in one pass and filter out nulls
+        const params = [
+            ...customCollectionsData.items.map(item => extractSlug(item, 'category')),
+            ...collectionsData.items.map(item => extractSlug(item, 'categories'))
+        ].filter(Boolean);
+
+        return params;
+    } catch (error) {
+        logError(`Error fetching collection page params: ${error.message}`, error);
+        return []; // Return empty array on error instead of undefined
+    }
+};

@@ -1,14 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { PrimaryImage } from '../common/PrimaryImage';
-import parse from 'html-react-parser';
 import { fetchSavedProductData } from '@/services/products';
 import { SaveProductButton } from '../common/SaveProductButton';
 import BannerStructures from '../Product-Tent/BannerStructures';
 import ProductSlider from '../Product/ProductSlider';
 import ProductSlider_tab from '../Product/ProductSlider_tab';
 import { AddToQuoteForm } from './AddToQuoteForm';
-import { AddToCartButton } from '../Product/AddtoQuoteButton';
 
 const ProductPoolCover = ({ productData }) => {
   const { covers, mediagallery } = productData;
@@ -36,24 +34,7 @@ const ProductPoolCover = ({ productData }) => {
           <ProductSlider_tab product={covers} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
-          <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
-            <span className='text-secondary-alt 
-            lg:text-[16px]
-            text-[12px]
-            uppercase font-haasLight'>Home/corporate</span>
-            <h3 className='uppercase text-secondary-alt font-recklessRegular 
-            lg:text-[90px] 
-            lg:leading-[85px]
-            text-[35px]
-            leading-[30px]
-            '>{productData?.title}</h3>
-
-            <div className="font-haasRegular lg:text-[16px] lg:leading-[19px] text-[14px] leading-[17px] text-secondary-alt">
-              {parse(covers?.description || '')}
-            </div>
-            <AddToQuoteForm productData={covers} />
-          </div>
-          <AddToCartButton classes={'lg:!h-[200px] lg:!mt-3'} text={"Add to Quote"} />
+          <AddToQuoteForm title={productData?.title} productData={covers} />
           <SaveProductButton
             key={productData._id}
             productData={{ ...productData.productData, product: covers }}

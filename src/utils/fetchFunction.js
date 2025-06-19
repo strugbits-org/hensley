@@ -52,6 +52,7 @@ const queryCollection = async (payload) => {
       extendedLimit = 50,
       sortOrder,
       sortKey,
+      isEmpty,
       isNotEmpty,
       startsWith = [],
       search,
@@ -107,6 +108,10 @@ const queryCollection = async (payload) => {
     // Apply isNotEmpty filter
     if (isNotEmpty) {
       dataQuery = dataQuery.isNotEmpty(isNotEmpty);
+    }
+
+    if (isEmpty) {
+      dataQuery = dataQuery.isEmpty(isEmpty);
     }
 
     // Apply skip for pagination

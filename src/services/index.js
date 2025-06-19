@@ -73,8 +73,6 @@ export const fetchTentsData = async () => {
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
     }
-
-    console.log("response is the:", response);
     return response.items;
   } catch (error) {
     logError(`Error fetching tents data: ${error.message}`, error);

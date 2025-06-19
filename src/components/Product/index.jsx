@@ -67,7 +67,7 @@ export const Product = ({ data }) => {
   const isProductCollection = productData?.isProductCollection || false;
 
   useMemo(() => {
-    if (!isProductCollection) {
+    if (!isProductCollection || !productCollectionData) {
       setProductSetItems([]);
       return;
     }

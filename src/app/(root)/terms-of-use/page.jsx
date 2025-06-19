@@ -1,15 +1,11 @@
-import PrivacyPolicy from "@/components/PrivacyPolicy";
 import TermsOfUse from "@/components/TermsOfUse";
 import { fetchTermsConditionsPageData } from "@/services/termsofuse";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
-export default async function Page({ params }) {
+export default async function Page() {
   try {
     const response = await fetchTermsConditionsPageData();
-
-    console.log("new response: ",response)
-
     const {termsData} = response
 
     return (

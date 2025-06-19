@@ -179,7 +179,7 @@ const Cart = () => {
             {cartItems.map((item) => {
               const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
               const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-              const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;              
+              const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
               if (productCollection) {
                 const productSetItems = productCollection.split("; ");
@@ -205,9 +205,11 @@ const Cart = () => {
           <div className='spacer h-10'></div>
         </div>
       </div>
-      <CustomLink to={"/quote-request"}>
-        <AddToQuote classes={'!mt-0'} text={"request to quote"} />
-      </CustomLink>
+      {!isLoading && cartItems.length > 0 && (
+        <CustomLink to={"/quote-request"}>
+          <AddToQuote classes={'!mt-0'} text={"request to quote"} />
+        </CustomLink>
+      )}
     </>
   )
 }

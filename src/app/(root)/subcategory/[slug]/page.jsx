@@ -1,7 +1,17 @@
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 import { SubCategoryPage } from "@/components/SubCategory";
-import { fetchSelectedCategoryData } from "@/services/subcategory";
+import { fetchSelectedCategoryData, fetchSubCategoryPagePaths } from "@/services/subcategory";
+
+export const generateStaticParams = async () => {
+  try {
+    const paths = await fetchSubCategoryPagePaths();
+  return paths;
+  } catch (error) {
+    logError("Error generating static params(tent page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {

@@ -30,7 +30,7 @@ export const ForgotPasswordModal = ({ isOpen, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="transform overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
+                            <DialogPanel className="transform overflow-hidden text-left align-middle transition-all relative flex justify-center items-center">
                                 <ForgotPassword close={onClose} />
                             </DialogPanel>
                         </TransitionChild>

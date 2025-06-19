@@ -1,9 +1,19 @@
 import { Product } from "@/components/Product";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
-import { fetchProductPageData } from "@/services/products";
+import { fetchProductPageData, fetchProductPaths } from "@/services/products";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  try {
+    const paths = await fetchProductPaths();
+    return paths;
+  } catch (error) {
+    logError("Error generating static params(tent page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {
