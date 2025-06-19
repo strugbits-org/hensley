@@ -1,5 +1,3 @@
-import searchIcon from '@/assets/icons/search-light.svg';
-import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { usePathname, useSearchParams } from 'next/navigation';

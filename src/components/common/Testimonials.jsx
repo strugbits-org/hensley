@@ -6,11 +6,8 @@ import { useKeenSlider } from 'keen-slider/react'
 import { TestimonialCard } from './TestimonialCard';
 
 export const Testimonials = ({ data, pageDetails, lgPreview = 1.4, cardClasses, sliderClasses, imageExp = true, titleClass = '' }) => {
-    const { testimonialsTitle } = pageDetails;
     const sliderInstance = useRef();
     const [currentSlide, setCurrentSlide] = useState(0);
-
-    console.log('temp data: ', data);
 
     const [sliderRef] = useKeenSlider(
         {

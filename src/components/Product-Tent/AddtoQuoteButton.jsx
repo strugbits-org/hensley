@@ -3,19 +3,7 @@ import React from 'react'
 export const AddToQuote = ({ text, classes, handleClick, type = 'button', disabled = false }) => {
     return (
 
-        <button onClick={handleClick} disabled={disabled} type={type} className={`
-        lg:w-full lg:h-[150px] 
-        lg:mt-[60px]
-        sm:mt-[40px]
-        mt-[33px]
-        w-full
-        h-[90px]
-        sm:w-[492px]
-        sm:my-[33px]
-         bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary
-        relative
-        ${classes}
-        `}>
+        <button onClick={handleClick} disabled={disabled} type={type} className={`lg:w-full lg:h-[150px] lg:mt-[60px] sm:mt-[40px] mt-[33px] w-full h-[90px] sm:w-[492px] sm:my-[33px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative ${classes}`}>
             <span
                 className='
              font-haasLight uppercase 

@@ -1,9 +1,21 @@
 import ProductTent from "@/components/Product-Tent";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
+import { fetchTentsData } from "@/services";
 import { fetchTentPageData } from "@/services/tents";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  try {
+    const tentsData = await fetchTentsData();
+    const paths = tentsData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
+    return paths;
+  } catch (error) {
+    logError("Error generating static params(tent page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {

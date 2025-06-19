@@ -6,7 +6,6 @@ import "keen-slider/keen-slider.min.css";
 import { PrimaryImage } from "../common/PrimaryImage";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "../common/CustomLink";
-import SectionTitle from "../common/SectionTitle";
 
 export default function OurProjects({ data, pageDetails }) {
 

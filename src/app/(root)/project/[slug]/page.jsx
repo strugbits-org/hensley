@@ -1,7 +1,18 @@
 import PortfolioDetails from "@/components/PortfolioDetails";
-import { fetchProjectPageData } from "@/services/projects";
+import { fetchProjectPageData, fetchProjects } from "@/services/projects";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  try {
+    const projectData = await fetchProjects();
+    const paths = projectData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
+    return paths;
+  } catch (error) {
+    logError("Error generating static params(project page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {

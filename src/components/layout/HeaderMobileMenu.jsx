@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { SearchModal } from "../Modals/SearchModal";
 import { MarketTentModal } from "../Modals/MarketTentModal";
 import { CustomLink } from "../common/CustomLink";
@@ -103,7 +103,9 @@ export const HeaderMobileMenu = ({
                             </div>
                         </div>
                     )}
-                    <SearchModal isMobileMenu isActive={searchModal} closeModal={() => setSearchModal(false)} />
+                    <Suspense>
+                        <SearchModal isMobileMenu isActive={searchModal} closeModal={() => setSearchModal(false)} />
+                    </Suspense>
                 </div>
             </div>
         </div>

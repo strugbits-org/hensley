@@ -78,7 +78,6 @@ export const fetchFeaturedBlogs = async (productId) => {
             throw new Error(`Selected blog not found`);
         }
 
-        console.log("Item is: ",response.items);
         return response.items;
     } catch (error) {
         logError(`Error fetching other blogs: ${error.message}`, error);

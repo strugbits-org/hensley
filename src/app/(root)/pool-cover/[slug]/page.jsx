@@ -1,9 +1,20 @@
 import ProductPoolCover from "@/components/PoolCover";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
-import { fetchPoolCoverPageData } from "@/services/poolcover";
+import { fetchPoolCoverPageData, fetchPoolCovers } from "@/services/poolcover";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateStaticParams = async () => {
+  try {
+    const poolCovers = await fetchPoolCovers();
+    const paths = poolCovers.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
+    return paths;
+  } catch (error) {
+    logError("Error generating static params(pool cover page):", error);
+    return [];
+  }
+}
 
 export default async function Page({ params }) {
   try {

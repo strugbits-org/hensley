@@ -8,12 +8,15 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 import { AddToQuote } from '../Product-Tent/AddtoQuoteButton';
+import { PrimaryButton } from '../common/PrimaryButton';
+import { FiPlus } from 'react-icons/fi';
+import { PrimaryImage } from '../common/PrimaryImage';
 
 // Validation schema
 const schema = yup.object({
     approxSize: yup.string().required('Approximate size is required'),
     coverType: yup.string().nullable(),
-    poolEdge: yup.string().nullable()
+    poolEdge: yup.string().nullable(),
 }).required();
 
 export const AddToQuoteForm = ({ productData }) => {
@@ -27,6 +30,7 @@ export const AddToQuoteForm = ({ productData }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const redirectWithLoader = useRedirectWithLoader();
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
+    const [relevantImages, setRelevantImages] = useState(["https://static.wixstatic.com/media/339f77_a59ba2740b2f4b009f7411826e26036a~mv2.jpg/v1/fill/w_755,h_3991,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/compress.webp", "https://static.wixstatic.com/media/339f77_b7b312f56eaa43c39a54937f4aef9c43~mv2.jpg/v1/fill/w_755,h_3991,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/compress.webp"]);
 
     const {
         register,
@@ -128,6 +132,30 @@ export const AddToQuoteForm = ({ productData }) => {
                 onChange={(newState, index, optionText) => handleInputChange('coverType', newState, index, optionText)}
                 disabled={isSubmitting}
             />
+
+            <div className='lg:col-span-4 col-span-2'>
+                <label for="file-upload" className="cursor-pointer">
+                    <span className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-4">PLEASE SHARE ANY RELEVANT VENUE OR INSPIRATION IMAGES</span>
+                    <div className='w-full min-w-48 lg:min-w-72 uppercase tracking-widest hover:font-bold [word-spacing:3px] text-sm transition-all duration-300'>
+                        <span className='flex justify-center items-center w-full bg-primary tracking-[6px] hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary text-[16px] leading-[19px] font-haasRegular h-[45px]'>
+                            <span>Upload File</span> <FiPlus className='size-5 ml-2' />
+                        </span>
+                    </div>
+                </label>
+                <input
+                    id="file-upload"
+                    type="file"
+                    className="sr-only"
+                    disabled={isSubmitting}
+                />
+            </div>
+            <div className='lg:col-span-4 col-span-2 grid grid-cols-5 gap-2'>
+                {relevantImages.map((image, index) => (
+                    <div key={index} className="mb-4 col-span-1 h-[120px] w-[120px]">
+                        <PrimaryImage url={image} fit={'fit'} customClasses="h-full w-full object-contain object-center" />
+                    </div>
+                ))}
+            </div>
 
             <AddToQuote
                 handleClick={handleSubmit(onSubmit)}

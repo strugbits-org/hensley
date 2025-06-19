@@ -181,34 +181,30 @@ export const fetchPortfolioData = async () => {
   }
 };
 
-// export const fetchBlogsData = async () => {
-//   try {
-//     const response = await queryCollection({
-//       dataCollectionId: "ManageBlogs",
-//       includeReferencedItems: ["blogRef", "author", "markets", "studios"],
-//       ne: [
-//         {
-//           key: "isHidden",
-//           value: true
-//         }
-//       ],
-//       sortKey: "publishDate",
-//       sortOrder: "desc"
-//     });
+export const fetchBlogsData = async () => {
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "ManageBlogs",
+      includeReferencedItems: ["blogRef", "author", "markets", "studios"],
+      ne: [
+        {
+          key: "isHidden",
+          value: true
+        }
+      ],
+      sortKey: "publishDate",
+      sortOrder: "desc"
+    });
 
-//     if (!Array.isArray(response.items)) {
-//       throw new Error(`Response does not contain items array`);
-//     }
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
 
-//     return response.items;
-//   } catch (error) {
-//     logError(`Error fetching blogs data: ${error.message}`, error);
-//   }
-// };
-
-
-
-// --------------------------------------------------------------------------
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching blogs data: ${error.message}`, error);
+  }
+};
 
 export const fetchFeaturedBlogs = async (productId) => {
   try {
@@ -235,11 +231,10 @@ export const fetchFeaturedBlogs = async (productId) => {
       throw new Error(`Selected blog not found`);
     }
 
-    console.log("Item is: ", response.items);
-    return response.items;
-  } catch (error) {
-    logError(`Error fetching other blogs: ${error.message}`, error);
-  }
+        return response.items;
+    } catch (error) {
+        logError(`Error fetching other blogs: ${error.message}`, error);
+    }
 }
 
 
