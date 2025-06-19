@@ -8,6 +8,7 @@ import BannerStructures from '../Product-Tent/BannerStructures';
 import ProductSlider from '../Product/ProductSlider';
 import ProductSlider_tab from '../Product/ProductSlider_tab';
 import { AddToQuoteForm } from './AddToQuoteForm';
+import { AddToCartButton } from '../Product/AddtoQuoteButton';
 
 const ProductPoolCover = ({ productData }) => {
   const { covers, mediagallery } = productData;
@@ -29,13 +30,13 @@ const ProductPoolCover = ({ productData }) => {
 
   return (
     <>
-      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] min-h-[937px] '>
+      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] '>
         <div className='xl:w-1/2 '>
           <ProductSlider product={covers} />
           <ProductSlider_tab product={covers} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
-          <div className='lg:max-w-[656px] sm:max-w-[492px] h-full'>
+          <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
             <span className='text-secondary-alt 
             lg:text-[16px]
             text-[12px]
@@ -52,6 +53,7 @@ const ProductPoolCover = ({ productData }) => {
             </div>
             <AddToQuoteForm productData={covers} />
           </div>
+          <AddToCartButton classes={'lg:!h-[200px] lg:!mt-3'} text={"Add to Quote"} />
           <SaveProductButton
             key={productData._id}
             productData={{ ...productData.productData, product: covers }}
