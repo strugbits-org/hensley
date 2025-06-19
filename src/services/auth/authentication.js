@@ -1,4 +1,3 @@
-"use server";
 import { logError } from "@/utils";
 import { getAuthToken, getCartId } from ".";
 const baseUrl = process.env.BASE_URL;
