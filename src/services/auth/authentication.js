@@ -96,7 +96,7 @@ export const resetPassword = async (userData, token) => {
         return data;
     } catch (error) {
         logError(error);
-        throw new Error(error);
+        throw new Error(error.message);
     }
 };
 
