@@ -84,7 +84,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     const { removeProduct } = actions;
 
     const productName = data?.productName?.original || data?.name;
-    const systemFields = ["POOLCOVER"];
+    const systemFields = ["POOLCOVER", "RELEVENT IMAGES"];
 
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>

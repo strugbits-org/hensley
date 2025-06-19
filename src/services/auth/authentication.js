@@ -1,4 +1,3 @@
-"use server";
 import { logError } from "@/utils";
 import { getAuthToken, getCartId } from ".";
 const baseUrl = process.env.BASE_URL;
@@ -97,7 +96,7 @@ export const resetPassword = async (userData, token) => {
         return data;
     } catch (error) {
         logError(error);
-        throw new Error(error);
+        throw new Error(error.message);
     }
 };
 

@@ -2,6 +2,8 @@ import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { fetchFeaturedProjects, fetchMatchedProducts } from "../products";
 
+const baseUrl = process.env.BASE_URL;
+
 export const fetchPoolCovers = async () => {
     try {
         const response = await queryCollection({
@@ -66,6 +68,26 @@ export const fetchPoolCoverPageData = async (slug) => {
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);
+        throw error;
+    }
+}
+export const uploadRelevantImage = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(`${baseUrl}/api/media/upload`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        logError(`Error uploading image: ${error.message}`, error);
         throw error;
     }
 }

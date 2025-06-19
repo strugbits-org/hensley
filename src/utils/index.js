@@ -7,6 +7,7 @@ import { submissions } from "@wix/forms";
 import parse from 'html-react-parser';
 import { generateImageURL, generateImageURLAlternate } from "./generateImageURL";
 import * as cheerio from "cheerio";
+import { files } from "@wix/media";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
 
@@ -24,7 +25,8 @@ export const createWixClient = async () => {
                 members,
                 cart,
                 currentCart,
-                contacts
+                contacts,
+                files
             },
             auth: ApiKeyStrategy({
                 siteId: process.env.SITE_ID_WIX,
@@ -46,7 +48,8 @@ export const createWixClientOAuth = async () => {
                 submissions,
                 members,
                 cart,
-                currentCart
+                currentCart,
+                files
             },
             auth: OAuthStrategy({ clientId: process.env.CLIENT_ID_WIX }),
         });
@@ -272,7 +275,7 @@ export function formatLineItemsForQuote(lineItems) {
             formattedCartData.push({
                 id: `${counter++}`,
                 name: productName.original,
-                description: generateDescriptionForQuote(formattedDescriptionLines, isTentOrCover.title === "POOLCOVER"),
+                description: generateDescriptionForQuote(formattedDescriptionLines, isTentOrCover),
                 price: price.amount,
                 quantity
             });
