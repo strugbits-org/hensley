@@ -68,13 +68,13 @@ export const fetchMarketsData = async () => {
 
 export const fetchTentsData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "TentsCollection", includeReferencedItems: ["tent","productData"] });
+    const response = await queryCollection({ dataCollectionId: "TentsCollection", includeReferencedItems: ["tent", "productData"] });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
     }
 
-    console.log("response is the:" ,response);
+    console.log("response is the:", response);
     return response.items;
   } catch (error) {
     logError(`Error fetching tents data: ${error.message}`, error);
@@ -211,66 +211,66 @@ export const fetchPortfolioData = async () => {
 // --------------------------------------------------------------------------
 
 export const fetchFeaturedBlogs = async (productId) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ],
-            hasSome: [
-                {
-                    key: "storeProducts",
-                    values: [productId]
-                }
-            ],
-            sortKey: "publishDate",
-            sortOrder: "desc",
-        });
-
-        if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Selected blog not found`);
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "ManageBlogs",
+      includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
+      ne: [
+        {
+          key: "isHidden",
+          value: true
         }
+      ],
+      hasSome: [
+        {
+          key: "storeProducts",
+          values: [productId]
+        }
+      ],
+      sortKey: "publishDate",
+      sortOrder: "desc",
+    });
 
-        console.log("Item is: ",response.items);
-        return response.items;
-    } catch (error) {
-        logError(`Error fetching other blogs: ${error.message}`, error);
+    if (!Array.isArray(response.items) || response.items.length === 0) {
+      throw new Error(`Selected blog not found`);
     }
+
+    console.log("Item is: ", response.items);
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching other blogs: ${error.message}`, error);
+  }
 }
 
 
 
 export const fetchFeaturedProjects = async (id) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ["portfolioRef"],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ],
-            hasSome: [
-                {
-                    key: "storeProducts",
-                    values: [id]
-                }
-            ],
-            sortKey: "order"
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "PortfolioCollection",
+      includeReferencedItems: ["portfolioRef"],
+      ne: [
+        {
+          key: "isHidden",
+          value: true
         }
-
-        return response.items;
-    } catch (error) {
-        logError(`Error fetching featured projects: ${error.message}`, error);
+      ],
+      hasSome: [
+        {
+          key: "storeProducts",
+          values: [id]
+        }
+      ],
+      sortKey: "order"
+    });
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
     }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching featured projects: ${error.message}`, error);
+  }
 }
 
 
@@ -288,12 +288,12 @@ export const fetchTentsWithProjectsAndBlogs = async () => {
         // Parallel fetching of related content
         const [featuredProjects, blogs] = await Promise.all([
           fetchFeaturedProjects(item.tent?._id),
-         fetchFeaturedBlogs(item.tent?._id), 
+          fetchFeaturedBlogs(item.tent?._id),
         ]);
 
         return {
           tentData,
-          portfolio:featuredProjects,
+          portfolio: featuredProjects,
           blogs,
         };
       })
