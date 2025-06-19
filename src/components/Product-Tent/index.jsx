@@ -9,6 +9,7 @@ import { AddToQuoteForm } from './AddToQuoteForm';
 import { fetchSavedProductData } from '@/services/products';
 import { SaveProductButton } from '../common/SaveProductButton';
 import ProductSlider_tab from '../Product/ProductSlider_tab';
+import { AddToCartButton } from '../Product/AddtoQuoteButton';
 
 const ProductTent = ({ productData }) => {
   const { tent, gallery } = productData;
@@ -30,13 +31,13 @@ const ProductTent = ({ productData }) => {
 
   return (
     <>
-      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] min-h-[937px] '>
+      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] '>
         <div className='xl:w-1/2 '>
           <ProductSlider product={tent} />
           <ProductSlider_tab product={tent} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
-          <div className='lg:max-w-[656px] sm:max-w-[492px] h-full'>
+          <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
             <span className='text-secondary-alt 
             lg:text-[16px]
             text-[12px]
@@ -53,6 +54,7 @@ const ProductTent = ({ productData }) => {
             </div>
             <AddToQuoteForm productData={tent} />
           </div>
+          <AddToCartButton classes={'lg:!h-[200px] lg:!mt-3'} text={"Add to Quote"} />
           <SaveProductButton
             key={productData._id}
             productData={{ ...productData.productData, product: tent }}
