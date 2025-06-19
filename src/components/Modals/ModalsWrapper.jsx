@@ -8,8 +8,7 @@ import { AddToCartLightBox } from '../AddToCart/AddToCartLightBox';
 import { LoginModal } from './LoginModal';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
 import { MatchFeatureLightBox } from '../Account/MatchFeature/MatchFeatureLightBox';
-import Invalidate from './Invalidate';
-import { InvalidateLightBox } from '../Invalidate/InvalidateLightbox';
+import { InvalidateLightBox } from '../Invalidate/InvalidateLightBox';
 
 export const ModalsWrapper = ({ data }) => {
     const { lightboxes, basicLightBoxDetails, addToCartModal } = useSnapshot(lightboxState);
