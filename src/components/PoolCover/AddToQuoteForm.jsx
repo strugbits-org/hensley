@@ -8,9 +8,9 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 import { AddToQuote } from '../Product-Tent/AddtoQuoteButton';
-import { PrimaryButton } from '../common/PrimaryButton';
 import { FiPlus } from 'react-icons/fi';
-import { PrimaryImage } from '../common/PrimaryImage';
+import { MdClose } from 'react-icons/md';
+import { uploadRelevantImage } from '@/services/poolcover';
 
 // Validation schema
 const schema = yup.object({
@@ -30,7 +30,8 @@ export const AddToQuoteForm = ({ productData }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const redirectWithLoader = useRedirectWithLoader();
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
-    const [relevantImages, setRelevantImages] = useState(["https://static.wixstatic.com/media/339f77_a59ba2740b2f4b009f7411826e26036a~mv2.jpg/v1/fill/w_755,h_3991,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/compress.webp", "https://static.wixstatic.com/media/339f77_b7b312f56eaa43c39a54937f4aef9c43~mv2.jpg/v1/fill/w_755,h_3991,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/compress.webp"]);
+    const [relevantImages, setRelevantImages] = useState([]);
+    const [uploading, setUploading] = useState(false);
 
     const {
         register,
@@ -57,6 +58,8 @@ export const AddToQuoteForm = ({ productData }) => {
         try {
             const productId = productData._id;
             const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+            const images = relevantImages.map(x => x.src);
+            
             const cartData = {
                 lineItems: [{
                     catalogReference: {
@@ -67,6 +70,7 @@ export const AddToQuoteForm = ({ productData }) => {
                                 "PLEASE SHARE THE APPROX. SIZE OF THE AREA YOUR POOL IS": data.approxSize.toUpperCase(),
                                 "HOW IS YOUR POOL EDGE?": data.poolEdge.toUpperCase(),
                                 "HOW MUCH OF THE POOL ARE YOU LOOKING TO COVER?": data.coverType.toUpperCase(),
+                                "RELEVENT IMAGES": images.join("~~"),
                                 "POOLCOVER": "true"
                             }
                         },
@@ -74,11 +78,6 @@ export const AddToQuoteForm = ({ productData }) => {
                     quantity: 1,
                 }]
             };
-
-            // console.log("cartData", cartData);
-            // setIsSubmitting(false);
-            // return;
-
 
             await AddProductToCart(cartData);
             const total = (cookies.cartQuantity || 0) + 1;
@@ -93,6 +92,28 @@ export const AddToQuoteForm = ({ productData }) => {
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleImageUpload = async (e) => {
+        try {
+            setUploading(true);
+            const fileData = e.target.files[0];
+            if(!fileData) return;
+            const response = await uploadRelevantImage(fileData);
+            const { file } = response;
+            const image = {
+                id: file.id,
+                src: file.url,
+            }
+            setRelevantImages(prev => [...prev, image]);
+        } catch (error) {
+            logError("Error uploading image", error.message);
+        } finally {
+            setUploading(false);
+        }
+    };
+    const handleRemoveImage = (imageId) => {
+        setRelevantImages(prev => prev.filter(image => image.id !== imageId));
     };
 
     return (
@@ -134,34 +155,36 @@ export const AddToQuoteForm = ({ productData }) => {
             />
 
             <div className='lg:col-span-4 col-span-2'>
-                <label for="file-upload" className="cursor-pointer">
+                <label htmlFor="file-upload" className="cursor-pointer">
                     <span className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-4">PLEASE SHARE ANY RELEVANT VENUE OR INSPIRATION IMAGES</span>
                     <div className='w-full min-w-48 lg:min-w-72 uppercase tracking-widest hover:font-bold [word-spacing:3px] text-sm transition-all duration-300'>
                         <span className='flex justify-center items-center w-full bg-primary tracking-[6px] hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary text-[16px] leading-[19px] font-haasRegular h-[45px]'>
-                            <span>Upload File</span> <FiPlus className='size-5 ml-2' />
+                            <span>{uploading ? "Uploading..." : "Upload File"}</span> {!uploading && <FiPlus className='size-5 ml-2' />}
                         </span>
                     </div>
                 </label>
                 <input
+                    onChange={handleImageUpload}
                     id="file-upload"
                     type="file"
                     className="sr-only"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || uploading}
                 />
             </div>
-            <div className='lg:col-span-4 col-span-2 grid grid-cols-5 gap-2'>
-                {relevantImages.map((image, index) => (
-                    <div key={index} className="mb-4 col-span-1 h-[120px] w-[120px]">
-                        <PrimaryImage url={image} fit={'fit'} customClasses="h-full w-full object-contain object-center" />
+            <div className={`lg:col-span-4 col-span-2 grid grid-cols-5 gap-2 ${relevantImages.length === 0 ? 'hidden' : ''}`}>
+                {relevantImages.map((image) => (
+                    <div key={image.id} className="group relative col-span-1 h-[120px] cursor-pointer p-2 bg-white ">
+                        <MdClose onClick={() => handleRemoveImage(image.id)} className="size-5 absolute top-2 right-2 text-secondary z-10 hover:scale-125 transition-all duration-200" />
+                        <img src={image.src} className="h-full w-full object-contain" />
                     </div>
                 ))}
             </div>
 
             <AddToQuote
                 handleClick={handleSubmit(onSubmit)}
-                classes={"col-span-4"}
+                classes={"col-span-4 lg:mt-4"}
                 text={isSubmitting ? "Please wait..." : "add to quote"}
-                disabled={isSubmitting}
+                disabled={isSubmitting || uploading}
             />
         </form>
     );
