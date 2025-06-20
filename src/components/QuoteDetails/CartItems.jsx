@@ -142,7 +142,6 @@ const CartTent = () => {
     )
 }
 
-
 const CartCollection = () => {
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>

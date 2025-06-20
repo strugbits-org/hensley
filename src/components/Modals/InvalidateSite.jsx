@@ -1,30 +1,54 @@
-import React from 'react'
+"use client";
+import { invalidateLayout, invalidatePath } from '@/services/invalidation';
+import { logError } from '@/utils';
+import { usePathname } from 'next/navigation';
+import React, { useState } from 'react'
 
-const Button = ({ text, classes, iconTrue }) => {
+const Button = ({ text, classes, onClick, disabled }) => {
     return (
-
-        <button className={`
-         w-full
-         bg-primary group hover:tracking-[1px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary
-        relative
-        ${classes}
-        `}>
-            <span
-                className='
-             font-haasBold uppercase 
-             text-[13px]
-            '
-            >{text}</span>
-
+        <button onClick={onClick} className={`w-full bg-primary group hover:tracking-[1px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative ${classes} ${disabled ? 'pointer-events-none opacity-50' : ''} `}>
+            <span className='font-haasBold uppercase text-[13px]'>{text}</span>
         </button>
-
     )
-}
-
-
-
+};
 
 const InvalidateSite = () => {
+    const pathname = usePathname();
+    const [loading, setLoading] = useState({
+        layout: false,
+        current: false
+    });
+    const [feedbackMessage, setFeedbackMessage] = useState('');
+
+    const handleInvalidate = async (type) => {
+        try {
+            setLoading(loading => ({ ...loading, [type]: true }));
+            let res;
+            if (type === 'layout') {
+                res = await invalidateLayout();
+            } else if (type === 'current') {
+                res = await invalidatePath(pathname);
+            }
+            if (res) {
+                setFeedbackMessage(type ? 'Layout invalidated, Refreshing...' : 'Site invalidated, Refreshing...');
+            }
+            setTimeout(() => {
+                window.location.reload();
+                setLoading({
+                    current: false,
+                    layout: false
+                });
+            }, 2000);
+        } catch (error) {
+            logError("Error invalidating site", error);
+            setFeedbackMessage(type ? 'Error invalidating layout' : 'Error invalidating site');
+            setLoading({
+                current: false,
+                layout: false
+            });
+        }
+    }
+
     return (
         <div className='px-[20px] mx-[20px] py-[20px] w-full sm:max-w-[300px] gap-y-[20px] bg-primary-alt flex flex-col justify-center items-center'>
             <svg preserveAspectRatio="xMidYMid meet" data-bbox="0 -0.002 184.096 29.081" viewBox="0 -0.002 184.096 29.081" height="29.078" width="184.094" xmlns="http://www.w3.org/2000/svg" data-type="color" role="presentation" aria-hidden="true" aria-label="">
@@ -40,18 +64,21 @@ const InvalidateSite = () => {
                 </g>
             </svg>
             <span className='font-haasRegular uppercase text-secondary-alt text-[12px] text-center'>
-                NOTE: The global section includes site-wide elements like the INSTAGRAM FEED, CATEGORIES, BLOGS, and PORTFOLIOS
+                Would you like to invalidate the current path?
             </span>
             <span className='font-haasRegular uppercase text-secondary-alt text-[14px] text-center'>
-                CURRENT PATH: [ /SUBCATEGORY ]
+                CURRENT PATH: [{pathname}]
             </span>
-            <div className='flex flex-col gap-y-[10px] w-full'>
-                <Button text="invalidate global sections" classes={"lg:!w-full !h-[40px]"} />
-                <Button text="invalidate complete site" classes={"lg:!w-full !h-[40px]"} />
-                <Button text="invalidate complete page" classes={"lg:!w-full !h-[40px]"} />
-                <Button text="invalidate complete site" classes={"lg:!w-full !h-[40px]"} />
-                <Button text="invalidate complete page" classes={"lg:!w-full !h-[40px]"} />
-            </div>
+            {!feedbackMessage ? (
+                <div className='flex flex-col gap-y-[10px] w-full'>
+                    <Button onClick={() => { handleInvalidate("current") }} text={loading.current ? "invalidating..." : "invalidate current page"} classes={"lg:!w-full !h-[40px]"} />
+                    <Button onClick={() => { handleInvalidate("layout") }} text={loading.layout ? "invalidating..." : "invalidate complete site"} classes={"lg:!w-full !h-[40px]"} />
+                </div>
+            ) : (
+                <div className='flex flex-col gap-y-[10px] w-full'>
+                    <span className='font-haasMedium uppercase text-secondary-alt text-base text-center'>{feedbackMessage}</span>
+                </div>
+            )}
         </div>
     )
 }

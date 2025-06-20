@@ -14,6 +14,7 @@ import { signInUser } from '@/services/auth/authentication';
 import { useCookies } from 'react-cookie';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
+import { convertToHTML, convertToHTMLBlog } from '@/utils/renderRichText';
 
 // Validation schema
 const schema = yup.object({
@@ -92,7 +93,12 @@ const InputField = ({
     );
 };
 
-const Login = ({ classes, close, isLightbox = true }) => {
+const Login = ({ classes, close, isLightbox = true, data = '' }) => {
+
+    const { newToHensleyText, submitButtonLabel, createAccountButtonLabel, logo, labels, agreementContent, forgetPasswordLabel } = data;
+
+    const { email, password } = labels;
+
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const redirectWithLoader = useRedirectWithLoader();
@@ -106,6 +112,15 @@ const Login = ({ classes, close, isLightbox = true }) => {
     } = useForm({
         resolver: yupResolver(schema)
     });
+
+    const wixImageToUrl = (wixImage) => {
+        if (!wixImage?.startsWith("wix:image://v1/")) return wixImage;
+
+        const parts = wixImage.replace("wix:image://v1/", "").split("/");
+        const mediaId = parts[0]; // "e3c477_..."
+        return `https://static.wixstatic.com/media/${mediaId}`;
+    };
+
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
@@ -187,7 +202,15 @@ const Login = ({ classes, close, isLightbox = true }) => {
                     </button>
                 )}
 
-                <Image src={image} className='lg:block hidden' alt="Hensley Logo" />
+                <Image
+                    src={wixImageToUrl(logo)}
+                    width={292}
+                    height={47}
+                    className="lg:block hidden"
+                    alt="Hensley Logo"
+                />
+
+
 
                 <h3 className='lg:hidden block uppercase text-[55px] leading-[30px] text-secondary-alt font-recklessRegular'>
                     Login
@@ -197,7 +220,7 @@ const Login = ({ classes, close, isLightbox = true }) => {
                 <div className='w-full'>
                     <InputField
                         id="email"
-                        label="Email"
+                        label={email}
                         placeholder="exemplo@myemail.com"
                         borderColor="secondary-alt"
                         type="email"
@@ -210,11 +233,11 @@ const Login = ({ classes, close, isLightbox = true }) => {
                 {/* Password Field */}
                 <div className='w-full grid grid-cols-2'>
                     <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
-                        password
+                        {password}
                     </label>
                     <label className="block text-[16px] leading-[19px] font-haasLight text-secondary-alt mb-2 text-right">
                         <button onClick={handleForgotPassword} className={"underline text-secondary-alt font-haasRegular hover:opacity-70 transition-opacity duration-200"}>
-                            Forgot your password?
+                            {forgetPasswordLabel}
                         </button>
                     </label>
                     <InputField
@@ -243,7 +266,7 @@ const Login = ({ classes, close, isLightbox = true }) => {
                     <span className={`font-haasLight uppercase text-[16px] hover:border-secondary-alt  
                          transition-all duration-300 tracking-[5px] 
                          ${!isSubmitting ? 'group-hover:[letter-spacing:8px] group-hover:font-haasBold group-hover:text-primary' : ''}`}>
-                        {isSubmitting ? 'Signing in...' : 'Sign in'}
+                        {isSubmitting ? 'Signing in...' : submitButtonLabel}
                     </span>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -273,7 +296,7 @@ const Login = ({ classes, close, isLightbox = true }) => {
 
                 {/* Terms & Conditions */}
                 <div className='w-full flex justify-center items-center'>
-                    <span className='text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center'>
+                    {/* <span className='text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center'>
                         By continuing, you are agreeing with
                         <a href="#" className='text-secondary underline hover:opacity-70 transition-opacity duration-200'>
                             Blueprint <br /> Studios Terms & Conditions
@@ -282,12 +305,15 @@ const Login = ({ classes, close, isLightbox = true }) => {
                         <a href="#" className='text-secondary underline hover:opacity-70 transition-opacity duration-200'>
                             Privacy Policy.
                         </a>
-                    </span>
+                    </span> */}
+                    <div className='w-full sm:max-w-[344px]'>
+                        {convertToHTMLBlog({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
+                    </div>
                 </div>
 
                 {/* New User Section */}
                 <span className='font-recklessLight text-[35px] leading-[20px] text-secondary-alt block lg:mt-0 mt-[100px]'>
-                    NEW TO HENSLEY?
+                    {newToHensleyText}
                 </span>
 
                 <CustomLink to={isSubmitting ? undefined : "/create-account"}>
@@ -300,7 +326,7 @@ const Login = ({ classes, close, isLightbox = true }) => {
                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' :
                                 'hover:tracking-[5px] hover:bg-primary hover:font-haasBold hover:text-primary-alt'}`}
                     >
-                        create your account
+                        {createAccountButtonLabel}
                     </button>
                 </CustomLink>
             </form>

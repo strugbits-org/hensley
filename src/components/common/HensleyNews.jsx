@@ -1,13 +1,15 @@
 "use client";
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { PrimaryButton } from '../common/PrimaryButton'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import NewsCard from './NewsCard';
+import Loading from '@/app/loading';
 
 export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center", titleType = "primary" }) => {
     const { hensleyNewsTitle } = pageDetails;
+    const [isSliderReady, setIsSliderReady] = useState(false);
 
     const sliderInstance = useRef();
 
@@ -22,6 +24,7 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
             },
             created(slider) {
                 sliderInstance.current = slider;
+                setIsSliderReady(true);
             },
             breakpoints: {
                 "(max-width: 768px)": {
@@ -52,7 +55,13 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
 
             </div>
             <div className="p-6">
-                <div ref={sliderRef} className="keen-slider">
+                {!isSliderReady && (
+                    <div className="w-full h-[300px] flex justify-center items-center">
+                        <Loading custom type='secondary' />
+                    </div>
+                )}
+
+                <div ref={sliderRef} className={`keen-slider ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
                     {data.map((item, index) => {
                         return (
                             <div

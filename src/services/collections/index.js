@@ -4,13 +4,31 @@ import { fetchCategoriesData } from "../products";
 import { fetchOurCategoriesData } from "..";
 import queryCollection from "@/utils/fetchFunction";
 
+
+export const fetchCategoryPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "categoryPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
+
 export const fetchSelectedCollectionData = async (slug) => {
     try {
-        const [ourCategoriesData, categoriesData, categoriesSortData, productBannersData] = await Promise.all([
+        const [ourCategoriesData, categoriesData, categoriesSortData, productBannersData, pageDetails] = await Promise.all([
             fetchOurCategoriesData(),
             fetchCategoriesData(),
             fetchCategoriesSortStructure(),
-            fetchProductBannersData()
+            fetchProductBannersData(),
+            fetchCategoryPageDetails()
         ]);
 
         const selectedCategory = categoriesData.find(category => category.slug === slug);
@@ -38,7 +56,8 @@ export const fetchSelectedCollectionData = async (slug) => {
             productBannersData,
             collectionIds,
             sortIndex,
-            sortedProducts
+            sortedProducts,
+            pageDetails
         }
 
         return data;

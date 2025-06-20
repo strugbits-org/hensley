@@ -1,8 +1,36 @@
 import { MarketPage } from "@/components/Market";
-import { fetchMarketsData } from "@/services";
+import { fetchMarketsData, fetchPageMetaData, fetchSelectedMarketsData } from "@/services";
 import { fetchSelectedMarketData } from "@/services/market";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+
+export async function generateMetadata({ params }) {
+  try {
+    const slug = decodeURIComponent(params.slug);
+
+    const [
+      metaData,
+      marketData
+    ] = await Promise.all([
+      fetchPageMetaData("market"),
+      fetchSelectedMarketsData(slug)
+    ]);
+
+    const { title, noFollowTag } = metaData;
+    const fullTitle = marketData.title + " " + title;
+    const metadata = { title: fullTitle };
+    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
+      metadata.robots = "noindex,nofollow";
+    }
+
+    return metadata;
+  } catch (error) {
+    logError("Error in metadata(market page):", error);
+  }
+}
+
+
 
 export const generateStaticParams = async () => {
   try {

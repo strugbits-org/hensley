@@ -1,18 +1,27 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react'
-import SectionTitle from '../common/SectionTitle'
-import { PrimaryButton } from '../common/PrimaryButton'
-import ProductCard from '../common/ProductCard'
-import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
-import { useKeenSlider } from 'keen-slider/react'
+import React, { useEffect, useRef, useState } from 'react';
+import SectionTitle from '../common/SectionTitle';
+import { PrimaryButton } from '../common/PrimaryButton';
+import ProductCard from '../common/ProductCard';
+import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md';
+import { useKeenSlider } from 'keen-slider/react';
 import { fetchSavedProductData } from '@/services/products';
 import { logError } from '@/utils';
+import Loading from '@/app/loading';
 
-export const BestSellers = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false }) => {
+export const BestSellers = ({
+    data,
+    pageDetails,
+    loop = true,
+    origin = "center",
+    classes,
+    headingClasses,
+    buttonHide = false,
+}) => {
     const { bestSellerTitle } = pageDetails;
     const [savedProducts, setSavedProducts] = useState([]);
-
     const sliderInstance = useRef();
+    const [isSliderReady, setIsSliderReady] = useState(false);
 
     const [sliderRef] = useKeenSlider(
         {
@@ -25,6 +34,7 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center",
             },
             created(slider) {
                 sliderInstance.current = slider;
+                setIsSliderReady(true);
             },
             breakpoints: {
                 "(max-width: 768px)": {
@@ -54,30 +64,46 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center",
         fetchSavedProducts();
     }, []);
 
+    if (!data || data.length === 0) return null;
+
     return (
-        (data && data.length > 0) && <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-[85px]`}>
-            <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={bestSellerTitle} classes={`!text-primary py-[20px] md:mt-6 lg:mt-0 ${headingClasses}`} />
-                {!buttonHide && <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>}
+        <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-[85px]`}>
+            <div className="sm:px-0 px-[12px] pb-12 flex items-center flex-col">
+                <SectionTitle
+                    text={bestSellerTitle}
+                    classes={`!text-primary py-[20px] md:mt-6 lg:mt-0 ${headingClasses}`}
+                />
+                {!buttonHide && (
+                    <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+                        SEE ALL
+                    </PrimaryButton>
+                )}
             </div>
-            <div className="p-6">
-                <div ref={sliderRef} className="keen-slider">
-                    {data.map((productData, index) => {
-                        return (
-                            <div
-                                key={index}
-                                className={`keen-slider__slide  flex flex-col px-2`}
-                            >
-                                <ProductCard
-                                    type='slider'
-                                    data={productData}
-                                    savedProducts={savedProducts}
-                                    setSavedProducts={setSavedProducts}
-                                    btnClass="border border-black"
-                                />
-                            </div>
-                        );
-                    })}
+
+            <div className="p-6 relative">
+                {!isSliderReady && (
+                    <div className="w-full h-[300px] flex justify-center items-center">
+                        <Loading custom type='secondary' />
+                    </div>
+                )}
+
+                <div ref={sliderRef} className={`keen-slider transition-opacity duration-300 ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
+                    {data.map((productData, index) => (
+                        <div
+                            key={index}
+                            className="keen-slider__slide flex flex-col px-2"
+                        >
+                            <ProductCard
+                                type="slider"
+                                data={productData}
+                                savedProducts={savedProducts}
+                                setSavedProducts={setSavedProducts}
+                                btnClass="border border-black"
+                            />
+                        </div>
+                    ))}
+
+                    {/* Navigation Buttons */}
                     <button
                         onClick={() => sliderInstance.current?.prev()}
                         className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
@@ -94,5 +120,5 @@ export const BestSellers = ({ data, pageDetails, loop = true, origin = "center",
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

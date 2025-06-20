@@ -14,7 +14,7 @@ export const ModalsWrapper = ({ data }) => {
     const { lightboxes, basicLightBoxDetails, addToCartModal } = useSnapshot(lightboxState);
     const { contact, login, forgotPassword, matchFeature, invalidate } = lightboxes;
 
-    const { branches, contactFormData } = data;
+    const { branches, contactFormData, loginPageDetails } = data;
 
     return (
         <>
@@ -22,7 +22,7 @@ export const ModalsWrapper = ({ data }) => {
             <MatchFeatureLightBox isOpen={matchFeature} onClose={() => lightboxActions.hideLightBox("matchFeature")} />
             <AddToCartLightBox data={addToCartModal} onClose={() => lightboxActions.resetAddToCartModal()} />
             <ContactFormLightbox locationsData={branches} data={contactFormData} isOpen={contact} onClose={() => lightboxActions.hideLightBox("contact")} />
-            <LoginModal isOpen={login} onClose={() => lightboxActions.hideLightBox("login")} />
+            <LoginModal data={loginPageDetails} isOpen={login} onClose={() => lightboxActions.hideLightBox("login")} />
             <ForgotPasswordModal isOpen={forgotPassword} onClose={() => lightboxActions.hideLightBox("forgotPassword")} />
             <InvalidateLightBox isOpen={invalidate} onClose={() => lightboxActions.hideLightBox("invalidate")}/>
         </>

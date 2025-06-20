@@ -1,7 +1,39 @@
 import { CollectionPage } from "@/components/Collections";
+import { fetchPageMetaData } from "@/services";
 import { fetchCollectionPagePaths, fetchSelectedCollectionData } from "@/services/collections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+
+
+export async function generateMetadata({ params }) {
+  try {
+    const slug = decodeURIComponent(params.slug);
+
+    const [
+      metaData,
+      subCategoryData
+    ] = await Promise.all([
+      fetchPageMetaData("collections"),
+     fetchSelectedCollectionData(slug)
+    ]);
+
+    const { title, noFollowTag } = metaData;
+    const {selectedCategory} = subCategoryData
+    const fullTitle = selectedCategory?.name + " " + title;
+    const metadata = { title: fullTitle };
+    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
+      metadata.robots = "noindex,nofollow";
+    }
+
+    return metadata;
+  } catch (error) {
+    logError("Error in metadata(market page):", error);
+  }
+}
+
+
+
 
 export const generateStaticParams = async () => {
   try {

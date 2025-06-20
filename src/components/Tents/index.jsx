@@ -9,7 +9,9 @@ import { FeaturedProjects } from '../Product/FeaturedProjects'
 
 const Tents = ({ data }) => {
 
-    const { tents, projectandblog } = data
+    const { tents, projectandblog, pageDetails } = data
+
+    const { featuredProductTitle, downloadBtnLabel } = pageDetails
 
     return (
         <>
@@ -20,14 +22,14 @@ const Tents = ({ data }) => {
                     <>
                         <BannerStructures title={item?.tentData?.productData?.title} data={item?.tentData?.tent} />
                         <OurProjects data={item.portfolio} />
-                        <FeaturedProjects data={item?.blogs} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
+                        <FeaturedProjects data={item?.blogs} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="start" />
 
                     </>
                 )
             })}
 
             <div className='w-full flex justify-center items-center'>
-                <DownloadButton text="DOWNLOAD MASTERCLASS TENTING 101" classes={"w-[656px]"} iconTrue={"true"} />
+                <DownloadButton text={downloadBtnLabel} classes={"w-[656px]"} iconTrue={"true"} />
             </div>
         </>
     )

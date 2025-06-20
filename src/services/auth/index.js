@@ -1,6 +1,7 @@
 "use server";
 import { cookies } from "next/headers";
 import { createCart } from "../cart/CartApisVisitor";
+import queryCollection from "@/utils/fetchFunction";
 
 export const getAuthToken = async () => {
   const cookieStore = cookies();
@@ -19,6 +20,52 @@ export const getMemberTokens = async () => {
     return "";
   }
 };
+
+export const fetchLoginPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "LoginPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
+export const fetchSignupPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "SignupPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
+export const fetchAccountPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "MyaccountPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
 
 export const getCartId = async (createNew = true) => {
   try {

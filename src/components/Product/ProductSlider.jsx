@@ -1,8 +1,9 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { PrimaryImage } from "../common/PrimaryImage";
+import Loading from "@/app/loading";
 
 const THUMBNAIL_CLASSES = {
   ACTIVE: "opacity-60",
@@ -35,13 +36,11 @@ function createThumbnailPlugin(mainRef) {
     };
 
     const addClickEvents = () => {
-      // Clean up existing handlers
       clickHandlers.forEach(({ slide, handler }) => {
         slide.removeEventListener("click", handler);
       });
       clickHandlers = [];
 
-      // Add new handlers
       slider.slides.forEach((slide, idx) => {
         const handler = () => {
           if (mainRef.current) {
@@ -74,7 +73,6 @@ function createThumbnailPlugin(mainRef) {
       mainRef.current.on("animationStarted", handleMainSliderAnimation);
     });
 
-    // Cleanup function
     slider.on("destroyed", () => {
       clickHandlers.forEach(({ slide, handler }) => {
         slide.removeEventListener("click", handler);
@@ -102,9 +100,15 @@ const SlideImage = React.memo(({ item, index, isMain = false }) => (
 SlideImage.displayName = 'SlideImage';
 
 export default function ProductSlider({ product }) {
-  const thumbnailPlugin = useMemo(() => createThumbnailPlugin, []);
+  const [isSliderReady, setIsSliderReady] = useState(false);
 
-  const [sliderRef, instanceRef] = useKeenSlider(SLIDER_CONFIG.MAIN);
+  const thumbnailPlugin = useMemo(() => createThumbnailPlugin, []);
+  const [sliderRef, instanceRef] = useKeenSlider({
+    ...SLIDER_CONFIG.MAIN,
+    created() {
+      setIsSliderReady(true);
+    },
+  });
 
   const [thumbnailRef] = useKeenSlider(
     SLIDER_CONFIG.THUMBNAIL,
@@ -122,40 +126,51 @@ export default function ProductSlider({ product }) {
   }
 
   return (
-    <div className="lg:flex hidden w-full h-full gap-x-[24px] justify-between">
-      {/* Main Slider */}
-      <div
-        ref={sliderRef}
-        className="keen-slider !w-[85%]"
-        role="region"
-        aria-label="Product images"
-      >
-        {mediaItems.map((item, index) => (
-          <SlideImage
-            key={`main-${item.id || index}`}
-            item={item}
-            index={index}
-            isMain={true}
-          />
-        ))}
-      </div>
+    <>
+      {!isSliderReady && (
+        <div className="w-full h-[937px] flex items-center justify-center text-gray-400">
+          <Loading custom type="secondary" />
+        </div>
+      )}
 
-      {/* Thumbnail Slider */}
       <div
-        ref={thumbnailRef}
-        className="keen-slider !w-[15%] thumbnail grid grid-cols-1 overflow-hidden"
-        role="region"
-        aria-label="Product image thumbnails"
+        className={`lg:flex hidden w-full h-full gap-x-[24px] justify-between transition-opacity duration-300 ${!isSliderReady ? 'invisible opacity-0' : 'visible opacity-100'
+          }`}
       >
-        {mediaItems.map((item, index) => (
-          <SlideImage
-            key={`thumb-${item.id || index}`}
-            item={item}
-            index={index}
-            isMain={false}
-          />
-        ))}
+        {/* Main Slider */}
+        <div
+          ref={sliderRef}
+          className="keen-slider !w-[85%]"
+          role="region"
+          aria-label="Product images"
+        >
+          {mediaItems.map((item, index) => (
+            <SlideImage
+              key={`main-${item.id || index}`}
+              item={item}
+              index={index}
+              isMain={true}
+            />
+          ))}
+        </div>
+
+        {/* Thumbnail Slider */}
+        <div
+          ref={thumbnailRef}
+          className="keen-slider !w-[15%] thumbnail grid grid-cols-1 overflow-hidden"
+          role="region"
+          aria-label="Product image thumbnails"
+        >
+          {mediaItems.map((item, index) => (
+            <SlideImage
+              key={`thumb-${item.id || index}`}
+              item={item}
+              index={index}
+              isMain={false}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
