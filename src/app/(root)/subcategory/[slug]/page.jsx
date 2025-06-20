@@ -6,7 +6,7 @@ import { fetchSelectedCategoryData, fetchSubCategoryPagePaths } from "@/services
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchSubCategoryPagePaths();
-  return paths;
+    return paths;
   } catch (error) {
     logError("Error generating static params(tent page):", error);
     return [];
@@ -19,14 +19,11 @@ export default async function Page({ params }) {
     if (!slug) {
       throw new Error("Slug is required");
     }
-    const data = await fetchSelectedCategoryData(slug);    
+    const data = await fetchSelectedCategoryData(slug);
 
-    const {pageDetails} = data
-
-    console.log("sub data is the: ",pageDetails);
-
+    const { pageDetails } = data
     return (
-      <SubCategoryPage data={data} pageDetails={pageDetails}/>
+      <SubCategoryPage data={data} pageDetails={pageDetails} />
     );
   } catch (error) {
     logError("Error fetching sub category page data:", error);

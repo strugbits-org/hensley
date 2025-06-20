@@ -12,6 +12,7 @@ import { signUpUser } from '@/services/auth/authentication';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
+import { convertToHTMLBlog } from '@/utils/renderRichText';
 
 // Validation schema
 const schema = yup.object({
@@ -45,19 +46,14 @@ const FIELD_CONFIGS = {
   confirmPassword: { type: 'password', placeholder: '********', gridSpan: '' }
 };
 
-export const SignupForm = ({ content }) => {
-  // Default content structure
+export const SignupForm = ({ content, data }) => {
+
+  const { submitButtonLabel, labels, agreementContent, title } = data;
+
   const defaultContent = {
-    labels: {
-      firstName: "First Name",
-      lastName: "Last Name",
-      email: "Email",
-      phone: "Phone Number",
-      password: "Password",
-      confirmPassword: "Confirm Password"
-    },
+    labels: { ...labels },
     buttons: {
-      submit: "create account",
+      submit: submitButtonLabel,
       submitting: "creating account..."
     },
     agreement: {
@@ -82,7 +78,6 @@ export const SignupForm = ({ content }) => {
     }
   };
 
-  // Use provided content or fall back to defaults
   const formContent = { ...defaultContent, ...content };
 
   const [showPassword, setShowPassword] = useState(false);
@@ -111,7 +106,6 @@ export const SignupForm = ({ content }) => {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      // Remove confirmPassword from submission data
       const { confirmPassword, ...submissionData } = data;
       const response = await signUpUser(submissionData);
       const { jwtToken: authToken, member: userData, userTokens } = response;
@@ -171,9 +165,11 @@ export const SignupForm = ({ content }) => {
           {formContent.labels[fieldId]}
         </label>
         <input
-          type={isPasswordField ? (showPassword ? "text" : "password")
+          type={
+            isPasswordField ? (showPassword ? "text" : "password")
             : isConfirmPasswordField ? (showConfirmPassword ? "text" : "password")
-              : config.type}
+            : config.type
+          }
           {...register(fieldId)}
           placeholder={config.placeholder}
           className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary pr-12 ${error ? 'border-b-red-500' : ''
@@ -186,7 +182,14 @@ export const SignupForm = ({ content }) => {
             className={"absolute right-3 top-10 cursor-pointer"}
             onClick={() => togglePasswordVisibility(fieldId)}
           >
-            <PrimaryImage fit='fit' url={showPassword ? "https://static.wixstatic.com/shapes/0e0ac5_e14dd77953084aec9c7994033fda7882.svg" : "https://static.wixstatic.com/shapes/0e0ac5_130c9cc93100439b8627738cde9c26c7.svg"} />
+            <PrimaryImage
+              fit='fit'
+              url={
+                (isPasswordField && showPassword) || (isConfirmPasswordField && showConfirmPassword)
+                  ? "https://static.wixstatic.com/shapes/0e0ac5_e14dd77953084aec9c7994033fda7882.svg"
+                  : "https://static.wixstatic.com/shapes/0e0ac5_130c9cc93100439b8627738cde9c26c7.svg"
+              }
+            />
           </button>
         )}
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -196,28 +199,16 @@ export const SignupForm = ({ content }) => {
 
   return (
     <div>
-      <FormHeading />
+      <FormHeading pageTitle={title} />
       <div className="w-full flex justify-center items-center py-[62px] sm:px-0 px-[37px]">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="lg:max-w-[924px] sm:max-w-[491px] grid lg:grid-cols-2 grid-cols-1 gap-x-[24px] justify-center items-center w-full gap-y-[39px]"
         >
-          {/* Personal Information */}
-          {FORM_STRUCTURE.personalInfo.map((fieldId) =>
-            renderField({ fieldId })
-          )}
+          {FORM_STRUCTURE.personalInfo.map((fieldId) => renderField({ fieldId }))}
+          {FORM_STRUCTURE.contactInfo.map((fieldId) => renderField({ fieldId }))}
+          {FORM_STRUCTURE.security.map((fieldId) => renderField({ fieldId }))}
 
-          {/* Contact Information */}
-          {FORM_STRUCTURE.contactInfo.map((fieldId) =>
-            renderField({ fieldId })
-          )}
-
-          {/* Security Fields */}
-          {FORM_STRUCTURE.security.map((fieldId) =>
-            renderField({ fieldId })
-          )}
-
-          {/* Submit Button */}
           <div className='lg:col-span-2 w-full flex justify-center items-center'>
             <Button
               text={isSubmitting ? formContent.buttons.submitting : formContent.buttons.submit}
@@ -225,19 +216,10 @@ export const SignupForm = ({ content }) => {
             />
           </div>
 
-          {/* Terms Agreement */}
           <div className='lg:col-span-2 w-full flex flex-col justify-center items-center gap-4'>
-            {/* Terms text */}
-            <span className='text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center'>
-              {formContent.agreement.text}{' '} <br />
-              <a href={formContent.agreement.termsUrl} className='text-secondary underline'>
-                {formContent.agreement.termsLink}
-              </a>{' '}
-              and{' '}
-              <a href={formContent.agreement.privacyUrl} className='text-secondary underline'>
-                {formContent.agreement.privacyLink}
-              </a>
-            </span>
+            <div className='w-full sm:max-w-[344px]'>
+              {convertToHTMLBlog({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
+            </div>
           </div>
         </form>
       </div>

@@ -1,4 +1,5 @@
 "use server";
+import queryCollection from "@/utils/fetchFunction";
 import { getAuthToken, getCartId, getMemberTokens } from "../auth";
 import { createPriceQuoteVisitor } from "./QuoteApisVisitor";
 
@@ -74,5 +75,21 @@ export const fetchQuote = async (id) => {
     return data.data;
   } catch (error) {
     throw new Error(error);
+  }
+};
+
+
+export const fetchQuotePageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "QuoteRequestPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
   }
 };

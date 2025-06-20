@@ -9,8 +9,6 @@ export const About = ({ data }) => {
 
     const { meetFamilyTitle, dreamTeamTitle, howWeDoItTitle } = aboutPageDetails
 
-    console.log("meetingfamily: ", meetFamilyTitle);
-
     const pageDetails = {
         buttonLabelPortfolioSlider: "View Portfolio",
     }

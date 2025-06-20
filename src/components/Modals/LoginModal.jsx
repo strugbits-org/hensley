@@ -3,7 +3,7 @@ import React, { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import Login from '../Login';
 
-export const LoginModal = ({ isOpen, onClose }) => {
+export const LoginModal = ({ isOpen, onClose, data }) => {
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -32,7 +32,7 @@ export const LoginModal = ({ isOpen, onClose }) => {
                         >
                             <DialogPanel className="w-full transform overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
                                 <div onClick={onClose} className='bg-[#2c2216a6] absolute top-0 left-0 w-full h-full z-[1]'></div>
-                                <Login close={onClose} />
+                                <Login data={data} close={onClose} />
                             </DialogPanel>
                         </TransitionChild>
                     </div>

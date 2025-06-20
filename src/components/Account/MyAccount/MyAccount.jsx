@@ -26,36 +26,6 @@ const FIELD_CONFIGS = {
   phone: { type: 'tel', readOnly: false }
 };
 
-const PAGE_DATA = {
-  heading: "MY ACCOUNT",
-  description: "View and edit your personal info below.",
-  accountTitle: "ACCOUNT",
-  accountSubtitle: "Update your personal information.",
-  loginEmailText: "Login Email:",
-  loginEmailNote: "Your Login email can't be changed",
-  discardButtonText: "DISCARD",
-  updateButtonText: "UPDATE INFO",
-  updatingButtonText: "UPDATING...",
-  formFields: {
-    firstName: "FIRST NAME*",
-    lastName: "LAST NAME*",
-    email: "EMAIL*",
-    phone: "PHONE"
-  },
-  messages: {
-    success: {
-      title: "Profile Updated Successfully!",
-      description: "Your account information has been updated.",
-      buttonText: "Continue"
-    },
-    error: {
-      title: "Update Failed",
-      description: "There was an error updating your profile. Please try again.",
-      buttonText: "Try Again"
-    }
-  }
-};
-
 const ArrowIcon = React.memo(() => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -107,8 +77,34 @@ const FormField = React.memo(({ fieldKey, field, register, error, isSubmitting, 
   );
 });
 
-export const MyAccount = ({ content }) => {
-  // Use provided content or fall back to defaults
+export const MyAccount = ({ content, data = "" }) => {
+  const PAGE_DATA = {
+    heading: data?.title,
+    description: data?.description,
+    accountTitle: data?.subTitle,
+    accountSubtitle: data?.personalInfoDescription,
+    loginEmailText: data?.emailTitle,
+    loginEmailNote: data?.emailNote,
+    discardButtonText: data?.discardButtonLabel,
+    updateButtonText: data?.updateButtonLabel,
+    updatingButtonText: "UPDATING...",
+    formFields: {
+      ...data?.labels
+    },
+    messages: {
+      success: {
+        title: "Profile Updated Successfully!",
+        description: "Your account information has been updated.",
+        buttonText: "Continue"
+      },
+      error: {
+        title: "Update Failed",
+        description: "There was an error updating your profile. Please try again.",
+        buttonText: "Try Again"
+      }
+    }
+  };
+
   const pageContent = { ...PAGE_DATA, ...content };
 
   const { firstName, lastName, email, phone } = useUserData();
@@ -126,25 +122,23 @@ export const MyAccount = ({ content }) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: ''
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: ""
     }
   });
 
   const watchedFields = watch();
 
-  // Initialize form with user data
   const setInitialData = useCallback(() => {
     setValue('firstName', firstName);
     setValue('lastName', lastName);
     setValue('email', email);
     setValue('phone', phone);
     setHasChanges(false);
-  }, [firstName, lastName, email, phone, reset]);
+  }, [firstName, lastName, email, phone, setValue]);
 
-  // Check for changes whenever watched fields change
   useEffect(() => {
     const currentData = { firstName, lastName, email, phone };
     const hasFormChanges = Object.keys(currentData).some(
@@ -153,7 +147,6 @@ export const MyAccount = ({ content }) => {
     setHasChanges(hasFormChanges);
   }, [watchedFields, firstName, lastName, email, phone]);
 
-  // Initialize form data when user data loads
   useEffect(() => {
     if (firstName || lastName || email || phone) {
       loaderActions.hide();
@@ -165,15 +158,12 @@ export const MyAccount = ({ content }) => {
     setIsSubmitting(true);
     try {
       const response = await updateProfile(formData);
-
-      // Update cookie with new user data
       const userData = JSON.stringify(response.updatedMember);
       setCookie("userData", userData, {
         path: "/",
         expires: new Date("2099-01-01"),
       });
 
-      // Show success message
       setTimeout(() => {
         lightboxActions.setBasicLightBoxDetails({
           title: pageContent.messages.success.title,
@@ -184,7 +174,6 @@ export const MyAccount = ({ content }) => {
         setHasChanges(false);
         setIsSubmitting(false);
       }, 1000);
-
     } catch (error) {
       logError(error);
       setTimeout(() => {

@@ -47,9 +47,6 @@ export default async function Page({ params }) {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchProductPageData(slug);
     const { matchedProducts, featuredProjectsData, pageDetails } = data;
-
-    console.log("The page details is new: ", pageDetails);
-
     const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     if (!data) {

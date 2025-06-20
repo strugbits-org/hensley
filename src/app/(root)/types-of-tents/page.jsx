@@ -1,5 +1,5 @@
 import Tents from "@/components/Tents";
-import { fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
+import { fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
 import { fetchFeaturedBlogs, fetchTentPageData } from "@/services/tents";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
@@ -9,13 +9,15 @@ export default async function Page({ params }) {
 
     const projectandblog = await fetchTentsWithProjectsAndBlogs();
 
-    const [tents] = await Promise.all([
+    const [tents, pageDetails] = await Promise.all([
       fetchTentsData(),
+      fetchTentListingPageDetails()
     ]);
 
     const data = {
       tents,
       projectandblog,
+      pageDetails
     };
 
     return <Tents data={data}/>
