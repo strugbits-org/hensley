@@ -9,7 +9,11 @@ export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchProductPageData(slug);
-    const { matchedProducts, featuredProjectsData } = data;
+    const { matchedProducts, featuredProjectsData, pageDetails } = data;
+
+    console.log("The page details is new: ", pageDetails);
+
+    const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     if (!data) {
       throw new Error("Product data not found");
@@ -18,8 +22,8 @@ export default async function Page({ params }) {
     return (
       <>
         <Product data={data} />
-        <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="start" />
-        <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Projects featured in this Product entry:" }} loop={false} origin="start" />
+        <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="start" />
+        <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="start" />
       </>
     );
   } catch (error) {

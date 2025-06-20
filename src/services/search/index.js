@@ -162,12 +162,34 @@ export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipPro
     }
 };
 
+
+export const fetchSearchPageDetails = async () => {
+  try {
+    const searchData = await queryCollection({ dataCollectionId: "searchPageDetails" });
+
+    if (!Array.isArray(searchData.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return {
+      searchPageDetails: searchData.items[0],
+    };
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
+
+
+
 export const searchOtherData = async (query) => {
-    const [tents, projects, blogs] = await Promise.all([
+    const [tents, projects, blogs, searchPageDetails] = await Promise.all([
         searchTents(query),
         searchProjects(query),
-        searchBlogs(query)
+        searchBlogs(query),
+
     ]);
 
-    return { tents, projects, blogs };
+    return { tents, projects, blogs, searchPageDetails };
 }

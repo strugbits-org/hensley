@@ -11,8 +11,12 @@ export default async function Page({ params }) {
     }
     const data = await fetchSelectedCategoryData(slug);    
 
+    const {pageDetails} = data
+
+    console.log("sub data is the: ",pageDetails);
+
     return (
-      <SubCategoryPage data={data} />
+      <SubCategoryPage data={data} pageDetails={pageDetails}/>
     );
   } catch (error) {
     logError("Error fetching sub category page data:", error);

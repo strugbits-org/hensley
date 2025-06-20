@@ -81,10 +81,10 @@ const ProjectCards = ({ data, isRTL }) => {
   )
 }
 
-function RelatedProjects({ data, classes }) {
+function RelatedProjects({ data, classes, pageTitle="" }) {
   return (
     <div className={`mb-20 md:mb-40 lg:mb-0 pb-[100px] ${classes}`}>
-      <SectionTitle text="PROJECTS RELATED TO YOUR SEARCH" classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />
+      <SectionTitle text={pageTitle} classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />
       <div className="w-full grid sm:grid-cols-2 grid-cols-1 lg:gap-0 lg:py-[24px] sm:gap-y-[12px] sm:gap-x-[12px] gap-y-[30px] lg:mt-0 mt-[12px]">
         {data.map((item, index) => {
           const isRTL = Math.floor(index / 2) % 2 === 1;

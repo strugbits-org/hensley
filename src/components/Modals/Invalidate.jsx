@@ -21,9 +21,6 @@ const Button = ({ text, classes, iconTrue }) => {
     )
 }
 
-
-
-
 const Invalidate = () => {
     return (
         <div className='px-[20px] mx-[20px] py-[20px] w-full sm:max-w-[300px] gap-y-[20px] bg-primary-alt flex flex-col justify-center items-center'>
@@ -42,10 +39,13 @@ const Invalidate = () => {
             <span className='font-haasRegular uppercase text-secondary-alt text-[12px] text-center'>
                 NOTE: The global section includes site-wide elements like the INSTAGRAM FEED, CATEGORIES, BLOGS, and PORTFOLIOS
             </span>
+            <span className='font-haasRegular uppercase text-secondary-alt text-[14px] text-center'>
+                CURRENT PATH: [ /SUBCATEGORY ]
+            </span>
             <div className='flex flex-col gap-y-[10px] w-full'>
                 <Button text="invalidate global sections" classes={"lg:!w-full !h-[40px]"} />
-            <Button text="invalidate complete site" classes={"lg:!w-full !h-[40px]"} />
-            <Button text="invalidate complete page" classes={"lg:!w-full !h-[40px]"} />
+                <Button text="invalidate complete site" classes={"lg:!w-full !h-[40px]"} />
+                <Button text="invalidate complete page" classes={"lg:!w-full !h-[40px]"} />
             </div>
         </div>
     )

@@ -182,6 +182,23 @@ export const fetchMatchedProducts = async (id) => {
     }
 }
 
+
+export const fetchProductPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "dynamicProductPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
+
 export const fetchProductPageData = async (slug) => {
     try {
         const productData = await fetchProductData(slug);
@@ -192,18 +209,21 @@ export const fetchProductPageData = async (slug) => {
         const [
             productCollectionData,
             featuredProjectsData,
-            matchedProducts
+            matchedProducts,
+            pageDetails
         ] = await Promise.all([
             fetchProductCollectionData(productId),
             fetchFeaturedProjects(productId),
-            fetchMatchedProducts(productId)
+            fetchMatchedProducts(productId),
+            fetchProductPageDetails()
         ]);
 
         return {
             productData,
             productCollectionData,
             featuredProjectsData,
-            matchedProducts
+            matchedProducts,
+            pageDetails
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);

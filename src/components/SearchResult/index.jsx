@@ -10,7 +10,9 @@ import { loaderActions } from '@/store/loaderStore';
 import { HensleyNewsSearch } from '../common/HensleyNewsSearch';
 import { fetchSavedProductData } from '@/services/products';
 
-const SearchResult = () => {
+const SearchResult = ({pageDetails}) => {
+
+    const {relatedPostTitle, tentsTypeTitle, ourMarketsTitle, relatedProductTitle, relatedProjectTitle} = pageDetails;
 
     const [marketsData, setMarketsData] = useState([]);
     const [blogsData, setBlogsData] = useState([]);
@@ -72,11 +74,11 @@ const SearchResult = () => {
             {!productsData.length && !marketsData.length && !blogsData.length && !projectsData.length && !tentsData.length && (
                 <div className='h-screen flex justify-center items-center'><span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>{loading ? `Searching for results...` : "No results found"}</span></div>
             )}
-            {marketsData.length > 0 && <OurMarkets data={marketsData} />}
-            {productsData.length > 0 && <RelatedProducts data={productsData} term={searchTerm} pageSize={pageSize} savedProducts={savedProducts} setSavedProducts={setSavedProducts} />}
-            {tentsData.length > 0 && <TentTypes data={tentsData} />}
-            {blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: "POSTS RELATED TO YOUR SEARCH" }} />}
-            {projectsData.length > 0 && <RelatedProjects data={projectsData} />}
+            {marketsData.length > 0 && <OurMarkets pageTitle={ourMarketsTitle} data={marketsData} />}
+            {productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} savedProducts={savedProducts} setSavedProducts={setSavedProducts} />}
+            {tentsData.length > 0 && <TentTypes pageTitle={tentsTypeTitle} data={tentsData} />}
+            {blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: relatedPostTitle }} />}
+            {projectsData.length > 0 && <RelatedProjects pageTitle={relatedProjectTitle} data={projectsData} />}
         </>
     )
 }
