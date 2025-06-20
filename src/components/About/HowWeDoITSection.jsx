@@ -2,11 +2,11 @@ import React from "react";
 import PortfolioSlider from "../common/PortfolioSlider";
 import SectionTitle from "../common/SectionTitle";
 
-function  HowWeDoITSection({ data }) {
+function  HowWeDoITSection({ data, pageTitle }) {
   return (
     <>
       <SectionTitle
-        text="How we do it"
+        text={pageTitle}
         classes={
           "md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:block"
         }

@@ -19,6 +19,8 @@ export async function generateMetadata() {
 export default async function Page() {  
   try {
     const data = await fetchAboutPageData();
+
+    console.log("The data is the: ",data);
     
     return (
       <About data={data}/>

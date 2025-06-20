@@ -4,7 +4,7 @@ import { PrimaryButton } from '../common/PrimaryButton';
 import SectionTitle from "../common/SectionTitle";
 import { PrimaryImage } from '../common/PrimaryImage';
 
-function DreamTeam({ dreamTeamData = [] }) {
+function DreamTeam({ dreamTeamData = [], pageTitle }) {
   const pageSize = dreamTeamData.length;
   const [pageLimit, setPageLimit] = useState(pageSize);
   const handleLoadMore = () => {
@@ -14,7 +14,7 @@ function DreamTeam({ dreamTeamData = [] }) {
   return (
     <>
       <div className='py-[20px]'>
-        <SectionTitle text={dreamTeamData[0].sectionTitle} classes="border-t border-b border-primary-border text-[55px] pt-[40px] pb-[40px]" />
+        <SectionTitle text={pageTitle} classes="border-t border-b border-primary-border text-[55px] pt-[40px] pb-[40px]" />
         <div className="min-h-screen flex flex-col items-center justify-center lg:pb-[130px] sm:pb-[140px] pb-[131px] border border-primary-border">
           <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 mb-[30px] sm:w-full">
             {dreamTeamData.slice(0, pageLimit).map((dt, index) => (

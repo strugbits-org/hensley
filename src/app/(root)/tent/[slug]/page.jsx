@@ -21,17 +21,21 @@ export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchTentPageData(slug);
-    const { productData, matchedProducts, featuredProjectsData } = data;
+    const { productData, matchedProducts, featuredProjectsData, pageDetails } = data;
 
     if (!data) {
       throw new Error("Product data not found");
     }
 
+    console.log("Tent data is: ", pageDetails);
+
+    const { matchItWithTitle, featuredProductTitle } = pageDetails
+
     return (
       <>
         <ProductTent productData={productData} />
-        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="start" />
-        <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
+        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="start" />
+        <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="start" />
       </>
     );
   } catch (error) {

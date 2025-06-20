@@ -57,13 +57,13 @@ function PortfolioSlider({ data, display, tab = false, cardCss }) {
 
   return (
     <>
-      {!display && <h3 className="uppercase font-recklessRegular sm:text-[65px] sm:leading-[50px] text-[55px] leading-[50px] text-[#2C2216 sm:w-full  text-center pt-[128px] pb-[40px] lg:hidden block">
+     <h3 className="uppercase font-recklessRegular sm:text-[65px] sm:leading-[50px] text-[55px] leading-[50px] text-[#2C2216 sm:w-full  text-center pt-[128px] pb-[40px] lg:hidden block">
         how we
         <span className="inline sm:hidden">
           <br />
         </span>{" "}
         do it
-      </h3>}
+      </h3>
       <div
         ref={sliderRef}
         className={` ${tab && 'lg:pl-[100px]'} keen-slider mt-[30px] md:min-h-[850px] pb-[70px]`}
