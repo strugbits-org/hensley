@@ -229,10 +229,10 @@ export const fetchFeaturedBlogs = async (productId) => {
       throw new Error(`Selected blog not found`);
     }
 
-        return response.items;
-    } catch (error) {
-        logError(`Error fetching other blogs: ${error.message}`, error);
-    }
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching other blogs: ${error.message}`, error);
+  }
 }
 
 
@@ -382,5 +382,41 @@ export const fetchContactPageData = async () => {
 
   } catch (error) {
     logError(`Error fetching contact form data: ${error.message}`, error);
+  }
+};
+
+export const fetchAllPagesMetaData = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "PageSEOConfigurationMeta", sortKey: "order" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching page meta data: ${error.message}`, error);
+  }
+};
+
+export const fetchPageMetaData = async (slug) => {
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "PageSEOConfigurationMeta",
+      eq: [
+        {
+          key: "slug",
+          value: slug
+        }
+      ]
+    });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`response does not contain items array`);
+    }
+
+    return response.items[0];
+  } catch (error) {
+    logError(`Error fetching page meta data: ${error.message}`, error);
   }
 };

@@ -40,10 +40,10 @@ const TentCards = ({ data }) => {
     )
 }
 
-const TentTypes = ({ data }) => {
+const TentTypes = ({ data, pageTitle }) => {
     return (
         <div className='lg:px-[24px] px-[12px] w-full h-full'>
-            <SectionTitle text="TENTS OF TYPE" classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />
+            <SectionTitle text={pageTitle} classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />
             <div className='w-full h-full grid lg:grid-cols-3 sm:grid-cols-1 gap-x-[24px] lg:gap-y-[20px] gap-y-[13px]'>
                 {data.map((item, index) => (
                     <TentCards key={index} data={item} />

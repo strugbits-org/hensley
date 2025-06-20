@@ -27,6 +27,21 @@ export const fetchTentData = async (slug) => {
 };
 
 
+export const fetchTentPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "dynamicTentPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
 
 export const fetchTentPageData = async (slug) => {
     try {
@@ -37,16 +52,19 @@ export const fetchTentPageData = async (slug) => {
         const productId = productData.tent._id;
         const [
             featuredProjectsData,
-            matchedProducts
+            matchedProducts,
+            pageDetails
         ] = await Promise.all([
             fetchFeaturedProjects(productId),
-            fetchMatchedProducts(productId)
+            fetchMatchedProducts(productId),
+            fetchTentPageDetails()
         ]);
 
         return {
             productData,
             featuredProjectsData,
-            matchedProducts
+            matchedProducts,
+            pageDetails
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);

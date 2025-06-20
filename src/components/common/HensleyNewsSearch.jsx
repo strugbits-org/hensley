@@ -7,7 +7,7 @@ import { useKeenSlider } from 'keen-slider/react'
 import NewsCard from './NewsCard';
 import { CustomLink } from './CustomLink';
 
-export const HensleyNewsSearch = ({ data, pageDetails, loop = true, origin = "center" }) => {
+export const HensleyNewsSearch = ({ data, pageDetails, loop = true, origin = "center" , pageTitle=""}) => {
     const { hensleyNewsTitle } = pageDetails;
 
     const sliderInstance = useRef();

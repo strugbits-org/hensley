@@ -5,7 +5,6 @@ import InvalidateSite from '../Modals/InvalidateSite';
 
 export const InvalidateLightBox = ({ data = "", locationsData = "", isOpen, onClose }) => {
 
-
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>

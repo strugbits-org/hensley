@@ -38,12 +38,12 @@ const Cards = ({ logo, title, buttonLabel, buttonLink }) => {
 };
 
 
-function MeetFamily({ data }) {
+function MeetFamily({ data, pageTitle }) {
 
   return (
     <>
       <div className="w-full">
-        <SectionTitle text="meet the family" classes=" text-[55px] sm:pt-[40px] sm:pb-[40px]" />
+        <SectionTitle text={pageTitle} classes=" text-[55px] sm:pt-[40px] sm:pb-[40px]" />
       </div>
       <div className="w-full grid grid-cols-1 lg:grid-cols-3 xl:gap-10 lg:gap-3 lg:px-8 px-2 pt-10 pb-10 gap-0">
         {data.map((card, idx) => (
