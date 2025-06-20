@@ -81,17 +81,65 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, r
 };
 
 const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, showAddToCart = false }) => {
+    const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const { removeProduct } = actions;
-
     const productName = data?.productName?.original || data?.name;
     const systemFields = ["POOLCOVER", "RELEVENT IMAGES"];
+    const [isLoading, setIsLoading] = useState(false);
 
+    const handleAddToCart = async () => {
+        try {
+            setIsLoading(true);
+            let catalogReference = data?.catalogReference;
+            if (!catalogReference) {
+                const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+                const { customTextFields = [], productId } = data;
+                const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
+                    acc[title] = value;
+                    return acc;
+                }, {});
+                customTextFieldsData.size = data.size;
+                catalogReference = {
+                    appId,
+                    catalogItemId: productId,
+                    options: {
+                        customTextFields: customTextFieldsData,
+                    },
+                };
+            }
+
+            const product = {
+                catalogReference: catalogReference,
+                quantity: data.quantity,
+            };
+
+            const cartData = {
+                lineItems: [product],
+            };
+
+            await AddProductToCart(cartData);
+            const newItems = calculateTotalCartQuantity(cartData.lineItems);
+            const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+            setCookie("cartQuantity", total, { path: "/" });
+            lightboxActions.setBasicLightBoxDetails({
+                title: "Added to Cart",
+                description: "Products added to cart successfully",
+                buttonText: "View Cart",
+                buttonLink: "/cart",
+                open: true,
+            })
+        } catch (error) {
+            logError("Error while adding products to cart:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
     return (
         <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
             <div className='h-[104px] w-[104px] bg-white'>
                 <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
-            <div className='flex lg:flex-row flex-col lg:items-center'>
+            <div className='w-full flex lg:flex-row flex-col lg:items-center'>
                 <div>
                     <span className='block text-[16px] text-secondary-alt font-haasLight uppercase'>Product</span>
                     <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
@@ -104,6 +152,17 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
                         ))}
                     </div>
                 </div>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='ml-auto lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
+                    <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
+                    <svg fill='currentColor' xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
+                        <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
+                            <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
+                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
+                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
+                            </g>
+                        </g>
+                    </svg>
+                </button>}
             </div>
 
             {!readOnly && (
@@ -236,13 +295,13 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                     </table>
                 </div>
 
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
                     <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
                             <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
-                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
-                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
+                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
                             </g>
                         </g>
                     </svg>
@@ -386,13 +445,13 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                 </table>
                 <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
 
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
                     <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
                             <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
-                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
-                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
+                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
                             </g>
                         </g>
                     </svg>

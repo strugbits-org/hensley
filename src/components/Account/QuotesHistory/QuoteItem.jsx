@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, logError } from '@/utils';
 import { FiArrowUpRight } from "react-icons/fi";
 import { lightboxActions } from '@/store/lightboxStore';
@@ -9,11 +9,13 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const totalPrice = useMemo(() => calculateCartTotalPrice(quote.lineItems.map(item => item.product)));
     const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
+    const [loading, setLoading] = useState(false);
 
     const date = useMemo(() => formatDateForQuote(quote.eventDate), [quote.eventDate]);
 
     const handleOrderAgainClick = async () => {
         try {
+            setLoading(true);
             const products = [];
             for (const item of quote?.lineItems || []) {
                 const productData = item.product;
@@ -71,6 +73,8 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
                 buttonText: "Try Again",
                 open: true,
             })
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -122,7 +126,7 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
                             onClick={handleOrderAgainClick}
                             aria-label={`Order again for ${quote.eventDescriptionPo}`}
                         >
-                            ORDER AGAIN
+                            {loading ? "ORDERING..." : "ORDER AGAIN"}
                             <span className="absolute right-3" aria-hidden="true">
                                 <FiArrowUpRight className="inline group-hover:text-white" />
                             </span>
@@ -170,7 +174,7 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
                             onClick={handleOrderAgainClick}
                             aria-label={`Order again for ${quote.eventDescriptionPo}`}
                         >
-                            ORDER AGAIN
+                            {loading ? "ORDERING..." : "ORDER AGAIN"}
                             <span className="absolute right-3" aria-hidden="true">
                                 <FiArrowUpRight className="inline group-hover:text-white" />
                             </span>
