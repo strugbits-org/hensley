@@ -1,15 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { PrimaryImage } from "../common/PrimaryImage";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "../common/CustomLink";
 import SectionTitle from "../common/SectionTitle";
+import Loading from "@/app/loading";
 
 export default function OurProjects({ data, pageDetails }) {
   const { ourProjectsTitle } = pageDetails;
+  const [isSliderReady, setIsSliderReady] = useState(false);
 
   const sliderInstance = React.useRef();
 
@@ -29,6 +31,7 @@ export default function OurProjects({ data, pageDetails }) {
     },
     created(s) {
       sliderInstance.current = s;
+      setIsSliderReady(true);
     },
   });
 
@@ -37,9 +40,15 @@ export default function OurProjects({ data, pageDetails }) {
       <div className='w-full sm:px-0 px-[12px]'>
         <SectionTitle text={ourProjectsTitle} classes="py-[40px] md:mt-6 lg:mt-0" />
       </div>
+      {!isSliderReady && (
+        <div className="w-full h-[300px] flex justify-center items-center">
+          <Loading custom type='secondary' />
+        </div>
+      )}
+
       <div
         ref={sliderRef}
-        className="relative keen-slider h-screen"
+        className={`relative keen-slider h-screen ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
       >
         {data.map((item, index) => {
           const { portfolioRef } = item;

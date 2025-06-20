@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import { PrimaryButton } from "./PrimaryButton";
 import SectionTitle from "./SectionTitle";
@@ -9,6 +9,7 @@ import { PrimaryImage } from "./PrimaryImage";
 import { CustomLink } from "./CustomLink";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { usePathname } from "next/navigation";
+import Loading from "@/app/loading";
 
 const privateRoutes = [
   "/account",
@@ -19,11 +20,10 @@ const privateRoutes = [
 
 function InstagramFeed({ data, details }) {
   const { instaFeedHeading, instaFeedTitle, instaFeedIcon, instaFeedButtonLabel, instaFeedButtonAction } = details;
+  const [isSliderReady, setIsSliderReady] = useState(false);
 
   const pathname = usePathname();
   const isPrivateRoute = privateRoutes.includes(pathname);
-  if (isPrivateRoute) return null;
-
   const sliderInstance = useRef();
 
   const [sliderRef] = useKeenSlider(
@@ -48,10 +48,13 @@ function InstagramFeed({ data, details }) {
       },
       created(slider) {
         sliderInstance.current = slider;
+        setIsSliderReady(true);
       },
     },
     []
   );
+
+  if (isPrivateRoute) return null;
 
   return (
     <div className="instagram-feed bg-white">
@@ -78,7 +81,13 @@ function InstagramFeed({ data, details }) {
             </CustomLink>
           </div>
           <div>
-            <div ref={sliderRef} className="keen-slider mt-[20px] pb-[85px] ">
+            {!isSliderReady && (
+              <div className="w-full h-[300px] flex justify-center items-center">
+                <Loading custom type='secondary' />
+              </div>
+            )}
+
+            <div ref={sliderRef} className={`keen-slider mt-[20px] pb-[85px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
               {data.map((dt, index) => {
                 return (
                   <CustomLink

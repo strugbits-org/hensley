@@ -4,10 +4,12 @@ import SectionTitle from '../common/SectionTitle'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import { TestimonialCard } from './TestimonialCard';
+import Loading from '@/app/loading';
 
 export const Testimonials = ({ data, pageDetails, lgPreview = 1.4, cardClasses, sliderClasses, imageExp = true, titleClass = '' }) => {
     const sliderInstance = useRef();
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isSliderReady, setIsSliderReady] = useState(false);
 
     const [sliderRef] = useKeenSlider(
         {
@@ -32,6 +34,7 @@ export const Testimonials = ({ data, pageDetails, lgPreview = 1.4, cardClasses, 
             origin: "center",
             created(slider) {
                 sliderInstance.current = slider;
+                setIsSliderReady(true);
             },
             slideChanged(slider) {
                 setCurrentSlide(slider.track.details.rel);
@@ -58,7 +61,12 @@ export const Testimonials = ({ data, pageDetails, lgPreview = 1.4, cardClasses, 
 
             </div>
             <div className="p-6 border-t border-b border-primary-border">
-                <div ref={sliderRef} className={`${sliderClasses} keen-slider lg:pl-32`}>
+                {!isSliderReady && (
+                    <div className="w-full h-[300px] flex justify-center items-center">
+                        <Loading custom type='secondary' />
+                    </div>
+                )}
+                <div ref={sliderRef} className={`${sliderClasses} keen-slider lg:pl-32 ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
                     {data.map((testimonial, index) => {
                         return (
                             <div

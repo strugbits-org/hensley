@@ -103,10 +103,9 @@ export default function ProductSlider({ product }) {
   const [isSliderReady, setIsSliderReady] = useState(false);
 
   const thumbnailPlugin = useMemo(() => createThumbnailPlugin, []);
-  const [sliderRef, instanceRef] = useKeenSlider(SLIDER_CONFIG.MAIN, {
-    created: () => {
-      console.log("slider created");
-      
+  const [sliderRef, instanceRef] = useKeenSlider({
+    ...SLIDER_CONFIG.MAIN,
+    created() {
       setIsSliderReady(true);
     },
   });
@@ -130,14 +129,13 @@ export default function ProductSlider({ product }) {
     <>
       {!isSliderReady && (
         <div className="w-full h-[937px] flex items-center justify-center text-gray-400">
-          <Loading custom />
+          <Loading custom type="secondary" />
         </div>
       )}
 
       <div
-        className={`lg:flex hidden w-full h-full gap-x-[24px] justify-between transition-opacity duration-300 ${
-          !isSliderReady ? 'invisible opacity-0' : 'visible opacity-100'
-        }`}
+        className={`lg:flex hidden w-full h-full gap-x-[24px] justify-between transition-opacity duration-300 ${!isSliderReady ? 'invisible opacity-0' : 'visible opacity-100'
+          }`}
       >
         {/* Main Slider */}
         <div
