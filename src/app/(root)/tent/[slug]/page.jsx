@@ -1,10 +1,38 @@
 import ProductTent from "@/components/Product-Tent";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
-import { fetchTentsData } from "@/services";
-import { fetchTentPageData } from "@/services/tents";
+import { fetchPageMetaData, fetchTentsData } from "@/services";
+import { fetchTentData, fetchTentPageData } from "@/services/tents";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({ params }) {
+  try {
+    const slug = decodeURIComponent(params.slug);
+
+    const [
+      metaData,
+      tentData
+    ] = await Promise.all([
+      fetchPageMetaData("tent"),
+      fetchTentData(slug)
+    ]);
+
+    const { title, noFollowTag } = metaData;
+
+    const fullTitle = tentData.title + title;
+
+    const metadata = { title: fullTitle };
+
+    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
+      metadata.robots = "noindex,nofollow";
+    }
+
+    return metadata;
+  } catch (error) {
+    logError("Error in metadata(tent page):", error);
+  }
+}
 
 export const generateStaticParams = async () => {
   try {
@@ -26,8 +54,6 @@ export default async function Page({ params }) {
     if (!data) {
       throw new Error("Product data not found");
     }
-
-    console.log("Tent data is: ", pageDetails);
 
     const { matchItWithTitle, featuredProductTitle } = pageDetails
 

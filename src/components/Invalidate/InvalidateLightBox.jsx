@@ -4,8 +4,6 @@ import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/re
 import InvalidateSite from '../Modals/InvalidateSite';
 
 export const InvalidateLightBox = ({ data = "", locationsData = "", isOpen, onClose }) => {
-export const InvalidateLightBox = ({ data = "", locationsData = "", isOpen, onClose }) => {
-
 
   return (
     <Transition appear show={isOpen} as={Fragment}>

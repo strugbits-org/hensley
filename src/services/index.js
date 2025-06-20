@@ -387,7 +387,7 @@ export const fetchContactPageData = async () => {
 
 export const fetchAllPagesMetaData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "PageSEOConfigurationMeta" });
+    const response = await queryCollection({ dataCollectionId: "PageSEOConfigurationMeta", sortKey: "order" });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`response does not contain items array`);
