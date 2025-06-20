@@ -105,8 +105,9 @@ export default async function RootLayout({ children }) {
             },
           }}
         />
-        <InvalidateButttonPin />
-
+        <div className="hidden">
+          <InvalidateButttonPin />
+        </div>
       </body>
     </html>
   );
