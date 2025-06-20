@@ -75,44 +75,51 @@ const FIELD_CONFIGS = {
   phone: { type: 'tel', placeholder: '(123) 456-7890' }
 };
 
-export const QuoteRequest = ({ content }) => {
+export const QuoteRequest = ({ content, data = "" }) => {
+
+  const { tagline, sections, submitButtonLabel, description, labels, title } = data;
+
+  const { eventDetails, billingDetails, orderBy } = sections;
+
+  const { eventDate, deliveryDate, pickupDate, eventLocation, eventDescription, billTo, streetAddress, addressLine2, city, state, zipCode, specialInstructions, city1, state1, name, email: emailLabel, phone: phoneLabel } = labels;
+
   // Default content structure
   const defaultContent = {
     header: {
-      title: "QUOTE REQUEST",
-      subtitle: "Let's build your next unforgettable event together!",
-      description: "Please complete this form to request a quote. We promise to respond to you within 48 hours. We look forward to the necessary details concerning your event and helping you make it truly memorable! Our customer service team is available to assist and will contact you if more information is required."
+      title,
+      subtitle: tagline,
+      description,
     },
     sections: {
-      eventDetails: "EVENT DETAILS",
-      billingDetails: "BILLING DETAILS",
-      orderBy: "ORDER BY"
+      eventDetails,
+      billingDetails,
+      orderBy
     },
     labels: {
-      eventDate: "EVENT DATE*",
-      deliveryDate: "DELIVERY DATE*",
-      pickupDate: "PICKUP DATE*",
-      eventLocation: "EVENT LOCATION",
-      eventDescription: "EVENT DESCRIPTION / PO#",
-      billTo: "BILL TO*",
-      streetAddress: "STREET ADDRESS*",
-      addressLine2: "ADDRESS LINE 2",
-      city: "CITY*",
-      state: "STATE*",
-      zipCode: "ZIP CODE*",
-      specialInstructions: "SPECIAL INSTRUCTIONS OR ORDER COMMENTS",
-      city1: "CITY",
-      state1: "STATE",
-      name: "NAME*",
-      email: "EMAIL*",
-      phone: "PHONE*"
+      eventDate,
+      deliveryDate,
+      pickupDate,
+      eventLocation,
+      eventDescription,
+      billTo,
+      streetAddress,
+      addressLine2,
+      city,
+      state,
+      zipCode,
+      specialInstructions,
+      city1,
+      state1,
+      name,
+      email: emailLabel,
+      phone: phoneLabel,
     },
     orderTypes: [
       { id: "DELIVERED", label: "DELIVERY" },
       { id: "WILL CALL", label: "WILL CALL" }
     ],
     buttons: {
-      submit: "SUBMIT",
+      submit: submitButtonLabel,
       submitting: "SUBMITTING..."
     },
     messages: {

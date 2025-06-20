@@ -10,6 +10,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ModalsWrapper } from "@/components/Modals/ModalsWrapper";
 import 'air-datepicker/air-datepicker.css';
 import { Toaster } from "sonner";
+import { fetchLoginPageDetails } from "@/services/auth";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -65,7 +66,8 @@ export default async function RootLayout({ children }) {
     footerData,
     instagramFeed,
     homePageDetails,
-    contactFormData
+    contactFormData,
+    loginPageDetails
     
   ] = await Promise.all([
     fetchHeaderData(),
@@ -74,7 +76,8 @@ export default async function RootLayout({ children }) {
     fetchFooterData(),
     fetchInstagramFeed(),
     fetchHomePageDetails(),
-    fetchContactPageData()
+    fetchContactPageData(),
+    fetchLoginPageDetails()
   ]);
 
   const { branches } = footerData;
@@ -91,7 +94,7 @@ export default async function RootLayout({ children }) {
         </main>
         <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
-        <ModalsWrapper data={{ branches, contactFormData }} />
+        <ModalsWrapper data={{ branches, contactFormData, loginPageDetails}} />
         <SpeedInsights />
         <Loader />
         <Toaster position="top-center"
