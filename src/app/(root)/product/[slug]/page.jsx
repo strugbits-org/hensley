@@ -1,9 +1,36 @@
 import { Product } from "@/components/Product";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
-import { fetchProductPageData, fetchProductPaths } from "@/services/products";
+import { fetchPageMetaData } from "@/services";
+import { fetchProductData, fetchProductPageData, fetchProductPaths } from "@/services/products";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({ params }) {
+  try {
+    const slug = decodeURIComponent(params.slug);
+
+    const [
+      metaData,
+      productData
+    ] = await Promise.all([
+      fetchPageMetaData("product"),
+      fetchProductData(slug)
+    ]);
+
+    const { title, noFollowTag } = metaData;
+    const fullTitle = productData.product.name + " " + title;
+    const metadata = { title: fullTitle };
+    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
+      metadata.robots = "noindex,nofollow";
+    }
+
+    return metadata;
+  } catch (error) {
+    logError("Error in metadata(product page):", error);
+  }
+}
+
 
 export const generateStaticParams = async () => {
   try {

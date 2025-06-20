@@ -10,6 +10,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ModalsWrapper } from "@/components/Modals/ModalsWrapper";
 import 'air-datepicker/air-datepicker.css';
 import { Toaster } from "sonner";
+import { InvalidateButttonPin } from "@/components/common/helpers/InvalidateButttonPin";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -102,10 +103,7 @@ export default async function RootLayout({ children }) {
             },
           }}
         />
-
-        <button className="min-w-[175px] rotate-90 fixed bottom-36 right-0 border border-secondary-alt bg-primary p-2 hover:bg-secondary-alt text-secondary-alt hover:text-primary z-50 transition-all duration-300 uppercase font-haasMedium tracking-widest hover:tracking-[4px] text-base">
-          Invalidate
-        </button>
+        <InvalidateButttonPin />
 
       </body>
     </html>
