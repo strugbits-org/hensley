@@ -53,7 +53,7 @@ const recklessNeueMedium = localFont({
 
 export const metadata = {
   title: "RENTALS | Hensley Event Resources",
-  robots: "noindex,nofollow",
+  robots: process.env.ENVIRONMENT !== "PRODUCTION" ? "noindex,nofollow" : null,
 };
 
 export default async function RootLayout({ children }) {
