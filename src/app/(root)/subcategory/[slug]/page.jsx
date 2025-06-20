@@ -2,6 +2,38 @@ import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 import { SubCategoryPage } from "@/components/SubCategory";
 import { fetchSelectedCategoryData, fetchSubCategoryPagePaths } from "@/services/subcategory";
+import { fetchPageMetaData } from "@/services";
+
+
+export async function generateMetadata({ params }) {
+  try {
+    const slug = decodeURIComponent(params.slug);
+
+    const [
+      metaData,
+      subCategoryData
+    ] = await Promise.all([
+      fetchPageMetaData("market"),
+     fetchSelectedCategoryData(slug)
+    ]);
+
+    const { title, noFollowTag } = metaData;
+    console.log("full data came as: ",subCategoryData);
+    const {selectedCategory} = subCategoryData
+    const fullTitle = selectedCategory?.name + " " + title;
+    const metadata = { title: fullTitle };
+    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
+      metadata.robots = "noindex,nofollow";
+    }
+
+    return metadata;
+  } catch (error) {
+    logError("Error in metadata(market page):", error);
+  }
+}
+
+
+
 
 export const generateStaticParams = async () => {
   try {
@@ -22,6 +54,9 @@ export default async function Page({ params }) {
     const data = await fetchSelectedCategoryData(slug);
 
     const { pageDetails } = data
+
+    console.log("The page details is for cate: ",pageDetails);
+
     return (
       <SubCategoryPage data={data} pageDetails={pageDetails} />
     );

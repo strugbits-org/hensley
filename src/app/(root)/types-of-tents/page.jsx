@@ -1,8 +1,23 @@
 import Tents from "@/components/Tents";
-import { fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
+import { fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
 import { fetchFeaturedBlogs, fetchTentPageData } from "@/services/tents";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+
+export async function generateMetadata() {
+  try {
+    const metaData = await fetchPageMetaData("types-of-tents");
+    const { title, noFollowTag } = metaData;
+    const metadata = { title };
+    console.log("title fetched as: ",title);
+    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) metadata.robots = "noindex,nofollow";
+    return metadata;
+  } catch (error) {
+    logError("Error in metadata(typesTent page):", error);
+  }
+}
+
 
 export default async function Page({ params }) {
   try {

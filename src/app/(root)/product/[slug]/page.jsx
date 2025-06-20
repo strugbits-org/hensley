@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
       productData
     ] = await Promise.all([
       fetchPageMetaData("product"),
-      fetchProductData(slug)
+      fetchProductPageData(slug)
     ]);
 
     const { title, noFollowTag } = metaData;
