@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { calculateTotalCartQuantity, logError } from '@/utils';
-import image from '@/assets/hens-logo.png';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { CustomLink } from '../common/CustomLink';
 import { toast } from 'sonner';
@@ -14,7 +13,7 @@ import { signInUser } from '@/services/auth/authentication';
 import { useCookies } from 'react-cookie';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
-import { convertToHTML, convertToHTMLBlog } from '@/utils/renderRichText';
+import { convertToHTMLBlog } from '@/utils/renderRichText';
 
 // Validation schema
 const schema = yup.object({
@@ -127,6 +126,11 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
 
         try {
             const response = await signInUser(data);
+
+            // console.log("Login response:", response);
+            // setIsSubmitting(false);
+            // return;
+            
             const { jwtToken: authToken, member: userData, userTokens } = response;
 
             const cookieOptions = {
