@@ -66,6 +66,29 @@ export const fetchMarketsData = async () => {
   }
 };
 
+export const fetchSelectedMarketsData = async (slug) => {
+  try {
+    const response = await queryCollection({
+      dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"], sortKey: "orderNumber",
+      eq: [
+        {
+          key: "slug",
+          value: `/${slug}`
+        }
+      ]
+    });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items[0];
+  } catch (error) {
+    logError(`Error fetching markets data: ${error.message}`, error);
+  }
+};
+
+
 
 export const fetchTentListingPageDetails = async () => {
   try {

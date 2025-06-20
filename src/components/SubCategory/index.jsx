@@ -4,6 +4,7 @@ import OurCategories from '../common/OurCategories'
 
 export const SubCategoryPage = ({ data, pageDetails }) => {
   const { ourCategoriesData } = data;
+  console.log("cating: ",ourCategoriesData);
   const { ourCategoriesTitle } = pageDetails
 
   return (
