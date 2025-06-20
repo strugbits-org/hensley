@@ -18,7 +18,6 @@ export async function generateMetadata({ params }) {
     ]);
 
     const { title, noFollowTag } = metaData;
-    console.log("full data came as: ",marketData);
     const fullTitle = marketData.title + " " + title;
     const metadata = { title: fullTitle };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {

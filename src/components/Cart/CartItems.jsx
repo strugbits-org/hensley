@@ -188,7 +188,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
 
     const productInfoSection = data.productSetItems.map(item => {
         const set = item.split("~");
-        const price = parseInt(set[2]);
+        const price = parseFloat(set[2]);
         const quantity = parseInt(set[3]);
 
         return {
@@ -199,6 +199,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
             formattedPrice: formatTotalPrice(price),
         }
     });
+    console.log("productInfoSection", productInfoSection);
 
     const price = useMemo(() =>
         productInfoSection.reduce((acc, { price, quantity }) => acc + (price * quantity), 0),

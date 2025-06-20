@@ -2,13 +2,20 @@ import React, { useState } from 'react'
 import { PrimaryImage } from './PrimaryImage';
 import { toast } from 'sonner';
 import { saveProduct, unSaveProduct } from '@/services/products';
+import { useCookies } from 'react-cookie';
+import { lightboxActions } from '@/store/lightboxStore';
 
 export const SaveProductButton = ({ productData, savedProducts, setSavedProducts, type = "primary" }) => {
     const [isUpdating, setIsUpdating] = useState(false);
-
     const isProductSaved = savedProducts.some(savedProduct => savedProduct._id === productData._id);
+      const [cookies, _setCookie] = useCookies(["authToken"]);
+    
 
     const handleSaveToggle = async () => {
+        if(!cookies.authToken) {
+            lightboxActions.showLightBox("login");
+            return;
+        };
         if (isUpdating) return;
 
         setIsUpdating(true);

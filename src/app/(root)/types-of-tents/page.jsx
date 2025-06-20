@@ -1,6 +1,5 @@
 import Tents from "@/components/Tents";
 import { fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
-import { fetchFeaturedBlogs, fetchTentPageData } from "@/services/tents";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -10,7 +9,6 @@ export async function generateMetadata() {
     const metaData = await fetchPageMetaData("types-of-tents");
     const { title, noFollowTag } = metaData;
     const metadata = { title };
-    console.log("title fetched as: ",title);
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) metadata.robots = "noindex,nofollow";
     return metadata;
   } catch (error) {

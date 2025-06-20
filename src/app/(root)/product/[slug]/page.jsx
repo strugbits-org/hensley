@@ -15,7 +15,7 @@ export async function generateMetadata({ params }) {
       productData
     ] = await Promise.all([
       fetchPageMetaData("product"),
-      fetchProductPageData(slug)
+      fetchProductData(slug)
     ]);
 
     const { title, noFollowTag } = metaData;
@@ -31,13 +31,12 @@ export async function generateMetadata({ params }) {
   }
 }
 
-
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchProductPaths();
-    return paths;
+    return paths.slice(0, 50);
   } catch (error) {
-    logError("Error generating static params(tent page):", error);
+    logError("Error generating static params(product page):", error);
     return [];
   }
 }

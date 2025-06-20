@@ -19,7 +19,6 @@ export async function generateMetadata({ params }) {
     ]);
 
     const { title, noFollowTag } = metaData;
-    console.log("full data came as: ",subCategoryData);
     const {selectedCategory} = subCategoryData
     const fullTitle = selectedCategory?.name + " " + title;
     const metadata = { title: fullTitle };

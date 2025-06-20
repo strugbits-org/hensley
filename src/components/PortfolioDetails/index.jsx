@@ -10,8 +10,6 @@ const PortfolioDetails = ({ data }) => {
     const { project, otherProjects } = data;
     const { storeProducts = [] } = project;
 
-    console.log("the project came is: ",project);
-
     return (
         <>
             <EventHighLight data={project} />

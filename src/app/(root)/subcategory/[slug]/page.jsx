@@ -18,7 +18,6 @@ export async function generateMetadata({ params }) {
     ]);
 
     const { title, noFollowTag } = metaData;
-    console.log("full data came as: ",subCategoryData);
     const {selectedCategory} = subCategoryData
     const fullTitle = selectedCategory?.name + " " + title;
     const metadata = { title: fullTitle };
@@ -54,8 +53,6 @@ export default async function Page({ params }) {
     const data = await fetchSelectedCategoryData(slug);
 
     const { pageDetails } = data
-
-    console.log("The page details is for cate: ",pageDetails);
 
     return (
       <SubCategoryPage data={data} pageDetails={pageDetails} />
