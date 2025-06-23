@@ -68,12 +68,12 @@ export const NewsLetter = ({ data }) => {
             <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'>
                 {newsletterHeading}
             </h2>
-            <p className='text-sm font-haasRegular uppercase text-primary mb-5'>
+            <p className='text-sm font-haasRegular uppercase text-primary mb-5 sm:max-w-[450px]'>
                 {newsletterDescription}
             </p>
             
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-                <div className="flex gap-2 lg:gap-6">
+                <div className="flex gap-2 gap-x-[24px]  w-full sm:max-w-[450px]">
                     <div className="flex-1">
                         <input 
                             type="email" 
@@ -82,8 +82,8 @@ export const NewsLetter = ({ data }) => {
                             disabled={isSubmitting}
                             {...register('email_443e')}
                             className={`
-                                w-full sm:min-w-[240px] lg:min-w-[220px] md:max-w-[350px] 
-                                bg-transparent appearance-none outline-none lg:p-5 p-3 
+                                w-full 
+                                bg-transparent appearance-none outline-none p-5 
                                 border text-base text-primary placeholder:text-primary 
                                 placeholder:uppercase transition-all duration-300
                                 ${errors.email_443e 
