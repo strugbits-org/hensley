@@ -13,7 +13,7 @@ import { signInUser } from '@/services/auth/authentication';
 import { useCookies } from 'react-cookie';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
-import { convertToHTMLBlog } from '@/utils/renderRichText';
+import { convertToHTMLRichContent } from '@/utils/renderRichText';
 
 // Validation schema
 const schema = yup.object({
@@ -311,7 +311,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                         </a>
                     </span> */}
                     <div className='w-full sm:max-w-[344px]'>
-                        {convertToHTMLBlog({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
+                        {convertToHTMLRichContent({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
                     </div>
                 </div>
 

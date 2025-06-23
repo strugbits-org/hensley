@@ -7,12 +7,11 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { calculateTotalCartQuantity, logError } from '@/utils';
 import { lightboxActions } from '@/store/lightboxStore';
-import { PrimaryImage } from '../common/PrimaryImage';
 import { signUpUser } from '@/services/auth/authentication';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
-import { convertToHTMLBlog } from '@/utils/renderRichText';
+import { convertToHTMLRichContent } from '@/utils/renderRichText';
 
 // Validation schema
 const schema = yup.object({
@@ -211,7 +210,7 @@ export const SignupForm = ({ content, data }) => {
 
           <div className='lg:col-span-2 w-full flex flex-col justify-center items-center gap-4'>
             <div className='w-full sm:max-w-[344px]'>
-              {convertToHTMLBlog({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
+              {convertToHTMLRichContent({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
             </div>
           </div>
         </form>
