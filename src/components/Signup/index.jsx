@@ -40,8 +40,8 @@ const FORM_STRUCTURE = {
 const FIELD_CONFIGS = {
   firstName: { type: 'text', placeholder: 'Enter your first name', gridSpan: '' },
   lastName: { type: 'text', placeholder: 'Enter your last name', gridSpan: '' },
-  email: { type: 'email', placeholder: 'exemplo@myemail.com', gridSpan: 'lg:col-span-2' },
-  phone: { type: 'tel', placeholder: '+1 (415) 000-00000', gridSpan: 'lg:col-span-2' },
+  email: { type: 'email', placeholder: 'exemplo@myemail.com',  },
+  phone: { type: 'tel', placeholder: '+1 (415) 000-00000',  },
   password: { type: 'password', placeholder: '********', gridSpan: '' },
   confirmPassword: { type: 'password', placeholder: '********', gridSpan: '' }
 };
@@ -172,7 +172,7 @@ export const SignupForm = ({ content, data }) => {
           }
           {...register(fieldId)}
           placeholder={config.placeholder}
-          className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary pr-12 ${error ? 'border-b-red-500' : ''
+          className={`w-full border-b h-[60px] font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary placeholder:uppercase pr-12 ${error ? 'border-b-red-500' : ''
             }`}
           disabled={isSubmitting}
         />
@@ -210,7 +210,7 @@ export const SignupForm = ({ content, data }) => {
           </div>
 
           <div className='lg:col-span-2 w-full flex flex-col justify-center items-center gap-4'>
-            <div className='w-full sm:max-w-[344px]'>
+            <div className='w-full sm:max-w-[370px] sm:my-[60px]'>
               {convertToHTMLBlog({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
             </div>
           </div>
