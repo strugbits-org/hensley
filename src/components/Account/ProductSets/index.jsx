@@ -3,34 +3,6 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import ProductListUpdate from './ProductListUpdate';
 import ProductListAdd from './ProductListAdd';
 import ProductList from './ProductList';
-import { fetchProductSetsData } from '@/services/admin';
-import { mapProductSetItems } from '@/utils';
-
-// Constants moved outside component to prevent recreation on each render
-const STATIC_DATA = {
-  heading: "product sets",
-  email: "gabriel@petrikor.design",
-  productSetsData: [
-    {
-      id: 1,
-      title: "vintage - dance floor",
-      tags: ["corporate", "event design and production", "creative services agency", "+3 studios"],
-      image: "/product-set-1.png"
-    },
-    {
-      id: 2,
-      title: "modern - stage decor",
-      tags: ["wedding", "lighting", "custom build"],
-      image: "/product-set-1.png"
-    },
-    {
-      id: 3,
-      title: "boho - lounge area",
-      tags: ["furniture", "rugs", "pillows"],
-      image: "/product-set-1.png"
-    }
-  ]
-};
 
 // Enum for view states to prevent typos and improve maintainability
 const VIEW_STATES = {
@@ -39,7 +11,7 @@ const VIEW_STATES = {
   ADD: 'add'
 };
 
-function ProductSets({ data }) {
+function ProductSets({ data, products = [] }) {
   const [viewState, setViewState] = useState(VIEW_STATES.LIST);
   const [activeProduct, setActiveProduct] = useState(null);
   const [productSets, setProductSets] = useState([]);
@@ -83,6 +55,7 @@ function ProductSets({ data }) {
           <ProductListUpdate
             toggleToList={toggleToList}
             activeProduct={activeProduct}
+            productOptions={products}
           />
         );
       case VIEW_STATES.LIST:
@@ -103,7 +76,7 @@ function ProductSets({ data }) {
     <div className='MyAccount w-full max-lg:mb-[85px]'>
       <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0'>
         <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[97px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px]'>
-          {STATIC_DATA.heading}
+          {"product sets"}
         </h2>
       </div>
       <div className='px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>

@@ -1,18 +1,22 @@
 
 import ProductSets from "@/components/Account/ProductSets";
 import { fetchProductSetsData } from "@/services/admin";
+import { fetchAllProducts } from "@/services/products";
 import { logError, mapProductSetItems } from "@/utils";
 import { notFound } from "next/navigation";
 
 export default async function Page() {
     try {
-        const response = await fetchProductSetsData();
-        const processedData = response.map(item => {
+        const [productSetsData, products] = await Promise.all([
+            fetchProductSetsData(),
+            fetchAllProducts()
+        ]);
+        const processedData = productSetsData.map(item => {
             mapProductSetItems(item);
-            const { setOfProduct, product, searchContent } = item;
-            return { product, setOfProduct, searchContent };
+            const { _id, setOfProduct, product, searchContent } = item;
+            return { _id, product, setOfProduct, searchContent };
         });
-        return <ProductSets data={processedData} />;
+        return <ProductSets data={processedData} products={products} />;
     } catch (error) {
         logError("Error fetching Quotes History:", error);
         notFound();

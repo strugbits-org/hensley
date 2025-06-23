@@ -1,19 +1,13 @@
 'use client'
 import React, { useEffect, useState, useCallback, useMemo } from 'react'
 import { PrimaryImage } from '@/components/common/PrimaryImage';
+import { toInteger } from 'lodash';
 
-const CustomDropdown = React.memo(() => {
+const CustomDropdown = React.memo(({ products }) => {
+    console.log("products", products);
+
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState('Select Any Product');
-    
-    const options = useMemo(() => [
-        "12\" BRONZE FLOOR FAN",
-        "12\" SQUARE RIM BOWL",
-        "14' ROUND BAR - GRACE W/CUSTOM PAINT COLOR",
-        "14' WHITE ROUND - BAR",
-        "16\" CANOE BOWL",
-        "16\" ROUND BOWL WITH HANDLES"
-    ], []);
 
     const toggleDropdown = useCallback(() => {
         setIsOpen(prev => !prev);
@@ -36,17 +30,20 @@ const CustomDropdown = React.memo(() => {
                 </svg>
             </div>
             {isOpen && (
-                <ul className="bg-white w-full shadow-md z-[99999]" role="listbox">
-                    {options.map((option) => (
-                        <li
-                            key={option}
-                            className="px-5 text-left py-3 transform transition-all duration-300 hover:bg-[#F0DEA2] cursor-pointer uppercase font-haasLight"
-                            onClick={() => handleOptionSelect(option)}
-                            role="option"
-                        >
-                            {option}
-                        </li>
-                    ))}
+                <ul className="bg-white w-full shadow-md z-[99999] max-h-[400px] overflow-y-scroll" role="listbox">
+                    {products.map(({ product }) => {
+                        const name = product.name;
+                        return (
+                            <li
+                                key={product}
+                                className="px-5 text-left py-3 transform transition-all duration-300 hover:bg-[#F0DEA2] cursor-pointer uppercase font-haasLight"
+                                onClick={() => handleOptionSelect(product)}
+                                role="option"
+                            >
+                                {name}
+                            </li>
+                        )
+                    })}
                 </ul>
             )}
         </div>
@@ -55,30 +52,27 @@ const CustomDropdown = React.memo(() => {
 
 CustomDropdown.displayName = 'CustomDropdown';
 
-const ProductCard = React.memo(({ item, classes, onRemove }) => {
+const ProductCard = React.memo(({ item, onRemove, isLastOdd, handleQuantityChange }) => {
     const { product, quantity } = item;
     const [quantityValue, setQuantityValue] = useState(quantity);
 
-    const handleQuantityChange = useCallback((e) => {
+    const handleQuantity = useCallback((e) => {
+        const value = e.target.value;
         setQuantityValue(e.target.value);
+        handleQuantityChange(product._id, value);
     }, []);
 
     const handleRemoveClick = useCallback(() => {
         onRemove(product._id);
     }, [onRemove, product._id]);
 
-    const cardClasses = useMemo(() => 
-        `${classes ?? ''} w-full border text-left border-primary-border flex flex-col gap-y-[10px] p-[10px]`,
-        [classes]
-    );
-
     return (
-        <div className={cardClasses}>
+        <div className={`border text-left border-primary-border flex flex-col gap-y-[10px] p-[10px] ${isLastOdd ? 'col-span-2 mx-auto w-1/2' : ''}`}>
             <div className='flex justify-between'>
                 <span className='font-haasRegular text-secondary-alt uppercase text-[16px] block'>
                     {product.name}
                 </span>
-                <button 
+                <button
                     onClick={handleRemoveClick}
                     className='flex items-center justify-center rounded-full w-[25px] h-[25px] border border-primary-border transform transition-all duration-300 group cursor-pointer hover:bg-secondary-alt flex-shrink-0 p-[2px]'
                     aria-label={`Remove ${product.name}`}
@@ -95,10 +89,10 @@ const ProductCard = React.memo(({ item, classes, onRemove }) => {
                 <label className='font-haasRegular text-secondary-alt uppercase block text-[16px]'>
                     quantity
                 </label>
-                <input 
-                    type="number" 
-                    value={quantityValue} 
-                    onChange={handleQuantityChange}
+                <input
+                    type="number"
+                    value={quantityValue}
+                    onChange={handleQuantity}
                     className="w-[60px] h-[30px] p-2 bg-transparent border border-primary-border outline-none text-center"
                     min="1"
                     aria-label="Product quantity"
@@ -110,7 +104,6 @@ const ProductCard = React.memo(({ item, classes, onRemove }) => {
 
 ProductCard.displayName = 'ProductCard';
 
-// Back button component
 const BackButton = React.memo(({ onClick }) => (
     <button
         onClick={onClick}
@@ -135,62 +128,49 @@ const BackButton = React.memo(({ onClick }) => (
 
 BackButton.displayName = 'BackButton';
 
-const ProductListUpdate = ({ toggleToList, activeProduct }) => {
+const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
     const { product, setOfProduct } = activeProduct;
     const [productSetItems, setProductSetItems] = useState([]);
 
-    // Memoized remove handler
     const handleRemove = useCallback((id) => {
         setProductSetItems(prev => prev.filter(({ product }) => product._id !== id));
     }, []);
 
-    // Memoized delete handler
+    const handleQuantityChange = useCallback((id, quantity) => {
+        setProductSetItems(prev => prev.map(item => item.product._id === id ? { ...item, quantity: toInteger(quantity) } : item));
+    }, []);
+
     const handleDelete = useCallback(() => {
-        // Add delete logic here
-        console.log('Delete clicked');
-    }, []);
+        console.log('Delete clicked', activeProduct._id);
+    }, [activeProduct]);
 
-    // Memoized update handler
     const handleUpdate = useCallback(() => {
-        // Add update logic here
         console.log('Update clicked');
-    }, []);
+        console.log("productSetItems", productSetItems);
+    }, [productSetItems, activeProduct]);
 
-    // Update productSetItems when setOfProduct changes
     useEffect(() => {
         setProductSetItems(setOfProduct || []);
     }, [setOfProduct]);
 
-    // Memoized grid layout calculations
     const { isEven, lastIndex } = useMemo(() => ({
         isEven: productSetItems.length % 2 === 0,
         lastIndex: productSetItems.length - 1
     }), [productSetItems.length]);
 
-    // Render product cards with optimized key handling
     const renderProductCards = useMemo(() => {
         return productSetItems.map((item, index) => {
             const { product } = item;
-            const isLast = !isEven && index === lastIndex;
             const key = product._id || product.id || index;
-            
-            return isLast ? (
-                <div key={key} className="w-full sm:col-span-2 flex flex-col justify-center items-center">
-                    <ProductCard 
-                        item={item} 
-                        classes="lg:w-[440px]" 
-                        onRemove={handleRemove}
-                        isLastOdd={true}
-                    />
-                </div>
-            ) : (
-                <ProductCard 
-                    key={key} 
-                    item={item} 
-                    onRemove={handleRemove}
-                    isLastOdd={false}
-                />
-            );
+            const isLastOdd = productSetItems.length % 2 !== 0 && index === productSetItems.length - 1;
+
+            return <ProductCard
+                key={key}
+                item={item}
+                onRemove={handleRemove}
+                isLastOdd={isLastOdd}
+                handleQuantityChange={handleQuantityChange}
+            />;
         });
     }, [productSetItems, isEven, lastIndex, handleRemove]);
 
@@ -204,10 +184,10 @@ const ProductListUpdate = ({ toggleToList, activeProduct }) => {
 
             <div className='w-full lg:max-w-[500px] flex gap-y-[10px] gap-x-[20px] py-[15px] px-[15px] cursor-pointer border border-primary-border transform transition-all duration-300'>
                 <div className='bg-white w-[100px] h-[100px] p-2 flex-shrink-0'>
-                    <PrimaryImage 
-                        url={product.mainMedia} 
+                    <PrimaryImage
+                        url={product.mainMedia}
                         alt={`${product.name} product image`}
-                        customClasses='h-full w-full object-cover' 
+                        customClasses='h-full w-full object-cover'
                     />
                 </div>
                 <div className='w-full text-left flex flex-col gap-y-[10px] justify-center'>
@@ -222,7 +202,7 @@ const ProductListUpdate = ({ toggleToList, activeProduct }) => {
             </h3>
 
             <div className='relative h-[60px]'>
-                <CustomDropdown />
+                <CustomDropdown products={productOptions} />
             </div>
 
             <div className="w-full grid sm:grid-cols-2 grid-cols-1 gap-[20px] items-center justify-center">
@@ -230,13 +210,13 @@ const ProductListUpdate = ({ toggleToList, activeProduct }) => {
             </div>
 
             <div className='flex w-full gap-x-[10px] justify-center'>
-                <button 
+                <button
                     onClick={handleDelete}
                     className='tracking-[3px] hover:tracking-[5px] hover:font-haasBold transform transition-all duration-300 border border-red-500 text-red-500 h-[58px] lg:w-[156px] w-full uppercase text-[14px] font-haasRegular'
                 >
                     delete
                 </button>
-                <button 
+                <button
                     onClick={handleUpdate}
                     className='tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[280px] w-full text-secondary-alt uppercase text-[14px] font-haasRegular'
                 >

@@ -31,6 +31,19 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
 
   };
 
+  if(to.startsWith("tel") || to.startsWith("mailto")) {
+    return (
+      <a
+        href={to || ""}
+        target={target}
+        className={className}
+        {...attributes}
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
     <Link
       prefetch={false}
