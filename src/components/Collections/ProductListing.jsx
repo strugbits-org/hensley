@@ -4,7 +4,6 @@ import React, { useEffect, useState, useCallback, useRef } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import ProductCard from '../common/ProductCard'
 import FilterMenu from '../common/MenuFilter'
-import FilterCardSubCategories from '../common/FilterCardSubCategories'
 import { ProductBanner } from '../common/ProductBanner'
 import Loading from '@/app/loading'
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper'
@@ -12,6 +11,7 @@ import { fetchSortedProducts } from '@/services/collections'
 import { findSortIndexByCategory, logError } from '@/utils'
 import { ProductsFilterPopup } from '../common/ProductsFilterPopup'
 import { fetchSavedProductData } from '@/services/products';
+import ProductFilterCardSubCategories from '../common/ProductFilterCardSubCategories';
 
 // Debounce utility function
 const useDebounce = (callback, delay) => {
@@ -144,7 +144,7 @@ function Listing({ data }) {
         />
       </div>
 
-      <FilterCardSubCategories data={subCategories} />
+      <ProductFilterCardSubCategories data={subCategories} />
 
       <div className="w-full flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:px-0 px-[12px]">
         {subCategories.length > 0 && (<div className="lg:w-1/4 w-full lg:h-screen pl-[24px] lg:block hidden">

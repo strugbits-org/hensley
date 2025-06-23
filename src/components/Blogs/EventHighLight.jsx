@@ -6,18 +6,20 @@ import { CustomLink } from '../common/CustomLink'
 import { formatDate } from '@/utils'
 import { MarketsStudiosTags } from './MarketsStudiosTags'
 
-const EventHighLight = ({ data, handleFilterChange, selectedTags }) => {
+const EventHighLight = ({ data, handleFilterChange, selectedTags, pageTitle="" }) => {
 
     if (!data) return;
+
+    const {hensleyNewsTitle} = pageTitle;
 
     const { slug, author, blogRef, markets, studios } = data;
     return (
         <div className='w-full group'>
             <SectionTitle
-                text="HENSLEY NEWS"
+                text={hensleyNewsTitle || "HENSLEY NEWS"}
                 classes={"lg:bg-primary-alt pt-[36px] pb-[44px]"}
             />
-            <div className='w-full border p-[24px] gap-x-[24px] flex lg:flex-row flex-col '>
+            <div className='w-full border border-primary-border p-[24px] gap-x-[24px] flex lg:flex-row flex-col '>
                 <div className='lg:w-1/2 overflow-hidden'>
                     <PrimaryImage url={blogRef.coverImage} alt={blogRef.title} customClasses="h-full w-full min-h-[528px] max-h-[528px] object-cover transition-transform duration-300 group-hover:scale-105" />
                 </div>

@@ -30,25 +30,25 @@ export const Footer = ({ data }) => {
             <div className='max-w-[133px] mt-9 flex lg:hidden social-links w-full gap-3 justify-between'>
               {socialLinks.map((item, index) => (
                 <CustomLink to={item.link} target={item.target} key={index}>
-                  <PrimaryImage timeout={0} url={item.icon} defaultDimensions={{ height: 19, width: 19 }} alt="icon" />
+                  <PrimaryImage min_h={24} min_w={24} fit='fit' url={item.icon} defaultDimensions={{ height: "24px", width: "24px" }} alt="icon" />
                 </CustomLink>
               ))}
             </div>
           </div>
         </div>
-        <div className='order-4 md:order-2 lg:order-4 w-1/2 lg:w-1/6 flex flex-col items-end'>
-          <h2 className='text-end text-sm font-haasMedium uppercase text-primary mb-[18.5px]'> {footerData.copyrightText1} </h2>
-          <p className='text-end text-sm font-haasRegular uppercase text-primary mb-5'>{footerData.copyrightText2}</p>
+        <div className='order-4 md:order-2 lg:order-4 w-1/2 lg:w-1/6 flex flex-col max-w-[150px]'>
+          <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'> {footerData.copyrightText1} </h2>
+          <p className='text-sm font-haasRegular uppercase text-primary mb-5'>{footerData.copyrightText2}</p>
           <div className='hidden lg:flex social-links w-full gap-3 justify-between max-w-[133px]'>
             {socialLinks.map((item, index) => (
-              <CustomLink to={item.title} key={index} target={item.target}>
-                <PrimaryImage timeout={0} url={item.icon} defaultDimensions={{ height: 19, width: 19 }} alt="icon" />
+              <CustomLink to={item.link} key={index} target={item.target}>
+                <PrimaryImage min_h={24} min_w={24} fit='fit' url={item.icon} defaultDimensions={{ height: "24px", width: "24px" }} alt="icon" />
               </CustomLink>
             ))}
           </div>
         </div>
       </div>
-      <PrimaryImage timeout={0} url={footerData.logo} fit='fit' customClasses="mt-20 lg:mt-0 mx-auto w-full" src={logo} alt="logo" />
+      <PrimaryImage min_w={1920} min_h={300} timeout={0} url={footerData.logo} fit='fit' customClasses="mt-20 lg:mt-0 mx-auto w-full" src={logo} alt="logo" />
     </footer>
   )
 }

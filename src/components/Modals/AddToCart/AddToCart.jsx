@@ -4,7 +4,7 @@ import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteButton } from './AddtoQuoteButton'
 import ProductDescription from '@/components/common/helpers/ProductDescription'
 import { QuantityControls } from '@/components/Product'
-import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils'
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError } from '@/utils'
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
 import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
@@ -33,9 +33,8 @@ const AddToCart = ({ data, onClose }) => {
     if (isProductCollection) {
       return [];
     }
-
-    const productSize = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
-    return [{ size: productSize, formattedPrice: product.formattedPrice }];
+    const size = findProductSize(product.additionalInfoSections);
+    return [{ size: size, formattedPrice: product.formattedPrice }];
   }, [isProductCollection, product]);
 
   const totalPrice = useMemo(() => {
@@ -139,7 +138,7 @@ const AddToCart = ({ data, onClose }) => {
           quantity: 1,
         }];
       } else {
-        const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+        const size = findProductSize(product.additionalInfoSections);
 
         lineItems = [{
           catalogReference: {
@@ -191,7 +190,7 @@ const AddToCart = ({ data, onClose }) => {
       const items = collectionData.map(set => ({
         id: set.product._id,
         product: set.product.name,
-        size: set.product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—",
+        size: findProductSize(set.product.additionalInfoSections),
         formattedPrice: set.product.formattedPrice,
         price: set.product.price,
         quantity: set.quantity
@@ -226,8 +225,8 @@ const AddToCart = ({ data, onClose }) => {
         </div>
       )}
       <AddToCartSlider data={productData} isOpen={data.open} />
-      <div className='h-full sm:w-[55%] w-full py-[20px] pr-[20px] relative'>
-        <div className='w-full flex flex-col gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
+      <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative'>
+        <div className='w-full flex flex-col  gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
           <div className='w-full flex justify-between relative '>
             <span className='
             text-[35px]
@@ -235,15 +234,15 @@ const AddToCart = ({ data, onClose }) => {
             text-secondary-alt
             font-recklessRegular
             uppercase
+            w-full
+            max-w-[350px]
             '>{product.name}</span>
-            <button onClick={onClose} className='close-button'>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                  <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                  <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
+            <button onClick={onClose} className='close-button absolute top-0 right-0'>
+              <svg preserveAspectRatio="xMidYMid meet" width="24.707" height="24.707" data-bbox="25.975 25.975 148.05 148.05" xmlns="http://www.w3.org/2000/svg" viewBox="25.975 25.975 148.05 148.05" role="presentation" aria-hidden="true">
+                <g>
+                  <path d="M172.9 167.6L105.3 100l67.6-67.6c1.5-1.5 1.5-3.8 0-5.3s-3.8-1.5-5.3 0L100 94.7 32.4 27.1c-1.5-1.5-3.8-1.5-5.3 0s-1.5 3.8 0 5.3L94.7 100l-67.6 67.6c-1.5 1.5-1.5 3.8 0 5.3s3.8 1.5 5.3 0l67.6-67.6 67.6 67.6c1.5 1.5 3.8 1.5 5.3 0s1.5-3.8 0-5.3z"></path>
                 </g>
               </svg>
-
             </button>
           </div>
           <div className='w-full flex gap-x-[20px] sm:justify-end justify-start '>

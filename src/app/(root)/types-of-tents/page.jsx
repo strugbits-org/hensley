@@ -33,7 +33,7 @@ export default async function Page({ params }) {
       pageDetails
     };
 
-    return <Tents data={data}/>
+    return <Tents data={data} />
     // return <h1>Hello World</h1>
 
   } catch (error) {

@@ -31,6 +31,9 @@ export const lightboxActions = {
     hideLightBox: (ligtbox) => {
         lightboxState.lightboxes[ligtbox] = false;
     },
+    toggleLightBox: (ligtbox) => {
+        lightboxState.lightboxes[ligtbox] = !lightboxState.lightboxes[ligtbox];
+    },
     setBasicLightBoxDetails: (details) => {
         lightboxState.basicLightBoxDetails = details
     },

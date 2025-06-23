@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { calculateTotalCartQuantity, logError } from '@/utils';
-import image from '@/assets/hens-logo.png';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { CustomLink } from '../common/CustomLink';
 import { toast } from 'sonner';
@@ -14,7 +13,7 @@ import { signInUser } from '@/services/auth/authentication';
 import { useCookies } from 'react-cookie';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
-import { convertToHTML, convertToHTMLBlog } from '@/utils/renderRichText';
+import { convertToHTMLRichContent } from '@/utils/renderRichText';
 
 // Validation schema
 const schema = yup.object({
@@ -52,8 +51,8 @@ const InputField = ({
     return (
         <div className={`gap-y-[8px] flex flex-col ${classes}`}>
             {label && (
-                <label htmlFor={id} className="uppercase block text-sm font-medium text-secondary-alt font-haasBold">
-                    {label}
+                <label htmlFor={id} className=" !text-[16px] uppercase block font-medium text-secondary-alt font-haasBold">
+                    {label} 
                 </label>
             )}
             <div className='relative'>
@@ -66,7 +65,7 @@ const InputField = ({
                     disabled={disabled}
                     {...register}
                     className={`
-                    w-full placeholder-secondary font-haasLight p-3 rounded-sm
+                    w-full px-[20px] placeholder-secondary font-haasLight p-3 h-[55px] rounded-sm
                     border-b transition-all duration-300 outline-none
                     ${hasError ? 'border-red-500 border-b-2' :
                             isFocused ? `border-${borderColor} border-b-2` :
@@ -127,6 +126,11 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
 
         try {
             const response = await signInUser(data);
+
+            // console.log("Login response:", response);
+            // setIsSubmitting(false);
+            // return;
+            
             const { jwtToken: authToken, member: userData, userTokens } = response;
 
             const cookieOptions = {
@@ -188,10 +192,10 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
     }
 
     return (
-        <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center z-[99] relative lg:w-[762px] lg:py-[80px] mx-auto`}>
+        <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center z-[99] relative lg:w-[600px] lg:py-[20px]  mx-auto`}>
             <form
                 onSubmit={(e) => e.preventDefault()}
-                className='w-full flex flex-col gap-y-[41px] justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[50px] sm:px-[120px] px-[36px] pt-[121px] pb-[55px] relative'
+                className='w-full flex flex-col gap-y-[35px] border border-black justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[30px] sm:px-[120px] px-[36px] pt-[50px] pb-[55px] relative'
             >
                 {isLightbox && (
                     <button onClick={isSubmitting ? undefined : handleClose}>
@@ -204,8 +208,8 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
 
                 <Image
                     src={wixImageToUrl(logo)}
-                    width={292}
-                    height={47}
+                    width={212}
+                    height={33}
                     className="lg:block hidden"
                     alt="Hensley Logo"
                 />
@@ -221,7 +225,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                     <InputField
                         id="email"
                         label={email}
-                        placeholder="exemplo@myemail.com"
+                        placeholder="example@myemail.com"
                         borderColor="secondary-alt"
                         type="email"
                         register={register("email")}
@@ -242,7 +246,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                     </label>
                     <InputField
                         id="password"
-                        placeholder="*****"
+                        placeholder="********"
                         borderColor="secondary-alt"
                         type={showPassword ? "text" : "password"}
                         classes={'col-span-2 !gap-y-0'}
@@ -259,7 +263,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                 <button
                     onClick={handleSubmit(onSubmit)}
                     disabled={isSubmitting}
-                    className={`group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] 
+                    className={`group lg:w-[100%] w-full relative bg-primary lg:h-[110px] h-[90px] 
                    transition-all duration-300 hover:bg-[#2c2216] 
                    ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
@@ -306,13 +310,13 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                             Privacy Policy.
                         </a>
                     </span> */}
-                    <div className='w-full sm:max-w-[344px]'>
-                        {convertToHTMLBlog({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
+                    <div className='w-full sm:max-w-[370px] '>
+                        {convertToHTMLRichContent({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
                     </div>
                 </div>
 
                 {/* New User Section */}
-                <span className='font-recklessLight text-[35px] leading-[20px] text-secondary-alt block lg:mt-0 mt-[100px]'>
+                <span className='font-recklessLight text-[28px] leading-[20px] text-secondary-alt block lg:mt-0 mt-[100px]'>
                     {newToHensleyText}
                 </span>
 
@@ -324,7 +328,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                                text-secondary-alt uppercase text-[12px] font-haasRegular
                                transition-all duration-300
                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' :
-                                'hover:tracking-[5px] hover:bg-primary hover:font-haasBold hover:text-primary-alt'}`}
+                                'hover:tracking-[5px] hover:bg-primary hover:font-haasBold'}`}
                     >
                         {createAccountButtonLabel}
                     </button>

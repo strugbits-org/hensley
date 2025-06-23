@@ -205,16 +205,21 @@ export const convertToHTML = ({ content = "", class_p = "", class_ul = "", class
     return parse(html);
 }
 
-export const convertToHTMLBlog = ({
+export const convertToHTMLRichContent = ({
     content = "",
     class_heading = "",
     class_p = "",
     class_ul = "",
     class_ol = "",
+    class_li = "",
     class_image = "",
+    class_image_container = "",
     class_video = "",
     class_gallery = "",
-    class_gallery_item = ""
+    class_gallery_item = "",
+    class_table = "",
+    class_table_row = "",
+    class_table_cell = ""
 }) => {
     if (typeof content === 'string') return content;
     let html = "";
@@ -268,6 +273,20 @@ export const convertToHTMLBlog = ({
         return textHTML;
     };
 
+    const processTableCell = (cellNode) => {
+        let cellHTML = "";
+        cellNode.nodes.forEach(cellChild => {
+            if (cellChild.type === 'PARAGRAPH') {
+                if (cellChild.nodes.length > 0) {
+                    cellHTML += processTextNodes(cellChild.nodes);
+                } else {
+                    cellHTML += '<br/>';
+                }
+            }
+        });
+        return cellHTML;
+    };
+
     content.nodes.forEach(node => {
         if (node.type === 'PARAGRAPH') {
             if (node.nodes.length > 0) {
@@ -303,7 +322,7 @@ export const convertToHTMLBlog = ({
             html += `<ul className="${class_ul}">`;
 
             node.nodes.forEach(listItem => {
-                html += '<li>';
+                html += `<li className="${class_li}">`;
                 listItem.nodes.forEach(paragraph => {
                     html += processTextNodes(paragraph.nodes);
                 });
@@ -311,6 +330,60 @@ export const convertToHTMLBlog = ({
             });
 
             html += '</ul>';
+        }
+        else if (node.type === 'TABLE') {
+            html += `<table className="${class_table}">`;
+
+            let hasHeader = false;
+            if (node.nodes.length > 0) {
+                const firstRow = node.nodes[0];
+                if (firstRow.type === 'TABLE_ROW' && firstRow.nodes.length > 0) {
+                    hasHeader = firstRow.nodes.some(cell =>
+                        cell.nodes.some(paragraph =>
+                            paragraph.nodes.some(textNode =>
+                                textNode.textData?.decorations?.some(decoration =>
+                                    decoration.type === 'BOLD'
+                                )
+                            )
+                        )
+                    );
+                }
+            }
+
+            node.nodes.forEach((rowNode, rowIndex) => {
+                if (rowNode.type === 'TABLE_ROW') {
+                    const isHeaderRow = hasHeader && rowIndex === 0;
+
+                    if (isHeaderRow) {
+                        html += '<thead>';
+                    } else if (rowIndex === 1 && hasHeader) {
+                        html += '<tbody>';
+                    }
+
+                    html += `<tr className="${class_table_row}">`;
+
+                    rowNode.nodes.forEach(cellNode => {
+                        if (cellNode.type === 'TABLE_CELL') {
+                            const cellTag = isHeaderRow ? 'th' : 'td';
+                            html += `<${cellTag} className="${class_table_cell}">`;
+                            html += processTableCell(cellNode);
+                            html += `</${cellTag}>`;
+                        }
+                    });
+
+                    html += '</tr>';
+
+                    if (isHeaderRow) {
+                        html += '</thead>';
+                    }
+                }
+            });
+
+            if (hasHeader && node.nodes.length > 1) {
+                html += '</tbody>';
+            }
+
+            html += '</table>';
         }
         else if (node.type === 'VIDEO') {
             const videoData = node.videoData;
@@ -338,8 +411,8 @@ export const convertToHTMLBlog = ({
             const altText = imageData.altText ? `alt="${imageData.altText}"` : '';
             const alignment = imageData.containerData?.alignment?.toLowerCase() || 'center';
 
-            html += `<div className="image-container ${class_image}" style="text-align: ${alignment};">`;
-            html += `<img src="${imageSrc}" ${altText} ${width} ${height} />`;
+            html += `<div className="image-container ${class_image_container}" style="text-align: ${alignment};">`;
+            html += `<img className="${class_image}" src="${imageSrc}" ${altText} ${width} ${height} />`;
             html += '</div>';
         }
         else if (node.type === 'GALLERY') {
@@ -351,7 +424,7 @@ export const convertToHTMLBlog = ({
             const alignment = galleryData.containerData?.alignment?.toLowerCase() || 'center';
 
             html += `<div className="gallery-container" style="text-align: ${alignment};">`;
-            html += `<div className="gallery-grid ${class_gallery}" style="display: grid; gap: ${spacing}px; grid-template-columns: repeat(${columns === 0 ? 'auto-fit' : columns}, minmax(200px, 1fr));">`;
+            html += `<div className="gallery-grid ${class_gallery}" style="display: grid; items: center; gap: ${spacing}px; grid-template-columns: repeat(${columns === 0 ? 'auto-fit' : columns}, minmax(200px, 1fr));">`;
 
             items.forEach(item => {
                 if (item.image) {

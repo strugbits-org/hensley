@@ -20,6 +20,7 @@ export async function generateMetadata() {
 export default async function Page() {
   try {
     const data = await fetchBlogPageData();
+
     return (
       <Blogs data={data} />
     );

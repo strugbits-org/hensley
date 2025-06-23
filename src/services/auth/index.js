@@ -2,6 +2,7 @@
 import { cookies } from "next/headers";
 import { createCart } from "../cart/CartApisVisitor";
 import queryCollection from "@/utils/fetchFunction";
+import { createWixClient } from "@/utils";
 
 export const getAuthToken = async () => {
   const cookieStore = cookies();
@@ -83,6 +84,19 @@ export const getCartId = async (createNew = true) => {
     }
 
     return cartId?.value || "";
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const checkIsAdmin = async (memberId) => {
+  try {
+    const wixClient = await createWixClient();
+    const response = await wixClient.badges.listBadgesPerMember([memberId]);
+    const badgeIds = response?.memberBadgeIds[0]?.badgeIds || [];
+    const adminBadgeId = process.env.ADMIN_BADGE_ID;
+    const isAdmin = badgeIds.includes(adminBadgeId);
+    return isAdmin;
   } catch (error) {
     throw new Error(error);
   }

@@ -22,7 +22,7 @@ const Tents = ({ data }) => {
                     <>
                         <BannerStructures title={item?.tentData?.productData?.title} data={item?.tentData?.tent} />
                         <OurProjects data={item.portfolio} />
-                        <FeaturedProjects data={item?.blogs} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="start" />
+                        <FeaturedProjects data={item?.blogs} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
 
                     </>
                 )

@@ -13,7 +13,7 @@ const QuoteSummary = ({ data }) => {
 
   return (
     <div className='w-full flex lg:flex-row flex-col'>
-      <div className='lg:w-[35%] border lg:pl-[24px] py-[36px] lg:pr-[95px]'>
+      <div className='lg:w-[35%] border border-primary-border lg:pl-[24px] py-[36px] lg:pr-[95px]'>
         {/* <div className='lg:block hidden'>
           <span className='
         text-[50px]
@@ -35,7 +35,7 @@ const QuoteSummary = ({ data }) => {
 
         <PriceDisplay totalPrice={totalPrice} />
       </div>
-      <div className='lg:w-[70%] border'>
+      <div className='lg:w-[70%] border border-primary-border'>
 
         {data.lineItems.map((item, index) => {
           const product = item.product;

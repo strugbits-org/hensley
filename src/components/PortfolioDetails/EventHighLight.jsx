@@ -3,15 +3,18 @@ import { formatDate } from '@/utils';
 import { generateImageURLAlternate } from '@/utils/generateImageURL';
 
 const EventHighLight = ({ data }) => {
-    const { portfolioRef, markets, studios } = data;
+    const { portfolioRef, markets } = data;
     const imageURL = generateImageURLAlternate({ wix_url: portfolioRef.coverImage.imageInfo });
+
+    console.log("portfolioRef", portfolioRef);
+    
 
     return (
         <div className='px-[24px] w-full'>
             <div className='w-full border-b py-[24px]'>
-                <div className='w-full h-screen bg-no-repeat bg-center' style={{ backgroundImage: `url(${imageURL})` }}></div>
+                <div className='w-full h-screen bg-no-repeat bg-cover bg-center' style={{ backgroundImage: `url(${imageURL})` }}></div>
             </div>
-            <div className='flex lg:flex-row flex-col gap-x-[182px] xl:px-[182px] sm:px-[70px]  lg:pt-[200px] lg:pb-[129px] py-[60px] justify-between relative'>
+            <div className='flex lg:flex-row flex-col gap-x-[182px] xl:px-[182px] sm:px-[70px] lg:pt-[200px] lg:pb-[129px] py-[60px] justify-between relative'>
                 <div className='lg:w-1/2 flex flex-col gap-y-[15px]'>
                     <span className='
                 font-haasRegular
@@ -60,10 +63,11 @@ const EventHighLight = ({ data }) => {
                     <span className='
                 font-haasRegular
                 uppercase
-                text-[12px]
+                text-[16px]
                 text-secondary-alt
                 text-left
                 block
+                whitespace-pre-line
                 '>{portfolioRef.description}</span>
                 </div>
             </div>

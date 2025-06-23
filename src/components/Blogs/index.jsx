@@ -6,6 +6,7 @@ import { PrimaryButton } from '../common/PrimaryButton';
 import EventHighLight from './EventHighLight';
 
 const Blogs = ({ data }) => {
+    const { pageDetails } = data;
     const PAGE_SIZE = 8;
     const [pageLimit, setPageLimit] = useState(PAGE_SIZE);
     const [selectedTags, setSelectedTags] = useState([]);
@@ -66,7 +67,7 @@ const Blogs = ({ data }) => {
 
     return (
         <div className="w-full">
-            {featuredBlog && <EventHighLight data={featuredBlog} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />}
+            {featuredBlog && <EventHighLight pageTitle={pageDetails} data={featuredBlog} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />}
 
             <div className="w-full bg-primary-border py-5">
                 <FilterCardSubCategories
@@ -76,15 +77,17 @@ const Blogs = ({ data }) => {
                 />
             </div>
 
-            <div className="w-full grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-6 sm:px-6 px-3 py-3">
-                {visibleBlogs.map((item, index) => (
-                    <BlogCard
-                        key={item._id || item.id || index}
-                        data={item}
-                        handleFilterChange={handleFilterChange}
-                        selectedTags={selectedTags}
-                    />
-                ))}
+            <div className='w-full flex flex-col py-[40px]'>
+                <div className="w-full grid border border-primary-border sm:py-[30px] lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-6 sm:px-6 px-3 py-3">
+                    {visibleBlogs.map((item, index) => (
+                        <BlogCard
+                            key={item._id || item.id || index}
+                            data={item}
+                            handleFilterChange={handleFilterChange}
+                            selectedTags={selectedTags}
+                        />
+                    ))}
+                </div>
             </div>
 
             {pageLimit < filteredBlogs.length && (

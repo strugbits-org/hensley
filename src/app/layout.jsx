@@ -82,7 +82,6 @@ export default async function RootLayout({ children }) {
 
   const { branches } = footerData;
 
-
   return (
     <html lang="en" className={`${neueHaasDisplayRegular.variable} ${neueHaasDisplayLight.variable} ${neueHaasDisplayMedium.variable} ${neueHaasDisplayBold.variable} ${recklessNeueRegular.variable} ${recklessNeueBold.variable} ${recklessNeueLight.variable} ${recklessNeueMedium.variable}`}>
       <body className={`antialiased`} >
@@ -105,10 +104,11 @@ export default async function RootLayout({ children }) {
             },
           }}
         />
-        <div className="hidden">
-          <InvalidateButttonPin />
-        </div>
+        <InvalidateButttonPin />
       </body>
     </html>
   );
-}
+};
+
+const time = +process.env.REVALIDATE_TIME || 86400;
+export const revalidate = time;

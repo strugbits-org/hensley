@@ -184,18 +184,18 @@ export const fetchMatchedProducts = async (id) => {
 
 
 export const fetchProductPageDetails = async () => {
-  try {
-    const pageDetails = await queryCollection({ dataCollectionId: "dynamicProductPageDetails" });
+    try {
+        const pageDetails = await queryCollection({ dataCollectionId: "dynamicProductPageDetails" });
 
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+        if (!Array.isArray(pageDetails.items)) {
+            throw new Error(`PrivacyPolicy response does not contain items array`);
+        }
+
+        return pageDetails.items[0]
+
+    } catch (error) {
+        logError(`Error fetching contact page data: ${error.message}`, error);
     }
-
-    return pageDetails.items[0]
-
-  } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
-  }
 };
 
 
@@ -350,5 +350,23 @@ export const fetchProductPaths = async () => {
         return response.items.map(x => ({ slug: x.slug.trim().replace("/", "") }));
     } catch (error) {
         logError(`Error fetching products by category: ${error.message}`, error);
+    }
+}
+
+export const fetchAllProducts = async () => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "FullProductData",
+            includeReferencedItems: ["product"],
+            limit: "infinite",
+            extendedLimit: 1000
+        });
+        if (!Array.isArray(response.items)) {
+            throw new Error(`Response does not contain items array`);
+        }
+
+        return response.items.filter(x => typeof x.product !== "string" && x.product);
+    } catch (error) {
+        logError(`Error fetching products: ${error.message}`, error);
     }
 }

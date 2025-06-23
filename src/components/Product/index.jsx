@@ -4,7 +4,7 @@ import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
@@ -75,7 +75,7 @@ export const Product = ({ data }) => {
     const items = productCollectionData.map(set => ({
       id: set.product._id,
       product: set.product.name,
-      size: set.product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—",
+      size: findProductSize(set.product.additionalInfoSections),
       formattedPrice: set.product.formattedPrice,
       price: set.product.price,
       quantity: set.quantity
@@ -87,7 +87,7 @@ export const Product = ({ data }) => {
   const productInfoSection = useMemo(() => {
     if (isProductCollection) return [];
 
-    const productSize = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+    const productSize = findProductSize(product.additionalInfoSections);
     return [{ size: productSize, formattedPrice: product.formattedPrice }];
   }, [isProductCollection, product]);
 
@@ -163,7 +163,7 @@ export const Product = ({ data }) => {
         }];
       } else {
         // Single product
-        const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+        const size = findProductSize(product.additionalInfoSections);
 
         lineItems = [{
           catalogReference: {

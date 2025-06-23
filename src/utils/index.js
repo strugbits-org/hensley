@@ -1,6 +1,6 @@
 import { ApiKeyStrategy, createClient, OAuthStrategy } from "@wix/sdk";
 import { collections, items } from "@wix/data";
-import { members } from "@wix/members";
+import { members, badges } from "@wix/members";
 import { cart, currentCart } from "@wix/ecom";
 import { contacts } from "@wix/crm";
 import { submissions } from "@wix/forms";
@@ -26,7 +26,8 @@ export const createWixClient = async () => {
                 cart,
                 currentCart,
                 contacts,
-                files
+                files,
+                badges
             },
             auth: ApiKeyStrategy({
                 siteId: process.env.SITE_ID_WIX,
@@ -49,7 +50,8 @@ export const createWixClientOAuth = async () => {
                 members,
                 cart,
                 currentCart,
-                files
+                files,
+                badges
             },
             auth: OAuthStrategy({ clientId: process.env.CLIENT_ID_WIX }),
         });
@@ -352,3 +354,8 @@ export const getAdditionalInfoSection = (sections, title) => {
 
     return parse(cleaned) || "";
 };
+
+export const findProductSize = (additionalInfoSections = []) => {
+    const size = additionalInfoSections?.find(x => x.title === "Size")?.description?.replace(/<[^>]*>/g, "").trim() || "—";
+    return size;
+}

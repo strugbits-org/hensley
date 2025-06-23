@@ -20,6 +20,9 @@ export const SearchModal = ({ closeModal, isActive }) => {
         if (e.key === 'Escape') {
             closeModal();
         }
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
     };
 
     const handleSearch = () => {
@@ -28,12 +31,12 @@ export const SearchModal = ({ closeModal, isActive }) => {
     };
 
     useEffect(() => {
-      if(pathname === '/search-results') {
-        const term = params.get('query') || '';
-        setSearchTerm(term);
-      };
+        if (pathname === '/search-results') {
+            const term = params.get('query') || '';
+            setSearchTerm(term);
+        };
     }, [])
-    
+
 
     if (!isActive && pathname !== '/search-results') return null;
 
