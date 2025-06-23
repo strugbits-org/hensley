@@ -5,6 +5,8 @@ import { PrimaryImage } from '../common/PrimaryImage';
 
 export const Footer = ({ data }) => {
   const { footerData, socialLinks, footerNaviationData, branches } = data;
+  console.log("socialLinks", socialLinks);
+  
 
   return (
     <footer className='relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]'>
@@ -41,7 +43,7 @@ export const Footer = ({ data }) => {
           <p className='text-end text-sm font-haasRegular uppercase text-primary mb-5'>{footerData.copyrightText2}</p>
           <div className='hidden lg:flex social-links w-full gap-3 justify-between max-w-[133px]'>
             {socialLinks.map((item, index) => (
-              <CustomLink to={item.title} key={index} target={item.target}>
+              <CustomLink to={item.link} key={index} target={item.target}>
                 <PrimaryImage timeout={0} url={item.icon} defaultDimensions={{ height: 19, width: 19 }} alt="icon" />
               </CustomLink>
             ))}
