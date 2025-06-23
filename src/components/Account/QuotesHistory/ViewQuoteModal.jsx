@@ -7,8 +7,9 @@ import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/re
 import { Fragment, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
 
-export const ViewQuoteModal = ({ data, onClose }) => {
+export const ViewQuoteModal = ({ data, onClose, labels }) => {
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
+    const { addToCartButtonLabel, addAllItemsButtonLabel, backToQuoteButtonLabel } = labels
     const [loading, setLoading] = useState(false);
 
     const totalPrice = useMemo(() => calculateCartTotalPrice((data?.lineItems || []).map(item => item.product)));
@@ -133,15 +134,15 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                         const productSetItems = productCollection.split("; ");
                                                         const lineItemData = { ...product, productSetItems };
                                                         return (
-                                                            <CartCollection key={index} data={lineItemData} readOnly={true} showAddToCart={true} />
+                                                            <CartCollection key={index} data={lineItemData} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} />
                                                         )
                                                     } else if (isTentItem) {
                                                         return (
-                                                            <CartTent key={index} data={product} descriptionLines={descriptionLines} readOnly={true} showAddToCart={true}/>
+                                                            <CartTent key={index} data={product} descriptionLines={descriptionLines} readOnly={true} addToCartButtonLabel={addToCartButtonLabel} showAddToCart={true}/>
                                                         )
                                                     } else {
                                                         return (
-                                                            <CartNormal key={index} data={product} readOnly={true} showAddToCart={true} />
+                                                            <CartNormal key={index} data={product} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} />
                                                         )
                                                     };
                                                 })}
@@ -153,7 +154,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                         aria-label="Load more quotes"
                                                     >
                                                         <span className='font-haasRegular uppercase text-sm leading-[30px] group-hover:font-haasBold'>
-                                                            {loading ? "Adding items to cart..." : "Add all items to cart"}
+                                                            {loading ? "PLEASE WAIT..." : (addAllItemsButtonLabel || "Add all items to cart")}
                                                         </span>
                                                         <svg
                                                             className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-[#2c2216] group-hover:text-white hidden max-lg:block'
@@ -175,7 +176,7 @@ export const ViewQuoteModal = ({ data, onClose }) => {
                                                         aria-label="Load more quotes"
                                                     >
                                                         <span className='font-haasRegular uppercase text-sm leading-[30px] group-hover:font-haasBold'>
-                                                            back to quotes
+                                                            {backToQuoteButtonLabel || 'back to quotes'}
                                                         </span>
 
                                                     </button>

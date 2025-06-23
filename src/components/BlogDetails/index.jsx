@@ -10,6 +10,12 @@ const BlogDetails = ({ data }) => {
     const { blog, otherBlogs } = data;
     const { storeProducts = [] } = blog;
 
+    const { pageDetails } = data;
+
+    const { featuredProductTitle, hensleyNewsTitle } = data
+
+    console.log("The page details of proudct is ", pageDetails);
+
     return (
         <>
             <EventHighLight data={blog} />
@@ -22,8 +28,8 @@ const BlogDetails = ({ data }) => {
                     class_ol: "list-decimal pl-6 text-secondary-alt font-haasRegular text-sm lg:text-base text-left mb-8 space-y-2",
                 })}
             </div>
-            <FeaturedProducts classes={'z-10'} data={storeProducts.map((product) => ({ product }))} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
-            <HensleyNews data={otherBlogs} pageDetails={{ hensleyNewsTitle: "Other Posts" }} loop={false} origin="start" titleType='secondary' />
+            <FeaturedProducts classes={'z-10'} data={storeProducts.map((product) => ({ product }))} pageDetails={{ featuredProjectTitle: featuredProductTitle || "Products featured in this PROJECT entry:" }} loop={false} origin="start" />
+            <HensleyNews data={otherBlogs} pageDetails={{ hensleyNewsTitle: hensleyNewsTitle || "Other Posts" }} loop={false} origin="start" titleType='secondary' />
         </>
     )
 }

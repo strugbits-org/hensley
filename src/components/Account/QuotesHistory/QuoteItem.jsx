@@ -5,7 +5,10 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 
-export const QuoteItem = ({ quote, handleViewClick }) => {
+export const QuoteItem = ({ quote, handleViewClick, data }) => {
+
+    const { viewButtonLabel, orderAgainButtonLabel } = data;
+
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const totalPrice = useMemo(() => calculateCartTotalPrice(quote.lineItems.map(item => item.product)));
     const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
@@ -116,7 +119,7 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
                             onClick={handleViewClick}
                             aria-label={`View quote for ${quote.eventDescriptionPo}`}
                         >
-                            VIEW
+                            {viewButtonLabel || 'VIEW'}
                             <span className="absolute right-3" aria-hidden="true">
                                 <FiArrowUpRight className="inline group-hover:text-white" />
                             </span>
@@ -126,7 +129,7 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
                             onClick={handleOrderAgainClick}
                             aria-label={`Order again for ${quote.eventDescriptionPo}`}
                         >
-                            {loading ? "ORDERING..." : "ORDER AGAIN"}
+                            {loading ? "PLEASE WAIT..." : (orderAgainButtonLabel || "ORDER AGAIN")}
                             <span className="absolute right-3" aria-hidden="true">
                                 <FiArrowUpRight className="inline group-hover:text-white" />
                             </span>
@@ -164,7 +167,7 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
                             onClick={handleViewClick}
                             aria-label={`View quote for ${quote.eventDescriptionPo}`}
                         >
-                            VIEW
+                            {viewButtonLabel || 'VIEW'}
                             <span className="absolute right-3" aria-hidden="true">
                                 <FiArrowUpRight className="inline group-hover:text-white" />
                             </span>
@@ -174,7 +177,7 @@ export const QuoteItem = ({ quote, handleViewClick }) => {
                             onClick={handleOrderAgainClick}
                             aria-label={`Order again for ${quote.eventDescriptionPo}`}
                         >
-                            {loading ? "ORDERING..." : "ORDER AGAIN"}
+                            {loading ? "PLEASE WAIT..." : (orderAgainButtonLabel || "ORDER AGAIN")}
                             <span className="absolute right-3" aria-hidden="true">
                                 <FiArrowUpRight className="inline group-hover:text-white" />
                             </span>

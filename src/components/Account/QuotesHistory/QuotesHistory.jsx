@@ -6,14 +6,17 @@ import { logError } from '@/utils';
 import { loaderActions } from '@/store/loaderStore';
 import { QuoteItem } from './QuoteItem';
 
-function QuotesHistory() {
+function QuotesHistory({ pageTitle, data: labels }) {
+
+    const { loadMoreButtonLabel } = labels;
+
     const pageSize = 5;
     const [quotesData, setQuotesData] = useState([]);
     const [pageLimit, setPageLimit] = useState(pageSize);
     const [selectedQuote, setSelectedQuote] = useState();
 
     const data = {
-        heading: "QUOTES HISTORY",
+        heading: pageTitle,
     };
 
     const fetchQuotesData = async () => {
@@ -55,6 +58,7 @@ function QuotesHistory() {
                         <div className='quotes-list space-y-0 mb-10' role="list">
                             {quotesData.slice(0, pageLimit).map((quote) => (
                                 <QuoteItem
+                                    data={labels}
                                     key={quote._id}
                                     quote={quote}
                                     handleViewClick={() => setSelectedQuote(quote)}
@@ -70,7 +74,7 @@ function QuotesHistory() {
                             aria-label="Load more quotes"
                         >
                             <span className='font-haasLight uppercase text-sm leading-[30px] group-hover:font-haasBold'>
-                                LOAD MORE
+                                {loadMoreButtonLabel || "LOAD MORE"}
                             </span>
                             <svg
                                 className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-[#2c2216] group-hover:text-white hidden max-lg:block'
@@ -89,6 +93,7 @@ function QuotesHistory() {
             </main>
 
             <ViewQuoteModal
+                labels={labels}
                 data={selectedQuote}
                 onClose={() => setSelectedQuote(null)}
             />

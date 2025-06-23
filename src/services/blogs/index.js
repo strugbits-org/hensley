@@ -44,11 +44,12 @@ export const fetchCategoriesMarketsAndStudios = async () => {
 
 export const fetchBlogPageData = async () => {
     try {
-        const [categoriesMarketStudios, blogs] = await Promise.all([
+        const [categoriesMarketStudios, blogs, pageDetails] = await Promise.all([
             fetchCategoriesMarketsAndStudios(),
-            fetchBlogs()
+            fetchBlogs(),
+            fetchBlogPageDetails()
         ]);
-        return { categoriesMarketStudios, blogs };
+        return { categoriesMarketStudios, blogs, pageDetails };
     } catch (error) {
         logError(`Error fetching blog page data: ${error.message}`, error);
     }
@@ -116,12 +117,44 @@ export const fetchOtherBlogs = async (slug) => {
 
 export const fetchPostPageData = async (slug) => {
     try {
-        const [blog, otherBlogs] = await Promise.all([
+        const [blog, otherBlogs, pageDetails] = await Promise.all([
             fetchSelectedBlog(slug),
-            fetchOtherBlogs(slug)
+            fetchOtherBlogs(slug),
+            fetchPostPageDetails()
         ]);
-        return { blog, otherBlogs };
+        return { blog, otherBlogs, pageDetails };
     } catch (error) {
         logError(`Error fetching blog page data: ${error.message}`, error);
     }
 }
+
+export const fetchPostPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "PostPageTitle" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
+
+export const fetchBlogPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "BlogPageTitle" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
