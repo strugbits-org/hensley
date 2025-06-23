@@ -1,6 +1,7 @@
 "use client";
 import useUserData from '@/hooks/useUserData';
 import { checkIsAdmin } from '@/services/auth';
+import { storeActions } from '@/store';
 import { lightboxActions } from '@/store/lightboxStore'
 import { logError } from '@/utils';
 import React, { useEffect, useState } from 'react'
@@ -18,6 +19,9 @@ export const InvalidateButttonPin = () => {
                 return;
             };
             const response = await checkIsAdmin(memberId);
+            if (response) {
+                storeActions.addRole("admin");
+            }
             setIsAdmin(response);
         } catch (error) {
             logError(error);
@@ -30,12 +34,12 @@ export const InvalidateButttonPin = () => {
     }, [memberId, retryTrigger, cookies.authToken]);
 
     const handleClick = () => {
-        lightboxActions.showLightBox("invalidate");
+        lightboxActions.toggleLightBox("invalidate");
     }
 
     if (!isAdmin) return null;
     return (
-        <button onClick={handleClick} className="min-w-[175px] rotate-90 fixed bottom-36 right-0 border border-secondary-alt bg-primary p-2 hover:bg-secondary-alt text-secondary-alt hover:text-primary z-50 transition-all duration-300 uppercase font-haasMedium tracking-widest hover:tracking-[4px] text-base">
+        <button onClick={handleClick} className="min-w-[175px] rotate-90 fixed bottom-36 right-0 border border-secondary-alt bg-primary p-2 hover:bg-secondary-alt text-secondary-alt hover:text-primary z-[100] transition-all duration-300 uppercase font-haasMedium tracking-widest hover:tracking-[4px] text-base">
             Invalidate
         </button>
     )

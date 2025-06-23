@@ -199,7 +199,6 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
             formattedPrice: formatTotalPrice(price),
         }
     });
-    console.log("productInfoSection", productInfoSection);
 
     const price = useMemo(() =>
         productInfoSection.reduce((acc, { price, quantity }) => acc + (price * quantity), 0),
