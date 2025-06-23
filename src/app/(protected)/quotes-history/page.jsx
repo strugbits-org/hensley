@@ -6,12 +6,8 @@ import { notFound } from "next/navigation";
 
 export default async function Page() {
     try {
-
         const data = await fetchQuoteHistoryPageDetails();
-
         const { quoteHistoryTitle } = data;
-
-        console.log("page detials history: ", data);
 
         return (
             <QuotesHistory pageTitle={quoteHistoryTitle} data={data} />

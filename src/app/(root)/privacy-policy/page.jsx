@@ -16,7 +16,7 @@ export async function generateMetadata() {
   }
 }
 
-export default async function Page({ params }) {
+export default async function Page() {
   try {
     const response = await fetchPrivacyPolicyPageData();
     const { privacyData } = response;

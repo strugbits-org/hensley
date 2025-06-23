@@ -5,8 +5,6 @@ import { PrimaryImage } from '../common/PrimaryImage';
 
 export const Footer = ({ data }) => {
   const { footerData, socialLinks, footerNaviationData, branches } = data;
-  console.log("socialLinks", socialLinks);
-  
 
   return (
     <footer className='relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]'>
@@ -32,7 +30,7 @@ export const Footer = ({ data }) => {
             <div className='max-w-[133px] mt-9 flex lg:hidden social-links w-full gap-3 justify-between'>
               {socialLinks.map((item, index) => (
                 <CustomLink to={item.link} target={item.target} key={index}>
-                  <PrimaryImage timeout={0} url={item.icon} defaultDimensions={{ height: 19, width: 19 }} alt="icon" />
+                  <PrimaryImage min_h={24} min_w={24} url={item.icon} defaultDimensions={{ height: "24px", width: "24px" }} alt="icon" />
                 </CustomLink>
               ))}
             </div>
@@ -44,13 +42,13 @@ export const Footer = ({ data }) => {
           <div className='hidden lg:flex social-links w-full gap-3 justify-between max-w-[133px]'>
             {socialLinks.map((item, index) => (
               <CustomLink to={item.link} key={index} target={item.target}>
-                <PrimaryImage timeout={0} url={item.icon} defaultDimensions={{ height: 19, width: 19 }} alt="icon" />
+                <PrimaryImage min_h={24} min_w={24} url={item.icon} defaultDimensions={{ height: "24px", width: "24px" }} alt="icon" />
               </CustomLink>
             ))}
           </div>
         </div>
       </div>
-      <PrimaryImage timeout={0} url={footerData.logo} fit='fit' customClasses="mt-20 lg:mt-0 mx-auto w-full" src={logo} alt="logo" />
+      <PrimaryImage min_w={1920} min_h={300} timeout={0} url={footerData.logo} fit='fit' customClasses="mt-20 lg:mt-0 mx-auto w-full" src={logo} alt="logo" />
     </footer>
   )
 }

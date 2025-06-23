@@ -5,10 +5,8 @@ import { loaderActions } from '@/store/loaderStore';
 import { useRouter } from 'next/navigation';
 import { CustomLink } from '../common/CustomLink';
 import useUserData from '@/hooks/useUserData';
-import { storeState } from '@/store';
-import { useSnapshot } from 'valtio';
 import { logError } from '@/utils';
-import Loading from '@/app/loading';
+import { checkIsAdmin } from '@/services/auth';
 
 const SidebarIcons = {
     account: (
@@ -64,16 +62,9 @@ const SidebarIcons = {
 
 export const AccountSidebar = React.memo(() => {
     const [cookies, _setCookie, removeCookie] = useCookies(["authToken", "userData", "cartQuantity", "userTokens"]);
-    const [isClient, setIsClient] = useState(false);
-    const { roles } = useSnapshot(storeState);
+    const [isAdmin, setIsAdmin] = useState(false);
     const router = useRouter();
-    const { firstName } = useUserData();
-
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
-
-    const isAdmin = useMemo(() => roles.includes("admin"), [roles]);
+    const { firstName, memberId } = useUserData();
 
     const handleLogOut = useCallback(async () => {
         loaderActions.show();
@@ -150,21 +141,19 @@ export const AccountSidebar = React.memo(() => {
         [links, isAdmin]
     );
 
-    if (!isClient) {
-        return (
-            <div className='sidebar lg:h-screen lg:sticky top-[90px] w-[317px] max-lg:w-full max-lg:p-3'>
-                <div className='innerSidebar bg-[#F0DEA2] w-full h-full py-[61px] pl-[64px] max-lg:py-6 max-lg:pl-6'>
-                    <h2 className='text-[45px] font-recklessRegular uppercase leading-[42px] max-lg:hidden break-words'>
-                        Hello,<br />
-                        {firstName || ""}
-                    </h2>
-                    <div className='sidebarLinks items-center flex flex-col max-lg:flex-row max-lg:flex-wrap gap-6 max-lg:gap-0 max-lg:gap-y-7 mt-[70px] max-lg:mt-0'>
-                        <Loading custom type='secondary' />
-                    </div>
-                </div>
-            </div>
-        );
+    const setInitialValues = async () => {
+        try {
+            if (!memberId) return;
+            const response = await checkIsAdmin(memberId);
+            setIsAdmin(response);
+        } catch (error) {
+            logError(error);
+        }
     }
+
+    useEffect(() => {
+        setInitialValues();
+    }, [memberId, cookies.authToken]);
 
     return (
         <div className='sidebar lg:h-screen lg:sticky top-[90px] w-[317px] max-lg:w-full max-lg:p-3'>

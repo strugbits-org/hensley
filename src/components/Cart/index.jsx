@@ -207,7 +207,7 @@ const Cart = () => {
       </div>
       {!isLoading && cartItems.length > 0 && (
         <CustomLink to={"/quote-request"}>
-          <AddToQuote classes={'!mt-0'} text={"request to quote"} />
+          <AddToQuote classes={'!mt-0'} text={"request for quote"} />
         </CustomLink>
       )}
     </>

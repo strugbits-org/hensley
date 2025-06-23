@@ -6,15 +6,9 @@ import { FeaturedProducts } from '../Product/FeaturedProducts';
 import { HensleyNews } from '../common/HensleyNews';
 
 const BlogDetails = ({ data }) => {
-
     const { blog, otherBlogs } = data;
     const { storeProducts = [] } = blog;
-
-    const { pageDetails } = data;
-
     const { featuredProductTitle, hensleyNewsTitle } = data
-
-    console.log("The page details of proudct is ", pageDetails);
 
     return (
         <>

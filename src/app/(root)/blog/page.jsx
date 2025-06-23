@@ -21,8 +21,6 @@ export default async function Page() {
   try {
     const data = await fetchBlogPageData();
 
-    console.log("--fetching blogs--", data);
-
     return (
       <Blogs data={data} />
     );

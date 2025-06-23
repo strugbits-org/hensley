@@ -1,7 +1,6 @@
 "use client";
 import useUserData from '@/hooks/useUserData';
 import { checkIsAdmin } from '@/services/auth';
-import { storeActions } from '@/store';
 import { lightboxActions } from '@/store/lightboxStore'
 import { logError } from '@/utils';
 import React, { useEffect, useState } from 'react'
@@ -19,9 +18,6 @@ export const InvalidateButttonPin = () => {
                 return;
             };
             const response = await checkIsAdmin(memberId);
-            if (response) {
-                storeActions.addRole("admin");
-            }
             setIsAdmin(response);
         } catch (error) {
             logError(error);
