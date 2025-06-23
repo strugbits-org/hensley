@@ -73,7 +73,7 @@ export const NewsLetter = ({ data }) => {
             </p>
             
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-                <div className="flex gap-2 lg:gap-6">
+                <div className="flex gap-2 lg:gap-x-[24px] border border-black">
                     <div className="flex-1">
                         <input 
                             type="email" 

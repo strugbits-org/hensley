@@ -12,7 +12,7 @@ const TentCards = ({ data }) => {
 
 
     return (
-        <CustomLink to={`/tent/${product.slug}`} className="group p-[24px] h-[973px] border overflow-hidden ">
+        <CustomLink to={`/tent/${product.slug}`} className="group p-[24px] h-[973px] border border-primary-border overflow-hidden ">
             <div className="w-full border h-full flex lg:flex-col lg:justify-between justify-center sm:px-[50px] px-[20px] lg:py-[24px] py-[44px] relative">
                 <PrimaryImage url={product?.mainMedia} alt={product?.name} customClasses="absolute top-0 left-0 w-full h-full object-cover" />
                 <div className='z-10 w-full'>

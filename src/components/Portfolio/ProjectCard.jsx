@@ -9,7 +9,7 @@ const ProjectCard = ({ data, handleFilterChange, selectedTags, isRTL }) => {
     const { slug, portfolioRef, markets, studios } = data;
 
     return (
-        <div className={`group border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out lg:h-[474px] gap-0 ${isRTL ? 'lg:flex-row-reverse' : ''}`}>
+        <div className={`group border border-primary-border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out lg:h-[474px] gap-0 ${isRTL ? 'lg:flex-row-reverse' : ''}`}>
             {/* Image Section */}
             <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] px-[12px] lg:h-auto h-[382px]">
                 <CustomLink to={`/project/${slug}`} className="overflow-hidden h-full w-full">
