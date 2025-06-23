@@ -60,6 +60,7 @@ export const fetchAllQuotes = async () => {
   }
 };
 
+
 export const fetchQuote = async (id) => {
   try {
     const response = await fetch(`${baseUrl}/api/quote/get/${id}`, {
@@ -77,6 +78,22 @@ export const fetchQuote = async (id) => {
     throw new Error(error);
   }
 };
+
+export const fetchQuoteHistoryPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "QuoteHistoryPageDetails" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
+
 
 
 export const fetchQuotePageDetails = async () => {

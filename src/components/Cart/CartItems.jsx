@@ -120,7 +120,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     );
 };
 
-const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
+const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel='' }) => {
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
@@ -202,7 +202,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
     }
 
     return (
-        <div className='border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
+        <div className='border-t border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
             <div className='
             h-[104px]
             w-[104px]
@@ -237,7 +237,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                 </div>
 
                 {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center'>
-                    <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
+                    <span>{isLoading ? "Adding..." : (addToCartButtonLabel || "Add to Cart")}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
                             <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
@@ -263,7 +263,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
     )
 }
 
-const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false }) => {
+const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel='' }) => {
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
@@ -387,7 +387,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                 <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
 
                 {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center'>
-                    <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
+                    <span>{isLoading ? "Adding..." : (addToCartButtonLabel || "Add to Cart")}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
                             <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">

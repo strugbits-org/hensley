@@ -10,7 +10,7 @@ export async function generateMetadata() {
     const metaData = await fetchPageMetaData("types-of-tents");
     const { title, noFollowTag } = metaData;
     const metadata = { title };
-    console.log("title fetched as: ",title);
+    console.log("title fetched as: ", title);
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) metadata.robots = "noindex,nofollow";
     return metadata;
   } catch (error) {
@@ -35,7 +35,7 @@ export default async function Page({ params }) {
       pageDetails
     };
 
-    return <Tents data={data}/>
+    return <Tents data={data} />
     // return <h1>Hello World</h1>
 
   } catch (error) {

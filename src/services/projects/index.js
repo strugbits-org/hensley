@@ -114,12 +114,28 @@ export const fetchOtherProjects = async (slug) => {
 
 export const fetchProjectPageData = async (slug) => {
     try {
-        const [project, otherProjects] = await Promise.all([
+        const [project, otherProjects, pageDetails] = await Promise.all([
             fetchSelectedProject(slug),
-            fetchOtherProjects(slug)
+            fetchOtherProjects(slug),
+            fetchProjectPageDetails()
         ]);
-        return { project, otherProjects };
+        return { project, otherProjects, pageDetails };
     } catch (error) {
         logError(`Error fetching project page data: ${error.message}`, error);
     }
 }
+
+export const fetchProjectPageDetails = async () => {
+  try {
+    const pageDetails = await queryCollection({ dataCollectionId: "ProjectPageTitle" });
+
+    if (!Array.isArray(pageDetails.items)) {
+      throw new Error(`PrivacyPolicy response does not contain items array`);
+    }
+
+    return pageDetails.items[0]
+
+  } catch (error) {
+    logError(`Error fetching contact page data: ${error.message}`, error);
+  }
+};
