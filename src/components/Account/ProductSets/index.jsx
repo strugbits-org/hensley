@@ -39,61 +39,36 @@ const VIEW_STATES = {
   ADD: 'add'
 };
 
-function ProductSets() {
-  // Consolidated state management
+function ProductSets({ data }) {
   const [viewState, setViewState] = useState(VIEW_STATES.LIST);
-  const [currentProd, setCurrentProd] = useState(null);
+  const [activeProduct, setActiveProduct] = useState(null);
   const [productSets, setProductSets] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Memoized toggle functions to prevent unnecessary re-renders
   const toggleToUpdate = useCallback((productId = null) => {
-    setCurrentProd(productId);
+    setActiveProduct(productId);
     setViewState(VIEW_STATES.UPDATE);
   }, []);
 
   const toggleToAdd = useCallback(() => {
-    setCurrentProd(null);
+    setActiveProduct(null);
     setViewState(VIEW_STATES.ADD);
   }, []);
 
   const toggleToList = useCallback(() => {
-    setCurrentProd(null);
+    setActiveProduct(null);
     setViewState(VIEW_STATES.LIST);
   }, []);
 
-  // Optimized data fetching with error handling
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetchProductSetsData();
-
-      // Process data more efficiently
-      const processedData = response.map(item => {
-        mapProductSetItems(item);
-        const { setOfProduct, product, searchContent } = item;
-        return { product, setOfProduct, searchContent };
-      });
-
-      setProductSets(processedData);
-      console.log("Processed data:", processedData);
-    } catch (err) {
-      console.error("Error fetching product sets:", err);
-      setError(err.message || "Failed to fetch product sets");
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    setProductSets(data);
   }, []);
 
-  // Effect with proper cleanup
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const handleSearch = useCallback((term = '') => {
+    const filteredData = data.filter((item) => item.searchContent.toLowerCase().includes(term.toLowerCase()));
+    setProductSets(filteredData);
+  }, []);
 
-  // Memoized current component to prevent unnecessary re-renders
+
   const currentComponent = useMemo(() => {
     switch (viewState) {
       case VIEW_STATES.ADD:
@@ -106,9 +81,8 @@ function ProductSets() {
       case VIEW_STATES.UPDATE:
         return (
           <ProductListUpdate
-            toggle={toggleToList}
-            data={STATIC_DATA.productSetsData}
-            currentProd={currentProd}
+            toggleToList={toggleToList}
+            activeProduct={activeProduct}
           />
         );
       case VIEW_STATES.LIST:
@@ -116,32 +90,14 @@ function ProductSets() {
         return (
           <ProductList
             data={productSets}
+            handleSearch={handleSearch}
             addProdToggle={toggleToAdd}
-            toggle={toggleToUpdate}
-            setCurrentProd={setCurrentProd}
-            loading={loading}
-            error={error}
+            toggleToUpdate={toggleToUpdate}
+            setActiveProduct={setActiveProduct}
           />
         );
     }
-  }, [viewState, currentProd, productSets, loading, error, toggleToAdd, toggleToUpdate, toggleToList]);
-
-  if (loading && productSets.length === 0) {
-    return (
-      <div className='MyAccount w-full max-lg:mb-[85px]'>
-        <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0'>
-          <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[97px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px]'>
-            {STATIC_DATA.heading}
-          </h2>
-        </div>
-        <div className='px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>
-          <div className='max-w-[900px] w-full mx-auto flex justify-center items-center py-8'>
-            <span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>{loading ? `Loading Product Sets...` : "No product sets found"}</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  }, [viewState, activeProduct, productSets, toggleToAdd, toggleToUpdate, toggleToList]);
 
   return (
     <div className='MyAccount w-full max-lg:mb-[85px]'>
