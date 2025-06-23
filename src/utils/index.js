@@ -354,3 +354,8 @@ export const getAdditionalInfoSection = (sections, title) => {
 
     return parse(cleaned) || "";
 };
+
+export const findProductSize = (additionalInfoSections = []) => {
+    const size = additionalInfoSections?.find(x => x.title === "Size")?.description?.replace(/<[^>]*>/g, "").trim() || "—";
+    return size;
+}

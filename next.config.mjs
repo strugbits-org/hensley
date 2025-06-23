@@ -14,6 +14,7 @@ const nextConfig = {
         CONTACT_FORM_ID_WIX: process.env.CONTACT_FORM_ID_WIX,
         NEWSLETTER_ID_WIX: process.env.NEWSLETTER_ID_WIX,
         ADMIN_BADGE: process.env.ADMIN_BADGE,
+        REVALIDATE_TIME: process.env.REVALIDATE_TIME,
         DEBUG_LOGS: process.env.DEBUG_LOGS,
     },
     images: {

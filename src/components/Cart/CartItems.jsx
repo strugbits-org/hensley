@@ -1,6 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import Image from 'next/image'
-import image from '@/assets/small-tent.png';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
 import { lightboxActions } from '@/store/lightboxStore';
@@ -21,9 +19,8 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
         {!readOnly ? (
             <>
                 <button
-                    className="select-none text-xl font-light hover:opacity-70 transition-opacity"
+                    className="h-[20px] select-none text-xl font-light hover:opacity-70 transition-opacity"
                     onClick={() => onQuantityChange(quantity - 1)}
-                    disabled={quantity <= QUANTITY_LIMITS.MIN}
                     aria-label="Decrease quantity"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1">

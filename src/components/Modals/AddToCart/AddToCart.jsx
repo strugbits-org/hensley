@@ -4,7 +4,7 @@ import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteButton } from './AddtoQuoteButton'
 import ProductDescription from '@/components/common/helpers/ProductDescription'
 import { QuantityControls } from '@/components/Product'
-import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils'
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError } from '@/utils'
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
 import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
@@ -33,9 +33,8 @@ const AddToCart = ({ data, onClose }) => {
     if (isProductCollection) {
       return [];
     }
-
-    const productSize = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
-    return [{ size: productSize, formattedPrice: product.formattedPrice }];
+    const size = findProductSize(product.additionalInfoSections);
+    return [{ size: size, formattedPrice: product.formattedPrice }];
   }, [isProductCollection, product]);
 
   const totalPrice = useMemo(() => {
@@ -139,7 +138,7 @@ const AddToCart = ({ data, onClose }) => {
           quantity: 1,
         }];
       } else {
-        const size = product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—";
+        const size = findProductSize(product.additionalInfoSections);
 
         lineItems = [{
           catalogReference: {
@@ -191,7 +190,7 @@ const AddToCart = ({ data, onClose }) => {
       const items = collectionData.map(set => ({
         id: set.product._id,
         product: set.product.name,
-        size: set.product.additionalInfoSections?.find(x => x.title === "Size")?.value || "—",
+        size: findProductSize(set.product.additionalInfoSections),
         formattedPrice: set.product.formattedPrice,
         price: set.product.price,
         quantity: set.quantity

@@ -108,4 +108,7 @@ export default async function RootLayout({ children }) {
       </body>
     </html>
   );
-}
+};
+
+const time = +process.env.REVALIDATE_TIME || 86400;
+export const revalidate = time;

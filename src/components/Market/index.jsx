@@ -18,10 +18,10 @@ export const MarketPage = ({ data }) => {
             <SliderComponent data={portfolioData} classes={"flex p-6"} pageDetails={marketPageDetails} />
             <HowWeDoIt data={howWeDoItData} pageDetails={marketPageDetails} />
             <Banner data={bannerData} />
-            <BestSellers data={bestSellers} pageDetails={marketPageDetails} loop={false} origin="start" />
+            <BestSellers data={bestSellers} pageDetails={marketPageDetails} loop={false} origin="auto" />
             <Testimonials cardClasses={'lg:hover:bg-primary'} data={testimonials} pageDetails={marketPageDetails} />
             <MarketSection data={otherMarketsData} pageDetails={marketPageDetails} />
-            <HensleyNews data={blogsData} pageDetails={marketPageDetails} loop={false} origin="start" />
+            <HensleyNews data={blogsData} pageDetails={marketPageDetails} loop={false} origin="auto" />
         </>
     )
 }
