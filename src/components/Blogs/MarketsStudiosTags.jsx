@@ -1,10 +1,11 @@
 import React from 'react'
 import { Tag } from '../common/helpers/Tag';
 
-export const MarketsStudiosTags = ({ markets = [], studios = [], handleFilterChange, selectedTags = [], count = 3 }) => {
+export const MarketsStudiosTags = ({ markets = [], studios = [], categories = [], handleFilterChange, selectedTags = [], count = 3 }) => {
     const allItems = [
-        ...markets.map(market => ({ ...market, type: 'market', displayText: market.category })),
-        ...studios.map(studio => ({ ...studio, type: 'studio', displayText: studio.name }))
+        ...categories.map(category => ({ ...category, displayText: category?.label || category.title })),
+        ...markets.map(market => ({ ...market, displayText: market.category })),
+        ...studios.map(studio => ({ ...studio, displayText: studio.name }))
     ];
 
     const sortedItems = selectedTags.length > 0
@@ -17,7 +18,8 @@ export const MarketsStudiosTags = ({ markets = [], studios = [], handleFilterCha
         })
         : allItems;
 
-    const handleClick = (id) => {
+    const handleClick = (e, id) => {
+        e.stopPropagation();
         if (handleFilterChange) {
             handleFilterChange(id);
         }
@@ -29,7 +31,7 @@ export const MarketsStudiosTags = ({ markets = [], studios = [], handleFilterCha
                 <Tag
                     key={studio._id}
                     active={selectedTags.includes(studio._id)}
-                    onClick={() => handleClick(studio._id)}
+                    onClick={(e) => handleClick(e, studio._id)}
                     text={studio.displayText}
                 />
             ))}

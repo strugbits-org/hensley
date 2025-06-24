@@ -102,7 +102,7 @@ const List = ({ data, toggle }) => {
         sm:w-[400px]
         w-full
         h-[40px]
-         bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary
+         bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         `}>
                 <span

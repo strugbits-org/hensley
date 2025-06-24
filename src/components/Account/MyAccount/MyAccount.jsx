@@ -32,7 +32,7 @@ const ArrowIcon = React.memo(() => (
     width="25px"
     height="25px"
     viewBox="0 0 19.877 19.67"
-    className='block ml-2 transition-all duration-300 stroke-[#2c2216] group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
+    className='block ml-2 transition-all duration-300 stroke-secondary-alt group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
   >
     <g transform="translate(9.835 0.5) rotate(45)">
       <path
@@ -254,7 +254,7 @@ export const MyAccount = ({ content, data = "" }) => {
             <div className='flex justify-between w-full max-lg:flex-col max-lg:justify-center max-lg:items-center gap-4'>
               <button
                 type="button"
-                className={`w-[292px] max-lg:max-w-[491px] max-lg:w-full h-[60px] text-sm font-haasRegular tracking-widest border border-[#2C2216] max-lg:mb-[13px] transition-opacity duration-200 ${!hasChanges || isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
+                className={`w-[292px] max-lg:max-w-[491px] max-lg:w-full h-[60px] text-sm font-haasRegular tracking-widest border border-secondary-alt max-lg:mb-[13px] transition-opacity duration-200 ${!hasChanges || isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'
                   }`}
                 onClick={handleDiscard}
                 disabled={!hasChanges || isSubmitting}
@@ -264,7 +264,7 @@ export const MyAccount = ({ content, data = "" }) => {
 
               <button
                 type='submit'
-                className={`max-w-[608px] min-w-[292px] max-lg:max-w-[491px] max-lg:w-full w-full h-[60px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative ${!hasChanges || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                className={`max-w-[608px] min-w-[292px] max-lg:max-w-[491px] max-lg:w-full w-full h-[60px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary relative ${!hasChanges || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 disabled={!hasChanges || isSubmitting}
               >

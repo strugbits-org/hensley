@@ -9,7 +9,7 @@ export const LoadMoreButton = ({ text, classes }) => {
         h-[90px]
         sm:w-[492px]
         sm:my-[33px]
-         bg-primary lg:mt-[22px] tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary
+         bg-primary lg:mt-[22px] tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         ${classes}
         `}>
@@ -36,7 +36,7 @@ export const LoadMoreButton = ({ text, classes }) => {
                 width="19.877"
                 height="19.67"
                 viewBox="0 0 19.877 19.67"
-                className='lg:hidden block ml-2 transition-all duration-300 stroke-[#2c2216] group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
+                className='lg:hidden block ml-2 transition-all duration-300 stroke-secondary-alt group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
             >
                 <g transform="translate(9.835 0.5) rotate(45)">
                     <path

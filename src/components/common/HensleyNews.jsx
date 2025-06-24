@@ -11,7 +11,6 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
     const { hensleyNewsTitle } = pageDetails;
     const [isSliderReady, setIsSliderReady] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
-
     const sliderInstance = useRef();
 
     const [sliderRef] = useKeenSlider(
@@ -28,7 +27,7 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                 setIsSliderReady(true);
             },
             detailsChanged(slider) {
-                setCurrentSlide(slider.track.details.rel);
+                setCurrentSlide(slider.track.details);
             },
             breakpoints: {
                 "(max-width: 768px)": {
@@ -54,7 +53,7 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                         <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
                     </>
                 ) : (
-                    <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
+                    <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[90px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
                 )}
 
             </div>
@@ -78,14 +77,14 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                     })}
                     {(data.length >= 4) && (
                         <>
-                            {(loop || currentSlide > 0) && <button
+                            {(loop || currentSlide?.rel > 0) && <button
                                 onClick={() => sliderInstance.current?.prev()}
                                 className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >
                                 <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
                             </button>}
 
-                            {(loop || currentSlide < data.length - 1) && <button
+                            {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
                                 onClick={() => sliderInstance.current?.next()}
                                 className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >

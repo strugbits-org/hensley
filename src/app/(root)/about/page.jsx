@@ -6,13 +6,13 @@ import { notFound } from "next/navigation";
 
 export async function generateMetadata() {
   try {
-    const metaData = await fetchPageMetaData("subcategory");
+    const metaData = await fetchPageMetaData("about");
     const { title, noFollowTag } = metaData;
     const metadata = { title };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) metadata.robots = "noindex,nofollow";
     return metadata;
   } catch (error) {
-    logError("Error in metadata(sub category page):", error);
+    logError("Error in metadata(about page):", error);
   }
 }
 
@@ -27,5 +27,3 @@ export default async function Page() {
     notFound();
   }
 }
-
-export const dynamic = "force-dynamic";

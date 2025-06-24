@@ -14,12 +14,12 @@ export async function generateMetadata({ params }) {
       projectData
     ] = await Promise.all([
       fetchPageMetaData("projects"),
-     fetchProjectPageData(slug)
+      fetchProjectPageData(slug)
     ]);
 
     const { title, noFollowTag } = metaData;
-    const {project} = projectData;
-    const {portfolioRef} = project;
+    const { project } = projectData;
+    const { portfolioRef } = project;
     const fullTitle = portfolioRef?.title + " " + title;
     const metadata = { title: fullTitle };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {

@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 
 const Button = ({ text, classes, onClick, disabled }) => {
     return (
-        <button onClick={onClick} className={`w-full bg-primary group hover:tracking-[1px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative ${classes} ${disabled ? 'pointer-events-none opacity-50' : ''} `}>
+        <button onClick={onClick} className={`w-full bg-primary group hover:tracking-[1px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary relative ${classes} ${disabled ? 'pointer-events-none opacity-50' : ''} `}>
             <span className='font-haasBold uppercase text-[13px]'>{text}</span>
         </button>
     )

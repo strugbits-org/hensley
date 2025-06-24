@@ -7,40 +7,51 @@ import { PrimaryButton } from "./PrimaryButton";
 import { PrimaryImage } from "./PrimaryImage";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "./CustomLink";
+import Loading from "@/app/loading";
 
-export default function SliderComponent({ data, classes, pageDetails }) {
+export default function SliderComponent({ data, classes, pageDetails, loop = false }) {
 
   const { buttonLabelPortfolioSlider } = pageDetails;
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isSliderReady, setIsSliderReady] = useState(false);
   const sliderInstance = React.useRef(null);
 
   const [sliderRef] = useKeenSlider({
     slides: data.length,
+    loop,
     breakpoints: {
       "(max-width: 1024px)": {
         slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 10, origin: "center" },
       },
       "(max-width: 768px)": {
-        loop: true,
         slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 8, origin: "center" },
       },
     },
     created(s) {
       sliderInstance.current = s;
-      setCurrentSlide(s.track.details.rel);
+      setCurrentSlide(s.track.details);
+      setIsSliderReady(true);
     },
     detailsChanged(s) {
-      setCurrentSlide(s.track.details.rel);
+      setCurrentSlide(s.track.details);
     },
   });
 
+  if (!data || data.length === 0) return null;
+
   return (
     <div className={classes}>
+      {!isSliderReady && (
+        <div className="w-full h-[300px] flex justify-center items-center">
+          <Loading custom type='secondary' />
+        </div>
+      )}
       <div
         ref={sliderRef}
-        className="relative keen-slider h-screen py-20 lg:py-[0px] lg:block hidden"
+        className={`relative keen-slider h-screen py-20 lg:py-[0px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
       >
+
         {data.map((slide, index) => {
           const { portfolioRef, titleAndDescription, image } = slide;
 
@@ -76,41 +87,26 @@ export default function SliderComponent({ data, classes, pageDetails }) {
               </div>
 
               {/* Arrows */}
-              <button
-                onClick={() => sliderInstance.current?.prev()}
-                className="hover:border border-black absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
-              >
-                {/* <MdOutlineChevronLeft className="size-[20px]" /> */}
-                <svg
-                  className="scale-x-[-1]"
-                  data-bbox="0.354 0.352 8.156 16.312"
-                  viewBox="0 0 9.217 17.019"
-                  height="17.019"
-                  width="9.217"
-                  xmlns="http://www.w3.org/2000/svg"
-                  data-type="ugc"
-                >
-                  <g>
-                    <path stroke="#2c2216" fill="none" d="M.354.352 8.51 8.508.354 16.664"></path>
-                  </g>
-                </svg>
+              {(data.length >= 4) && (
+                <>
+                  {(loop || currentSlide?.rel > 0) && <button
+                    onClick={() => sliderInstance.current?.prev()}
+                    className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                  >
+                    <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                  </button>}
 
-              </button>
-
-              <button
-                onClick={() => sliderInstance.current?.next()}
-                className={`absolute top-1/2 right-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full ${currentSlide == data.length - 1 ? 'bg-[#D3D3D3]' : 'bg-white hover:border border-black'} shadow-md lg:flex items-center justify-center hidden z-20`}
-              >
-                {/* <MdOutlineChevronRight className="size-[20px]" /> */}
-                <svg data-bbox="0.354 0.352 8.156 16.312" viewBox="0 0 9.217 17.019" height="17.019" width="9.217" xmlns="http://www.w3.org/2000/svg" data-type="ugc">
-                  <g>
-                    <path stroke="#2c2216" fill="none" d="M.354.352 8.51 8.508.354 16.664"></path>
-                  </g>
-                </svg>
-              </button>
+                  {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
+                    onClick={() => sliderInstance.current?.next()}
+                    className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                  >
+                    <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                  </button>}
+                </>
+              )}
 
               <span className="lg:block hidden absolute bottom-[48px] left-[48px] text-white font-recklessRegular text-[35px]">
-                {currentSlide + 1}/{data.length}
+                {currentSlide?.rel + 1}/{data.length}
               </span>
             </div>
           );

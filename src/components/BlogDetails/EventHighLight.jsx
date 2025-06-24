@@ -4,11 +4,17 @@ import { formatDate } from '@/utils';
 import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
 
 const EventHighLight = ({ data }) => {
-    if (!data) return;
-
     const { author, blogRef, markets, studios } = data;
-
     const imageURL = generateImageURL({ wix_url: blogRef.coverImage });
+    
+    const scrollToBottom = () => {
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth',
+        });
+    }
+    
+    if (!data) return;
     return (
         <div className='px-[24px] w-full'>
             <div className='w-full border-b py-[24px]'>
@@ -32,19 +38,21 @@ const EventHighLight = ({ data }) => {
                     <span className='font-haasRegular uppercase text-[12px] text-secondary-alt text-left block max-lg:mt-[60px] '>{blogRef.excerpt}</span>
                 </div>
 
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="36.355"
-                    height="36.562"
-                    className="absolute left-1/2 transform -translate-x-1/2 bottom-5 lg:block hidden"
-                    viewBox="0 0 36.355 36.562"
-                >
-                    <g id="Group_3530" data-name="Group 3530" transform="translate(35.855 18.178) rotate(135)">
-                        <path id="Path_3283" data-name="Path 3283" d="M.354.5h25v25" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
-                        <line id="Line_13" data-name="Line 13" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
-                        <line id="Line_14" data-name="Line 14" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
-                    </g>
-                </svg>
+                <button onClick={scrollToBottom}>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="36.355"
+                        height="36.562"
+                        className="absolute left-1/2 transform -translate-x-1/2 bottom-5 lg:block hidden"
+                        viewBox="0 0 36.355 36.562"
+                    >
+                        <g id="Group_3530" data-name="Group 3530" transform="translate(35.855 18.178) rotate(135)">
+                            <path id="Path_3283" data-name="Path 3283" d="M.354.5h25v25" transform="translate(-0.354 -0.501)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                            <line id="Line_13" data-name="Line 13" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                            <line id="Line_14" data-name="Line 14" x1="25" y2="25" transform="translate(0)" fill="none" stroke="#2c2216" strokeMiterlimit="10" strokeWidth="1" />
+                        </g>
+                    </svg>
+                </button>
 
             </div>
         </div>

@@ -70,14 +70,14 @@ function QuotesHistory({ pageTitle, data: labels }) {
                     {showLoadMore && (
                         <button
                             onClick={handleAutoSeeMore}
-                            className={`w-full h-[150px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center mb-20`}
+                            className={`w-full h-[150px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary relative flex items-center justify-center mb-20`}
                             aria-label="Load more quotes"
                         >
                             <span className='font-haasLight uppercase text-sm leading-[30px] group-hover:font-haasBold'>
                                 {loadMoreButtonLabel || "LOAD MORE"}
                             </span>
                             <svg
-                                className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-[#2c2216] group-hover:text-white hidden max-lg:block'
+                                className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-secondary-alt group-hover:text-white hidden max-lg:block'
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 10.665 10.367"
                                 aria-hidden="true"

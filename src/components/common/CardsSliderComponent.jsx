@@ -8,14 +8,14 @@ import { PrimaryImage } from "./PrimaryImage";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import Loading from "@/app/loading";
 
-export const CardsSlider = ({ data, cardCss, loop = true }) => {
+export const CardsSlider = ({ data, cardCss, loop = false }) => {
   const sliderInstance = useRef(null);
   const [isSliderReady, setIsSliderReady] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const [sliderRef] = useKeenSlider(
     {
       loop,
-      slides: data.length,
       defaultAnimation: {
         duration: 2000,
       },
@@ -33,6 +33,9 @@ export const CardsSlider = ({ data, cardCss, loop = true }) => {
       created(slider) {
         sliderInstance.current = slider;
         setIsSliderReady(true);
+      },
+      detailsChanged(slider) {
+        setCurrentSlide(slider.track.details);
       },
     },
     []
@@ -73,18 +76,23 @@ export const CardsSlider = ({ data, cardCss, loop = true }) => {
             </div>
           );
         })}
-        <button
-          onClick={() => sliderInstance.current?.prev()}
-          className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-        >
-          <MdOutlineChevronLeft className="size-[20px]" />
-        </button>
-        <button
-          onClick={() => sliderInstance.current?.next()}
-          className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-        >
-          <MdOutlineChevronRight className="size-[20px]" />
-        </button>
+        {(data.length >= 4) && (
+          <>
+            {(loop || currentSlide?.rel > 0) && <button
+              onClick={() => sliderInstance.current?.prev()}
+              className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+            >
+              <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+            </button>}
+
+            {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
+              onClick={() => sliderInstance.current?.next()}
+              className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+            >
+              <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+            </button>}
+          </>
+        )}
       </div>
     </div>
   );

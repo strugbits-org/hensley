@@ -255,15 +255,7 @@ const AddToCart = ({ data, onClose }) => {
         block
         '
             >{totalPrice}</span>
-            <span
-              className='
-        text-[25px]
-        text-secondary-alt
-        font-recklessRegular
-        block
-        uppercase
-        '
-            >(total)</span>
+            <span className='text-[25px] text-secondary-alt font-recklessRegular block uppercase '>(total)</span>
           </div>
           <table className="w-full text-left border-separate border-spacing-y-[15px]">
             <thead>
@@ -279,9 +271,11 @@ const AddToCart = ({ data, onClose }) => {
               {renderTableRows()}
             </tbody>
           </table>
-          <div className='py-[10px] '>
-            <ProductDescription maxChars={130} text={product.description} />
-          </div>
+          {product.description && (
+            <div className='py-[10px]'>
+              <ProductDescription maxChars={130} text={product.description} />
+            </div>
+          )}
         </div>
         <AddToQuoteButton classes={"lg:!h-[80px] lg:!mt-0 !mt-0 !text-[14px] "} onClick={handleAddToCart} text={isLoading ? "PLEASE WAIT..." : "ADD TO QUOTE"} disabled={isLoading} />
 

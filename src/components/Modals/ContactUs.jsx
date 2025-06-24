@@ -302,7 +302,7 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className={`group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-[#2c2216] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`group lg:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-secondary-alt ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         <span className='font-haasLight uppercase text-[16px] hover:border-secondary-alt group-hover:[letter-spacing:8px] transition-all duration-300 tracking-[5px] group-hover:font-haasBold group-hover:text-primary'>
                             {isSubmitting ? formContent.buttons.submitting : data?.submitButtonLabel}
@@ -312,7 +312,7 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
                             width="19.877"
                             height="19.67"
                             viewBox="0 0 19.877 19.67"
-                            className='ml-2 transition-all duration-300 stroke-[#2c2216] group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
+                            className='ml-2 transition-all duration-300 stroke-secondary-alt group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
                         >
                             <g transform="translate(9.835 0.5) rotate(45)">
                                 <path

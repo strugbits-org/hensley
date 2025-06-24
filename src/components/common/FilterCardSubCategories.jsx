@@ -40,7 +40,7 @@ const FilterCardSubCategories = ({ data, handleFilterChange, selectedTags, isPor
 
   return (
     <div className="flex justify-center items-center pb-[18px]">
-      <div className={`relative lg:w-[924px] sm:w-[681px] w-[344px] bg-white py-[25px] flex flex-col justify-between items-center ${!isOpen ? "border-b border-b-secondary-alt" : ""}`}>
+      <div onMouseLeave={() => setIsOpen(false)} className={`relative lg:w-[924px] sm:w-[681px] w-[344px] bg-white py-[25px] flex flex-col justify-between items-center ${!isOpen ? "border-b border-b-secondary-alt" : ""}`}>
 
         {/* Header */}
         <div
