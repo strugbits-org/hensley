@@ -2,23 +2,15 @@ import React from 'react';
 import { PrimaryImage } from './PrimaryImage';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
-import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
-import { loaderActions } from '@/store/loaderStore';
 import { CustomLink } from './CustomLink';
 
 function SecondaryProductCard({ data, savedProducts = [], setSavedProducts, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
     const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
-    const redirectWithLoader = useRedirectWithLoader();
 
     const handleAddToCart = () => {
-        if (isTent) {
-            loaderActions.show();
-            redirectWithLoader(`/tent/${product.slug}`);
-            return;
-        };
-        lightboxActions.setAddToCartModal({ open: true, productData: data });
+        lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     };
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-[5px] pb-0 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>

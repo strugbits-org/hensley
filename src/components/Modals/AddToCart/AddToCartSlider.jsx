@@ -5,7 +5,7 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import { PrimaryImage } from '@/components/common/PrimaryImage';
 
-export const AddToCartSlider = ({ data, loop = true, origin = "center" }) => {
+export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent = false }) => {
     const mediaItems = data.product.mediaItems;
     const [currentSlide, setCurrentSlide] = useState(0)
     const [isMounted, setIsMounted] = useState(false);
@@ -44,10 +44,10 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center" }) => {
     );
 
     return (
-        <div className={`relative w-full h-full sm:max-w-[45%]`}>
+        <div className={`relative w-full lg:h-full sm:max-w-[45%] ${isTent ? 'h-auto' : 'h-full'}`}>
             <div ref={sliderRef} className="keen-slider">
                 {mediaItems.map((item, index) => (
-                    <div key={item.id} className={`keen-slider__slide number-slide${index + 1} !max-h-[400px] p-4`}>
+                    <div key={item.id} className={`keen-slider__slide lg:!max-h-[400px] number-slide${index + 1} p-4 ${isTent ? '!max-h-[250px]' : '!max-h-[400px]'}`}>
                         <PrimaryImage
                             key={item.id}
                             url={item.src}

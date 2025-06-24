@@ -19,6 +19,7 @@ export const lightboxState = proxy({
     },
     addToCartModal: {
         open: false,
+        type: 'product',
         productData: null
     }
 });

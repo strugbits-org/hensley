@@ -4,22 +4,14 @@ import { CopyIcon } from '../common/helpers/CopyIcon';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { CustomLink } from '../common/CustomLink';
 import { lightboxActions } from '@/store/lightboxStore';
-import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
-import { loaderActions } from '@/store/loaderStore';
 
 function MatchedProductCard({ data, type = 'listing' }) {
     const { product } = data;
     const { mainMedia, name, slug, sku, additionalInfoSections } = product;
     const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
-    const redirectWithLoader = useRedirectWithLoader();
 
     const handleAddToCart = () => {
-        if (isTent) {
-            loaderActions.show();
-            redirectWithLoader(`/tent/${product.slug}`);
-            return;
-        };
-        lightboxActions.setAddToCartModal({ open: true, productData: data });
+        lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     }
     return (
         <div className={`relative w-full max-w-[436px] group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>

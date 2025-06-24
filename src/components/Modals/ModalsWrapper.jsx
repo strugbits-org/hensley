@@ -13,7 +13,6 @@ import { InvalidateLightBox } from '../Invalidate/InvalidateLightBox';
 export const ModalsWrapper = ({ data }) => {
     const { lightboxes, basicLightBoxDetails, addToCartModal } = useSnapshot(lightboxState);
     const { contact, login, forgotPassword, matchFeature, invalidate } = lightboxes;
-
     const { branches, contactFormData, loginPageDetails } = data;
 
     return (
