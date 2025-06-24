@@ -2,9 +2,10 @@
 import React, { Fragment } from 'react';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import AddToCart from '../Modals/AddToCart/AddToCart';
+import AddToCartTent from '../Modals/AddToCart/AddToCartTent';
 
 export const AddToCartLightBox = ({ data, onClose }) => {
-    const { open } = data;
+    const { open, type } = data;
 
     return (
         <Transition appear show={open} as={Fragment}>
@@ -32,8 +33,8 @@ export const AddToCartLightBox = ({ data, onClose }) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="transform sm:!px-[20px]  overflow-hidden text-left align-middle shadow-xl transition-all relative flex justify-center items-center">
-                                <AddToCart data={data} onClose={onClose} />
+                            <DialogPanel className="transform sm:!px-[20px] overflow-hidden text-left align-middle transition-all relative flex justify-center items-center">
+                                {type === 'tent' ? <AddToCartTent data={data} onClose={onClose} /> : <AddToCart data={data} onClose={onClose} />}
                             </DialogPanel>
                         </TransitionChild>
                     </div>

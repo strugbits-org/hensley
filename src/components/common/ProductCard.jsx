@@ -5,22 +5,14 @@ import { copyToClipboard } from '@/utils';
 import { CustomLink } from './CustomLink';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
-import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
-import { loaderActions } from '@/store/loaderStore';
 
 function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts, btnClass }) {
     const { product } = data;
     const { name } = product;
     const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
-    const redirectWithLoader = useRedirectWithLoader();
 
     const handleAddToCart = () => {
-        if (isTent) {
-            loaderActions.show();
-            redirectWithLoader(`/tent/${product.slug}`);
-            return;
-        };
-        lightboxActions.setAddToCartModal({ open: true, productData: data });
+        lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     };
 
     return (
