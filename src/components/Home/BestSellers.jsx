@@ -38,7 +38,7 @@ export const BestSellers = ({
                 setIsSliderReady(true);
             },
             detailsChanged(slider) {
-                setCurrentSlide(slider.track.details.rel);
+                setCurrentSlide(slider.track.details);
             },
             breakpoints: {
                 "(max-width: 768px)": {
@@ -109,14 +109,14 @@ export const BestSellers = ({
 
                     {(data.length >= 4) && (
                         <>
-                            {(loop || currentSlide > 0) && <button
+                            {(loop || currentSlide?.rel > 0) && <button
                                 onClick={() => sliderInstance.current?.prev()}
                                 className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >
                                 <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
                             </button>}
 
-                            {(loop || currentSlide < data.length - 1) && <button
+                            {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
                                 onClick={() => sliderInstance.current?.next()}
                                 className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >

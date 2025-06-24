@@ -11,7 +11,7 @@ export const AddToQuote = ({ text, classes }) => {
         w-full
         h-[90px]
         sm:my-[33px]
-         bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary
+         bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         ${classes}
         `}>

@@ -150,14 +150,14 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                                     <button
                                                         disabled={loading}
                                                         onClick={handleOrderAgainClick}
-                                                        className={`mt-[39px] w-full h-[150px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center`}
+                                                        className={`mt-[39px] w-full h-[150px] max-lg:h-[90px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary relative flex items-center justify-center`}
                                                         aria-label="Load more quotes"
                                                     >
                                                         <span className='font-haasRegular uppercase text-sm leading-[30px] group-hover:font-haasBold'>
                                                             {loading ? "PLEASE WAIT..." : (addAllItemsButtonLabel || "Add all items to cart")}
                                                         </span>
                                                         <svg
-                                                            className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-[#2c2216] group-hover:text-white hidden max-lg:block'
+                                                            className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-secondary-alt group-hover:text-white hidden max-lg:block'
                                                             xmlns="http://www.w3.org/2000/svg"
                                                             viewBox="0 0 10.665 10.367"
                                                             aria-hidden="true"
@@ -172,7 +172,7 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                                     <button
                                                         onClick={onClose}
                                                         disabled={loading}
-                                                        className={` w-full h-[150px] max-lg:h-[90px] bg-transparent border border-primary-border tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center `}
+                                                        className={` w-full h-[150px] max-lg:h-[90px] bg-transparent border border-primary-border tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary relative flex items-center justify-center `}
                                                         aria-label="Load more quotes"
                                                     >
                                                         <span className='font-haasRegular uppercase text-sm leading-[30px] group-hover:font-haasBold'>

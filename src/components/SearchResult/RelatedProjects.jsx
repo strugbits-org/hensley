@@ -4,17 +4,10 @@ import { PrimaryImage } from '../common/PrimaryImage'
 import { PrimaryButton } from '../common/PrimaryButton'
 import { CustomLink } from '../common/CustomLink'
 import { formatDate } from '@/utils'
-
-const Tag = ({ text, classes }) => {
-  return (
-    <>
-      <button className={`${classes} border uppercase bg-white font-haasLight text-[10px] leading-[15px] p-2`}>{text}</button>
-    </>
-  )
-}
+import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags'
 
 const ProjectCards = ({ data, isRTL }) => {
-  const { portfolioRef, markets, studios } = data;
+  const { portfolioRef, markets, studios, portfolioCategories, publishDate } = data;
 
   return (
     <CustomLink to={`/project/${data.slug}`} className={`cursor-pointer group border border-primary-border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out lg:h-[474px] gap-0 ${isRTL ? "lg:flex-row-reverse" : ""}`}>
@@ -35,27 +28,13 @@ const ProjectCards = ({ data, isRTL }) => {
             uppercase
             text-secondary-alt
             block
-            '>{formatDate(portfolioRef._updatedDate)}</span>
+            '>{formatDate(publishDate)}</span>
 
               <h2 className="font-recklessRegular 2xl:text-[35px] 2xl:leading-[35px] max-2xl:text-[20px] max-2xl:leading-[18px] text-[23px] leading-[25px] uppercase ">
                 {portfolioRef.title}
               </h2>
 
-              <ul className="flex gap-2 flex-wrap my-4">
-                {markets.map((market, index) => (
-                  <Tag key={index} text={market.category} />
-                ))}
-                {studios.map((studio, index) => (
-                  <React.Fragment key={index}>
-                    {index < 2 && (
-                      <Tag text={studio.name} />
-                    )}
-                  </React.Fragment>
-                ))}
-                {studios.length > 2 ? (
-                  <Tag text={`+${studios.length - 2} studios`} />
-                ) : null}
-              </ul>
+              <MarketsStudiosTags markets={markets} studios={studios} categories={portfolioCategories} />
               <p className='font-haasRegular uppercase 2xl:text-[12px] 2xl:leading-[16px] lg:text-[12px] text-secondary-alt block line-clamp-3'>
                 {portfolioRef.description.slice(0, 200)}{portfolioRef.description.length > 200 ? '...' : ''}
               </p>
@@ -81,7 +60,7 @@ const ProjectCards = ({ data, isRTL }) => {
   )
 }
 
-function RelatedProjects({ data, classes, pageTitle="" }) {
+function RelatedProjects({ data, classes, pageTitle = "" }) {
   return (
     <div className={`mb-20 md:mb-40 lg:mb-0 pb-[100px] ${classes}`}>
       <SectionTitle text={pageTitle} classes="lg:py-[40px] py-[14px] lg:!text-[45px] lg:!leading-[70PX] !text-[35px] !leading-[50px]" />

@@ -3,7 +3,8 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import EventHighLight from './EventHighLight'
 import FilterCardSubCategories from '../common/FilterCardSubCategories';
 import ProjectCard from './ProjectCard';
-import { Button } from '@headlessui/react';
+import { Button } from './Button';
+import AutoClickWrapper from '../common/helpers/AutoClickWrapper';
 
 const Portfolio = ({ data }) => {
     const PAGE_SIZE = 8;
@@ -38,10 +39,6 @@ const Portfolio = ({ data }) => {
         };
     }, [selectedTags, data]);
 
-    const visibleProjects = useMemo(() => {
-        return filteredProjects.slice(0, pageLimit);
-    }, [filteredProjects, pageLimit]);
-
     const categoriesMarketStudios = useMemo(() => {
         return data?.categoriesMarketStudios || [];
     }, [data?.categoriesMarketStudios]);
@@ -73,17 +70,20 @@ const Portfolio = ({ data }) => {
                 </div>
 
                 <div className="w-full lg:px-[24px] px-[12px] grid sm:grid-cols-2 grid-cols-1 lg:gap-0 lg:py-[24px] sm:gap-y-[12px] sm:gap-x-[12px] gap-y-[30px] lg:mt-0 mt-[12px]">
-                    {visibleProjects.map((project, index) => {
+                    {filteredProjects.slice(0, pageLimit).map((project, index) => {
                         const isRTL = Math.floor(index / 2) % 2 === 1;
                         return (
                             <ProjectCard key={index} data={project} handleFilterChange={handleFilterChange} selectedTags={selectedTags} isRTL={isRTL} />
                         )
-                    }
-                    )}
+                    })}
                 </div>
-                <div className='w-full flex justify-center items-center py-[10px]'>
-                    <Button text="load more" />
-                </div>
+                {pageLimit < filteredProjects.length && (
+                    <div className='w-full flex justify-center items-center py-[10px]'>
+                        <AutoClickWrapper onIntersect={handleAutoSeeMore}>
+                            <Button onClick={handleAutoSeeMore} text="load more" />
+                        </AutoClickWrapper>
+                    </div>
+                )}
             </div>
         </>
     )

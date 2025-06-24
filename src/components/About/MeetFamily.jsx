@@ -27,7 +27,7 @@ const Cards = ({ logo, title, buttonLabel, buttonLink }) => {
           </p>
         ))}
 
-        <CustomLink to={buttonLink}>
+        <CustomLink to={buttonLink} target={"_blank"}>
           <PrimaryButton className="lg:text-[14px] font-haasRegular uppercase block border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
             {buttonLabel}
           </PrimaryButton>

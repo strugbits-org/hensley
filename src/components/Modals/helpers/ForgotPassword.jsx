@@ -128,7 +128,7 @@ export const ForgotPassword = ({ classes, close, isLightbox = true }) => {
                     onClick={handleSubmit(onSubmit)}
                     disabled={isSubmitting}
                     className={`group w-full relative bg-primary h-[60px] sm:h-[90px] lg:h-[130px]
-                transition-all duration-300 hover:bg-[#2c2216]
+                transition-all duration-300 hover:bg-secondary-alt
                 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     <span className={`font-haasLight uppercase text-[14px] sm:text-[16px] transition-all duration-300 tracking-[4px]
@@ -140,7 +140,7 @@ export const ForgotPassword = ({ classes, close, isLightbox = true }) => {
                         width="19.877"
                         height="19.67"
                         viewBox="0 0 19.877 19.67"
-                        className={`ml-2 transition-all duration-300 stroke-[#2c2216] absolute right-[5%] top-1/2 -translate-y-1/2
+                        className={`ml-2 transition-all duration-300 stroke-secondary-alt absolute right-[5%] top-1/2 -translate-y-1/2
                     ${!isSubmitting ? 'group-hover:stroke-primary' : ''}`}
                     >
                         <g transform="translate(9.835 0.5) rotate(45)">

@@ -13,7 +13,7 @@ const BlogDetails = ({ data }) => {
     return (
         <>
             <EventHighLight data={blog} />
-            <div className='px-[24px] w-full'>
+            <div className='px-[24px] w-full border-b border-primary-border mb-10'>
                 {convertToHTMLRichContent({
                     content: blog.blogRef.richContent,
                     class_heading: "text-secodary-alt font-haasRegular text-3xl lg:text-[32px] leading-tight text-left",

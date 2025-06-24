@@ -1,23 +1,26 @@
 import React from 'react';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { formatDate } from '@/utils';
-import { CustomLink } from '../common/CustomLink';
 import { MarketsStudiosTags } from './MarketsStudiosTags';
+import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 
 function BlogCard({ data, handleFilterChange, selectedTags }) {
-    const { slug, author, blogRef, markets, studios } = data;
+    const { slug, author, blogRef, markets, studios, blogCategories } = data;
 
     const arrowImageUrl = "https://static.wixstatic.com/media/0e0ac5_87d58241be704c008a2500d6691fb318~mv2.png";
+    const redirectWithLoader = useRedirectWithLoader();
+
+    const handleRedirection = () => {
+        redirectWithLoader(`/posts/${slug}`);
+    }
 
     return (
-        <div className="relative group border border-primary-border pb-6">
-            <CustomLink to={`/posts/${slug}`}>
-                <PrimaryImage
-                    alt={blogRef.title}
-                    url={blogRef.coverImage}
-                    customClasses="h-full w-full object-cover min-h-[528px] max-h-[528px]"
-                />
-            </CustomLink>
+        <div onClick={handleRedirection} className="relative group border border-primary-border pb-6 cursor-pointer">
+            <PrimaryImage
+                alt={blogRef.title}
+                url={blogRef.coverImage}
+                customClasses="h-full w-full object-cover min-h-[528px] max-h-[528px]"
+            />
 
 
             <div className='w-full flex gap-1 p-6 pb-0'>
@@ -40,7 +43,7 @@ function BlogCard({ data, handleFilterChange, selectedTags }) {
                     {formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}
                 </p>
 
-                <MarketsStudiosTags markets={markets} studios={studios} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />
+                <MarketsStudiosTags markets={markets} studios={studios} categories={blogCategories} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />
             </div>
         </div>
     );

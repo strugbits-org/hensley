@@ -176,7 +176,7 @@ export const AddToQuoteForm = ({ title, productData }) => {
                         <label htmlFor="file-upload" className="cursor-pointer">
                             <span className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-4">PLEASE SHARE ANY RELEVANT VENUE OR INSPIRATION IMAGES</span>
                             <div className='w-full min-w-48 lg:min-w-72 uppercase tracking-widest hover:font-bold [word-spacing:3px] text-sm transition-all duration-300'>
-                                <span className='flex justify-center items-center w-full bg-primary tracking-[6px] hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary text-[16px] leading-[19px] font-haasRegular h-[45px]'>
+                                <span className='flex justify-center items-center w-full bg-primary tracking-[6px] hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary text-[16px] leading-[19px] font-haasRegular h-[45px]'>
                                     <span>{uploading ? "Uploading..." : "Upload File"}</span> {!uploading && <FiPlus className='size-5 ml-2' />}
                                 </span>
                             </div>

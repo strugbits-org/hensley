@@ -58,11 +58,11 @@ function SavedProducts() {
                 {pageLimit < savedProducts.length && (
                     <div className="flex-tablet-center mt-lg-60 mt-tablet-40 mt-phone-45">
                         <AutoClickWrapper onIntersect={handleAutoSeeMore}>
-                            <button onClick={handleAutoSeeMore} className={`mt-[25px] w-full h-[150px] max-lg:h-[90px]  bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary relative flex items-center justify-center`}>
+                            <button onClick={handleAutoSeeMore} className={`mt-[25px] w-full h-[150px] max-lg:h-[90px]  bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary relative flex items-center justify-center`}>
                                 <span
                                     className='font-haasLight uppercase text-sm leading-[30px] group-hover:font-haasBold'
                                 >LOAD MORE CHAIRS</span>
-                                <svg className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-[#2c2216] group-hover:text-white hidden max-lg:block' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.665 10.367">
+                                <svg className='rotate-45 size-[13px] group-hover:w-4 transition-all duration-300 ease-in-out absolute right-[26.3px] text-secondary-alt group-hover:text-white hidden max-lg:block' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10.665 10.367">
                                     <g id="Group_2072" data-name="Group 2072" transform="translate(-13.093 0.385)">
                                         <path id="Path_3283" data-name="Path 3283" d="M0,0H9.867V9.867" transform="translate(13.39 0.115)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
                                         <line id="Line_14" data-name="Line 14" x1="9.822" y2="9.27" transform="translate(13.436 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />

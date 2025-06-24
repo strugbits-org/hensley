@@ -4,6 +4,7 @@ import FilterCardSubCategories from '../common/FilterCardSubCategories';
 import BlogCard from './BlogCard';
 import { PrimaryButton } from '../common/PrimaryButton';
 import EventHighLight from './EventHighLight';
+import AutoClickWrapper from '../common/helpers/AutoClickWrapper';
 
 const Blogs = ({ data }) => {
     const { pageDetails } = data;
@@ -92,18 +93,19 @@ const Blogs = ({ data }) => {
 
             {pageLimit < filteredBlogs.length && (
                 <div className="w-full flex justify-center items-center pb-[90px]">
-                    <PrimaryButton
-                        onClick={handleAutoSeeMore}
-                        className="border border-black text-secondary-alt hover:bg-primary hover:border-secondary-alt max-h-[60px] lg:w-[608px] w-[198px] p-0 lg:mt-[60px] sm:mt-[59px] mt-[40px] hover:[letter-spacing:4px]"
-                    >
-                        Load More
-                    </PrimaryButton>
+                    <AutoClickWrapper onIntersect={handleAutoSeeMore}>
+                        <PrimaryButton
+                            onClick={handleAutoSeeMore}
+                            className="border border-black text-secondary-alt hover:bg-primary hover:border-secondary-alt max-h-[60px] lg:w-[608px] w-[198px] p-0 lg:mt-[60px] sm:mt-[59px] mt-[40px] hover:[letter-spacing:4px]"
+                        >
+                            Load More
+                        </PrimaryButton>
+                    </AutoClickWrapper>
                 </div>
             )}
 
             {(pageLimit < filteredBlogs.length || featuredBlog) && filteredBlogs.length === 0 && selectedTags.length > 0 && (
                 <div className='h-screen flex justify-center items-center'><span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>No blogs found for the selected filters.</span></div>
-
             )}
         </div>
     );

@@ -10,7 +10,7 @@ export const DownloadButton = ({ text, classes, iconTrue }) => {
        sm:mt-[40px]
          h-[90px]
          my-[33px]
-         bg-primary tracking-[4px] group  transform transition-all duration-300 hover:bg-[#2C2216] hover:text-primary
+         bg-primary tracking-[4px] group  transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         lg:px-0
         px-[70px]
@@ -33,7 +33,7 @@ export const DownloadButton = ({ text, classes, iconTrue }) => {
                 viewBox="0 0 36.355 36.562"
                 className={`${iconTrue ? "lg:block" : "lg:hidden"
                     } border-b pb-[7px] block ml-2 transition-all duration-300
-  border-[#2c2216] stroke-[#2c2216] group-hover:stroke-primary group-hover:border-primary
+  border-secondary-alt stroke-secondary-alt group-hover:stroke-primary group-hover:border-primary
   absolute right-[5%] top-1/2 -translate-y-1/2`}
             >
                 <g id="Group_3547" data-name="Group 3547" transform="translate(35.855 18.178) rotate(135)">

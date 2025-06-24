@@ -91,9 +91,7 @@ export const fetchOtherProjects = async (slug) => {
                 {
                     key: "slug",
                     value: slug
-                }
-            ],
-            ne: [
+                },
                 {
                     key: "isHidden",
                     value: true
