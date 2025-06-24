@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { PrimaryButton } from "./PrimaryButton";
@@ -15,10 +15,10 @@ export default function SliderComponent({ data, classes, pageDetails, loop = fal
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSliderReady, setIsSliderReady] = useState(false);
-  const sliderInstance = React.useRef(null);
+  const sliderInstance = useRef(null);
 
   const [sliderRef] = useKeenSlider({
-    slides: data.length,
+    slides: { perView: 1, spacing: 10 },
     loop,
     breakpoints: {
       "(max-width: 1024px)": {
@@ -41,7 +41,7 @@ export default function SliderComponent({ data, classes, pageDetails, loop = fal
   if (!data || data.length === 0) return null;
 
   return (
-    <div className={classes}>
+    <div className={`w-full relative ${classes}`}>
       {!isSliderReady && (
         <div className="w-full h-[300px] flex justify-center items-center">
           <Loading custom type='secondary' />
