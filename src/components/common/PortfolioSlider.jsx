@@ -44,10 +44,7 @@ function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
     setTimeout(() => {
       sliderInstance.current?.moveToIdx(index);
     });
-  };
-
-  console.log("currentSlide", currentSlide);
-  
+  };  
 
   if (!data || data.length === 0) return null;
 
