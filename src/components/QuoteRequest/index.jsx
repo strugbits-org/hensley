@@ -160,7 +160,6 @@ export const QuoteRequest = ({ content, data = "" }) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      orderType: "DELIVERED",
       ...(hasUserData && {
         name: fullName,
         email: email,
@@ -268,8 +267,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
   const onSubmit = async (data) => {
     setIsSubmitting(true);
     try {
-      const submissionData = { orderType, ...data };
-
+      const submissionData = { orderType: orderType, ...data };
       await createPriceQuote({
         lineItems: cartItems,
         quoteDetails: submissionData

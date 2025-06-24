@@ -107,7 +107,11 @@ export const fetchTentListingPageDetails = async () => {
 
 export const fetchTentsData = async () => {
   try {
-    const response = await queryCollection({ dataCollectionId: "TentsCollection", includeReferencedItems: ["tent", "productData"] });
+    const response = await queryCollection({
+      dataCollectionId: "TentsCollection",
+      includeReferencedItems: ["tent", "productData"],
+      sortKey: "orderNumber"
+    });
 
     if (!Array.isArray(response.items)) {
       throw new Error(`Response does not contain items array`);
@@ -115,6 +119,16 @@ export const fetchTentsData = async () => {
     return response.items;
   } catch (error) {
     logError(`Error fetching tents data: ${error.message}`, error);
+  }
+};
+
+export const fetchMasterClassTenting = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "MasterClassTenting101" });
+    const url = response?.items[0]?.masterClassTenting101 || "";
+    return url;
+  } catch (error) {
+    logError(`Error fetching master class tenting data: ${error.message}`, error);
   }
 };
 
@@ -308,16 +322,13 @@ export const fetchFeaturedProjects = async (id) => {
 
 export const fetchTentsWithProjectsAndBlogs = async () => {
   try {
-    // Step 1: Fetch all tents
     const tents = await fetchTentsData();
     if (!Array.isArray(tents)) throw new Error("Tents not found");
 
-    // Step 2: For each tent, fetch related featured projects and blogs
     const results = await Promise.all(
       tents.map(async (item) => {
         const tentData = item;
 
-        // Parallel fetching of related content
         const [featuredProjects, blogs] = await Promise.all([
           fetchFeaturedProjects(item.tent?._id),
           fetchFeaturedBlogs(item.tent?._id),

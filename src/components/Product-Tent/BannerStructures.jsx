@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from './Button';
 import { generateImageURL } from '@/utils/generateImageURL';
 import { getAdditionalInfoSection } from '@/utils';
+import { CustomLink } from '../common/CustomLink';
 
 const BannerStructures = ({ title, data }) => {
     const { additionalInfoSections } = data;
@@ -20,10 +21,9 @@ const BannerStructures = ({ title, data }) => {
                     text-[45px]
                     leading-[55px]
                     text-white font-recklessRegular uppercase'>{title}</h3>
-                    {/* <Button text="add to quote" classes={"xl:!height-[130px] xl:!w-[450px] lg:!w-[300px] lg:!h-[130px] lg:block hidden"} /> */}
-                    <button className='tracking-[5px] hover:tracking-[8px] transform transition-all duration-300 border border-white h-[45px] lg:w-[292px] w-full text-white uppercase text-[12px] font-haasRegular'>
+                    <CustomLink to={"/types-of-tents"} className='flex items-center justify-center tracking-[5px] hover:tracking-[8px] transform transition-all duration-300 border border-white h-[45px] lg:w-[292px] w-full text-white uppercase text-[12px] font-haasRegular'>
                         see gallery
-                    </button>
+                    </CustomLink>
                 </div>
 
                 <div className={`w-full py-[16px] flex lg:flex-row flex-col lg:border-b border-t border-t-primary-alt ${!info && !pros && !cons ? "lg:border-b-0" : ""}`}>
