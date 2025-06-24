@@ -1,12 +1,12 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useCookies } from 'react-cookie';
 import { loaderActions } from '@/store/loaderStore';
-import { useRouter } from 'next/navigation';
 import { CustomLink } from '../common/CustomLink';
 import useUserData from '@/hooks/useUserData';
 import { logError } from '@/utils';
 import { checkIsAdmin } from '@/services/auth';
+import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 
 const SidebarIcons = {
     account: (
@@ -63,31 +63,21 @@ const SidebarIcons = {
 export const AccountSidebar = React.memo(() => {
     const [cookies, _setCookie, removeCookie] = useCookies(["authToken", "userData", "cartQuantity", "userTokens"]);
     const [isAdmin, setIsAdmin] = useState(false);
-    const router = useRouter();
     const { firstName, memberId } = useUserData();
+    const redirectWithLoader = useRedirectWithLoader();
 
-    const handleLogOut = useCallback(async () => {
-        loaderActions.show();
+    const handleLogOut = async () => {
         try {
-            const loggedIn = cookies.authToken !== undefined;
-            if (loggedIn) {
-                removeCookie("authToken", { path: "/" });
-                removeCookie("userData", { path: "/" });
-                removeCookie("cartQuantity", { path: "/" });
-                removeCookie("userTokens", { path: "/" });
+            removeCookie("authToken", { path: "/" });
+            removeCookie("userData", { path: "/" });
+            removeCookie("cartQuantity", { path: "/" });
+            removeCookie("userTokens", { path: "/" });
 
-                setTimeout(() => {
-                    router.push("/");
-                    loaderActions.hide();
-                }, 200);
-            } else {
-                loaderActions.hide();
-            }
+            redirectWithLoader("/");
         } catch (error) {
             logError("Error while logging out", error);
-            loaderActions.hide();
         }
-    }, [cookies.authToken, removeCookie, router]);
+    };
 
     const links = useMemo(() => [
         {

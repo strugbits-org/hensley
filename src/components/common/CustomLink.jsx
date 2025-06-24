@@ -31,7 +31,7 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
 
   };
 
-  if (to && typeof to === "string" && to && to.startsWith("tel") || to.startsWith("mailto")) {
+  if (to && (typeof to === "string" && to && to.startsWith("tel") || to.startsWith("mailto"))) {
     return (
       <a
         href={to || ""}
