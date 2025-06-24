@@ -31,6 +31,8 @@ const FIELD_CONFIGS = {
 };
 
 export const QuoteDetails = ({ data, content }) => {
+  console.log("data", data);
+  
   // Default content structure
   const defaultContent = {
     header: {
@@ -63,7 +65,7 @@ export const QuoteDetails = ({ data, content }) => {
       phoneNumber: "PHONE"
     },
     orderTypes: [
-      { id: "DELIVERED", label: "DELIVERY" },
+      { id: "DELIVERED", label: "DELIVERED" },
       { id: "WILL CALL", label: "WILL CALL" }
     ],
     orderTypeLabel: "ORDER TYPE"

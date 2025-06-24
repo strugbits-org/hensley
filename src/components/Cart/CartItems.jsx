@@ -132,7 +132,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
         }
     }
     return (
-        <div className='border-t border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
+        <div className='border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
             <div className='h-[104px] w-[104px] bg-white'>
                 <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>

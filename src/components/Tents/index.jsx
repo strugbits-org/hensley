@@ -8,28 +8,26 @@ import { DownloadButton } from './DownloadButton'
 import { FeaturedProjects } from '../Product/FeaturedProjects'
 
 const Tents = ({ data }) => {
-
-    const { tents, projectandblog, pageDetails } = data
-
+    const { tents, projectAndblog, pageDetails, masterClassTentingURL } = data;
     const { featuredProductTitle, downloadBtnLabel } = pageDetails
 
     return (
         <>
             <TentsTypes data={tents} />
-
-            {projectandblog.map((item) => {
+            {projectAndblog.map((item) => {
                 return (
-                    <>
-                        <BannerStructures title={item?.tentData?.productData?.title} data={item?.tentData?.tent} />
+                    <div key={item?.tentData?.slug} id={(item?.tentData?.slug || "").replace(/[/]/g, "")}>
+                        <BannerStructures tent={item?.tentData} data={item?.tentData?.tent} />
                         <OurProjects data={item.portfolio} />
                         <FeaturedProjects data={item?.blogs} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
-
-                    </>
+                    </div>
                 )
             })}
 
             <div className='w-full flex justify-center items-center'>
-                <DownloadButton text={downloadBtnLabel} classes={"w-[656px]"} iconTrue={"true"} />
+                <a href={masterClassTentingURL} download>
+                    <DownloadButton text={downloadBtnLabel} classes={"w-[656px]"} iconTrue={"true"} />
+                </a>
             </div>
         </>
     )

@@ -1,5 +1,5 @@
 import Tents from "@/components/Tents";
-import { fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
+import { fetchMasterClassTenting, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -17,24 +17,25 @@ export async function generateMetadata() {
 }
 
 
-export default async function Page({ params }) {
+export default async function Page() {
   try {
 
-    const projectandblog = await fetchTentsWithProjectsAndBlogs();
+    const projectAndblog = await fetchTentsWithProjectsAndBlogs();
 
-    const [tents, pageDetails] = await Promise.all([
+    const [tents, pageDetails, masterClassTentingURL] = await Promise.all([
       fetchTentsData(),
-      fetchTentListingPageDetails()
+      fetchTentListingPageDetails(),
+      fetchMasterClassTenting()
     ]);
 
     const data = {
       tents,
-      projectandblog,
-      pageDetails
+      projectAndblog,
+      pageDetails,
+      masterClassTentingURL
     };
 
     return <Tents data={data} />
-    // return <h1>Hello World</h1>
 
   } catch (error) {
     logError("Error fetching product page data:", error);

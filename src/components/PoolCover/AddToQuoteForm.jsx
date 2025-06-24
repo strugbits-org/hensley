@@ -69,9 +69,9 @@ export const AddToQuoteForm = ({ title, productData }) => {
                         catalogItemId: productId,
                         options: {
                             customTextFields: {
-                                "PLEASE SHARE THE APPROX. SIZE OF THE AREA YOUR POOL IS": data.approxSize.toUpperCase(),
-                                "HOW IS YOUR POOL EDGE?": data.poolEdge.toUpperCase(),
-                                "HOW MUCH OF THE POOL ARE YOU LOOKING TO COVER?": data.coverType.toUpperCase(),
+                                "PLEASE SHARE THE APPROX. SIZE OF THE AREA YOUR POOL IS": data.approxSize?.toUpperCase() || "-",
+                                "HOW IS YOUR POOL EDGE?": data.poolEdge?.toUpperCase() || "-",
+                                "HOW MUCH OF THE POOL ARE YOU LOOKING TO COVER?": data.coverType?.toUpperCase() || "-",
                                 "RELEVENT IMAGES": images.join("~~"),
                                 "POOLCOVER": "true"
                             }

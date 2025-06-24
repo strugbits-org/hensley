@@ -45,7 +45,7 @@ export const CheckBox = ({
     };
 
     return (
-        <div className={classes}>
+        <div className={`relative ${classes}`}>
             <span className="lg:text-[16px] mb-[25px] font-haasBold sm:text-[14px] text-[#2B2218] uppercase select-none block">
                 {label}
             </span>
@@ -58,7 +58,7 @@ export const CheckBox = ({
                         onChange={() => handleChange(option)}
                         checked={isChecked(option)}
                     />
-                    <div className="relative w-4 h-4 border-[1.5px] border-secondary-alt bg-transparent">
+                    <div className="relative w-4 h-4 border-[1.5px] border-secondary-alt bg-transparent flex-shrink-0">
                         {isChecked(option) && (
                             <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="w-2 h-2 bg-secondary-alt"></div>
