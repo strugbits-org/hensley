@@ -125,7 +125,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                             </span>
                         </button>
                         <button
-                            className="bg-transparent border border-black font-haasLight text-xs w-[134px] h-[27px] max-lg:w-[114px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[1px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary"
+                            className="break-keep bg-transparent border border-secondary-alt font-haasLight text-xs w-[134px] h-[27px] max-lg:w-[114px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[1px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary"
                             onClick={handleOrderAgainClick}
                             aria-label={`Order again for ${quote.eventDescriptionPo}`}
                         >
@@ -173,7 +173,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                             </span>
                         </button>
                         <button
-                            className="flex-1 bg-transparent border border-black font-haasLight text-xs h-[27px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[1px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary"
+                            className="flex-1 break-keep bg-transparent border border-secondary-alt font-haasLight text-xs h-[27px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[1px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary"
                             onClick={handleOrderAgainClick}
                             aria-label={`Order again for ${quote.eventDescriptionPo}`}
                         >

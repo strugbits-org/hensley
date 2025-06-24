@@ -6,6 +6,7 @@ export default function ProductDescription({ text, maxChars = 200 }) {
     const isLong = text.length > maxChars;
     const displayedText = expanded ? text : text.slice(0, maxChars) + (isLong ? '...' : '');
 
+    if (!text) return null;
     return (
         <div className='w-full flex flex-col gap-y-[15px]'>
             <h2 className='uppercase text-[16px] text-secondary-alt font-haasLight block'>Description</h2>

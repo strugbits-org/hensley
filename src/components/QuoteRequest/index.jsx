@@ -115,7 +115,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
       phone: phoneLabel,
     },
     orderTypes: [
-      { id: "DELIVERED", label: "DELIVERY" },
+      { id: "DELIVERED", label: "DELIVERED" },
       { id: "WILL CALL", label: "WILL CALL" }
     ],
     buttons: {

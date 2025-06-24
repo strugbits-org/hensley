@@ -15,7 +15,7 @@ const INFO_HEADERS = [
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
 const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
-    <div className="border-b border-black pb-1 flex items-center justify-center gap-x-[30px] font-haasRegular">
+    <div className="mx-auto h-full w-[120px] border-b border-secondary-alt pb-1 flex items-end justify-center font-haasRegular">
         {!readOnly ? (
             <>
                 <button
@@ -62,11 +62,11 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
 
 const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, readOnly }) => {
     return productInfoSection.map((item, index) => (
-        <tr key={`item-${index}`}>
-            <td className="py-2 font-semibold lg:block hidden">{item.product}</td>
-            <td className="font-haasRegular text-center ">{item.size}</td>
-            <td className="text-center font-haasRegular">{item.formattedPrice}</td>
-            <td className="font-haasRegular w-[114px]">
+        <tr className='border-b border-primary-border align-bottom' key={`item-${index}`}>
+            <td className="pt-2 pb-4 font-semibold lg:block hidden min-w-[260px]">{item.product}</td>
+            <td className="pt-2 pb-4 font-haasRegular text-center ">{item.size}</td>
+            <td className="pt-2 pb-4 text-center font-haasRegular">{item.formattedPrice}</td>
+            <td className="pt-2 pb-4 font-haasRegular">
                 <QuantityControls
                     quantity={quantity || item.quantity}
                     onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id || item.product, isDisabled)}
@@ -176,7 +176,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     );
 };
 
-const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel='' }) => {
+const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
@@ -258,7 +258,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
     }
 
     return (
-        <div className='border-t border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
+        <div className='border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
             <div className='
             h-[104px]
             w-[104px]
@@ -273,7 +273,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                         <span className='block lg:text-[16px] text-[20px] font-medium text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
                         <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px] mr-[100px]'>{formattedPrice}</span>
                     </div>
-                    <table className="lg:max-w-[766px] max-w-full w-full text-left border-separate border-spacing-y-[15px] ">
+                    <table className="lg:max-w-[766px] max-w-full w-full text-left border-spacing-y-[15px] border-collapse">
                         <thead>
                             <tr className="text-xs uppercase text-gray-500">
                                 {INFO_HEADERS.map((title, index) => (
@@ -287,7 +287,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                             </tr>
                         </thead>
                         <tbody>
-                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly })}
+                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly, showBorders: true })}
                         </tbody>
                     </table>
                 </div>
@@ -319,7 +319,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
     )
 }
 
-const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel='' }) => {
+const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
@@ -398,7 +398,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
     }
 
     return (
-        <div className='sm:border-t border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex '>
+        <div className='border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex '>
             <div className='
             h-[104px]
             w-[104px]

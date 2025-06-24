@@ -173,9 +173,9 @@ const Cart = () => {
         <div className='lg:w-[35%] sm:border border-primary-border lg:pl-[24px] py-[36px] lg:pr-[95px]'>
           <PriceDisplay totalPrice={totalPrice} />
         </div>
-        <div className='lg:w-[65%] border border-primary-border overflow-y-scroll hide-scrollbar'>
+        <div className='lg:w-[65%] overflow-y-scroll hide-scrollbar'>
           <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
-          <div className='flex flex-col '>
+          <div className='flex flex-col border-t border-primary-border'>
             {cartItems.map((item) => {
               const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
               const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
