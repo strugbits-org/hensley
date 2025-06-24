@@ -13,8 +13,8 @@ function HeroSection({ data = {} }) {
   return (
     <div className="w-full">
       {/* First Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 lg:min-h-[600px] mb-10 lg:mb-0 p-6 lg:px-0">
-        <div className="bg-secondary-glass p-6 md:p-12 lg:p-16 flex flex-col justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:min-h-[600px] mb-10 lg:mb-0 p-3 lg:px-0">
+        <div className="bg-secondary-glass p-6 md:p-12 lg:p-16 flex flex-col justify-center mb-10">
           <div className="lg:max-w-[600px] lg:text-left text-center ml-auto mr-0">
             <p className="text-secondary uppercase text-lg
             sm:text-[14px]
@@ -37,22 +37,22 @@ function HeroSection({ data = {} }) {
             </CustomLink>
           </div>
         </div>
-        <div className="w-full h-full lg:px-[24px]">
-          <PrimaryImage url={image1} alt="Hensley Events" customClasses=" w-full h-full" />
+        <div className="w-full h-full lg:px-[24px] min-h-[500px]">
+          <PrimaryImage url={image1} alt="Hensley Events" customClasses=" w-full h-full object-cover" />
         </div>
       </div>
 
       {/* Second Section */}
-      <div className="bg-primary p-6 ">
-        <div className="grid grid-cols-1 py-[25px] lg:grid-cols-2 border border-primary-alt items-center">
-       <div className="relative h-auto lg:h-full m-6">
+      <div className="bg-primary p-4 py-12">
+        <div className="grid grid-cols-1 lg:py-[25px] lg:grid-cols-2 lg:border border-primary-alt items-center">
+          <div className="relative h-auto lg:h-full my-20 lg:m-6">
             <VideoPlayer url={video} classes={"lg:!h-full !w-full"} />
           </div>
-          <div className="p-6 md:p-12 lg:pl-16  flex flex-col justify-center">
+          <div className="md:p-12 lg:pl-16 flex flex-col justify-center">
             {convertToHTML({
               content: content1,
-              class_p: "text-secondary-alt uppercase leading-[20px] text-base font-haasRegular mb-3",
-              class_heading: "text-secondary-alt uppercase text-[35px] leading-[35px] tracking-tight font-recklessRegular mb-4"
+              class_heading: "text-secondary-alt lg:uppercase text-[24px] lg:text-[35px] lg:leading-[35px] tracking-tight font-recklessRegular mb-4",
+              class_p: "text-secondary-alt uppercase leading-[20px] text-sm lg:text-base font-haasRegular mb-3",
             })}
           </div>
         </div>

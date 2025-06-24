@@ -29,11 +29,13 @@ export const ProductBanner = ({ data }) => {
   }, []);
 
   return (
-    <div className="relative col-span-3 lg:h-[425px] sm:h-[230px] h-[600px] border my-[24px]">
+    <div className="relative col-span-3 h-[400px] sm:h-[230px] lg:h-[425px] border my-[24px]">
       <PrimaryImage
         url={image}
         alt={`Banner for ${title}`}
-        customClasses="w-full h-full absolute inset-0 bg-cover bg-center"
+        min_h={1080}
+        min_w={1029}
+        customClasses="w-full h-full absolute inset-0 object-cover"
       />
       <CustomLink
         to={url}
@@ -42,7 +44,7 @@ export const ProductBanner = ({ data }) => {
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 132.853 132.854"
-          className="lg:h-[132px] lg:w-[132px] sm:h-[70px] sm:w-[70px] h-[148px] w-[148px]"
+          className=" h-[110px] w-[110px] sm:h-[70px] sm:w-[70px] lg:h-[132px] lg:w-[132px]"
         >
           <g transform="translate(0.702 0.379)">
             <g transform="translate(-0.377 0.121)">
@@ -78,9 +80,9 @@ export const ProductBanner = ({ data }) => {
         <h3
           ref={titleRef}
           className={`text-primary-alt font-haasRegular
-          lg:text-[24px] lg:leading-[30px]
-          sm:text-[12px] sm:leading-[12px]
-          text-[27px] uppercase max-w-[200px]
+            text-[20px]
+          lg:text-[27px] lg:leading-[30px]
+          uppercase max-w-[160px] lg:max-w-[200px]
           ${isVisible ? 'animate__animated animate__fadeInUp' : 'opacity-0'}
         `}
         >

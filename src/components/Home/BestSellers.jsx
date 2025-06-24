@@ -22,6 +22,7 @@ export const BestSellers = ({
     const [savedProducts, setSavedProducts] = useState([]);
     const sliderInstance = useRef();
     const [isSliderReady, setIsSliderReady] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     const [sliderRef] = useKeenSlider(
         {
@@ -30,21 +31,24 @@ export const BestSellers = ({
             slides: {
                 origin,
                 perView: 4,
-                spacing: 4,
+                spacing: 20,
             },
             created(slider) {
                 sliderInstance.current = slider;
                 setIsSliderReady(true);
             },
+            detailsChanged(slider) {
+                setCurrentSlide(slider.track.details.rel);
+            },
             breakpoints: {
                 "(max-width: 768px)": {
-                    slides: { perView: 1.5, spacing: 5, origin: "center" },
+                    slides: { perView: 1.1, spacing: 12 },
                 },
                 "(min-width: 768px) and (max-width: 1024px)": {
-                    slides: { perView: 3, spacing: 4, origin: "center" },
+                    slides: { perView: 3, spacing: 20 },
                 },
                 "(min-width: 1025px) and (max-width: 1280px)": {
-                    slides: { perView: 3.5, spacing: 4, origin: "center" },
+                    slides: { perView: 3.5, spacing: 20 },
                 },
             },
         },
@@ -91,32 +95,35 @@ export const BestSellers = ({
                     {data.map((productData, index) => (
                         <div
                             key={index}
-                            className="keen-slider__slide flex flex-col px-2"
+                            className="keen-slider__slide flex flex-col"
                         >
                             <ProductCard
                                 type="slider"
                                 data={productData}
                                 savedProducts={savedProducts}
                                 setSavedProducts={setSavedProducts}
-                                btnClass="border border-black"
+                                btnClass="border border-secondary-alt"
                             />
                         </div>
                     ))}
 
-                    {/* Navigation Buttons */}
-                    <button
-                        onClick={() => sliderInstance.current?.prev()}
-                        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-                    >
-                        <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
-                    </button>
+                    {(data.length >= 4) && (
+                        <>
+                            {(loop || currentSlide > 0) && <button
+                                onClick={() => sliderInstance.current?.prev()}
+                                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                            >
+                                <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                            </button>}
 
-                    <button
-                        onClick={() => sliderInstance.current?.next()}
-                        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-                    >
-                        <MdOutlineChevronRight className="w-[20px] h-[20px]" />
-                    </button>
+                            {(loop || currentSlide < data.length - 1) && <button
+                                onClick={() => sliderInstance.current?.next()}
+                                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                            >
+                                <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                            </button>}
+                        </>
+                    )}
                 </div>
             </div>
         </div>
