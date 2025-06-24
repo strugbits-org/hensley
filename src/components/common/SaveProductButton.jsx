@@ -52,7 +52,7 @@ export const SaveProductButton = ({ productData, savedProducts, setSavedProducts
 
     return (
         <div
-            className={`lg:flex hidden group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full items-center justify-center shrink-0 cursor-pointer transition-colors ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''} ${type === 'primary' ? 'w-[56px] h-[56px]' : 'w-[36px] h-[36px]'}`}
+            className={`flex group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full items-center justify-center shrink-0 cursor-pointer transition-colors w-[36px] h-[36px] ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''} ${type === 'primary' ? 'lg:w-[56px] lg:h-[56px]' : ''}`}
             onClick={handleSaveToggle}
             role="button"
             aria-label={isProductSaved ? "Remove from saved products" : "Save product"}
@@ -61,13 +61,13 @@ export const SaveProductButton = ({ productData, savedProducts, setSavedProducts
             <PrimaryImage
                 url={isProductSaved ? savedUrl : unSavedUrl}
                 alt={isProductSaved ? "Saved Icon" : "Not Saved Icon"}
-                customClasses={`block ${isUpdating ? '' : 'group-hover/cart:hidden'} ${type === 'primary' ? 'w-[13px] h-[20px]' : 'w-[8px] h-[12px]'}`}
+                customClasses={`block w-[8px] h-[12px] ${isUpdating ? '' : 'group-hover/cart:hidden'} ${type === 'primary' ? 'lg:w-[13px] lg:h-[20px]' : ''}`}
             />
 
             <PrimaryImage
                 url={isProductSaved ? unSavedUrl : savedUrl}
                 alt={isProductSaved ? "Not Saved Icon" : "Saved Icon"}
-                customClasses={`hidden ${isUpdating ? '' : 'group-hover/cart:block'} ${type === 'primary' ? 'w-[13px] h-[20px]' : 'w-[8px] h-[12px]'}`}
+                customClasses={`hidden w-[8px] h-[12px] ${isUpdating ? '' : 'group-hover/cart:block'} ${type === 'primary' ? 'lg:w-[13px] lg:h-[20px]' : ''}`}
             />
         </div>
     );

@@ -30,7 +30,7 @@ export const VideoPlayer = ({ url, classes, controls = false }) => {
         >
             <video
                 ref={videoRef}
-                className="h-full w-full object-cover"
+                className="aspect-video h-full w-full object-cover"
                 controls={controls}
                 src={formattedUrl}
                 type="video/mp4"

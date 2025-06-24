@@ -39,7 +39,7 @@ export default function SliderComponent({ data, classes, pageDetails }) {
     <div className={classes}>
       <div
         ref={sliderRef}
-        className="relative keen-slider h-screen pb-[150px] lg:pb-[0px] lg:block hidden"
+        className="relative keen-slider h-screen py-20 lg:py-[0px] lg:block hidden"
       >
         {data.map((slide, index) => {
           const { portfolioRef, titleAndDescription, image } = slide;

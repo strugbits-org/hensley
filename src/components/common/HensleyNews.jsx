@@ -10,6 +10,7 @@ import Loading from '@/app/loading';
 export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center", titleType = "primary" }) => {
     const { hensleyNewsTitle } = pageDetails;
     const [isSliderReady, setIsSliderReady] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     const sliderInstance = useRef();
 
@@ -25,6 +26,9 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
             created(slider) {
                 sliderInstance.current = slider;
                 setIsSliderReady(true);
+            },
+            detailsChanged(slider) {
+                setCurrentSlide(slider.track.details.rel);
             },
             breakpoints: {
                 "(max-width: 768px)": {
@@ -72,19 +76,23 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                             </div>
                         );
                     })}
-                    <button
-                        onClick={() => sliderInstance.current?.prev()}
-                        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-                    >
-                        <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
-                    </button>
+                    {(data.length >= 4) && (
+                        <>
+                            {(loop || currentSlide > 0) && <button
+                                onClick={() => sliderInstance.current?.prev()}
+                                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                            >
+                                <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                            </button>}
 
-                    <button
-                        onClick={() => sliderInstance.current?.next()}
-                        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-                    >
-                        <MdOutlineChevronRight className="w-[20px] h-[20px]" />
-                    </button>
+                            {(loop || currentSlide < data.length - 1) && <button
+                                onClick={() => sliderInstance.current?.next()}
+                                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                            >
+                                <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                            </button>}
+                        </>
+                    )}
                 </div>
             </div>
         </div>
