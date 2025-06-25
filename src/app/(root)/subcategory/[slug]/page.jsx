@@ -34,8 +34,6 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchSubCategoryPagePaths();
-    console.log("paths", paths.length);
-    
     return paths;
   } catch (error) {
     logError("Error generating static params(tent page):", error);

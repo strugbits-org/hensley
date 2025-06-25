@@ -1,47 +1,71 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react';
 
-export const CustomDropdown = ({ products }) => {
-    // console.log("products", products);
-
+export const CustomDropdown = ({ products, onSelect }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState('Select Any Product');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredProducts, setFilteredProducts] = useState([]);
 
     const toggleDropdown = useCallback(() => {
         setIsOpen(prev => !prev);
     }, []);
 
+    const handleSearchChange = useCallback((e) => {
+        setSearchQuery(e.target.value);
+        if (!isOpen) setIsOpen(true);
+    }, [isOpen]);
+
     const handleOptionSelect = useCallback((option) => {
-        setSelected(option);
+        setSelected(option.name);
+        setSearchQuery('');
         setIsOpen(false);
-    }, []);
+        onSelect?.(option);
+    }, [onSelect]);
+
+    useEffect(() => {
+        const q = searchQuery.toLowerCase();
+        const filtered = products.filter((item) => item.content.toLowerCase().includes(q));
+        setFilteredProducts(filtered);
+    }, [products, searchQuery]);
 
     return (
         <div className="relative w-[460px] z-[9999]">
             <div
-                className="h-[60px] px-5 border-b border-black bg-white cursor-pointer flex items-center justify-between"
+                className="h-[60px] px-5 border-b border-secondary-alt bg-white flex items-center justify-between cursor-pointer"
                 onClick={toggleDropdown}
             >
-                <span className="uppercase font-haasLight">{selected}</span>
-                <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+                <input
+                    type="text"
+                    placeholder={selected}
+                    className="w-full px-3 py-2 outline-none border-none text-base uppercase placeholder:text-secondary-alt font-haasLight cursor-pointer"
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                // onClick={(e) => e.stopPropagation()}
+                />
+                <svg className={`w-4 h-4 ml-2 ${isOpen ? 'rotate-180' : ''} transition-transform duration-300`} viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M7 10l5 5 5-5H7z" />
                 </svg>
             </div>
+
             {isOpen && (
-                <ul className="bg-white w-full shadow-md z-[99999] max-h-[400px] overflow-y-scroll" role="listbox">
-                    {products.map(({ product }) => {
-                        const name = product.name;
-                        return (
-                            <li
-                                key={product}
-                                className="px-5 text-left py-3 transform transition-all duration-300 hover:bg-[#F0DEA2] cursor-pointer uppercase font-haasLight"
-                                onClick={() => handleOptionSelect(product)}
-                                role="option"
-                            >
-                                {name}
-                            </li>
-                        )
-                    })}
-                </ul>
+                <div className="bg-white w-full shadow-md z-[99999] max-h-[200px] overflow-y-auto">
+                    <ul role="listbox">
+                        {filteredProducts.length > 0 ? (
+                            filteredProducts.map(({ product }, index) => (
+                                <li
+                                    key={(product._id || product.name) + index}
+                                    className="px-5 text-left py-3 transition-all duration-300 hover:bg-[#F0DEA2] cursor-pointer uppercase font-haasLight"
+                                    onClick={() => handleOptionSelect(product)}
+                                    role="option"
+                                >
+                                    {product.name}
+                                </li>
+                            ))
+                        ) : (
+                            <li className="px-5 py-3 text-sm text-secondary-altas uppercase font-haasRegular">No matching products</li>
+                        )}
+                    </ul>
+                </div>
             )}
         </div>
     );
