@@ -9,6 +9,11 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
 
   const delayedRedirect = (e) => {
     e.preventDefault();
+
+    if (typeof window === 'undefined') {
+      document.body.classList.remove('overflow-hidden');
+    };
+
     if (onClick) onClick();
 
     if (to === undefined || !to || to === "") return;

@@ -149,6 +149,7 @@ const FormHeading = ({ title = "" }) => {
 
 
 const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => {
+    console.log("data", data);
 
     const defaultContent = {
         header: {
@@ -193,6 +194,8 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
     const formContent = { ...defaultContent, ...content };
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    console.log("formContent", formContent);
+    
     const {
         register,
         handleSubmit,

@@ -49,17 +49,17 @@ export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchTentPageData(slug);
-    const { productData, matchedProducts, featuredProjectsData, pageDetails } = data;
+    const { productData, matchedProducts, featuredProjectsData, pageDetails, masterClassTentingURL } = data;
 
     if (!data) {
       throw new Error("Product data not found");
     }
 
-    const { matchItWithTitle, featuredProductTitle } = pageDetails
+    const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     return (
       <>
-        <ProductTent productData={productData} />
+        <ProductTent productData={productData} masterClassTentingURL={masterClassTentingURL} />
         <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" />
         <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
       </>

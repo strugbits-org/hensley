@@ -1,6 +1,7 @@
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { fetchFeaturedProjects, fetchMatchedProducts } from "../products";
+import { fetchMasterClassTenting } from "..";
 
 export const fetchTentData = async (slug) => {
     try {
@@ -28,18 +29,18 @@ export const fetchTentData = async (slug) => {
 
 
 export const fetchTentPageDetails = async () => {
-  try {
-    const pageDetails = await queryCollection({ dataCollectionId: "dynamicTentPageDetails" });
+    try {
+        const pageDetails = await queryCollection({ dataCollectionId: "dynamicTentPageDetails" });
 
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+        if (!Array.isArray(pageDetails.items)) {
+            throw new Error(`PrivacyPolicy response does not contain items array`);
+        }
+
+        return pageDetails.items[0]
+
+    } catch (error) {
+        logError(`Error fetching contact page data: ${error.message}`, error);
     }
-
-    return pageDetails.items[0]
-
-  } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
-  }
 };
 
 
@@ -53,18 +54,21 @@ export const fetchTentPageData = async (slug) => {
         const [
             featuredProjectsData,
             matchedProducts,
-            pageDetails
+            pageDetails,
+            masterClassTentingURL
         ] = await Promise.all([
             fetchFeaturedProjects(productId),
             fetchMatchedProducts(productId),
-            fetchTentPageDetails()
+            fetchTentPageDetails(),
+            fetchMasterClassTenting()
         ]);
 
         return {
             productData,
             featuredProjectsData,
             matchedProducts,
-            pageDetails
+            pageDetails,
+            masterClassTentingURL
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);

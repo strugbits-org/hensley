@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from 'react';
 import { PrimaryImage } from '../common/PrimaryImage';
 import BannerStructures from './BannerStructures';
-// import { DownloadButton } from './DownloadButton';
 import ProductSlider from '../Product/ProductSlider';
 import { AddToQuoteForm } from './AddToQuoteForm';
 import { fetchSavedProductData } from '@/services/products';
 import { SaveProductButton } from '../common/SaveProductButton';
 import ProductSlider_tab from '../Product/ProductSlider_tab';
+import { DownloadButton } from '../common/DownloadButton';
 
-const ProductTent = ({ productData }) => {
+const ProductTent = ({ productData, masterClassTentingURL }) => {
   const { tent, gallery } = productData;
   const [savedProducts, setSavedProducts] = useState([]);
 
@@ -62,9 +62,9 @@ const ProductTent = ({ productData }) => {
           })}
         </div>
 
-        {/* <div className='w-full flex justify-center items-center'>
-          <DownloadButton text="DOWNLOAD MASTERCLASS TENTING 101" classes={"lg:!w-[656px] sm:!w-[492px]"} iconTrue={"true"} />
-        </div> */}
+        <div className='w-full flex justify-center items-center'>
+          <DownloadButton link={masterClassTentingURL} text="DOWNLOAD MASTERCLASS TENTING 101" classes={"lg:!w-[656px] sm:!w-[492px]"} iconTrue={"true"} />
+        </div>
       </div>
     </>
   )

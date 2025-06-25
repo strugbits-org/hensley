@@ -96,3 +96,27 @@ export const generateSVGURL = (wix_url) => {
 export const generateImageURLById = ({
   id
 }) => generateImageURL({ wix_url: `wix:image://v1/${id}`, fit: "fit" });
+
+export const generateWixDocumentUrl = (folderId, wixDocumentUrl) => {
+  if (!folderId || typeof folderId !== 'string') {
+    return null;
+  }
+
+  if (!wixDocumentUrl || typeof wixDocumentUrl !== 'string') {
+    return null;
+  }
+
+  if (!wixDocumentUrl.startsWith('wix:document://v1/ugd/')) {
+    return null;
+  }
+  const urlParts = wixDocumentUrl.replace('wix:document://v1/ugd/', '').split('/');
+  const filePath = urlParts[0];
+
+  if (!filePath) {
+    return null;
+  }
+
+  const directUrl = `https://${folderId}.usrfiles.com/ugd/${filePath}`;
+
+  return directUrl;
+}

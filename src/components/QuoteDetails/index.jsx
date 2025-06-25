@@ -92,7 +92,7 @@ export const QuoteDetails = ({ data, content }) => {
         <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
           {formContent.labels[fieldId]}
         </label>
-        <div className="w-full border-b font-haasLight border-secondary-alt p-3 bg-gray-50 rounded-sm text-secondary-alt min-h-[48px] flex items-center">
+        <div className="w-full border-b font-haasLight border-secondary-alt p-3 bg-gray-50 rounded-sm text-secondary-alt min-h-[48px] flex items-center uppercase">
           {displayValue}
         </div>
       </div>
@@ -108,7 +108,7 @@ export const QuoteDetails = ({ data, content }) => {
         <label className="block text-[13px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
           {formContent.labels[fieldId]}
         </label>
-        <div className="w-full border-b font-haasLight border-secondary-alt p-3 bg-gray-50 rounded-sm text-secondary-alt min-h-[48px] flex items-center">
+        <div className="w-full border-b font-haasLight border-secondary-alt p-3 bg-gray-50 rounded-sm text-secondary-alt min-h-[48px] flex items-center uppercase">
           {displayValue}
         </div>
       </div>

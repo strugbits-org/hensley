@@ -149,7 +149,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
                         ))}
                     </div>
                 </div>
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='ml-auto lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='ml-auto break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
                     <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
                     <svg fill='currentColor' xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
@@ -176,7 +176,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     );
 };
 
-const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
+const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityControls = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
@@ -287,7 +287,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
                             </tr>
                         </thead>
                         <tbody>
-                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly, showBorders: true })}
+                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly: enableQuantityControls ? false : readOnly, showBorders: true })}
                         </tbody>
                     </table>
                 </div>
@@ -319,7 +319,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, showAddToCart = 
     )
 }
 
-const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
+const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityControls = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
@@ -437,12 +437,12 @@ const CartNormal = ({ data, actions = {}, readOnly = false, showAddToCart = fals
                         </tr>
                     </thead>
                     <tbody>
-                        {renderTableRows({ handleQuantityChange, quantity: data.quantity, productInfoSection: productInfoSection, readOnly })}
+                        {renderTableRows({ handleQuantityChange, quantity: data.quantity, productInfoSection: productInfoSection, readOnly: enableQuantityControls ? false : readOnly })}
                     </tbody>
                 </table>
                 <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
 
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
+                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
                     <span>{isLoading ? "PLEASE WAIT..." : (addToCartButtonLabel || "Add to Cart")}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
                         <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
