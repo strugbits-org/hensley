@@ -1,4 +1,3 @@
-
 export default function NotFound() {
   return (
     <div className='z-[999] bg-primary h-screen w-full flex items-center justify-center'>

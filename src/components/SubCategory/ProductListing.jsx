@@ -181,7 +181,7 @@ export const ProductListing = ({ data }) => {
                                 />
                             </li>
                             {(shouldInsertBanner || forceInsertBanner) && (
-                                <li className={`col-span-2 md:col-span-3 lg:col-span-4`}>
+                                <li className={`col-span-2 sm:col-span-3 md:col-span-3 lg:col-span-4`}>
                                     <ProductBanner key={banners[bannerIndex]._id} data={banners[bannerIndex]} />
                                 </li>
                             )}

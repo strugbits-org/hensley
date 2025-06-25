@@ -71,20 +71,11 @@ export const fetchSelectedCategoryData = async (slug) => {
 
 export const fetchSubCategoryPagePaths = async () => {
     try {
-        const collectionsData = await queryCollection({
-            dataCollectionId: "HeaderMegaMenu",
-            includeReferencedItems: ["category"],
-            isEmpty: "redirection",
-        });
-
-        const extractSlug = (item, property) => {
-            const slug = item[property]?.slug;
-            return slug ? { slug: slug.trim().replace("/", "") } : null;
-        };
-
-        const params = collectionsData.items.map(item => extractSlug(item, 'category')).filter(Boolean);
-
-        return params;
+        const response = await queryCollection({ dataCollectionId: "Stores/Collections", limit: "infinite", extendedLimit: 100 });
+        if(!Array.isArray(response.items)){
+            throw new Error(`Response does not contain items array`);
+        }
+        return response.items.map(x => ({ slug: x.slug.trim().replace("/", "") }));
     } catch (error) {
         logError(`Error fetching sub category page params: ${error.message}`, error);
         return []; // Return empty array on error instead of undefined
