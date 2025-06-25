@@ -31,7 +31,6 @@ const FIELD_CONFIGS = {
 };
 
 export const QuoteDetails = ({ data, content }) => {
-  console.log("data", data);
   
   // Default content structure
   const defaultContent = {

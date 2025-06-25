@@ -4,8 +4,6 @@ import TentTypesSlider from './TentTypesSlider';
 import { generateImageURL } from '@/utils/generateImageURL';
 
 const TentsTypes = ({ data }) => {
-    console.log("data", data);
-
     return (
         <>
             <SectionTitle text="types of tents" classes="py-[40px] md:mt-6 lg:mt-0 border-t border-b" />

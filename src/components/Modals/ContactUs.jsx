@@ -149,8 +149,6 @@ const FormHeading = ({ title = "" }) => {
 
 
 const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => {
-    console.log("data", data);
-
     const defaultContent = {
         header: {
             title: "send your message",
@@ -193,9 +191,6 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
     // Use provided content or fall back to defaults
     const formContent = { ...defaultContent, ...content };
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    console.log("formContent", formContent);
-    
     const {
         register,
         handleSubmit,

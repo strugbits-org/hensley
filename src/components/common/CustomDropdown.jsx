@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
 export const CustomDropdown = ({ products }) => {
-    console.log("products", products);
+    // console.log("products", products);
 
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState('Select Any Product');

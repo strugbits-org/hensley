@@ -4,9 +4,6 @@ import { getAdditionalInfoSection } from '@/utils';
 import { generateImageURL } from '@/utils/generateImageURL';
 import { CustomLink } from '../common/CustomLink';
 const BannerStructures = ({ tent, data = {} }) => {
-    console.log("tent", tent);
-
-
     const { additionalInfoSections = [] } = data;
     const info = getAdditionalInfoSection(additionalInfoSections, "INFO");
     const pros = getAdditionalInfoSection(additionalInfoSections, "PROS");
