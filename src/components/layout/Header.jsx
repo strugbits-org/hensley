@@ -27,12 +27,12 @@ const userMenu = [
 
 export const Header = ({ data, marketsData, tentsData }) => {
     const [cookies, setCookie, removeCookie] = useCookies(["cartQuantity", "authToken"]);
-
     const [activeMenu, setActiveMenu] = useState("RENTALS");
     const [subNavigation, setSubNavigation] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState(false);
     const [searchModal, setSearchModal] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [enableMarketModal, setEnableMarketModal] = useState(false);
     const [cartTotalQuantity, setCartTotalQuantity] = useState(typeof window !== 'undefined' && localStorage?.getItem('cartQuantity') || "0");
     const pathname = usePathname();
     const router = useRouter();
@@ -118,11 +118,13 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 type: 'slug'
             }));
             setSubNavigation(sortByOrderNumber(marketsNavigation) || []);
-            setSelectedMenu({
-                title: 'MARKETS',
-                type: 'markets',
-                data: sortByOrderNumber(marketsData)
-            });
+            if (enableMarketModal) {
+                setSelectedMenu({
+                    title: 'MARKETS',
+                    type: 'markets',
+                    data: sortByOrderNumber(marketsData)
+                });
+            }
         } else {
             const currentMenu = header.find(item => item.title === activeMenu);
             const currentSubMenu = headerSubMenu.filter(item => item.Header_menuItems.some(subItem => subItem._id === currentMenu?._id));
@@ -181,7 +183,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
 
     useEffect(() => {
         const activeMapping = {
-            // MARKETS: ["/market"],
+            MARKETS: ["/market"],
             ABOUT: ["/about", "/blog", "/careers", "/contact", "/posts", "/project", "/projects"],
         }
         const basePath = '/' + pathname.split('/')[1];
@@ -189,6 +191,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
             activeMapping[menu].includes(basePath)
         );
         setActiveMenu(matchedMenu ? matchedMenu : "RENTALS");
+        setTimeout(() => {
+            setEnableMarketModal(true);
+        }, 100);
     }, [pathname]);
 
 

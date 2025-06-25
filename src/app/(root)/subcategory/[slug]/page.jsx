@@ -14,11 +14,11 @@ export async function generateMetadata({ params }) {
       subCategoryData
     ] = await Promise.all([
       fetchPageMetaData("market"),
-     fetchSelectedCategoryData(slug)
+      fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug)
     ]);
 
     const { title, noFollowTag } = metaData;
-    const {selectedCategory} = subCategoryData
+    const { selectedCategory } = subCategoryData
     const fullTitle = selectedCategory?.name + " " + title;
     const metadata = { title: fullTitle };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
@@ -31,12 +31,11 @@ export async function generateMetadata({ params }) {
   }
 }
 
-
-
-
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchSubCategoryPagePaths();
+    console.log("paths", paths.length);
+    
     return paths;
   } catch (error) {
     logError("Error generating static params(tent page):", error);
@@ -50,7 +49,7 @@ export default async function Page({ params }) {
     if (!slug) {
       throw new Error("Slug is required");
     }
-    const data = await fetchSelectedCategoryData(slug);
+    const data = await fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug);
 
     const { pageDetails } = data
 

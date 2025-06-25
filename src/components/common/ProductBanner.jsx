@@ -33,8 +33,8 @@ export const ProductBanner = ({ data }) => {
       <PrimaryImage
         url={image}
         alt={`Banner for ${title}`}
-        min_h={1080}
-        min_w={1029}
+        fit='fit'
+        min_w={1920}
         customClasses="w-full h-full absolute inset-0 object-cover"
       />
       <CustomLink
