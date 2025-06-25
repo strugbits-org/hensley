@@ -1,9 +1,10 @@
 import React from 'react'
 import { PrimaryImage } from './PrimaryImage';
 import { PrimaryButton } from './PrimaryButton';
+import { CustomLink } from './CustomLink';
 
 export const Banner = ({ data }) => {
-    const { backgroundImage, title, subtitle, buttonLabel, mobileImage } = data;
+    const { backgroundImage, title, subtitle, buttonLabel, mobileImage, buttonLink } = data;
     return (
         <div className='relative banner lg:h-[125vh] h-[100vh] lg:p-6 border border-primary-border'>
             <div className='absolute lg:inset-6 inset-0 bg-[#babab2]'>
@@ -18,7 +19,9 @@ export const Banner = ({ data }) => {
                         <span className="text-center  lg:text-start block text-[14px] lg:text-[24px] leading-4 lg:leading-10 font-haasRegular text-primary-alt">{subtitle}</span>
                         <h2 className="text-center block lg:text-start text-[55px] lg:text-[120px] xl:text-[140px] leading-[55px] lg:leading-[140px] font-recklessRegular text-white">{title}</h2>
                     </div>
-                    <PrimaryButton className=" font-haasRegular border border-white text-white hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">{buttonLabel}</PrimaryButton>
+                    <CustomLink to={buttonLink}>
+                        <PrimaryButton className=" font-haasRegular border border-white text-white hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">{buttonLabel}</PrimaryButton>
+                    </CustomLink>
                 </div>
             </div>
         </div>

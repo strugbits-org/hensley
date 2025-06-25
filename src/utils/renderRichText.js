@@ -418,31 +418,32 @@ export const convertToHTMLRichContent = ({
         else if (node.type === 'GALLERY') {
             const galleryData = node.galleryData;
             const items = galleryData.items || [];
-            const layout = galleryData.options?.layout?.type?.toLowerCase() || 'masonry';
-            const columns = galleryData.options?.layout?.numberOfColumns ? galleryData.options?.layout?.numberOfColumns : layout === 'masonry' ? 'auto-fit' : 'auto';
-            const spacing = galleryData.options?.item?.spacing || 6;
+            const spacing = galleryData.options?.item?.spacing ?? 6;
             const alignment = galleryData.containerData?.alignment?.toLowerCase() || 'center';
 
-            html += `<div className="gallery-container" style="text-align: ${alignment};">`;
-            html += `<div className="gallery-grid ${class_gallery}" style="display: grid; items: center; gap: ${spacing}px; grid-template-columns: repeat(${columns === 0 ? 'auto-fit' : columns}, minmax(200px, 1fr));">`;
+            html += `<div className="gallery-container text-${alignment}">`;
+            html += `<div className="gallery-grid grid ${class_gallery} grid-cols-${items.length > 4 ? 4 : items.length} gap-[${spacing}px] space-y-[${spacing}px]">`;
 
             items.forEach(item => {
-                if (item.image) {
-                    const image = item.image;
-                    const imageSrc = generateImageURLById({ id: image.media.src.url });
-                    const width = image.media?.width ? `width="${image.media.width}"` : '';
-                    const height = image.media?.height ? `height="${image.media.height}"` : '';
+                const image = item.image?.media;
+                if (image?.src?.url) {
+                    const imageSrc = generateImageURLById({ id: image.src.url });
+                    const width = image.width ? `width="${image.width}"` : '';
+                    const height = image.height ? `height="${image.height}"` : '';
                     const altText = item.altText ? `alt="${item.altText}"` : '';
 
-                    html += `<div className="gallery-item ${class_gallery_item}">`;
-                    html += `<img src="${imageSrc}" ${altText} ${width} ${height} style="width: 100%; height: auto; object-fit: cover;" />`;
-                    html += '</div>';
+                    html += `<div className="gallery-item ${class_gallery_item} col-span-1 mb-[${spacing}px]">`;
+                    html += `<img src="${imageSrc}" ${altText} ${width} ${height} class="w-full h-auto object-cover" />`;
+                    html += `</div>`;
                 }
             });
 
-            html += '</div>';
-            html += '</div>';
+            html += `</div>`;
+            html += `</div>`;
+            html += `</div>`;
+            html += `</div>`;
         }
+
     });
 
     return parse(html);

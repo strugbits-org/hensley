@@ -5,16 +5,16 @@ import FilterCardSubCategories from '../common/FilterCardSubCategories';
 import ProjectCard from './ProjectCard';
 import { Button } from './Button';
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper';
+import { useSearchParams } from 'next/navigation';
 
 const Portfolio = ({ data }) => {
     const PAGE_SIZE = 8;
     const [pageLimit, setPageLimit] = useState(PAGE_SIZE);
     const [selectedTags, setSelectedTags] = useState([]);
+    const searchParams = useSearchParams();
 
     const { featuredProject, filteredProjects } = useMemo(() => {
-        if (!data?.projects?.length) {
-            return { featuredProject: null, filteredProjects: [] };
-        }
+        if (!data?.projects?.length) return { featuredProject: null, filteredProjects: [] };
 
         const { projects } = data;
 
@@ -60,6 +60,12 @@ const Portfolio = ({ data }) => {
     useEffect(() => {
         setPageLimit(PAGE_SIZE);
     }, [selectedTags, PAGE_SIZE]);
+
+    useEffect(() => {
+        const slug = searchParams.get("market");
+        const selectedMarket = (data?.markets || []).find((market) => market.slug === `/${slug}`)?._id;
+        if(selectedMarket) setSelectedTags([selectedMarket]);
+    }, [searchParams]);
 
     return (
         <>

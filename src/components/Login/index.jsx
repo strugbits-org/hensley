@@ -126,11 +126,6 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
 
         try {
             const response = await signInUser(data);
-
-            // console.log("Login response:", response);
-            // setIsSubmitting(false);
-            // return;
-            
             const { jwtToken: authToken, member: userData, userTokens } = response;
 
             const cookieOptions = {

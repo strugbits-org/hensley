@@ -16,6 +16,11 @@ const privateRoutes = [
   "/change-password",
   "/quotes-history",
   "/saved-products",
+  "/product-sets",
+  "/quotes-history",
+  "/manage-blogs",
+  "/manage-projects",
+  "product-sorting"
 ];
 
 function InstagramFeed({ data, details }) {
@@ -91,7 +96,8 @@ function InstagramFeed({ data, details }) {
               {data.map((dt, index) => {
                 return (
                   <CustomLink
-                    to={"/"}
+                    to={dt.permalink}
+                    target={"_blank"}
                     key={index}
                     className={`keen-slider__slide  flex flex-col md:p-[10px]`}
                   >

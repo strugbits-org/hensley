@@ -25,7 +25,7 @@ const EventHighLight = ({ data, handleFilterChange, selectedTags, pageTitle="" }
             />
             <div onClick={handleRedirection} className='w-full border border-primary-border p-[24px] gap-x-[24px] flex lg:flex-row flex-col cursor-pointer'>
                 <div className='lg:w-3/5 overflow-hidden'>
-                    <PrimaryImage url={blogRef.coverImage} alt={blogRef.title} customClasses="h-full w-full h-[600px] object-cover transition-transform duration-300 group-hover:scale-105" />
+                    <PrimaryImage url={blogRef.coverImage} alt={blogRef.title} customClasses="h-full w-full max-h-[600px] object-cover transition-transform duration-300 group-hover:scale-105" />
                 </div>
                 <div className='lg:w-2/5  flex flex-row lg:flex-col gap-x-[20px] lg:px-0 max-lg:py-[40px] lg:gap-y-[15px] relative '>
                     <div className=' max-lg:w-1/2  flex flex-col gap-y-[15px]'>

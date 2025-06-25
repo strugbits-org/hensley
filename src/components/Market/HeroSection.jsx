@@ -7,8 +7,7 @@ import { convertToHTML } from "@/utils/renderRichText";
 import { VideoPlayer } from "../common/helpers/VideoPlayer";
 
 function HeroSection({ data = {} }) {
-
-  const { title, tagline, image1, content1, buttonLabel, video, buttonLink = "#" } = data;
+  const { title, tagline, image1, content1, buttonLabel, video, buttonLink } = data;
 
   return (
     <div className="w-full">

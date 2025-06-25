@@ -1,6 +1,7 @@
 "use server";
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
+import { fetchMarketsData } from "..";
 
 export const fetchProjects = async () => {
     try {
@@ -43,11 +44,12 @@ export const fetchCategoriesMarketsAndStudios = async () => {
 
 export const fetchPortfolioPageData = async () => {
     try {
-        const [categoriesMarketStudios, projects] = await Promise.all([
+        const [categoriesMarketStudios, projects, markets] = await Promise.all([
             fetchCategoriesMarketsAndStudios(),
-            fetchProjects()
+            fetchProjects(),
+            fetchMarketsData()
         ]);
-        return { categoriesMarketStudios, projects };
+        return { categoriesMarketStudios, projects, markets };
     } catch (error) {
         logError(`Error fetching projects page data: ${error.message}`, error);
     }

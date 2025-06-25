@@ -3,6 +3,7 @@ import { fetchPageMetaData } from "@/services";
 import { fetchPortfolioPageData } from "@/services/projects";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 
 export async function generateMetadata() {
@@ -23,7 +24,9 @@ export default async function Page() {
     const data = await fetchPortfolioPageData();
 
     return (
-      <Portfolio data={data} />
+      <Suspense>
+        <Portfolio data={data} />
+      </Suspense>
     );
   } catch (error) {
     logError("Error fetching category page data:", error);
