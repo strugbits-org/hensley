@@ -8,7 +8,7 @@ import { HensleyNews } from '../common/HensleyNews';
 const BlogDetails = ({ data }) => {
     const { blog, otherBlogs } = data;
     const { storeProducts = [] } = blog;
-    const { featuredProductTitle, hensleyNewsTitle } = data
+    const { featuredProductTitle, hensleyNewsTitle } = data;
 
     return (
         <>
@@ -24,7 +24,7 @@ const BlogDetails = ({ data }) => {
                     class_image: "w-full h-full object-cover object-center",
                 })}
             </div>
-            <FeaturedProducts classes={'z-10'} data={storeProducts.map((product) => ({ product }))} pageDetails={{ featuredProjectTitle: featuredProductTitle || "Products featured in this PROJECT entry:" }} loop={false} origin="auto" />
+            <FeaturedProducts classes={'z-10'} data={storeProducts.map((product) => ({ product }))} pageDetails={{ featuredProjectTitle: featuredProductTitle || "PRODUCTS FEATURED IN THIS POST ENTRY:" }} loop={false} origin="auto" />
             <HensleyNews data={otherBlogs} pageDetails={{ hensleyNewsTitle: hensleyNewsTitle || "Other Posts" }} loop={false} origin="auto" titleType='secondary' />
         </>
     )

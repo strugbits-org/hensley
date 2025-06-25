@@ -6,6 +6,7 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import NewsCard from './NewsCard';
 import Loading from '@/app/loading';
+import { CustomLink } from './CustomLink';
 
 export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center", titleType = "primary" }) => {
     const { hensleyNewsTitle } = pageDetails;
@@ -50,7 +51,9 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                 {titleType === "primary" ? (
                     <>
                         <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
-                        <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
+                        <CustomLink to={"/blog"}>
+                            <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
+                        </CustomLink>
                     </>
                 ) : (
                     <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[90px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />

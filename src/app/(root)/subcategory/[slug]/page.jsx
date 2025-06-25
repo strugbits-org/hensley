@@ -34,8 +34,6 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchSubCategoryPagePaths();
-    console.log("paths", paths.length);
-    
     return paths;
   } catch (error) {
     logError("Error generating static params(tent page):", error);
@@ -45,7 +43,7 @@ export const generateStaticParams = async () => {
 
 export default async function Page({ params }) {
   try {
-    const slug = decodeURIComponent(params.slug);
+    const slug = decodeURIComponent(params.slug?.toLowerCase());
     if (!slug) {
       throw new Error("Slug is required");
     }
