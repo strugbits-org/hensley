@@ -37,6 +37,8 @@ export const Header = ({ data, marketsData, tentsData }) => {
     const pathname = usePathname();
     const router = useRouter();
 
+    const [activeSubMenuItem, setActiveSubMenuItem] = useState({});
+
     const { header, headerSubMenu, headerMegaMenu } = data;
     const redirectWithLoader = useRedirectWithLoader();
 
@@ -98,8 +100,14 @@ export const Header = ({ data, marketsData, tentsData }) => {
     const toggleMobileMenu = () => {
         setSearchModal(false);
         setSelectedMenu(false);
-        document.body.classList.toggle('overflow-hidden');
-        setIsMobileMenuOpen(prev => !prev);
+        setIsMobileMenuOpen(prev => {
+            if (!prev) {
+                document.body.classList.add('overflow-hidden');
+            } else {
+                document.body.classList.remove('overflow-hidden');
+            }
+            return !prev;
+        });
     }
 
     useEffect(() => {
@@ -154,6 +162,35 @@ export const Header = ({ data, marketsData, tentsData }) => {
     useEffect(() => {
         fetchCartItems();
     }, []);
+
+    useEffect(() => {
+        const findActiveSubMenu = () => {
+            return subNavigation.find(item => {
+                if (item.type === "lightbox") return false;
+                const { title } = item;
+                if (item.slug === pathname) {
+                    return item;
+                } else if (selectedMenu?.title === title) {
+                    return item;
+                }
+            });
+        }
+        const activeItem = findActiveSubMenu();
+        setActiveSubMenuItem(activeItem);
+    }, [pathname, subNavigation, selectedMenu]);
+
+    useEffect(() => {
+        const activeMapping = {
+            // MARKETS: ["/market"],
+            ABOUT: ["/about", "/blog", "/careers", "/contact", "/posts", "/project", "/projects"],
+        }
+        const basePath = '/' + pathname.split('/')[1];
+        const matchedMenu = Object.keys(activeMapping).find(menu =>
+            activeMapping[menu].includes(basePath)
+        );
+        setActiveMenu(matchedMenu ? matchedMenu : "RENTALS");
+    }, [pathname]);
+
 
     return (
         <>
@@ -224,7 +261,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                         >
                             {subNavigation.map((item) => {
                                 const { title } = item;
-                                const isActive = selectedMenu?.title === title || item.slug === pathname;
+                                const isActive = activeSubMenuItem?.title === title && item.type !== "lightbox";
 
                                 return (
 
@@ -266,7 +303,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                     </Suspense>
                 </div>
 
-                <div className="relative">
+                <div className="relative z-50">
                     <div className='mobile-menu lg:hidden fixed inset-x-3 top-3 z-50 px-6 py-2'>
                         <div className={`absolute inset-0 -z-10 backdrop-blur-[20px] brightness-[50px] ${isMobileMenuOpen ? "bg-glass-white" : "bg-secondary-glass"}`}></div>
                         <div className="flex p-2 lg:px-6 justify-between">

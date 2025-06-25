@@ -332,7 +332,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
       {/* Header */}
       <div className="w-full border-secondary-alt">
         <div className="container mx-auto max-w-5xl px-4 py-12 font-['neue-haas-display'] text-center">
-          <h1 className="text-[90px] leading-[85px] font-['reckless-neue-regular'] text-secondary-alt mb-5">
+          <h1 className="text-[90px] leading-[85px] font-['reckless-neue-regular'] text-secondary-alt mb-5 uppercase">
             {formContent.header.title}
           </h1>
           <p className="text-[30px] leading-[30px] text-secondary-alt font-recklessRegular uppercase mt-[27px] mb-[30px]">

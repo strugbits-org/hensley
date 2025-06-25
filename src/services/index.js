@@ -2,6 +2,7 @@
 
 import { logError, sortByOrderNumber } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
+import { generateWixDocumentUrl } from "@/utils/generateImageURL";
 
 const BASE_URL = process.env.BASE_URL;
 
@@ -126,7 +127,8 @@ export const fetchMasterClassTenting = async () => {
   try {
     const response = await queryCollection({ dataCollectionId: "MasterClassTenting101" });
     const url = response?.items[0]?.masterClassTenting101 || "";
-    return url;
+    const folderId = "0e0ac59a-ee22-4893-94f5-fe2986338ea7";
+    return generateWixDocumentUrl(folderId, url);
   } catch (error) {
     logError(`Error fetching master class tenting data: ${error.message}`, error);
   }

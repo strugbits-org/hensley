@@ -4,17 +4,74 @@ import { AddProductToCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
 import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
+
+const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
 export const ViewQuoteModal = ({ data, onClose, labels }) => {
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const { addToCartButtonLabel, addAllItemsButtonLabel, backToQuoteButtonLabel } = labels
     const [loading, setLoading] = useState(false);
+    const [cartItems, setCartItems] = useState([]);
+    const [formattedTotalPrice, setFormattedTotalPrice] = useState([]);
 
-    const totalPrice = useMemo(() => calculateCartTotalPrice((data?.lineItems || []).map(item => item.product)));
-    const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
     const date = useMemo(() => formatDateForQuote(data?.eventDate), [data?.eventDate]);
+    const handleQuantityChange = (value, id, disabled) => {
+        const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+
+        if (
+            isNaN(numValue) ||
+            numValue < QUANTITY_LIMITS.MIN ||
+            numValue > QUANTITY_LIMITS.MAX
+        ) {
+            return;
+        }
+
+        const updatedLineItems = cartItems.map(item =>
+            item.product._id === id ? { ...item, product: { ...item.product, quantity: numValue } } : item
+        );
+        setCartItems(updatedLineItems);
+    };
+    const handleCollectionQuantityChange = (collection, value, id) => {
+        const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+
+        if (
+            isNaN(numValue) ||
+            numValue < QUANTITY_LIMITS.MIN ||
+            numValue > QUANTITY_LIMITS.MAX
+        ) {
+            return;
+        }
+        const updatedSet = collection.productSetItems.map(item => {
+            const set = item.split("~");
+            if (set[0] === id) {
+                return `${set[0]}~${set[1]}~${set[2]}~${numValue}`;
+            }
+            return item;
+        }).join("; ");
+
+        collection.catalogReference.options.customTextFields.Set = updatedSet;
+        collection.descriptionLines = collection.descriptionLines.map(line => {
+            if (line.name.original === "Set") {
+                const plainText = {
+                    translated: updatedSet,
+                    original: updatedSet
+                };
+
+                return { ...line, plainText };
+            }
+            return line;
+        });
+
+        delete collection.productSetItems;
+
+        const updatedLineItems = cartItems.map(item =>
+            item.product._id === collection._id ? { ...item, product: collection } : item
+        );
+        setCartItems(updatedLineItems);
+    };
+
 
     const handleOrderAgainClick = async () => {
         try {
@@ -81,7 +138,20 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
             onClose();
         }
     };
+
+    useEffect(() => {        
+        const totalPrice = calculateCartTotalPrice(cartItems.map(x => x.product));
+        setFormattedTotalPrice(formatTotalPrice(totalPrice));
+    }, [cartItems]);
+
+    useEffect(() => {
+        const lineItems = data?.lineItems || [];
+        setCartItems(lineItems);
+    }, [data]);
+
+
     if (!data) return null;
+
     return (
         <Transition appear show={data !== undefined && data !== null} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -124,7 +194,7 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                                 </div>
                                             </div>
                                             <div className=''>
-                                                {data.lineItems.map((item, index) => {
+                                                {cartItems.map((item, index) => {
                                                     const product = item.product;
                                                     const descriptionLines = product.descriptionLines ? formatDescriptionLines(product.descriptionLines) : product.customTextFields;
                                                     const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
@@ -134,15 +204,15 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                                         const productSetItems = productCollection.split("; ");
                                                         const lineItemData = { ...product, productSetItems };
                                                         return (
-                                                            <CartCollection key={index} data={lineItemData} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} />
+                                                            <CartCollection key={index} data={lineItemData} enableQuantityControls={true} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} actions={{ handleQuantityChange: (value, id) => handleCollectionQuantityChange(lineItemData, value, id) }} />
                                                         )
                                                     } else if (isTentItem) {
                                                         return (
-                                                            <CartTent key={index} data={product} descriptionLines={descriptionLines} readOnly={true} addToCartButtonLabel={addToCartButtonLabel} showAddToCart={true}/>
+                                                            <CartTent key={index} data={product} descriptionLines={descriptionLines} readOnly={true} addToCartButtonLabel={addToCartButtonLabel} showAddToCart={true} />
                                                         )
                                                     } else {
                                                         return (
-                                                            <CartNormal key={index} data={product} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} />
+                                                            <CartNormal key={index} data={product} enableQuantityControls={true} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} actions={{ handleQuantityChange }} />
                                                         )
                                                     };
                                                 })}
