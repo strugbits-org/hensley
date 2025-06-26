@@ -67,6 +67,20 @@ export const fetchMarketsData = async () => {
   }
 };
 
+export const fetchStudiosData = async () => {
+  try {
+    const response = await queryCollection({ dataCollectionId: "Studios" });
+
+    if (!Array.isArray(response.items)) {
+      throw new Error(`Response does not contain items array`);
+    }
+
+    return response.items;
+  } catch (error) {
+    logError(`Error fetching studios data: ${error.message}`, error);
+  }
+};
+
 export const fetchSelectedMarketsData = async (slug) => {
   try {
     const response = await queryCollection({

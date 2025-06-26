@@ -152,3 +152,7 @@ body {
 .form-input {
   @apply w-full border-b font-haasLight border-secondary-alt p-3 bg-primary-alt text-secondary-alt placeholder-secondary shadow-sm rounded-sm focus:outline-none;
 }
+
+.react-tabs__tab--selected {
+  @apply bg-primary text-secondary-alt;
+}

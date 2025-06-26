@@ -1,17 +1,17 @@
 
 import ManageBlogs from "@/components/Account/ManageBlogs";
-import { fetchBlogsData } from "@/services";
+import { fetchManageBlogsData } from "@/services/admin";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
 export default async function Page() {
     try {
-        const data = await fetchBlogsData();
+        const data = await fetchManageBlogsData();
         return (
             <ManageBlogs data={data} />
         );
     } catch (error) {
-        logError("Error fetching save products:", error);
+        logError("Error fetching manage blogs data:", error);
         notFound();
     }
 }

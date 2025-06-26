@@ -21,8 +21,9 @@ export const POST = async (req) => {
     }
 
     const response = await queryCollection({
-      dataCollectionId: "ManageBlogs",
-      includeReferencedItems: ['blogRef', "author", 'markets', 'studios', 'storeProducts', 'portfolioCategories'],
+      dataCollectionId: "PortfolioCollection",
+      includeReferencedItems: ['portfolioRef', 'markets', 'studios', 'storeProducts', 'portfolioCategories'],
+      sortKey: "order",
       limit: "infinite",
       ne: [
         {

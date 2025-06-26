@@ -1,8 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 
-
-const InputField = ({ id, label, placeholder, classes, borderColor = 'black', type = "text" }) => {
+const InputField = ({ id, label, placeholder, classes, borderColor = 'secondary-alt', type = "text", onChange }) => {
     const [isFocused, setIsFocused] = useState(false);
 
     const handleBlur = () => {
@@ -24,22 +23,27 @@ const InputField = ({ id, label, placeholder, classes, borderColor = 'black', ty
                 type={type}
                 id={id}
                 placeholder={placeholder}
+                onChange={(e) => onChange(e.target.value)}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 className={`
-                    w-full placeholder-secondary font-haasLight p-3 rounded-sm
+                    w-full placeholder-secondary font-haasLight p-3 rounded-sm bg-gray-100
                     border-b 
                     border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}
                     hover:border-b-2
-                    outline-none transition-all duration-300
+                    outline-none transition-all duration-300 uppercase
                 `}
             />
         </div>
     );
 };
 
-const List = ({ data, toggle }) => {
-    const { title, authorName, studios, markets } = data;
+const Card = ({ data, handleSelectedBlog }) => {
+    const { author, blogRef, studios, markets } = data;
+    const marketsString = markets.map((market) => market?.category || market?.title).join(', ');
+    const studiosString = studios.map((studio) => studio.name).join(', ');
+    const authorName = author ? (author?.nickname || author?.firstName + ' ' + author?.lastName) : 'N/A';
+
     return (
         <div className='w-full px-[10px] gap-y-[25px] flex flex-col justify-center items-center py-[20px] bg-[#FFFDF9] '>
             <div className='w-full gap-y-[30px] grid sm:grid-cols-[40%_1fr_1fr_1fr] grid-cols-1'>
@@ -53,18 +57,18 @@ const List = ({ data, toggle }) => {
                     <span
                         className='text-[16px] block text-secondary-alt uppercase font-recklessRegular'
                     >
-                        {title}
+                        {blogRef?.title}
                     </span>
                 </div>
                 <div className='flex flex-col sm:gap-y-[20px] gap-y-[10px]'>
                     <span
                         className='text-[16px] block text-secondary-alt uppercase font-haasBold'
                     >
-                        Author name
+                        Author Name
                     </span>
 
                     <span
-                        className='text-[16px] block text-secondary-alt uppercase font-recklessRegular'
+                        className='text-[16px] block text-secondary-alt font-recklessRegular uppercase'
                     >
                         {authorName}
                     </span>
@@ -77,9 +81,9 @@ const List = ({ data, toggle }) => {
                     </span>
 
                     <span
-                        className='text-[16px] block text-secondary-alt font-recklessRegular'
+                        className='text-[16px] block text-secondary-alt font-recklessRegular uppercase'
                     >
-                        {studios}
+                        {studiosString || 'N/A'}
                     </span>
                 </div>
                 <div className='flex flex-col sm:gap-y-[20px] gap-y-[10px]'>
@@ -90,86 +94,40 @@ const List = ({ data, toggle }) => {
                     </span>
 
                     <span
-                        className='text-[16px] block text-secondary-alt  font-recklessRegular'
+                        className='text-[16px] block text-secondary-alt  font-recklessRegular uppercase'
                     >
-                        {markets}
+                        {marketsString || 'N/A'}
                     </span>
                 </div>
             </div>
-            <button 
-            onClick={()=>{toggle()}}
-            className={`
-        sm:w-[400px]
-        w-full
-        h-[40px]
-         bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
-        relative
-        `}>
-                <span
-                    className='
-             font-haasLight uppercase
-        lg:text-[16px] 
-        group-hover:font-haasBold
-            '
-                >Manage Data</span>
-
-
+            <button
+                onClick={handleSelectedBlog}
+                className={`sm:w-[400px] w-full h-[40px] bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary relative`}>
+                <span className='font-haasLight uppercase lg:text-[16px] group-hover:font-haasBold'>Manage Data</span>
             </button>
         </div>
     )
 }
 
-const blogs = [
-    {
-        title: 'Halo Moments by the Sea: An Event Pavilion Affair at Rosewood Miramar Beach',
-        authorName: 'Carolina Ortiz',
-        studios: 'Custom Furniture, Event Design & Production, Specialty Rentals',
-        markets: 'social'
-    },
-    {
-        title: 'Halo Moments by the Sea: An Event Pavilion Affair at Rosewood Miramar Beach',
-        authorName: 'Carolina Ortiz',
-        studios: 'Custom Furniture, Event Design & Production, Specialty Rentals',
-        markets: 'social'
-    },
-    {
-        title: 'Halo Moments by the Sea: An Event Pavilion Affair at Rosewood Miramar Beach',
-        authorName: 'Carolina Ortiz',
-        studios: 'Custom Furniture, Event Design & Production, Specialty Rentals',
-        markets: 'social'
-    },
-    {
-        title: 'Halo Moments by the Sea: An Event Pavilion Affair at Rosewood Miramar Beach',
-        authorName: 'Carolina Ortiz',
-        studios: 'Custom Furniture, Event Design & Production, Specialty Rentals',
-        markets: 'social'
-    },
-    {
-        title: 'Halo Moments by the Sea: An Event Pavilion Affair at Rosewood Miramar Beach',
-        authorName: 'Carolina Ortiz',
-        studios: 'Custom Furniture, Event Design & Production, Specialty Rentals',
-        markets: 'social'
-    },
+const BlogsList = ({ data = [], handleSelectedBlog, handleSearch }) => {
 
-]
-
-const BlogList = ({ toggle, data, setCurrentProd, addProdToggle }) => {
     return (
         <div className='w-full flex flex-col justify-center items-center text-center py-[50px] gap-y-[40px]'>
 
             <div className='w-full flex flex-col justify-center items-center'>
                 <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
-                    Search Blog
+                    Search Blogs
                 </label>
-                <InputField id="search" placeholder="ENTER A BLOG TITLE..." borderColor="secondary-alt" classes={'w-[350px]'} />
+                <InputField id="search" placeholder="SEARCH BLOGS" onChange={handleSearch} borderColor="secondary-alt" classes={"self-center w-[280px]"} />
             </div>
             <div className='w-full flex flex-col gap-y-[30px]'>
-                {blogs.map((dt) => (
-                    <List data={dt} toggle={toggle} />
+                {data.map((item) => (
+                    <Card key={item._id} data={item} handleSelectedBlog={() => handleSelectedBlog(item)} />
                 ))}
+                {data.length === 0 && <p className='text-secondary-alt text-[20px] font-haasRegular uppercase'>No blogs found</p>}
             </div>
         </div>
     );
 };
 
-export default BlogList
+export default BlogsList;

@@ -27,9 +27,9 @@ export const POST = async (req) => {
     const marketIds = markets?.map(item => item._id) || [];
 
     await Promise.all([
-      wixClient.items.replaceReferences("ManageBlogs", "storeProducts", _id, productIds),
-      wixClient.items.replaceReferences("ManageBlogs", "studios", _id, studioIds),
-      wixClient.items.replaceReferences("ManageBlogs", "markets", _id, marketIds)
+      wixClient.items.replaceReferences("PortfolioCollection", "storeProducts", _id, productIds),
+      wixClient.items.replaceReferences("PortfolioCollection", "studios", _id, studioIds),
+      wixClient.items.replaceReferences("PortfolioCollection", "markets", _id, marketIds)
     ]);
 
     return NextResponse.json({
