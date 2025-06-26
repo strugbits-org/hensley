@@ -1,25 +1,25 @@
 "use client"
 import React, { useState } from 'react';
-import BlogsListUpdate from './BlogsListUpdate';
-import BlogsList from './BlogsList';
+import ProjectsList from './ProjectsList';
+import ProjectsListUpdate from './ProjectsListUpdate';
 
-function ManageBlogs({ data }) {
-    const { blogsData, productsData, marketsData, studiosData } = data;
-    const [activeBlog, setActiveBlog] = useState(null);
+function ManageProjects({ data }) {
+    const { projectsData, productsData, marketsData, studiosData } = data;
+    const [activeProject, setActiveProject] = useState(null);
     const [open, setOpen] = useState(false);
-    const [filteredBlogs, setFilteredBlogs] = useState(blogsData);
+    const [filteredProjects, setFilteredProjects] = useState(projectsData);
 
     const handleSearch = (term = '') => {
-        const filteredData = blogsData.filter((item) => item.titleAndDescription.toLowerCase().includes(term.toLowerCase()));
-        setFilteredBlogs(filteredData);
+        const filteredData = projectsData.filter((item) => item.titleAndDescription.toLowerCase().includes(term.toLowerCase()));
+        setFilteredProjects(filteredData);
     };
 
-    const handleSelectedBlog = (item) => {
+    const handleSelectedProject = (item) => {
         if (item) {
-            setActiveBlog(item);
+            setActiveProject(item);
             setOpen(true);
         } else {
-            setActiveBlog(null);
+            setActiveProject(null);
             setOpen(false);
         }
     }
@@ -36,9 +36,9 @@ function ManageBlogs({ data }) {
 
                     {(
                         open ? (
-                            <BlogsListUpdate data={activeBlog} productsData={productsData} studiosData={studiosData} marketsData={marketsData} handleSelectedBlog={handleSelectedBlog} setFilteredBlogs={setFilteredBlogs} />
+                            <ProjectsListUpdate data={activeProject} productsData={productsData} studiosData={studiosData} marketsData={marketsData} handleSelectedProject={handleSelectedProject} setFilteredProjects={setFilteredProjects} />
                         ) : (
-                            <BlogsList data={filteredBlogs} products={productsData} handleSearch={handleSearch} handleSelectedBlog={handleSelectedBlog} />
+                            <ProjectsList data={filteredProjects} products={productsData} handleSearch={handleSearch} handleSelectedProject={handleSelectedProject} />
                         )
                     )}
 
@@ -48,4 +48,4 @@ function ManageBlogs({ data }) {
     );
 }
 
-export default ManageBlogs;
+export default ManageProjects;

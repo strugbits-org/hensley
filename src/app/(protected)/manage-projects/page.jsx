@@ -1,15 +1,18 @@
-
-import ManageBlogs from "@/components/Account/ManageBlogs";
+import ManageProjects from "@/components/Account/ManageProjects";
+import { fetchManageProjectsData } from "@/services/admin";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
 export default async function Page() {
     try {
+        const data = await fetchManageProjectsData();
         return (
-            <ManageBlogs />
+            <ManageProjects data={data} />
         );
     } catch (error) {
-        logError("Error fetching save products:", error);
+        logError("Error fetching manage projects data:", error);
         notFound();
     }
 }
+
+export const dynamic = "force-dynamic";

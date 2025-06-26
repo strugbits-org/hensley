@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 
-export const CustomDropdown = ({ products, onSelect }) => {
+export const CustomDropdownPrimary = ({ products, onSelect, placeholder = "" }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [selected, setSelected] = useState('Select Any Product');
+    const [selected, setSelected] = useState(placeholder);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredProducts, setFilteredProducts] = useState([]);
 
@@ -17,7 +17,7 @@ export const CustomDropdown = ({ products, onSelect }) => {
     }, [isOpen]);
 
     const handleOptionSelect = useCallback((option) => {
-        setSelected(option.name);
+        setSelected(option.label);
         setSearchQuery('');
         setIsOpen(false);
         onSelect?.(option);
@@ -25,7 +25,7 @@ export const CustomDropdown = ({ products, onSelect }) => {
 
     useEffect(() => {
         const q = searchQuery.toLowerCase();
-        const filtered = products.filter((item) => item.content.toLowerCase().includes(q));
+        const filtered = products.filter((item) => item.label?.toLowerCase().includes(q));
         setFilteredProducts(filtered);
     }, [products, searchQuery]);
 
@@ -54,18 +54,18 @@ export const CustomDropdown = ({ products, onSelect }) => {
                 <div className="bg-white w-full shadow-md z-[999] max-h-[200px] overflow-y-auto">
                     <ul role="listbox">
                         {filteredProducts.length > 0 ? (
-                            filteredProducts.map(({ product }, index) => (
+                            filteredProducts.map((item, index) => (
                                 <li
-                                    key={(product._id || product.name) + index}
+                                    key={(item._id || item.label) + index}
                                     className="px-5 text-left py-3 transition-all duration-300 hover:bg-[#F0DEA2] cursor-pointer uppercase font-haasLight"
-                                    onClick={() => handleOptionSelect(product)}
+                                    onClick={() => handleOptionSelect(item)}
                                     role="option"
                                 >
-                                    {product.name}
+                                    {item.label}
                                 </li>
                             ))
                         ) : (
-                            <li className="px-5 py-3 text-sm text-secondary-altas uppercase font-haasRegular">No matching products</li>
+                            <li className="px-5 py-3 text-sm text-secondary-altas uppercase font-haasRegular">No matching results</li>
                         )}
                     </ul>
                 </div>
