@@ -1,19 +1,21 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { PrimaryImage } from "../common/PrimaryImage";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "../common/CustomLink";
+import Loading from "@/app/loading";
 
-export default function OurProjects({ data, pageDetails }) {
+export default function OurProjects({ data, loop = true }) {
 
     const sliderInstance = React.useRef();
+    const [isSliderReady, setIsSliderReady] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
 
     const [sliderRef] = useKeenSlider({
-        loop: true,
-        slides: data.length,
+        loop,
         defaultAnimation: {
             duration: 2000,
         },
@@ -22,27 +24,35 @@ export default function OurProjects({ data, pageDetails }) {
                 slides: { perView: 1.2, spacing: 10, origin: "center" },
             },
             "(min-width: 1024px)": {
-                slides: { perView: 1.1, spacing: 10, },
+                slides: { perView: data.length === 1 ? 1 : 1.2, spacing: 10, },
             },
         },
-        created(s) {
-            sliderInstance.current = s;
+        created(slider) {
+            sliderInstance.current = slider;
+            setIsSliderReady(true);
+        },
+        detailsChanged(slider) {
+            setCurrentSlide(slider.track.details);
         },
     });
 
+    if (!data || data.length === 0) return null;
+
     return (
         <>
-            <div
-                ref={sliderRef}
-                className="mt-[21px] relative keen-slider h-screen"
-            >
+            {!isSliderReady && (
+                <div className="w-full h-[300px] flex justify-center items-center">
+                    <Loading custom type='secondary' />
+                </div>
+            )}
+            <div ref={sliderRef} className={`mt-[21px] relative keen-slider h-screen ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
                 {data.map((item, index) => {
                     const { portfolioRef } = item;
                     return (
                         <div key={index} className="keen-slider__slide relative group">
                             <PrimaryImage useNextImage={true} q={60} url={portfolioRef.coverImage.imageInfo} type={"alternate"} customClasses="size-full object-cover" />
                             <CustomLink to={`/project/${portfolioRef.slug}`} className="absolute inset-0 flex justify-end pt-40 md:pt-20 lg:pt-64 lg:pb-24 px-6 lg:px-24">
-                                <div className="flex justify-center md:justify-end w-full flex-shrink-0">
+                                <div className="flex justify-center md:justify-end w-full flex-shrink-0 gap-2">
                                     <div>
                                         <PrimaryImage
                                             url={"https://static.wixstatic.com/shapes/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}
@@ -63,19 +73,23 @@ export default function OurProjects({ data, pageDetails }) {
                     );
                 })}
                 {/* Arrows */}
-                <button
-                    onClick={() => sliderInstance.current?.prev()}
-                    className="absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20 "
-                >
-                    <MdOutlineChevronLeft className="size-[20px]" />
-                </button>
+                {(data.length >= 4) && (
+                    <>
+                        {(loop || currentSlide?.rel > 0) && <button
+                            onClick={() => sliderInstance.current?.prev()}
+                            className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        >
+                            <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                        </button>}
 
-                <button
-                    onClick={() => sliderInstance.current?.next()}
-                    className="absolute top-1/2 right-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
-                >
-                    <MdOutlineChevronRight className="size-[20px]" />
-                </button>
+                        {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
+                            onClick={() => sliderInstance.current?.next()}
+                            className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        >
+                            <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                        </button>}
+                    </>
+                )}
             </div>
         </>
     );

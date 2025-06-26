@@ -46,8 +46,8 @@ function ProductSets({ data, products = [] }) {
       case VIEW_STATES.ADD:
         return (
           <ProductListAdd
-            addProdToggle={toggleToList}
-            toggle={toggleToUpdate}
+            toggleToList={toggleToList}
+            productOptions={products}
           />
         );
       case VIEW_STATES.UPDATE:
@@ -64,7 +64,7 @@ function ProductSets({ data, products = [] }) {
           <ProductList
             data={productSets}
             handleSearch={handleSearch}
-            addProdToggle={toggleToAdd}
+            toggleToAdd={toggleToAdd}
             toggleToUpdate={toggleToUpdate}
             setActiveProduct={setActiveProduct}
           />

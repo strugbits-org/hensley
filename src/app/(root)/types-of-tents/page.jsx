@@ -1,5 +1,5 @@
 import Tents from "@/components/Tents";
-import { fetchMasterClassTenting, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
+import { fetchFeaturedBlogs, fetchFeaturedProjects, fetchMasterClassTenting, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -19,18 +19,32 @@ export async function generateMetadata() {
 
 export default async function Page() {
   try {
-
-    const projectAndblog = await fetchTentsWithProjectsAndBlogs();
-
     const [tents, pageDetails, masterClassTentingURL] = await Promise.all([
       fetchTentsData(),
       fetchTentListingPageDetails(),
       fetchMasterClassTenting()
     ]);
 
+    const fullTentData = await Promise.all(
+      tents.map(async (item) => {
+        const tentData = item;
+
+        const [featuredProjects, blogs] = await Promise.all([
+          fetchFeaturedProjects(item.tent?._id),
+          fetchFeaturedBlogs(item.tent?._id),
+        ]);
+
+        return {
+          tentData,
+          portfolio: featuredProjects,
+          blogs,
+        };
+      })
+    );
+
     const data = {
       tents,
-      projectAndblog,
+      fullTentData,
       pageDetails,
       masterClassTentingURL
     };

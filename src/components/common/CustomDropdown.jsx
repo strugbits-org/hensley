@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { useDetectClickOutside } from 'react-detect-click-outside';
 
 export const CustomDropdown = ({ products, onSelect }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -28,8 +29,10 @@ export const CustomDropdown = ({ products, onSelect }) => {
         setFilteredProducts(filtered);
     }, [products, searchQuery]);
 
+    const dropDownRef = useDetectClickOutside({ onTriggered: () => { if (isOpen) setIsOpen(false); } });
+
     return (
-        <div className="relative w-[460px] z-[9999]">
+        <div ref={dropDownRef} className="relative w-[460px] z-[9999]">
             <div
                 className="h-[60px] px-5 border-b border-secondary-alt bg-white flex items-center justify-between cursor-pointer"
                 onClick={toggleDropdown}

@@ -3,7 +3,7 @@ import parse from 'html-react-parser';
 
 export default function ProductDescription({ text, maxChars = 200 }) {
     const [expanded, setExpanded] = useState(false);
-    const isLong = text.length > maxChars;
+    const isLong = text.replace(/<[^>]+>/g, '').trim().length > maxChars;
     const displayedText = expanded ? text : text.slice(0, maxChars) + (isLong ? '...' : '');
 
     if (!text) return null;

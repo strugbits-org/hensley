@@ -1,10 +1,10 @@
 'use client'
-import React, { useEffect, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { PrimaryImage } from '@/components/common/PrimaryImage';
 import { toInteger } from 'lodash';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
 
-const ProductCard = React.memo(({ item, onRemove, isLastOdd, handleQuantityChange }) => {
+const ProductCard = memo(({ item, onRemove, isLastOdd, handleQuantityChange }) => {
     const { product, quantity } = item;
     const [quantityValue, setQuantityValue] = useState(quantity);
 
@@ -19,7 +19,7 @@ const ProductCard = React.memo(({ item, onRemove, isLastOdd, handleQuantityChang
     }, [onRemove, product._id]);
 
     return (
-        <div className={`border text-left border-primary-border flex flex-col gap-y-[10px] p-[10px] ${isLastOdd ? 'col-span-2 mx-auto w-1/2' : ''}`}>
+        <div className={`border text-left border-primary-border flex flex-col gap-y-[10px] p-[10px] ${isLastOdd ? 'mx-auto md:w-1/2' : ''}`}>
             <div className='flex justify-between'>
                 <span className='font-haasRegular text-secondary-alt uppercase text-[16px] block'>
                     {product.name}
@@ -54,9 +54,7 @@ const ProductCard = React.memo(({ item, onRemove, isLastOdd, handleQuantityChang
     );
 });
 
-ProductCard.displayName = 'ProductCard';
-
-const BackButton = React.memo(({ onClick }) => (
+const BackButton = memo(({ onClick }) => (
     <button
         onClick={onClick}
         className="absolute top-9 left-0 cursor-pointer"
@@ -77,8 +75,6 @@ const BackButton = React.memo(({ onClick }) => (
         </svg>
     </button>
 ));
-
-BackButton.displayName = 'BackButton';
 
 const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
     const { product, setOfProduct } = activeProduct;
@@ -101,6 +97,10 @@ const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
         console.log("productSetItems", productSetItems);
     }, [productSetItems, activeProduct]);
 
+    const filteredProductOptions = useMemo(() => {
+        return productOptions.filter(({ product }) => !productSetItems.some(set => set._id === product._id) && activeProduct._id !== product._id);
+    }, [productSetItems, productOptions]);
+
     useEffect(() => {
         setProductSetItems(setOfProduct || []);
     }, [setOfProduct]);
@@ -116,15 +116,26 @@ const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
             const key = product._id || product.id || index;
             const isLastOdd = productSetItems.length % 2 !== 0 && index === productSetItems.length - 1;
 
-            return <ProductCard
-                key={key}
-                item={item}
-                onRemove={handleRemove}
-                isLastOdd={isLastOdd}
-                handleQuantityChange={handleQuantityChange}
-            />;
+            return <div className={`${isLastOdd ? 'col-span-1 md:col-span-2' : 'col-span-1'}`}>
+                <ProductCard
+                    key={key}
+                    item={item}
+                    onRemove={handleRemove}
+                    isLastOdd={isLastOdd}
+                    handleQuantityChange={handleQuantityChange}
+                />
+            </div>;
         });
     }, [productSetItems, isEven, lastIndex, handleRemove]);
+
+    const handleProductSelect = (product) => {
+        setProductSetItems(prev => [...prev, { _id: product._id, product, quantity: 1 }]);
+    };
+
+    useEffect(() => {
+        console.log("productSetItems", productSetItems);
+    }, [productSetItems])
+
 
     return (
         <div className='w-full flex flex-col justify-center items-center text-center py-[50px] gap-y-[40px] relative'>
@@ -154,10 +165,10 @@ const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
             </h3>
 
             <div className='relative h-[60px]'>
-                <CustomDropdown products={productOptions} />
+                <CustomDropdown products={filteredProductOptions} onSelect={handleProductSelect} />
             </div>
 
-            <div className="w-full grid sm:grid-cols-2 grid-cols-1 gap-[20px] items-center justify-center">
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-[20px] items-center justify-center">
                 {renderProductCards}
             </div>
 

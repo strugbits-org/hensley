@@ -41,12 +41,12 @@ const InputField = ({ id, label, placeholder, classes, borderColor = 'secondary-
     );
 };
 
-const ProductList = ({ data, handleSearch, toggleToUpdate, setActiveProduct, addProdToggle }) => {
+const ProductList = ({ data, handleSearch, toggleToUpdate, toggleToAdd }) => {
 
     return (
         <div className='w-full flex flex-col justify-center items-center text-center py-[50px] gap-y-[40px]'>
             <span className='block font-haasRegular uppercase text-[25px] text-secondary-alt'>manage your sets below</span>
-            <button onClick={() => { addProdToggle() }} className='tracking-[3px] hover:tracking-[5px] hover:bg-primary hover:font-haasBold transform transition-all duration-300 border border-secondary-alt h-[45px] lg:w-[292px] w-full text-secondary-alt uppercase text-[12px] font-haasRegular'>
+            <button onClick={toggleToAdd} className='tracking-[3px] hover:tracking-[5px] hover:bg-primary hover:font-haasBold transform transition-all duration-300 border border-secondary-alt h-[45px] lg:w-[292px] w-full text-secondary-alt uppercase text-[12px] font-haasRegular'>
                 create a new set
             </button>
             <InputField id="search" placeholder="SEARCH SETS" onChange={handleSearch} borderColor="secondary-alt" classes={"self-start w-[280px]"} />
