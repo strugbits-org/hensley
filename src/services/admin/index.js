@@ -4,6 +4,8 @@ import { getAuthToken } from "../auth";
 
 const baseUrl = process.env.BASE_URL;
 
+// Product Sets
+
 export const fetchProductSetsData = async () => {
     try {
         const authToken = await getAuthToken();
@@ -103,3 +105,30 @@ export const deleteProductSet = async (payload) => {
         throw new Error(error.message);
     }
 };
+
+// Manage Blogs and Projects
+
+export const fetchBlogsData = async () => {
+    try {
+        const authToken = await getAuthToken();
+
+        const response = await fetch(`${baseUrl}/api/manage-blogs/get`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: authToken,
+            },
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message);
+        }
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        logError(error);
+        throw new Error(error.message);
+    }
+}
