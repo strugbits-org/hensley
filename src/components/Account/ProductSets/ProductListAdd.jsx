@@ -1,44 +1,55 @@
 'use client'
 import React, { useMemo, useState, useCallback } from 'react'
-import Image from 'next/image'
-import image from '@/assets/product-set-1.png'
 import { CustomDropdown } from '@/components/common/CustomDropdown'
+import { PrimaryImage } from '@/components/common/PrimaryImage'
+import { createProductSet } from '@/services/admin'
+import { logError } from '@/utils'
+import { toInteger } from 'lodash'
 
-// Card Component - Memoized to prevent unnecessary re-renders
-const Card = React.memo(({ data, onClick, classes = '' }) => (
-    <div className={`${classes} w-full border text-left border-primary-border flex flex-col gap-y-[10px] p-[10px] cursor-pointer`}>
-        <div className='flex justify-between'>
-            <span className='font-haasRegular text-secondary-alt uppercase text-[16px] block'>
-                {data.product?.name || data.name}
-            </span>
-            <button 
-                onClick={onClick} 
-                className='flex items-center justify-center rounded-full w-[25px] h-[25px] border border-primary-border transform transition-all duration-300 group cursor-pointer hover:bg-black'
-                aria-label="Remove product"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" className='group-hover:hidden' fill="black">
-                    <path d="M16 4.707 15.293 4 10 9.293 4.707 4 4 4.707 9.293 10 4 15.293l.707.707L10 10.707 15.293 16l.707-.707L10.707 10 16 4.707Z" clipRule="evenodd" fillRule="evenodd" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" className="hidden group-hover:block fill-white">
-                    <path d="M16 4.707 15.293 4 10 9.293 4.707 4 4 4.707 9.293 10 4 15.293l.707.707L10 10.707 15.293 16l.707-.707L10.707 10 16 4.707Z" clipRule="evenodd" fillRule="evenodd" />
-                </svg>
-            </button>
-        </div>
-        <div className='flex gap-x-[10px] items-center'>
-            <label className='font-haasRegular text-secondary-alt uppercase block text-[16px]'>
-                quantity
-            </label>
-            <input 
-                type="number" 
-                defaultValue={data.quantity || 1}
-                min="1"
-                className="w-[60px] h-[30px] p-2 bg-transparent border border-primary-border outline-none focus:border-primary" 
-            />
-        </div>
-    </div>
-))
+const Card = React.memo(({ data, removeProduct, classes = '', handleQuantityChange }) => {
+    const { product, quantity } = data;
+    const [quantityValue, setQuantityValue] = useState(quantity);
 
-// Back Button Component
+    const handleQuantity = useCallback((e) => {
+        const value = e.target.value;
+        setQuantityValue(e.target.value);
+        handleQuantityChange(product._id, value);
+    }, []);
+    return (
+        <div className={`${classes} w-full border text-left border-primary-border flex flex-col gap-y-[10px] p-[10px] cursor-pointer`}>
+            <div className='flex justify-between'>
+                <span className='font-haasRegular text-secondary-alt uppercase text-[16px] block'>
+                    {product?.name || data.name}
+                </span>
+                <button
+                    onClick={removeProduct}
+                    className='flex items-center justify-center rounded-full w-[25px] h-[25px] border border-primary-border transform transition-all duration-300 group cursor-pointer hover:bg-secondary-alt flex-shrink-0'
+                    aria-label="Remove product"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" className='group-hover:hidden' fill="black">
+                        <path d="M16 4.707 15.293 4 10 9.293 4.707 4 4 4.707 9.293 10 4 15.293l.707.707L10 10.707 15.293 16l.707-.707L10.707 10 16 4.707Z" clipRule="evenodd" fillRule="evenodd" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" className="hidden group-hover:block fill-white">
+                        <path d="M16 4.707 15.293 4 10 9.293 4.707 4 4 4.707 9.293 10 4 15.293l.707.707L10 10.707 15.293 16l.707-.707L10.707 10 16 4.707Z" clipRule="evenodd" fillRule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+            <div className='flex gap-x-[10px] items-center'>
+                <label className='font-haasRegular text-secondary-alt uppercase block text-[16px]'>
+                    quantity
+                </label>
+                <input
+                    type="number"
+                    defaultValue={quantityValue}
+                    onChange={handleQuantity}
+                    min="1"
+                    className="w-[60px] h-[30px] p-2 bg-transparent border border-primary-border outline-none focus:border-primary"
+                />
+            </div>
+        </div>
+    )
+})
+
 const BackButton = React.memo(({ onClick }) => (
     <button
         onClick={onClick}
@@ -61,17 +72,10 @@ const BackButton = React.memo(({ onClick }) => (
     </button>
 ))
 
-// Product Display Component
 const ProductDisplay = React.memo(({ product }) => (
     <div className='w-full lg:max-w-[500px] flex gap-y-[10px] gap-x-[20px] py-[15px] px-[15px] cursor-pointer border border-primary-border transform transition-all duration-300'>
         <div className='bg-white w-[100px] h-[90px]'>
-            <Image 
-                src={product.image || image} 
-                className='h-full w-full object-contain' 
-                width={100} 
-                height={90} 
-                alt={product.name || 'product'} 
-            />
+            <PrimaryImage url={product.mainMedia} alt={product.name} customClasses="h-full w-full object-contain" />
         </div>
         <div className='w-full text-left flex flex-col gap-y-[10px] justify-center'>
             <span className='font-haasRegular text-secondary-alt uppercase text-[20px] block'>
@@ -81,30 +85,29 @@ const ProductDisplay = React.memo(({ product }) => (
     </div>
 ))
 
-const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
+const ProductListAdd = ({ toggleToList, productOptions = [], setProductSets }) => {
     const [mainProduct, setMainProduct] = useState(null);
     const [productSetItems, setProductSetItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
-    // Memoized filtered options to prevent unnecessary recalculations
     const filteredProductOptions = useMemo(() => {
         const usedIds = new Set([
             ...(mainProduct ? [mainProduct._id] : []),
             ...productSetItems.map(item => item._id)
         ]);
-        
+
         return productOptions.filter(({ product }) => !usedIds.has(product._id));
     }, [productSetItems, productOptions, mainProduct]);
 
-    // Memoized handlers to prevent unnecessary re-renders
     const handleMainProductSelect = useCallback((product) => {
         setMainProduct(product);
     }, []);
 
     const handleSetProductSelect = useCallback((product) => {
-        setProductSetItems(prev => [...prev, { 
-            _id: product._id, 
-            product, 
-            quantity: 1 
+        setProductSetItems(prev => [...prev, {
+            _id: product._id,
+            product,
+            quantity: 1
         }]);
     }, []);
 
@@ -112,14 +115,24 @@ const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
         setProductSetItems(prev => prev.filter(item => item._id !== id));
     }, []);
 
-    const handleDelete = useCallback(() => {
-        setMainProduct(null);
-        setProductSetItems([]);
-    }, []);
-
-    const handleUpdate = useCallback(() => {
-        console.log('Update:', { mainProduct, productSetItems });
+    const handleCreate = useCallback(async () => {
+        if (!mainProduct) return;
+        setIsLoading(true);
+        try {
+            const setData = { mainProduct, productSetItems };
+            await createProductSet(setData);
+            setProductSets(prev => [{ product: mainProduct, setOfProduct: productSetItems }, ...prev]);
+            toggleToList();
+        } catch (error) {
+            logError(error);
+        } finally {
+            setIsLoading(false);
+        }
     }, [mainProduct, productSetItems]);
+
+    const handleQuantityChange = useCallback((id, quantity) => {
+        setProductSetItems(prev => prev.map(item => item.product._id === id ? { ...item, quantity: toInteger(quantity) } : item));
+    }, []);
 
     const isEven = productSetItems.length % 2 === 0;
     const lastIndex = productSetItems.length - 1;
@@ -127,7 +140,7 @@ const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
     return (
         <div className='w-full flex flex-col justify-center items-center text-center py-[50px] gap-y-[40px] relative'>
             <BackButton onClick={toggleToList} />
-            
+
             <h1 className='block font-haasRegular uppercase text-[25px] text-secondary-alt'>
                 create a new set
             </h1>
@@ -137,8 +150,8 @@ const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
                     main product
                 </h2>
                 <div className='relative h-[60px]'>
-                    <CustomDropdown 
-                        products={filteredProductOptions} 
+                    <CustomDropdown
+                        products={filteredProductOptions}
                         onSelect={handleMainProductSelect}
                         placeholder="Select main product"
                     />
@@ -154,8 +167,8 @@ const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
                     set of products
                 </h2>
                 <div className='relative h-[60px]'>
-                    <CustomDropdown 
-                        products={filteredProductOptions} 
+                    <CustomDropdown
+                        products={filteredProductOptions}
                         onSelect={handleSetProductSelect}
                         placeholder="Add product to set"
                     />
@@ -167,17 +180,19 @@ const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
                             const isLast = !isEven && index === lastIndex;
                             return isLast ? (
                                 <div key={item._id} className="w-full sm:col-span-2 flex flex-col justify-center items-center">
-                                    <Card 
-                                        data={item} 
-                                        classes="lg:w-[440px]" 
-                                        onClick={() => handleRemoveSetItem(item._id)} 
+                                    <Card
+                                        data={item}
+                                        classes="lg:w-[440px]"
+                                        removeProduct={() => handleRemoveSetItem(item._id)}
+                                        handleQuantityChange={handleQuantityChange}
                                     />
                                 </div>
                             ) : (
-                                <Card 
-                                    key={item._id} 
-                                    data={item} 
-                                    onClick={() => handleRemoveSetItem(item._id)} 
+                                <Card
+                                    key={item._id}
+                                    data={item}
+                                    removeProduct={() => handleRemoveSetItem(item._id)}
+                                    handleQuantityChange={handleQuantityChange}
                                 />
                             );
                         })}
@@ -186,20 +201,13 @@ const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
             </section>
 
             {/* Action Buttons */}
-            <div className='flex w-full gap-x-[10px] justify-center'>
-                <button 
-                    onClick={handleDelete}
-                    className='tracking-[3px] hover:tracking-[5px] hover:font-haasBold transform transition-all duration-300 border border-red-500 text-red-500 h-[58px] lg:w-[156px] w-full uppercase text-[14px] font-haasRegular'
-                >
-                    delete
-                </button>
-                <button 
-                    onClick={handleUpdate}
-                    className='tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[280px] w-full text-secondary-alt uppercase text-[14px] font-haasRegular'
-                >
-                    update
-                </button>
-            </div>
+            <button
+                disabled={isLoading}
+                onClick={handleCreate}
+                className='mx-auto max-w-[300px] tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[280px] w-full text-secondary-alt uppercase text-[14px] font-haasRegular'
+            >
+                {isLoading ? "SAVING..." : "SAVE"}
+            </button>
         </div>
     )
 }

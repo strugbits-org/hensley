@@ -3,6 +3,9 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import ProductListUpdate from './ProductListUpdate';
 import ProductListAdd from './ProductListAdd';
 import ProductList from './ProductList';
+import { fetchProductSetsData } from '@/services/admin';
+import { logError } from '@/utils';
+import Loading from '@/app/loading';
 
 // Enum for view states to prevent typos and improve maintainability
 const VIEW_STATES = {
@@ -15,9 +18,10 @@ function ProductSets({ data, products = [] }) {
   const [viewState, setViewState] = useState(VIEW_STATES.LIST);
   const [activeProduct, setActiveProduct] = useState(null);
   const [productSets, setProductSets] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const toggleToUpdate = useCallback((productId = null) => {
-    setActiveProduct(productId);
+  const toggleToUpdate = useCallback((product = null) => {
+    setActiveProduct(product);
     setViewState(VIEW_STATES.UPDATE);
   }, []);
 
@@ -33,13 +37,13 @@ function ProductSets({ data, products = [] }) {
 
   useEffect(() => {
     setProductSets(data);
+    setIsLoading(false);
   }, []);
 
   const handleSearch = useCallback((term = '') => {
     const filteredData = data.filter((item) => item.searchContent.toLowerCase().includes(term.toLowerCase()));
     setProductSets(filteredData);
   }, []);
-
 
   const currentComponent = useMemo(() => {
     switch (viewState) {
@@ -48,6 +52,7 @@ function ProductSets({ data, products = [] }) {
           <ProductListAdd
             toggleToList={toggleToList}
             productOptions={products}
+            setProductSets={setProductSets}
           />
         );
       case VIEW_STATES.UPDATE:
@@ -56,6 +61,7 @@ function ProductSets({ data, products = [] }) {
             toggleToList={toggleToList}
             activeProduct={activeProduct}
             productOptions={products}
+            setProductSets={setProductSets}
           />
         );
       case VIEW_STATES.LIST:
@@ -66,7 +72,6 @@ function ProductSets({ data, products = [] }) {
             handleSearch={handleSearch}
             toggleToAdd={toggleToAdd}
             toggleToUpdate={toggleToUpdate}
-            setActiveProduct={setActiveProduct}
           />
         );
     }
@@ -79,6 +84,11 @@ function ProductSets({ data, products = [] }) {
           {"product sets"}
         </h2>
       </div>
+      {isLoading && (
+        <div className="w-full h-[300px] flex justify-center items-center">
+          <Loading custom type='secondary' />
+        </div>
+      )}
       <div className='px-6 max-lg:py-0 max-lg:mt-3 max-sm:p-9'>
         <div className='max-w-[900px] w-full mx-auto'>
           {currentComponent}

@@ -17,7 +17,7 @@ export default function ProductDescription({ text, maxChars = 200 }) {
                 <div>
                     <button
                         onClick={() => setExpanded(prev => !prev)}
-                        className="flex items-center gap-2 text-sm font-medium text-black text-secondary-alt font-haasBold uppercase"
+                        className="flex items-center gap-2 text-sm font-medium text-secondary-alt font-haasBold uppercase"
                     >
                         <span className='border-b border-secondary-alt border-spacing-0'>
                             {expanded ? 'Read less' : 'Read more'}

@@ -3,6 +3,8 @@ import React, { useEffect, useState, useCallback, useMemo, memo } from 'react'
 import { PrimaryImage } from '@/components/common/PrimaryImage';
 import { toInteger } from 'lodash';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
+import { deleteProductSet, updateProductSet } from '@/services/admin';
+import { logError } from '@/utils';
 
 const ProductCard = memo(({ item, onRemove, isLastOdd, handleQuantityChange }) => {
     const { product, quantity } = item;
@@ -76,11 +78,15 @@ const BackButton = memo(({ onClick }) => (
     </button>
 ));
 
-const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
+const ProductListUpdate = ({ toggleToList, activeProduct, productOptions, setProductSets }) => {
     const { product, setOfProduct } = activeProduct;
     const [productSetItems, setProductSetItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [removedItems, setRemovedItems] = useState([]);
 
     const handleRemove = useCallback((id) => {
+        setRemovedItems(prev => prev.includes(id) ? prev : [...prev, id]);
         setProductSetItems(prev => prev.filter(({ product }) => product._id !== id));
     }, []);
 
@@ -88,13 +94,34 @@ const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
         setProductSetItems(prev => prev.map(item => item.product._id === id ? { ...item, quantity: toInteger(quantity) } : item));
     }, []);
 
-    const handleDelete = useCallback(() => {
-        console.log('Delete clicked', activeProduct._id);
-    }, [activeProduct]);
+    const handleDelete = useCallback(async () => {
+        if (!activeProduct) return;
+        setIsDeleting(true);
+        try {
+            const setData = { mainProduct: activeProduct, productSetItems };
+            await deleteProductSet(setData);
+            setProductSets(prev => prev.filter(item => item._id !== activeProduct._id));
+            toggleToList();
+        } catch (error) {
+            logError(error);
+        } finally {
+            setIsDeleting(false);
+        }
+    }, [activeProduct, productSetItems]);
 
-    const handleUpdate = useCallback(() => {
-        console.log('Update clicked');
-        console.log("productSetItems", productSetItems);
+    const handleUpdate = useCallback(async () => {
+        if (!activeProduct) return;
+        try {
+            setIsLoading(true);
+            const setData = { mainProduct: activeProduct, productSetItems, removedItems };
+            await updateProductSet(setData);
+            setProductSets(prev => prev.map(item => item._id === activeProduct._id ? { ...item, setOfProduct: productSetItems } : item));
+            toggleToList();
+        } catch (error) {
+            logError(error);
+        } finally {
+            setIsLoading(false);
+        }
     }, [productSetItems, activeProduct]);
 
     const filteredProductOptions = useMemo(() => {
@@ -131,11 +158,6 @@ const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
     const handleProductSelect = (product) => {
         setProductSetItems(prev => [...prev, { _id: product._id, product, quantity: 1 }]);
     };
-
-    useEffect(() => {
-        console.log("productSetItems", productSetItems);
-    }, [productSetItems])
-
 
     return (
         <div className='w-full flex flex-col justify-center items-center text-center py-[50px] gap-y-[40px] relative'>
@@ -174,16 +196,18 @@ const ProductListUpdate = ({ toggleToList, activeProduct, productOptions }) => {
 
             <div className='flex w-full gap-x-[10px] justify-center'>
                 <button
+                    disabled={isDeleting}
                     onClick={handleDelete}
                     className='tracking-[3px] hover:tracking-[5px] hover:font-haasBold transform transition-all duration-300 border border-red-500 text-red-500 h-[58px] lg:w-[156px] w-full uppercase text-[14px] font-haasRegular'
                 >
-                    delete
+                    {isDeleting ? 'deleting...' : 'delete'}
                 </button>
                 <button
+                    disabled={isLoading}
                     onClick={handleUpdate}
                     className='tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[280px] w-full text-secondary-alt uppercase text-[14px] font-haasRegular'
                 >
-                    update
+                    {isLoading ? 'updating...' : 'update'}
                 </button>
             </div>
         </div>

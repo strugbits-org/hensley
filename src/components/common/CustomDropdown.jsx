@@ -32,7 +32,7 @@ export const CustomDropdown = ({ products, onSelect }) => {
     const dropDownRef = useDetectClickOutside({ onTriggered: () => { if (isOpen) setIsOpen(false); } });
 
     return (
-        <div ref={dropDownRef} className="relative w-[460px] z-[9999]">
+        <div ref={dropDownRef} className={`relative w-[460px] ${isOpen ? 'z-[9999]' : 'z-[999]'}`}>
             <div
                 className="h-[60px] px-5 border-b border-secondary-alt bg-white flex items-center justify-between cursor-pointer"
                 onClick={toggleDropdown}
@@ -40,7 +40,7 @@ export const CustomDropdown = ({ products, onSelect }) => {
                 <input
                     type="text"
                     placeholder={selected}
-                    className="w-full px-3 py-2 outline-none border-none text-base uppercase placeholder:text-secondary-alt font-haasLight cursor-pointer"
+                    className="w-full px-3 py-2 outline-none border-none text-base uppercase placeholder:text-secondary-alt font-haasLight cursor-pointer placeholder:text-center"
                     value={searchQuery}
                     onChange={handleSearchChange}
                 // onClick={(e) => e.stopPropagation()}
@@ -51,7 +51,7 @@ export const CustomDropdown = ({ products, onSelect }) => {
             </div>
 
             {isOpen && (
-                <div className="bg-white w-full shadow-md z-[99999] max-h-[200px] overflow-y-auto">
+                <div className="bg-white w-full shadow-md z-[999] max-h-[200px] overflow-y-auto">
                     <ul role="listbox">
                         {filteredProducts.length > 0 ? (
                             filteredProducts.map(({ product }, index) => (
