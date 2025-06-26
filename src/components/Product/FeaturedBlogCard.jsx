@@ -4,16 +4,14 @@ import { Tag } from '../common/helpers/Tag';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { CustomLink } from '../common/CustomLink';
 
-function FeaturedCard({ data, classes }) {
-
-    const { portfolioRef, markets, studios, publishDate, slug } = data;
-    const title = portfolioRef?.title || data?.blogRef?.title;
-    const coverImage = portfolioRef?.coverImage;
+function FeaturedBlogCard({ data, classes }) {
+    const { blogRef, markets, studios, publishDate, slug, author } = data;
+    const title = blogRef?.title;
+    const coverImage = blogRef?.coverImage;
 
     return (
-        <CustomLink to={`/${data?.blogRef ? "posts" : "project"}/${slug}`} className={`${classes} relative group border border-primary-border pb-2`}>
-            <PrimaryImage alt={title} url={coverImage?.imageInfo || data?.blogRef?.coverImage} type={"alternate"} customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
-            {/* <img src={generateImageURLAlternate({wix_url:coverImage.imageInfo})} className="h-full w-full object-cover min-h-[528px] max-h-[528px]" /> */}
+        <CustomLink to={`/posts/${slug}`} className={`${classes} relative group border border-primary-border pb-2`}>
+            <PrimaryImage alt={title} url={coverImage} customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
             <div className='w-full flex gap-1 p-6 pb-0'>
                 <div className='grow'>
                     <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular mb-3">
@@ -29,7 +27,7 @@ function FeaturedCard({ data, classes }) {
                 </div>
             </div>
             <div className='px-6'>
-                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>{formatDate(publishDate)} - {portfolioRef?.nickname || data?.author?.nickname}</p>
+                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>{formatDate(publishDate)} - {author?.nickname}</p>
 
                 <ul className="flex gap-2 flex-wrap">
                     {markets?.map((market, index) => (
@@ -51,4 +49,4 @@ function FeaturedCard({ data, classes }) {
     );
 }
 
-export default FeaturedCard;
+export default FeaturedBlogCard;

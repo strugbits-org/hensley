@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { loaderActions } from '@/store/loaderStore';
+import { scrollToTop } from "@/utils";
 
 export const CustomLink = ({ to, children, className, target, attributes, onClick }) => {
   const router = useRouter();
@@ -16,10 +17,14 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
 
     if (onClick) onClick();
 
-    if (to === undefined || !to || to === "") return;
+    if (to === undefined || !to || to === "") {
+      scrollToTop();
+      return;
+    };
 
     if (pathname === to) {
       loaderActions.show();
+      scrollToTop();
       setTimeout(() => loaderActions.hide(), 900);
       return;
     }

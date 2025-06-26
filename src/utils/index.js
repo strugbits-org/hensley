@@ -359,3 +359,5 @@ export const findProductSize = (additionalInfoSections = []) => {
     const size = additionalInfoSections?.find(x => x.title === "Size")?.description?.replace(/<[^>]*>/g, "").trim() || "—";
     return size;
 }
+
+export const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });

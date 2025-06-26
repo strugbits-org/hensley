@@ -11,6 +11,7 @@ import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 import { AddToCartButton } from '../Product/AddtoQuoteButton';
 import parse from 'html-react-parser';
+import { BreadCrumbs } from '../common/BreadCrumbs';
 
 // Validation schema
 const schema = yup.object({
@@ -214,18 +215,14 @@ export const AddToQuoteForm = ({ title, productData }) => {
     return (
         <>
             <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
-                <span className='text-secondary-alt 
-                    lg:text-[16px]
-                    text-[12px]
-                    uppercase font-haasLight'>Home/corporate</span>
-                <h3 className='uppercase text-secondary-alt font-recklessRegular 
-                    lg:text-[90px] 
-                    lg:leading-[85px]
-                    text-[35px]
-                    leading-[30px]
-                    '>{title}</h3>
-
-                <div className="font-haasRegular lg:text-[16px] lg:leading-[19px] text-[14px] leading-[17px] text-secondary-alt">
+                <div className='w-full flex items-center my-8'>
+                    <BreadCrumbs items={[
+                        { label: 'Home', to: '/' },
+                        { label: 'TENTS' }
+                    ]} />
+                </div>
+                <h3 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] mb-4'>{title}</h3>
+                <div className="font-haasLight lg:text-[16px] lg:leading-[19px] text-[14px] leading-[17px] text-secondary-alt">
                     {parse(productData?.description || '')}
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className='w-full grid lg:grid-cols-4 grid-cols-2 justify-between gap-x-[24px] gap-y-[39px] mt-[20px]'>

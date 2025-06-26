@@ -10,6 +10,7 @@ import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApi
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
 import { checkProductInCart, fetchSavedProductData } from '@/services/products';
+import { BreadCrumbs } from '../common/BreadCrumbs';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -252,9 +253,12 @@ export const Product = ({ data }) => {
 
       <div className='xl:w-1/2 flex flex-col items-center relative'>
         <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
-          <span className='text-secondary-alt lg:text-[16px] text-[12px] uppercase font-haasLight'>
-            RENTALS/ Product(Item)
-          </span>
+          <div className='w-full flex items-center my-8'>
+            <BreadCrumbs items={[
+              { label: 'Home', to: '/' },
+              { label: `${product.name}` }
+            ]} />
+          </div>
 
           <h1 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[15px] lg:mb-[28px] sm:mt-[9px] sm:mb-[9px]'>
             {product.name}

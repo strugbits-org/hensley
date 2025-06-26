@@ -47,7 +47,7 @@ export default function OurProjects({ data, pageDetails }) {
             <div key={index} className="keen-slider__slide relative group">
               <PrimaryImage useNextImage={true} q={60} url={portfolioRef.coverImage.imageInfo} type={"alternate"} customClasses="size-full object-cover" />
               <CustomLink to={`/project/${portfolioRef.slug}`} className="absolute inset-0 flex justify-end pt-40 md:pt-20 lg:pt-64 lg:pb-24 px-6 lg:px-24">
-                <div className="flex justify-center md:justify-end w-full flex-shrink-0">
+                <div className="flex justify-center md:justify-end w-full flex-shrink-0 gap-2">
                   <div>
                     <PrimaryImage
                       url={"https://static.wixstatic.com/shapes/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}

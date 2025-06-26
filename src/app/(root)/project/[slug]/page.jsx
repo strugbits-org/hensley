@@ -32,9 +32,6 @@ export async function generateMetadata({ params }) {
   }
 }
 
-
-
-
 export const generateStaticParams = async () => {
   try {
     const projectData = await fetchProjects();

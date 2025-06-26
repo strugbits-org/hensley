@@ -290,8 +290,6 @@ export const fetchFeaturedBlogs = async (productId) => {
   }
 }
 
-
-
 export const fetchFeaturedProjects = async (id) => {
   try {
     const response = await queryCollection({
@@ -320,44 +318,6 @@ export const fetchFeaturedProjects = async (id) => {
     logError(`Error fetching featured projects: ${error.message}`, error);
   }
 }
-
-
-export const fetchTentsWithProjectsAndBlogs = async () => {
-  try {
-    const tents = await fetchTentsData();
-    if (!Array.isArray(tents)) throw new Error("Tents not found");
-
-    const results = await Promise.all(
-      tents.map(async (item) => {
-        const tentData = item;
-
-        const [featuredProjects, blogs] = await Promise.all([
-          fetchFeaturedProjects(item.tent?._id),
-          fetchFeaturedBlogs(item.tent?._id),
-        ]);
-
-        return {
-          tentData,
-          portfolio: featuredProjects,
-          blogs,
-        };
-      })
-    );
-
-    return results;
-  } catch (error) {
-    logError(`Error fetching tents with projects and blogs: ${error.message}`, error);
-  }
-};
-
-
-
-
-// --------------------------------------------------------------------------
-
-
-
-
 
 export const fetchBestSellers = async (slug = '/') => {
   try {

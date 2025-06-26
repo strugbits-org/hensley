@@ -1,162 +1,202 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import Image from 'next/image'
 import image from '@/assets/product-set-1.png'
+import { CustomDropdown } from '@/components/common/CustomDropdown'
 
-// Initial Product Data for set of products
-const initialProductData = [
-    { id: 1, name: "vintage dance floor 1" },
-    { id: 2, name: "vintage dance floor 2" },
-    { id: 3, name: "vintage dance floor 3" },
-    { id: 4, name: "vintage dance floor 4" },
-    { id: 5, name: "vintage dance floor 5" },
-]
-
-// Card Component
-const Card = ({ data, onClick, classes }) => (
+// Card Component - Memoized to prevent unnecessary re-renders
+const Card = React.memo(({ data, onClick, classes = '' }) => (
     <div className={`${classes} w-full border text-left border-primary-border flex flex-col gap-y-[10px] p-[10px] cursor-pointer`}>
         <div className='flex justify-between'>
-            <span className='font-haasRegular text-secondary-alt uppercase text-[16px] block'>{data.name}</span>
-            <div onClick={onClick} className='flex items-center justify-center rounded-full w-[25px] h-[25px] border border-primary-border transform transition-all duration-300 group cursor-pointer hover:bg-black'>
+            <span className='font-haasRegular text-secondary-alt uppercase text-[16px] block'>
+                {data.product?.name || data.name}
+            </span>
+            <button 
+                onClick={onClick} 
+                className='flex items-center justify-center rounded-full w-[25px] h-[25px] border border-primary-border transform transition-all duration-300 group cursor-pointer hover:bg-black'
+                aria-label="Remove product"
+            >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" className='group-hover:hidden' fill="black">
                     <path d="M16 4.707 15.293 4 10 9.293 4.707 4 4 4.707 9.293 10 4 15.293l.707.707L10 10.707 15.293 16l.707-.707L10.707 10 16 4.707Z" clipRule="evenodd" fillRule="evenodd" />
                 </svg>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" height="20" width="20" className="hidden group-hover:block fill-white">
                     <path d="M16 4.707 15.293 4 10 9.293 4.707 4 4 4.707 9.293 10 4 15.293l.707.707L10 10.707 15.293 16l.707-.707L10.707 10 16 4.707Z" clipRule="evenodd" fillRule="evenodd" />
                 </svg>
-            </div>
+            </button>
         </div>
         <div className='flex gap-x-[10px] items-center'>
-            <span className='font-haasRegular text-secondary-alt uppercase block text-[16px]'>quantity</span>
-            <input type="number" className="w-[60px] h-[30px] p-2 bg-transparent border border-primary-border outline-none" />
+            <label className='font-haasRegular text-secondary-alt uppercase block text-[16px]'>
+                quantity
+            </label>
+            <input 
+                type="number" 
+                defaultValue={data.quantity || 1}
+                min="1"
+                className="w-[60px] h-[30px] p-2 bg-transparent border border-primary-border outline-none focus:border-primary" 
+            />
         </div>
     </div>
-)
+))
 
-// CustomDropdown for single selection
-const CustomDropdown = ({ onSelect, selected }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const options = [
-        "12\" BRONZE FLOOR FAN",
-        "12\" SQUARE RIM BOWL",
-        "14' ROUND BAR - GRACE W/CUSTOM PAINT COLOR",
-        "14' WHITE ROUND - BAR",
-        "16\" CANOE BOWL",
-        "16\" ROUND BOWL WITH HANDLES"
-    ];
-    return (
-        <div className="relative w-[460px] ">
-            <div
-                className="h-[60px] px-5 border-b border-black bg-white cursor-pointer flex items-center justify-between z-[9]"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <span className="uppercase font-haasLight">{selected || 'Select Any Product'}</span>
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                    <path d="M7 10l5 5 5-5H7z" />
-                </svg>
-            </div>
-            {isOpen && (
-                <ul className="bg-white w-full shadow-md z-[99999] relative">
-                    {options.map(option => (
-                        <li
-                            key={option}
-                            className="] px-5 text-left py-3 transform transition-all duration-300 hover:bg-[#F0DEA2] cursor-pointer uppercase font-haasLight"
-                            onClick={() => {
-                                onSelect(option);
-                                setIsOpen(false);
-                            }}
-                        >
-                            {option}
-                        </li>
-                    ))}
-                </ul>
-            )}
+// Back Button Component
+const BackButton = React.memo(({ onClick }) => (
+    <button
+        onClick={onClick}
+        className="absolute top-9 left-0 cursor-pointer"
+        aria-label="Go back to list"
+    >
+        <svg
+            data-bbox="63 62.951 74.049 74.049"
+            viewBox="0 0 200 200"
+            height="57"
+            width="57"
+            xmlns="http://www.w3.org/2000/svg"
+            data-type="shape"
+            style={{ transform: "rotate(45deg)" }}
+        >
+            <g>
+                <path d="M137 133a4 4 0 0 1-4 4H67c-.263 0-.525-.027-.783-.079-.117-.023-.225-.067-.339-.1-.137-.04-.275-.072-.408-.127-.133-.055-.253-.131-.379-.199-.103-.057-.211-.102-.309-.168a4.023 4.023 0 0 1-1.109-1.109c-.065-.097-.109-.203-.165-.304-.07-.127-.146-.25-.202-.384-.055-.132-.086-.271-.126-.407-.033-.113-.077-.222-.101-.339A4.056 4.056 0 0 1 63 133V67a4 4 0 0 1 8 0v56.344l59.172-59.172a4 4 0 1 1 5.656 5.656L76.656 129H133a4 4 0 0 1 4 4z"></path>
+            </g>
+        </svg>
+    </button>
+))
+
+// Product Display Component
+const ProductDisplay = React.memo(({ product }) => (
+    <div className='w-full lg:max-w-[500px] flex gap-y-[10px] gap-x-[20px] py-[15px] px-[15px] cursor-pointer border border-primary-border transform transition-all duration-300'>
+        <div className='bg-white w-[100px] h-[90px]'>
+            <Image 
+                src={product.image || image} 
+                className='h-full w-full object-contain' 
+                width={100} 
+                height={90} 
+                alt={product.name || 'product'} 
+            />
         </div>
-    );
-}
+        <div className='w-full text-left flex flex-col gap-y-[10px] justify-center'>
+            <span className='font-haasRegular text-secondary-alt uppercase text-[20px] block'>
+                {product.name}
+            </span>
+        </div>
+    </div>
+))
 
-const ProductListAdd = ({toggle, addProdToggle}) => {
-    // Single selection state
-    const [singleSelected, setSingleSelected] = useState(null);
+const ProductListAdd = ({ toggleToList, productOptions = [] }) => {
+    const [mainProduct, setMainProduct] = useState(null);
+    const [productSetItems, setProductSetItems] = useState([]);
 
-    // Set of products state
-    const [productList, setProductList] = useState([]);
+    // Memoized filtered options to prevent unnecessary recalculations
+    const filteredProductOptions = useMemo(() => {
+        const usedIds = new Set([
+            ...(mainProduct ? [mainProduct._id] : []),
+            ...productSetItems.map(item => item._id)
+        ]);
+        
+        return productOptions.filter(({ product }) => !usedIds.has(product._id));
+    }, [productSetItems, productOptions, mainProduct]);
 
-    const handleRemove = (id) => {
-        setProductList(prev => prev.filter(item => item.id !== id));
-    };
+    // Memoized handlers to prevent unnecessary re-renders
+    const handleMainProductSelect = useCallback((product) => {
+        setMainProduct(product);
+    }, []);
 
-    const handleAdd = (name) => {
-        setProductList(prev => [...prev, { id: Date.now(), name }]);
-    }
+    const handleSetProductSelect = useCallback((product) => {
+        setProductSetItems(prev => [...prev, { 
+            _id: product._id, 
+            product, 
+            quantity: 1 
+        }]);
+    }, []);
 
-    const isEven = productList.length % 2 === 0;
-    const lastIndex = productList.length - 1;
+    const handleRemoveSetItem = useCallback((id) => {
+        setProductSetItems(prev => prev.filter(item => item._id !== id));
+    }, []);
+
+    const handleDelete = useCallback(() => {
+        setMainProduct(null);
+        setProductSetItems([]);
+    }, []);
+
+    const handleUpdate = useCallback(() => {
+        console.log('Update:', { mainProduct, productSetItems });
+    }, [mainProduct, productSetItems]);
+
+    const isEven = productSetItems.length % 2 === 0;
+    const lastIndex = productSetItems.length - 1;
 
     return (
         <div className='w-full flex flex-col justify-center items-center text-center py-[50px] gap-y-[40px] relative'>
+            <BackButton onClick={toggleToList} />
+            
+            <h1 className='block font-haasRegular uppercase text-[25px] text-secondary-alt'>
+                create a new set
+            </h1>
 
-              <svg
-                data-bbox="63 62.951 74.049 74.049"
-                viewBox="0 0 200 200"
-                height="57"
-                width="57"
-                onClick={() => addProdToggle()}
-                className="absolute top-9 left-0 cursor-pointer"
-                xmlns="http://www.w3.org/2000/svg"
-                data-type="shape"
-                style={{ transform: "rotate(45deg)" }}
-            >
-                <g>
-                    <path d="M137 133a4 4 0 0 1-4 4H67c-.263 0-.525-.027-.783-.079-.117-.023-.225-.067-.339-.1-.137-.04-.275-.072-.408-.127-.133-.055-.253-.131-.379-.199-.103-.057-.211-.102-.309-.168a4.023 4.023 0 0 1-1.109-1.109c-.065-.097-.109-.203-.165-.304-.07-.127-.146-.25-.202-.384-.055-.132-.086-.271-.126-.407-.033-.113-.077-.222-.101-.339A4.056 4.056 0 0 1 63 133V67a4 4 0 0 1 8 0v56.344l59.172-59.172a4 4 0 1 1 5.656 5.656L76.656 129H133a4 4 0 0 1 4 4z"></path>
-                </g>
-            </svg>
-            <span className='block font-haasRegular uppercase text-[25px] text-secondary-alt'>create a new set</span>
-
-            {/* Main Product */}
-            <span className='font-haasBold text-secondary-alt uppercase text-[20px] block'>main product</span>
-            <div className='relative h-[60px]'>
-                <CustomDropdown onSelect={setSingleSelected} selected={singleSelected} />
-            </div>
-
-            {/* Display selected main product */}
-            {singleSelected && (
-                <div className='w-full lg:max-w-[500px] flex gap-y-[10px] gap-x-[20px] py-[15px] px-[15px] cursor-pointer border border-primary-border  transform transition-all duration-30'>
-                    <div className=' bg-white w-[100px] h-[90px] '>
-                        <Image src={image} className='h-full w-full object-contain' width={100} height={90} alt='product' />
-                    </div>
-                    <div className='w-full text-left flex flex-col gap-y-[10px] justify-center'>
-                        <span className='font-haasRegular text-secondary-alt uppercase text-[20px] block'>{singleSelected}</span>
-                    </div>
+            <section className='w-full flex flex-col items-center gap-y-[20px]'>
+                <h2 className='font-haasBold text-secondary-alt uppercase text-[20px] block'>
+                    main product
+                </h2>
+                <div className='relative h-[60px]'>
+                    <CustomDropdown 
+                        products={filteredProductOptions} 
+                        onSelect={handleMainProductSelect}
+                        placeholder="Select main product"
+                    />
                 </div>
-            )}
 
-            {/* Set of products */}
-            <span className='font-haasBold text-secondary-alt uppercase text-[20px] block'>set of products</span>
-            <div className='relative h-[60px]'>
-                <CustomDropdown onSelect={handleAdd} selected={null} />
-            </div>
+                {mainProduct && (
+                    <ProductDisplay product={mainProduct} />
+                )}
+            </section>
 
-            {/* Render product list */}
-            <div className="w-full grid sm:grid-cols-2 grid-cols-1 gap-[20px] items-center justify-center">
-                {productList.map((item, index) => {
-                    const isLast = !isEven && index === lastIndex;
-                    return isLast ? (
-                        <div key={item.id} className="w-full  sm:col-span-2 flex flex-col justify-center items-center">
-                            <Card data={item} classes="lg:w-[440px]" onClick={() => handleRemove(item.id)} />
-                        </div>
-                    ) : (
-                        <Card key={item.id} data={item} onClick={() => handleRemove(item.id)} />
-                    );
-                })}
-            </div>
+            <section className='w-full flex flex-col items-center gap-y-[20px]'>
+                <h2 className='font-haasBold text-secondary-alt uppercase text-[20px] block'>
+                    set of products
+                </h2>
+                <div className='relative h-[60px]'>
+                    <CustomDropdown 
+                        products={filteredProductOptions} 
+                        onSelect={handleSetProductSelect}
+                        placeholder="Add product to set"
+                    />
+                </div>
 
-            {/* Buttons */}
+                {productSetItems.length > 0 && (
+                    <div className="w-full grid sm:grid-cols-2 grid-cols-1 gap-[20px] items-center justify-center">
+                        {productSetItems.map((item, index) => {
+                            const isLast = !isEven && index === lastIndex;
+                            return isLast ? (
+                                <div key={item._id} className="w-full sm:col-span-2 flex flex-col justify-center items-center">
+                                    <Card 
+                                        data={item} 
+                                        classes="lg:w-[440px]" 
+                                        onClick={() => handleRemoveSetItem(item._id)} 
+                                    />
+                                </div>
+                            ) : (
+                                <Card 
+                                    key={item._id} 
+                                    data={item} 
+                                    onClick={() => handleRemoveSetItem(item._id)} 
+                                />
+                            );
+                        })}
+                    </div>
+                )}
+            </section>
+
+            {/* Action Buttons */}
             <div className='flex w-full gap-x-[10px] justify-center'>
-                <button className='tracking-[3px] hover:tracking-[5px] hover:font-haasBold transform transition-all duration-300 border border-red-500 text-red-500 h-[58px] lg:w-[156px] w-full uppercase text-[14px] font-haasRegular'>
+                <button 
+                    onClick={handleDelete}
+                    className='tracking-[3px] hover:tracking-[5px] hover:font-haasBold transform transition-all duration-300 border border-red-500 text-red-500 h-[58px] lg:w-[156px] w-full uppercase text-[14px] font-haasRegular'
+                >
                     delete
                 </button>
-                <button className='tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[280px] w-full text-secondary-alt uppercase text-[14px] font-haasRegular'>
+                <button 
+                    onClick={handleUpdate}
+                    className='tracking-[3px] hover:tracking-[5px] bg-primary hover:bg-secondary-alt hover:text-primary hover:font-haasBold transform transition-all duration-300 h-[58px] lg:w-[280px] w-full text-secondary-alt uppercase text-[14px] font-haasRegular'
+                >
                     update
                 </button>
             </div>
