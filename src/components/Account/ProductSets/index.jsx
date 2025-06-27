@@ -3,8 +3,6 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import ProductListUpdate from './ProductListUpdate';
 import ProductListAdd from './ProductListAdd';
 import ProductList from './ProductList';
-import { fetchProductSetsData } from '@/services/admin';
-import { logError } from '@/utils';
 import Loading from '@/app/loading';
 
 // Enum for view states to prevent typos and improve maintainability
@@ -41,7 +39,7 @@ function ProductSets({ data, products = [] }) {
   }, []);
 
   const handleSearch = useCallback((term = '') => {
-    const filteredData = data.filter((item) => item.searchContent.toLowerCase().includes(term.toLowerCase()));
+    const filteredData = data.filter(({ product }) => product?.name.toLowerCase().includes(term.toLowerCase()));
     setProductSets(filteredData);
   }, []);
 

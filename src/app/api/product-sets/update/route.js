@@ -1,5 +1,6 @@
 import handleAuthentication from "@/services/auth/handleAuthentication";
 import { createWixClient, logError } from "@/utils";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 
 export const POST = async (req) => {
