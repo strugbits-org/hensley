@@ -7,21 +7,19 @@ import queryCollection from "@/utils/fetchFunction";
 
 
 export const fetchsubCategoriesPageDetails = async () => {
-  try {
-    const pageDetails = await queryCollection({ dataCollectionId: "subCategoryPageDetails" });
+    try {
+        const pageDetails = await queryCollection({ dataCollectionId: "subCategoryPageDetails" });
 
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+        if (!Array.isArray(pageDetails.items)) {
+            throw new Error(`PrivacyPolicy response does not contain items array`);
+        }
+
+        return pageDetails.items[0]
+
+    } catch (error) {
+        logError(`Error fetching contact page data: ${error.message}`, error);
     }
-
-    return pageDetails.items[0]
-
-  } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
-  }
 };
-
-
 
 export const fetchSelectedCategoryData = async (slug) => {
     try {
@@ -72,12 +70,33 @@ export const fetchSelectedCategoryData = async (slug) => {
 export const fetchSubCategoryPagePaths = async () => {
     try {
         const response = await queryCollection({ dataCollectionId: "Stores/Collections", limit: "infinite", extendedLimit: 100 });
-        if(!Array.isArray(response.items)){
+        if (!Array.isArray(response.items)) {
             throw new Error(`Response does not contain items array`);
         }
         return response.items.map(x => ({ slug: x.slug.trim().replace("/", "") }));
     } catch (error) {
         logError(`Error fetching sub category page params: ${error.message}`, error);
-        return []; // Return empty array on error instead of undefined
+        return [];
+    }
+};
+
+export const fetchAllCategoriesForSorting = async () => {
+    try {
+        const response = await queryCollection({
+            dataCollectionId: "CategorySortStructure",
+            includeReferencedItems: ["collections"],
+            increasedLimit: 100,
+            limit: "infinite",
+        });
+
+        if (!response?.items?.length) {
+            return [];
+        }
+
+        return response.items.filter(item => item.sortTitle?.length > 0).sort((a, b) => a.collections.name.localeCompare(b.collections.name));
+
+    } catch (error) {
+        logError("Error fetching all categories from Stores/Collections:", error);
+        return [];
     }
 };

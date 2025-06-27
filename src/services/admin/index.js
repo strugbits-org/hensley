@@ -174,8 +174,6 @@ export const updateProjectData = async (payload) => {
     }
 };
 
-
-
 export const fetchManageBlogsData = async () => {
     try {
         const [blogsData, productsData, marketsData, studiosData] = await Promise.all([
@@ -221,6 +219,30 @@ export const updateBlogData = async (payload) => {
         const authToken = await getAuthToken();
 
         const response = await fetch(`${baseUrl}/api/manage-blogs/update`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: authToken,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        logError(error);
+    }
+};
+
+export const updateSortedProducts = async (payload) => {
+    try {
+        const authToken = await getAuthToken();
+
+        const response = await fetch(`${baseUrl}/api/product-sorting/update`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
