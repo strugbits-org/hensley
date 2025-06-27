@@ -187,7 +187,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
     }
 
     return (
-        <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center z-[99] relative lg:w-[600px] lg:py-[20px]  mx-auto`}>
+        <div className={`${classes} lg:bg-transparent bg-[#F4F1EC] w-full flex justify-center items-center z-[${isLightbox ? 100 : 0}] relative lg:w-[600px] lg:py-[20px]  mx-auto`}>
             <form
                 onSubmit={(e) => e.preventDefault()}
                 className='w-full flex flex-col gap-y-[35px] border border-black justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[30px] sm:px-[120px] px-[36px] pt-[50px] pb-[55px] relative'
@@ -319,7 +319,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                     <button
                         type="button"
                         disabled={isSubmitting}
-                        className={`tracking-[3px] border border-secondary-alt h-[45px] lg:w-[292px] w-full 
+                        className={`px-4 tracking-[3px] border border-secondary-alt h-[45px] lg:w-[292px] w-full 
                                text-secondary-alt uppercase text-[12px] font-haasRegular
                                transition-all duration-300
                                ${isSubmitting ? 'opacity-50 cursor-not-allowed' :

@@ -10,9 +10,9 @@ import { loaderActions } from '@/store/loaderStore';
 import { HensleyNewsSearch } from '../common/HensleyNewsSearch';
 import { fetchSavedProductData } from '@/services/products';
 
-const SearchResult = ({pageDetails}) => {
+const SearchResult = ({ pageDetails }) => {
 
-    const {relatedPostTitle, tentsTypeTitle, ourMarketsTitle, relatedProductTitle, relatedProjectTitle} = pageDetails;
+    const { relatedPostTitle, tentsTypeTitle, ourMarketsTitle, relatedProductTitle, relatedProjectTitle } = pageDetails;
 
     const [marketsData, setMarketsData] = useState([]);
     const [blogsData, setBlogsData] = useState([]);
@@ -52,6 +52,11 @@ const SearchResult = ({pageDetails}) => {
     useEffect(() => {
         if (searchTerm) {
             setInitialValues();
+        } else {
+            setTimeout(() => {
+                loaderActions.hide();
+                setLoading(false);
+            }, 5000);
         }
     }, [searchTerm]);
 

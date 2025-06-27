@@ -26,7 +26,7 @@ export default async function Page() {
 
     return (
       <>
-        <div className='h-[130px]'></div>
+        <div className='h-[130px] hidden lg:block'></div>
         <Suspense>
           <SearchResult pageDetails={searchPageDetails}/>
         </Suspense>

@@ -55,11 +55,15 @@ export const Header = ({ data, marketsData, tentsData }) => {
                 }
                 return !prev;
             });
+            return;
         } else if (item.type === 'account' && !isMobile && !cookies.authToken) {
             lightboxActions.showLightBox('login');
+        } else if (item.type === 'account' && isMobile && !cookies.authToken) {
+            redirectWithLoader("/login");
         } else {
             redirectWithLoader(item.slug);
         }
+        toggleMobileMenu();
     }
 
     const handleMainMenuClick = (item) => {
@@ -383,6 +387,7 @@ export const Header = ({ data, marketsData, tentsData }) => {
                         handleSubMenuClick={handleSubMenuClick}
                         setIsMobileMenuOpen={setIsMobileMenuOpen}
                         closeAllModals={closeAllModals}
+                        toggleMobileMenu={toggleMobileMenu}
                     />
                 </div>
 
