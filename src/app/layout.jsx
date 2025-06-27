@@ -10,8 +10,8 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { ModalsWrapper } from "@/components/Modals/ModalsWrapper";
 import 'air-datepicker/air-datepicker.css';
 import { Toaster } from "sonner";
-import { InvalidateButttonPin } from "@/components/common/helpers/InvalidateButttonPin";
 import { fetchLoginPageDetails } from "@/services/auth";
+import { InvalidateButtonPin } from "@/components/common/helpers/InvalidateButtonPin";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -104,9 +104,7 @@ export default async function RootLayout({ children }) {
             },
           }}
         />
-        <div className="hidden">
-          <InvalidateButttonPin />
-        </div>
+        <InvalidateButtonPin />
       </body>
     </html>
   );

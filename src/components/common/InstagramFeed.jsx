@@ -12,6 +12,8 @@ import { usePathname } from "next/navigation";
 import Loading from "@/app/loading";
 
 const privateRoutes = [
+  "/login",
+  "/create-account",
   "/account",
   "/change-password",
   "/quotes-history",

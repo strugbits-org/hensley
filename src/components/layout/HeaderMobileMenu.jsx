@@ -35,7 +35,8 @@ export const HeaderMobileMenu = ({
     activeMenu,
     handleMainMenuClick,
     handleSubMenuClick,
-    closeAllModals
+    closeAllModals,
+    toggleMobileMenu
 }) => {
     const transitionClass = isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full';
 
@@ -104,7 +105,7 @@ export const HeaderMobileMenu = ({
                         </div>
                     )}
                     <Suspense>
-                        <SearchModal isMobileMenu isActive={searchModal} closeModal={() => setSearchModal(false)} />
+                        <SearchModal isMobileMenu isActive={searchModal} closeModal={() => setSearchModal(false)} onSearch={() => isMobileMenuOpen ? toggleMobileMenu() : null} />
                     </Suspense>
                 </div>
             </div>

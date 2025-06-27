@@ -3,7 +3,7 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { PrimaryImage } from '../common/PrimaryImage';
 
-export const SearchModal = ({ closeModal, isActive }) => {
+export const SearchModal = ({ closeModal, isActive, onSearch = () => { } }) => {
     const inputRef = useRef(null);
     const [searchTerm, setSearchTerm] = useState('');
     const redirectWithLoader = useRedirectWithLoader();
@@ -25,9 +25,11 @@ export const SearchModal = ({ closeModal, isActive }) => {
         }
     };
 
-    const handleSearch = () => {
-        redirectWithLoader(`/search-results?query=${searchTerm}`);
+    const handleSearch = (e) => {
+        e?.preventDefault();
+        redirectWithLoader(`/search-results?query=${searchTerm}`, true);
         closeModal();
+        onSearch();
     };
 
     useEffect(() => {

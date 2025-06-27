@@ -146,7 +146,11 @@ export const findSortIndexByCategory = (data, categoryId) => {
         'L1': 'l1SubCategoryIndex',
         'L2': 'l2SubCategoryIndex'
     }
-    const category = data?.find(item => item.collections === categoryId);
+
+    const category = data.find(item => 
+        item.collections === categoryId || 
+        item.collections?._id === categoryId
+    );
     const sortIndex = category?.sortTitle?.[0];
     return sortIndex ? sortMapping[sortIndex] : null;
 };

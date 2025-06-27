@@ -8,6 +8,7 @@ import { useKeenSlider } from 'keen-slider/react';
 import { fetchSavedProductData } from '@/services/products';
 import { logError } from '@/utils';
 import Loading from '@/app/loading';
+import { CustomLink } from '../common/CustomLink';
 
 export const BestSellers = ({
     data,
@@ -78,9 +79,11 @@ export const BestSellers = ({
                     classes={`!text-primary py-[20px] md:mt-6 lg:mt-0 ${headingClasses}`}
                 />
                 {!buttonHide && (
-                    <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
-                        SEE ALL
-                    </PrimaryButton>
+                    <CustomLink to={"/subcategory/best-sellers"}>
+                        <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+                            SEE ALL
+                        </PrimaryButton>
+                    </CustomLink>
                 )}
             </div>
 

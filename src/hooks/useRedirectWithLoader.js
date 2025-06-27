@@ -5,8 +5,8 @@ const useRedirectWithLoader = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const redirectWithLoader = (slug) => {
-    if (pathname === slug) {
+  const redirectWithLoader = (slug, ignoreSamePath) => {
+    if (pathname === slug && ignoreSamePath) {
       loaderActions.show();
       setTimeout(() => loaderActions.hide(), 900);
     } else {

@@ -90,9 +90,10 @@ const SlideImage = React.memo(({ item, index, isMain = false }) => (
     <PrimaryImage
       min_h={200}
       min_w={200}
+      fit="fit"
       url={item.src}
       alt={item.alt || `Product image ${index + 1}`}
-      customClasses={`border border-black cursor-pointer h-full w-full object-contain transition-opacity duration-200 ${!isMain ? 'hover:opacity-80 max-h-[150px]' : 'max-h-[800px]'}`}
+      customClasses={`bg-white p-4 border border-black cursor-pointer h-full w-full object-contain transition-opacity duration-200 ${!isMain ? 'hover:opacity-80 max-h-[150px]' : 'max-h-[800px]'}`}
     />
   </div>
 ));

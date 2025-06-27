@@ -11,7 +11,6 @@ const ProductSlider_tab = ({ product }) => {
 
   const mediaItems = useMemo(() => product?.mediaItems || [], [product?.mediaItems])
 
-
   const sliderConfig = useMemo(() => ({
     loop: true,
     slides: {
@@ -46,36 +45,16 @@ const ProductSlider_tab = ({ product }) => {
 
   const slideItems = useMemo(() =>
     mediaItems.map((slide, idx) => {
-      const isActive = currentSlide === idx
-
       return (
         <div key={`slide-${idx}`} className="keen-slider__slide relative bg-white">
           <PrimaryImage
             min_h={200}
             min_w={200}
+            fit='fit'
             url={slide.src}
             alt={`Product image ${idx + 1}`}
-            customClasses="h-full w-full object-contain"
+            customClasses="h-full w-full object-contain p-4"
           />
-
-          {/* Cart icon with improved conditional rendering */}
-          <div
-            className={`absolute right-6 top-6 border border-black rounded-full w-14 h-14 flex items-center justify-center shrink-0 cursor-pointer transition-opacity duration-300 group/cart ${isActive
-              ? 'opacity-100'
-              : 'opacity-0 pointer-events-none md:opacity-100 md:pointer-events-auto'
-              }`}
-          >
-            <PrimaryImage
-              url="https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg"
-              alt="Add to cart"
-              customClasses="block group-hover/cart:hidden"
-            />
-            <PrimaryImage
-              url="https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg"
-              alt="Add to cart hover"
-              customClasses="hidden group-hover/cart:block"
-            />
-          </div>
         </div>
       )
     }), [mediaItems, currentSlide]);
