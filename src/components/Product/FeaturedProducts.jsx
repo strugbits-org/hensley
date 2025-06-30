@@ -1,15 +1,13 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import ProductCard from '../common/ProductCard';
-import { fetchSavedProductData } from '@/services/products';
 import Loading from '@/app/loading';
 
 export const FeaturedProducts = ({ data, pageDetails, loop = true, origin = "center", classes }) => {
     const { featuredProjectTitle } = pageDetails;
-    const [savedProducts, setSavedProducts] = useState([]);
     const [isSliderReady, setIsSliderReady] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
     const sliderInstance = useRef();
@@ -44,20 +42,6 @@ export const FeaturedProducts = ({ data, pageDetails, loop = true, origin = "cen
         []
     );
 
-    const fetchSavedProducts = async () => {
-        try {
-            const savedProducts = await fetchSavedProductData();
-            setSavedProducts(savedProducts);
-        } catch (error) {
-            logError("Error while fetching Saved Product", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchSavedProducts();
-    }, []);
-
-
     return (
         data && data.length > 0 && <div className={`w-full py-20 bg-primary lg:py-6 ${classes}`}>
             <div className='sm:px-0 px-[12px] flex items-center flex-col '>
@@ -79,8 +63,6 @@ export const FeaturedProducts = ({ data, pageDetails, loop = true, origin = "cen
                                 <ProductCard
                                     type='slider'
                                     data={productData}
-                                    savedProducts={savedProducts}
-                                    setSavedProducts={setSavedProducts}
                                     btnClass="border border-black"
                                 />
                             </div>

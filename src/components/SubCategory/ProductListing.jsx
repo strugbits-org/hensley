@@ -9,7 +9,6 @@ import Loading from '@/app/loading';
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper';
 import { findSortIndexByCategory, logError } from '@/utils';
 import { fetchSortedProducts } from '@/services/collections';
-import { fetchSavedProductData } from '@/services/products';
 
 // Debounce utility function
 const useDebounce = (callback, delay) => {
@@ -38,7 +37,6 @@ export const ProductListing = ({ data }) => {
     const [hasMore, setHasMore] = useState(true);
     const [bannersDesktop, setBannersDesktop] = useState([]);
     const [bannersMobile, setBannersMobile] = useState([]);
-    const [savedProducts, setSavedProducts] = useState([]);
     const [isMobile, setIsMobile] = useState(false);
 
     const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
@@ -121,19 +119,6 @@ export const ProductListing = ({ data }) => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    const fetchSavedProducts = async () => {
-        try {
-            const savedProducts = await fetchSavedProductData();
-            setSavedProducts(savedProducts);
-        } catch (error) {
-            logError("Error while fetching Saved Product", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchSavedProducts();
-    }, []);
-
     return (
         <div className='flex flex-col items-center lg:px-[24px] px-[12px]'>
             {/* Title Section */}
@@ -176,8 +161,6 @@ export const ProductListing = ({ data }) => {
                                 <ProductCard
                                     key={productData._id}
                                     data={productData}
-                                    savedProducts={savedProducts}
-                                    setSavedProducts={setSavedProducts}
                                 />
                             </li>
                             {(shouldInsertBanner || forceInsertBanner) && (

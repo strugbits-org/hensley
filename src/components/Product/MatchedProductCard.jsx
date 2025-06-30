@@ -4,13 +4,15 @@ import { CopyIcon } from '../common/helpers/CopyIcon';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { CustomLink } from '../common/CustomLink';
 import { lightboxActions } from '@/store/lightboxStore';
+import { SaveProductButton } from '../common/SaveProductButton';
+import { actions } from '@/store';
 
 function MatchedProductCard({ data, type = 'listing' }) {
     const { product } = data;
     const { mainMedia, name, slug, sku, additionalInfoSections } = product;
-    const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
 
     const handleAddToCart = () => {
+        const isTent = actions.isTentProduct(product._id);
         lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     }
     return (
@@ -63,10 +65,7 @@ function MatchedProductCard({ data, type = 'listing' }) {
                 </div>
             </div>
 
-            <div className="group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full w-[56px] h-[56px] flex items-center justify-center shrink-0 cursor-pointer">
-                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg" alt="Cart Icon" customClasses={"block group-hover/cart:hidden"} />
-                <PrimaryImage url="https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg" alt="Cart Icon" customClasses={"hidden group-hover/cart:block"} />
-            </div>
+            <SaveProductButton productData={data} />
         </div>
     );
 }

@@ -5,13 +5,14 @@ import { copyToClipboard } from '@/utils';
 import { CustomLink } from './CustomLink';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
+import { actions } from '@/store';
 
-function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProducts, btnClass }) {
+function ProductCard({ data, type = 'listing', btnClass }) {
     const { product } = data;
     const { name } = product;
-    const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
 
     const handleAddToCart = () => {
+        const isTent = actions.isTentProduct(product._id);
         lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     };
 
@@ -68,8 +69,6 @@ function ProductCard({ data, type = 'listing', savedProducts = [], setSavedProdu
             <SaveProductButton
                 key={product._id}
                 productData={data}
-                savedProducts={savedProducts}
-                setSavedProducts={setSavedProducts}
             />
         </div>
     );

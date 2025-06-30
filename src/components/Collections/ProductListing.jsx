@@ -10,7 +10,6 @@ import AutoClickWrapper from '../common/helpers/AutoClickWrapper'
 import { fetchSortedProducts } from '@/services/collections'
 import { findSortIndexByCategory, logError } from '@/utils'
 import { ProductsFilterPopup } from '../common/ProductsFilterPopup'
-import { fetchSavedProductData } from '@/services/products';
 import ProductFilterCardSubCategories from '../common/ProductFilterCardSubCategories';
 
 // Debounce utility function
@@ -39,7 +38,6 @@ function Listing({ data }) {
   const [hasMore, setHasMore] = useState(true);
   const [bannersDesktop, setBannersDesktop] = useState([]);
   const [bannersMobile, setBannersMobile] = useState([]);
-  const [savedProducts, setSavedProducts] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
 
   const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
@@ -115,17 +113,7 @@ function Listing({ data }) {
     setIsLoading(false);
   }, [sortedProducts, productBannersData]);
 
-  const fetchSavedProducts = async () => {
-    try {
-      const savedProducts = await fetchSavedProductData();
-      setSavedProducts(savedProducts);
-    } catch (error) {
-      logError("Error while fetching Saved Product", error);
-    }
-  };
-
   useEffect(() => {
-    fetchSavedProducts();
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -175,8 +163,6 @@ function Listing({ data }) {
                     <ProductCard
                       key={productData._id}
                       data={productData}
-                      savedProducts={savedProducts}
-                      setSavedProducts={setSavedProducts}
                     />
                   </li>
                   {(shouldInsertBanner || forceInsertBanner) && (
