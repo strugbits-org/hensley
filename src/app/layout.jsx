@@ -12,6 +12,7 @@ import 'air-datepicker/air-datepicker.css';
 import { Toaster } from "sonner";
 import { fetchLoginPageDetails } from "@/services/auth";
 import { InvalidateButtonPin } from "@/components/common/helpers/InvalidateButtonPin";
+import { SavedProductsHandler } from "@/components/common/helpers/SavedProductsHandler";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -105,6 +106,7 @@ export default async function RootLayout({ children }) {
           }}
         />
         <InvalidateButtonPin />
+        <SavedProductsHandler />
       </body>
     </html>
   );

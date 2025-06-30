@@ -18,6 +18,7 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import { actions } from '@/store';
 
 const userMenu = [
     { icon: searchIcon, type: 'search' },
@@ -200,6 +201,10 @@ export const Header = ({ data, marketsData, tentsData }) => {
         }, 100);
     }, [pathname]);
 
+    useEffect(() => {
+        const ids = tentsData.map(({ tent }) => tent._id);
+        actions.setTentsIds(ids);
+    }, []);
 
     return (
         <>

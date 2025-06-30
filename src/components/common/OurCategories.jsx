@@ -11,6 +11,7 @@ function OurCategories({ data, pageDetails, classes }) {
     const isTent = category._id === "d27f504d-05a2-ec30-c018-cc403e815bfa";
     return isTent;
   };
+
   return (
     <div className={`mb-20 md:mb-40 lg:mb-0 ${classes}`}>
       <div className='w-full sm:px-0 px-[12px]'>

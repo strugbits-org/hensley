@@ -45,7 +45,6 @@ const schema = yup.object({
 }).required();
 
 export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
-    console.log("matchedProducts", matchedProducts);
     
     // Form state management
     const [formData, setFormData] = useState({

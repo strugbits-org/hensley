@@ -58,7 +58,6 @@ export const Product = ({ data, matchedProducts = [] }) => {
   const [productSetItems, setProductSetItems] = useState([]);
   const [cartQuantity, setCartQuantity] = useState(1);
   const [isUpdatingCart, setIsUpdatingCart] = useState(false);
-  const [savedProducts, setSavedProducts] = useState([]);
   const [productInCart, setProductInCart] = useState();
 
   const redirectWithLoader = useRedirectWithLoader();
@@ -229,11 +228,7 @@ export const Product = ({ data, matchedProducts = [] }) => {
 
   const setInitialData = async () => {
     try {
-      const [savedProducts, existInCart] = await Promise.all([
-        fetchSavedProductData(),
-        checkProductInCart(product._id, isProductCollection)
-      ]);
-      setSavedProducts(savedProducts);
+      const existInCart = await checkProductInCart(product._id, isProductCollection);
       setProductInCart(existInCart);
     } catch (error) {
       logError("Error while fetching product data", error);
@@ -298,8 +293,6 @@ export const Product = ({ data, matchedProducts = [] }) => {
         <SaveProductButton
           key={product._id}
           productData={productData}
-          savedProducts={savedProducts}
-          setSavedProducts={setSavedProducts}
         />
       </div>
     </div>

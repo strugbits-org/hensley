@@ -8,7 +8,6 @@ import { useSearchParams } from 'next/navigation'
 import { searchMarkets, searchOtherData, searchProducts } from '@/services/search'
 import { loaderActions } from '@/store/loaderStore';
 import { HensleyNewsSearch } from '../common/HensleyNewsSearch';
-import { fetchSavedProductData } from '@/services/products';
 
 const SearchResult = ({ pageDetails }) => {
 
@@ -20,7 +19,6 @@ const SearchResult = ({ pageDetails }) => {
     const [tentsData, setTentsData] = useState([]);
     const [productsData, setProductsData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [savedProducts, setSavedProducts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const pageSize = 24;
 
@@ -65,22 +63,13 @@ const SearchResult = ({ pageDetails }) => {
         setSearchTerm(term);
     }, [searchParams]);
 
-    const fetchSavedProducts = async () => {
-        try {
-            const savedProducts = await fetchSavedProductData();
-            setSavedProducts(savedProducts);
-        } catch (error) {
-            logError("Error while fetching Saved Product", error);
-        }
-    };
-
     return (
         <>
             {!productsData.length && !marketsData.length && !blogsData.length && !projectsData.length && !tentsData.length && (
                 <div className='h-screen flex justify-center items-center'><span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>{loading ? `Searching for results...` : "No results found"}</span></div>
             )}
             {marketsData.length > 0 && <OurMarkets pageTitle={ourMarketsTitle} data={marketsData} />}
-            {productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} savedProducts={savedProducts} setSavedProducts={setSavedProducts} />}
+            {productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} />}
             {tentsData.length > 0 && <TentTypes pageTitle={tentsTypeTitle} data={tentsData} />}
             {blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: relatedPostTitle }} />}
             {projectsData.length > 0 && <RelatedProjects pageTitle={relatedProjectTitle} data={projectsData} />}

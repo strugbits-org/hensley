@@ -1,18 +1,21 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { PrimaryImage } from './PrimaryImage';
 import { toast } from 'sonner';
 import { saveProduct, unSaveProduct } from '@/services/products';
 import { useCookies } from 'react-cookie';
 import { lightboxActions } from '@/store/lightboxStore';
+import { useSnapshot } from 'valtio';
+import { actions, states } from '@/store';
 
-export const SaveProductButton = ({ productData, savedProducts, setSavedProducts, type = "primary" }) => {
+export const SaveProductButton = ({ productData, type = "primary" }) => {
+    const { savedProducts: savedProductsData } = useSnapshot(states);
+    const [savedProducts, setSavedProducts] = useState(savedProductsData);
     const [isUpdating, setIsUpdating] = useState(false);
     const isProductSaved = savedProducts.some(savedProduct => savedProduct._id === productData._id);
-      const [cookies, _setCookie] = useCookies(["authToken"]);
-    
+    const [cookies, _setCookie] = useCookies(["authToken"]);
 
     const handleSaveToggle = async () => {
-        if(!cookies.authToken) {
+        if (!cookies.authToken) {
             lightboxActions.showLightBox("login");
             return;
         };
@@ -49,6 +52,10 @@ export const SaveProductButton = ({ productData, savedProducts, setSavedProducts
     // Icon URLs
     const unSavedUrl = "https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg";
     const savedUrl = "https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg";
+
+    useEffect(() => {
+        actions.setSavedProducts(savedProducts);
+    }, [savedProducts]);
 
     return (
         <div

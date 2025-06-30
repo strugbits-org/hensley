@@ -3,13 +3,14 @@ import { PrimaryImage } from './PrimaryImage';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
 import { CustomLink } from './CustomLink';
+import { actions } from '@/store';
 
-function SecondaryProductCard({ data, savedProducts = [], setSavedProducts, type = 'listing' }) {
+function SecondaryProductCard({ data, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
-    const isTent = data?.categories?.includes("d27f504d-05a2-ec30-c018-cc403e815bfa") || false;
 
     const handleAddToCart = () => {
+        const isTent = actions.isTentProduct(product._id);
         lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     };
     return (
@@ -40,8 +41,6 @@ function SecondaryProductCard({ data, savedProducts = [], setSavedProducts, type
             <SaveProductButton
                 key={product._id}
                 productData={data}
-                savedProducts={savedProducts}
-                setSavedProducts={setSavedProducts}
                 type={"secondary"}
             />
         </div>

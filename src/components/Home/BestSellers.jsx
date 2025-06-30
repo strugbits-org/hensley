@@ -1,12 +1,10 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import SectionTitle from '../common/SectionTitle';
 import { PrimaryButton } from '../common/PrimaryButton';
 import ProductCard from '../common/ProductCard';
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md';
 import { useKeenSlider } from 'keen-slider/react';
-import { fetchSavedProductData } from '@/services/products';
-import { logError } from '@/utils';
 import Loading from '@/app/loading';
 import { CustomLink } from '../common/CustomLink';
 
@@ -20,7 +18,6 @@ export const BestSellers = ({
     buttonHide = false,
 }) => {
     const { bestSellerTitle } = pageDetails;
-    const [savedProducts, setSavedProducts] = useState([]);
     const sliderInstance = useRef();
     const [isSliderReady, setIsSliderReady] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -56,19 +53,6 @@ export const BestSellers = ({
         []
     );
 
-    const fetchSavedProducts = async () => {
-        try {
-            const savedProducts = await fetchSavedProductData();
-            setSavedProducts(savedProducts);
-        } catch (error) {
-            logError("Error while fetching Saved Product", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchSavedProducts();
-    }, []);
-
     if (!data || data.length === 0) return null;
 
     return (
@@ -103,8 +87,6 @@ export const BestSellers = ({
                             <ProductCard
                                 type="slider"
                                 data={productData}
-                                savedProducts={savedProducts}
-                                setSavedProducts={setSavedProducts}
                                 btnClass="border border-secondary-alt"
                             />
                         </div>
