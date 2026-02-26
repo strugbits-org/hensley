@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { createCart } from "../cart/CartApisVisitor";
 import queryCollection from "@/utils/fetchFunction";
-import { createWixClient } from "@/utils";
+import { payloadGetCurrentMember } from "./payloadAuth";
 
 export const getAuthToken = async () => {
   const cookieStore = cookies();
@@ -91,13 +91,20 @@ export const getCartId = async (createNew = true) => {
 
 export const checkIsAdmin = async (memberId) => {
   try {
-    const wixClient = await createWixClient();
-    const response = await wixClient.badges.listBadgesPerMember([memberId]);
-    const badgeIds = response?.memberBadgeIds[0]?.badgeIds || [];
-    const adminBadgeId = process.env.ADMIN_BADGE_ID;
-    const isAdmin = badgeIds.includes(adminBadgeId);
+    // TODO: Implement admin check with Payload CMS
+    // For now, we can check member metadata or a specific field
+    // when the admin role system is defined in Payload
+    const authToken = await getAuthToken();
+    if (!authToken) return false;
+    
+    const memberResponse = await payloadGetCurrentMember(authToken);
+    if (!memberResponse?.user) return false;
+    
+    // Check if user has admin role in metadata
+    const isAdmin = memberResponse.user.metadata?.isAdmin === true;
     return isAdmin;
   } catch (error) {
-    throw new Error(error);
+    console.error("Error checking admin status:", error);
+    return false;
   }
 };

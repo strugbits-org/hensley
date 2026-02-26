@@ -1,6 +1,7 @@
 import handleAuthentication from "@/services/auth/handleAuthentication";
-import { createWixClient, logError } from "@/utils";
+import { logError } from "@/utils";
 import { NextResponse } from "next/server";
+import { payloadUpdateProfile } from "@/services/auth/payloadAuth";
 
 export const POST = async (req) => {
   try {
@@ -11,28 +12,22 @@ export const POST = async (req) => {
 
     const body = await req.json();
     const { firstName, lastName, phone } = body;
-    const { memberId } = authenticatedUserData;
+    const { memberId, token } = authenticatedUserData;
 
-    
+    // Update profile in Payload CMS
     const updatedData = {
-      contact: {
-        firstName: firstName,
-        lastName: lastName,
-        phones: [phone],
-      },
+      firstName,
+      lastName,
+      metadata: { phone },
     };
     
-    const wixClient = await createWixClient();
-    const response = await wixClient.members.updateMember(
-      memberId,
-      updatedData
-    );
+    const response = await payloadUpdateProfile(memberId, token, updatedData);
 
     const updatedMember = {
-      loginEmail: response.loginEmail,
-      firstName: response.contact.firstName,
-      lastName: response.contact.lastName,
-      mainPhone: response.contact.phones[0],
+      loginEmail: response.email,
+      firstName: response.firstName,
+      lastName: response.lastName,
+      mainPhone: response.metadata?.phone || phone,
       memberId,
     };
 
