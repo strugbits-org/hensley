@@ -10,11 +10,13 @@ export const isAuthenticated = async (token) => {
     // Validate token with Payload CMS
     const memberResponse = await payloadGetCurrentMember(token);
     
-    if (!memberResponse || !memberResponse.user) {
+    // Handle different response structures from Payload
+    // Could be { user: {...} } or direct user object
+    const memberData = memberResponse?.user || memberResponse;
+    
+    if (!memberData || !memberData.id) {
       throw new Error("Unauthorized: Invalid token");
     }
-
-    const memberData = memberResponse.user;
 
     const data = {
       memberId: memberData.id,

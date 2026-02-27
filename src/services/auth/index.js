@@ -98,10 +98,12 @@ export const checkIsAdmin = async (memberId) => {
     if (!authToken) return false;
     
     const memberResponse = await payloadGetCurrentMember(authToken);
-    if (!memberResponse?.user) return false;
+    // Handle different response structures
+    const user = memberResponse?.user || memberResponse;
+    if (!user || !user.id) return false;
     
     // Check if user has admin role in metadata
-    const isAdmin = memberResponse.user.metadata?.isAdmin === true;
+    const isAdmin = user.metadata?.isAdmin === true;
     return isAdmin;
   } catch (error) {
     console.error("Error checking admin status:", error);

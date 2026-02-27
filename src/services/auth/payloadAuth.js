@@ -19,7 +19,7 @@ export const payloadLogin = async (email, password) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": CORE_API_KEY,
+      "Authorization": `Bearer ${CORE_API_KEY}`,
     },
     body: JSON.stringify({ email, password }),
   });
@@ -44,7 +44,7 @@ export const payloadRegister = async (userData) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": CORE_API_KEY,
+      "Authorization": `Bearer ${CORE_API_KEY}`,
     },
     body: JSON.stringify({
       email,
@@ -74,7 +74,6 @@ export const payloadGetCurrentMember = async (token) => {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`,
-      "x-api-key": CORE_API_KEY,
     },
   });
 
@@ -95,7 +94,7 @@ export const payloadForgotPassword = async (email) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": CORE_API_KEY,
+      "Authorization": `Bearer ${CORE_API_KEY}`,
     },
     body: JSON.stringify({ email }),
   });
@@ -114,7 +113,7 @@ export const payloadResetPassword = async (token, password) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": CORE_API_KEY,
+      "Authorization": `Bearer ${CORE_API_KEY}`,
     },
     body: JSON.stringify({ token, password }),
   });
@@ -140,7 +139,6 @@ export const payloadUpdateProfile = async (memberId, token, updates) => {
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`,
-      "x-api-key": CORE_API_KEY,
     },
     body: JSON.stringify(updates),
   });
@@ -163,7 +161,6 @@ export const payloadRefreshToken = async (token) => {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${token}`,
-      "x-api-key": CORE_API_KEY,
     },
   });
 
@@ -184,7 +181,6 @@ export const payloadLogout = async (token) => {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${token}`,
-      "x-api-key": CORE_API_KEY,
     },
   });
 };

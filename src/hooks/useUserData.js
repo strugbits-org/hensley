@@ -15,7 +15,10 @@ function useUserData() {
         logError("Error parsing user data from cookie", error);
       }
     }
-  }, [cookies]);  
+  }, [cookies]);
+
+  console.log("signedUserData", signedUserData);
+  
 
   return {
     signedUserData,

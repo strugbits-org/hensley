@@ -166,9 +166,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
         }
     };
 
-    useEffect(() => {
-        fetchCartItems();
-    }, []);
+    // useEffect(() => {
+    //     fetchCartItems();
+    // }, []);
 
     useEffect(() => {
         const findActiveSubMenu = () => {

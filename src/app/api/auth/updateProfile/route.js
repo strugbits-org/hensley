@@ -23,11 +23,14 @@ export const POST = async (req) => {
     
     const response = await payloadUpdateProfile(memberId, token, updatedData);
 
+    // Payload returns updated doc in response.doc
+    const doc = response.doc || response;
+    
     const updatedMember = {
-      loginEmail: response.email,
-      firstName: response.firstName,
-      lastName: response.lastName,
-      mainPhone: response.metadata?.phone || phone,
+      loginEmail: doc.email || authenticatedUserData.email,
+      firstName: doc.firstName || firstName,
+      lastName: doc.lastName || lastName,
+      mainPhone: doc.metadata?.phone || phone,
       memberId,
     };
 

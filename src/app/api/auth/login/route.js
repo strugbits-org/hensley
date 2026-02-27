@@ -9,7 +9,15 @@ export const POST = async (req) => {
 
     // Authenticate with Payload CMS
     const loginResponse = await payloadLogin(email, password);
-    const { user, token, exp } = loginResponse;
+    
+    // Handle different response structures from Payload
+    const user = loginResponse.user || loginResponse.doc || loginResponse;
+    const token = loginResponse.token || user.token;
+    const exp = loginResponse.exp || user.exp;
+
+    if (!user || !user.id) {
+      throw new Error("Invalid response from authentication server");
+    }
 
     // Handle cart merge if cartId is provided
     // TODO: Implement cart merge with new cart system when ready
