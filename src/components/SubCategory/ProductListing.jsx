@@ -59,7 +59,7 @@ export const ProductListing = ({ data }) => {
                 setProducts(newSortedProducts.items);
             }
 
-            setHasMore(newSortedProducts.hasNext);
+            setHasMore(newSortedProducts.hasNextPage);
             return newSortedProducts;
         } catch (error) {
             logError(`Error fetching ${isLoadMore ? 'more' : 'sorted'} products:`, error);
@@ -107,8 +107,10 @@ export const ProductListing = ({ data }) => {
             setBannersDesktop([]);
             setBannersMobile([]);
         }
-        setProducts(sortedProducts.items);
-        setHasMore(sortedProducts.hasNext);
+        console.log("products", sortedProducts);
+        
+        setProducts(sortedProducts.docs);
+        setHasMore(sortedProducts.hasNextPage);
         setIsLoading(false);
     }, [sortedProducts, productBannersData]);
 
@@ -172,11 +174,11 @@ export const ProductListing = ({ data }) => {
                     );
                 })}
             </ul>
-            {!isLoading && hasMore && (
+            {/* {!isLoading && hasMore && (
                 <AutoClickWrapper onIntersect={handleLoadMore}>
                     <Loading custom={true} classes='w-full flex justify-center p-6' />
                 </AutoClickWrapper>
-            )}
+            )} */}
 
             {isLoading && (<Loading custom={true} classes='w-full flex justify-center p-6' />)}
         </div>

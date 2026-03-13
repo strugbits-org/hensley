@@ -4,6 +4,7 @@ import { fetchCategoriesData } from "../products";
 import { fetchOurCategoriesData } from "..";
 import { fetchCategoriesSortStructure, fetchProductBannersData, fetchSortedProducts, fetchSubcategoriesData } from "../collections";
 import queryCollection from "@/utils/fetchFunction";
+import { queryProductCollectionBySlug, queryProductCollections, queryProductsByCollectionIds } from "../payloadCollections";
 
 
 export const fetchsubCategoriesPageDetails = async () => {
@@ -31,23 +32,35 @@ export const fetchSelectedCategoryData = async (slug) => {
             fetchsubCategoriesPageDetails()
         ]);
 
-        const selectedCategory = categoriesData.find(category => category.slug === slug);
+        // const selectedCategory = categoriesData.find(category => category.slug === slug);
+        const selectedCategory = await queryProductCollectionBySlug(slug);
+
         if (!selectedCategory) {
             throw new Error(`Category with slug "${slug}" not found`);
         }
 
-        const subCategoriesData = await fetchSubcategoriesData(selectedCategory._id);
-        const subCategories = subCategoriesData?.subcategories || [];
+        // const subCategoriesData = await fetchSubcategoriesData(selectedCategory._id);
+        const subCategories = selectedCategory?.children?.docs
+            || selectedCategory?.children
+            || [];
 
-        const collectionIds = [selectedCategory._id, ...subCategories.map(item => item._id)];
-        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory._id);
+        // const subCategories = subCategoriesData?.subcategories || [];
 
-        const sortedProducts = await fetchSortedProducts({
-            collectionIds,
-            limit: 12,
-            skip: 0,
-            sortIndex
-        });
+        const collectionIds = [selectedCategory.id, ...subCategories.map(x => x.id)];
+        // const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory._id);
+
+        // const sortedProducts = await fetchSortedProducts({
+        //     collectionIds,
+        //     limit: 12,
+        //     skip: 0,
+        //     sortIndex
+        // });
+
+        // const sortedProducts = selectedCategory?.products || [];
+        const sortedProducts = await queryProductsByCollectionIds(collectionIds);
+
+        console.log("sortedProducts", sortedProducts);
+        
 
         const data = {
             selectedCategory,
@@ -56,7 +69,7 @@ export const fetchSelectedCategoryData = async (slug) => {
             categoriesSortData,
             productBannersData,
             collectionIds,
-            sortIndex,
+            sortIndex: 0,
             sortedProducts,
             pageDetails
         }

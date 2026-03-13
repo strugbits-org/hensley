@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { PrimaryImage } from './PrimaryImage';
 import { CopyIcon } from './helpers/CopyIcon';
@@ -6,10 +7,15 @@ import { CustomLink } from './CustomLink';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
 import { actions } from '@/store';
+import Image from 'next/image';
 
-function ProductCard({ data, type = 'listing', btnClass }) {
-    const { product } = data;
-    const { name } = product;
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
+
+function ProductCard({ data: product, type = 'listing', btnClass }) {
+    console.log("product", product);
+    const { title } = product;
+
+    
 
     const handleAddToCart = () => {
         const isTent = actions.isTentProduct(product._id);
@@ -19,12 +25,12 @@ function ProductCard({ data, type = 'listing', btnClass }) {
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between max-lg:h-full h-[620px] ${type !== 'listing' ? 'bg-primary-alt col-span-1.5 md:col-span-2' : ''}`}>
             <CustomLink to={`/product/${product.slug}`} className={`h-[217px] lg:h-full overflow-hidden flex justify-center items-center p-2 lg:p-14 ${type === 'listing' ? 'bg-white' : 'min-h-[450px]'}`}>
-                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
+                <Image src={ CORE_API_BASE_URL + product.mainMedia.url} alt={title} width={500} height={500} className={"aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
             </CustomLink>
 
             <div className="flex max-w-full flex-wrap lg:pl-[23px] lg:gap-y-[15px] pt-2 lg:pt-6 ">
                 <h2 className={`uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular ${type === 'listing' ? 'text-xs leading-tight ' : ''}`}>
-                    {name}
+                    {title}
                 </h2>
 
                 <div className="mt-1 w-full flex flex-col 2xl:flex-row justify-between items-center gap-4">
@@ -35,7 +41,7 @@ function ProductCard({ data, type = 'listing', btnClass }) {
                                 <CopyIcon />
                             </div>
                         )}
-                        {product.additionalInfoSections?.map((data, index) => {
+                        {/* {product.additionalInfoSections?.map((data, index) => {
                             const { title, description } = data;
                             if (title == "Size") {
                                 return (
@@ -48,7 +54,7 @@ function ProductCard({ data, type = 'listing', btnClass }) {
                                     ></div>
                                 );
                             }
-                        })}
+                        })} */}
                     </div>
 
                     <button
@@ -66,10 +72,10 @@ function ProductCard({ data, type = 'listing', btnClass }) {
                 </div>
             </div>
 
-            <SaveProductButton
+            {/* <SaveProductButton
                 key={product._id}
                 productData={data}
-            />
+            /> */}
         </div>
     );
 }
