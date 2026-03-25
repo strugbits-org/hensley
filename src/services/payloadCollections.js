@@ -66,3 +66,23 @@ export const queryProductsByCollectionIds = async (collections) => {
         throw error;
     }
 }
+
+export const queryProductsBySlug = async (slug) => {
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            where: {
+                slug: { equals: slug }
+            },
+            limit: 1,
+            draft: false,
+            locale: "en",
+            depth: 1,
+        });
+
+        return result.docs?.[0] || null;
+    } catch (error) {
+        logError('Error querying product by slug:', error);
+        throw error;
+    }
+}

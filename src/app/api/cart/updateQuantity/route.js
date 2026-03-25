@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { createWixClientCart, logError } from "@/utils";
+import { logError } from "@/utils";
 import handleAuthentication from "@/services/auth/handleAuthentication";
+import { updateCartQuantity } from "@/services/cart/payloadCart";
 
-// POST method handler
 export const POST = async (req) => {
   try {
     const authenticatedUserData = await handleAuthentication(req);
@@ -10,18 +10,23 @@ export const POST = async (req) => {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const body = await req.json();
-    const { memberTokens, lineItems } = body;
+    const { lineItems } = body;
 
-    const cartClient = await createWixClientCart(memberTokens);
-
-    await cartClient.currentCart.updateCurrentCartLineItemQuantity(lineItems);
+    const updatedCart = await updateCartQuantity(
+      authenticatedUserData.memberId,
+      authenticatedUserData.token,
+      lineItems
+    );
 
     return NextResponse.json(
-      { message: "Cart updated Successfully" },
+      { 
+        message: "Cart updated Successfully",
+        cart: updatedCart
+      },
       { status: 200 }
     );
   } catch (error) {
-    logError(error);
+    logError("Error updating cart quantity:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

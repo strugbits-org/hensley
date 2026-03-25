@@ -10,6 +10,7 @@ import * as cheerio from "cheerio";
 import { files } from "@wix/media";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
 
 export const logError = (...args) => {
     if (isDebugMode) console.error(...args);
@@ -341,7 +342,7 @@ export const formatDateForQuote = (d) => {
 }
 
 export const getAdditionalInfoSection = (sections, title) => {
-    const html = sections.find(item => item.title.toUpperCase() === title)?.description;
+    const html = richTextToHTML(sections.find(item => item.title.toUpperCase() === title)?.description);
     if (!html) return "";
 
     const $ = cheerio.load(html);
@@ -359,8 +360,225 @@ export const getAdditionalInfoSection = (sections, title) => {
     return parse(cleaned) || "";
 };
 
+const escapeHtml = (value = "") => String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const applyLexicalTextFormatting = (value = "", format = 0) => {
+    let formattedValue = value;
+
+    if (format & 1) formattedValue = `<strong>${formattedValue}</strong>`;
+    if (format & 2) formattedValue = `<em>${formattedValue}</em>`;
+    if (format & 4) formattedValue = `<s>${formattedValue}</s>`;
+    if (format & 8) formattedValue = `<u>${formattedValue}</u>`;
+    if (format & 16) formattedValue = `<code>${formattedValue}</code>`;
+
+    return formattedValue;
+};
+
+const renderLexicalNodeToHTML = (node) => {
+    if (!node || typeof node !== "object") return "";
+
+    const childrenHTML = Array.isArray(node.children)
+        ? node.children.map(renderLexicalNodeToHTML).join("")
+        : "";
+
+    switch (node.type) {
+        case "root":
+            return childrenHTML;
+        case "paragraph":
+            return childrenHTML ? `<p>${childrenHTML}</p>` : "";
+        case "text":
+            return applyLexicalTextFormatting(escapeHtml(node.text || ""), node.format || 0);
+        case "linebreak":
+            return "<br />";
+        case "list": {
+            const listTag = node.listType === "number" ? "ol" : "ul";
+            return `<${listTag}>${childrenHTML}</${listTag}>`;
+        }
+        case "listitem":
+            return `<li>${childrenHTML}</li>`;
+        case "quote":
+            return `<blockquote>${childrenHTML}</blockquote>`;
+        case "heading": {
+            const headingLevel = Math.min(Math.max(node.tag?.replace("h", "") || 2, 1), 6);
+            return `<h${headingLevel}>${childrenHTML}</h${headingLevel}>`;
+        }
+        default:
+            return childrenHTML;
+    }
+};
+
+const extractLexicalNodeText = (node) => {
+    if (!node || typeof node !== "object") return "";
+
+    if (node.type === "text") return node.text || "";
+    if (node.type === "linebreak") return "\n";
+
+    const childrenText = Array.isArray(node.children)
+        ? node.children.map(extractLexicalNodeText).join("")
+        : "";
+
+    if (["paragraph", "listitem", "quote", "heading"].includes(node.type)) {
+        return `${childrenText}\n`;
+    }
+
+    return childrenText;
+};
+
+export const richTextToHTML = (content) => {
+    if (!content) return "";
+    if (typeof content === "string") return content;
+
+    if (content?.root?.type === "root") {
+        return renderLexicalNodeToHTML(content.root);
+    }
+
+    return "";
+};
+
+export const richTextToPlainText = (content) => {
+    if (!content) return "";
+
+    if (typeof content === "string") {
+        return content
+            .replace(/<br\s*\/?>/gi, "\n")
+            .replace(/<[^>]*>/g, " ")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+\n/g, "\n")
+            .replace(/\n\s+/g, "\n")
+            .replace(/\n{3,}/g, "\n\n")
+            .replace(/[ \t]{2,}/g, " ")
+            .trim();
+    }
+
+    if (content?.root?.type === "root") {
+        return extractLexicalNodeText(content.root)
+            .replace(/\n{3,}/g, "\n\n")
+            .trim();
+    }
+
+    return "";
+};
+
+export const resolveProductMediaUrl = (media) => {
+    const source = typeof media === "string"
+        ? media
+        : media?.src || media?.url || media?.media?.url || media?.mainMedia?.url || media?.mainMedia;
+
+    if (!source) return "";
+    if (/^(https?:)?\/\//.test(source) || source.startsWith("wix:")) return source;
+
+    return `${CORE_API_BASE_URL}${source}`;
+};
+
+const normalizeAdditionalInfoSections = (sections = []) => {
+    if (!Array.isArray(sections)) return [];
+
+    return sections.map((section) => ({
+        ...section,
+        html: richTextToHTML(section?.description),
+        text: richTextToPlainText(section?.description),
+    }));
+};
+
+const getCollectionKey = (collection = {}) => collection.id || collection._id || collection.slug || collection.name;
+
+const buildCollectionBreadcrumbs = (collections = []) => {
+    if (!Array.isArray(collections) || collections.length === 0) return [];
+
+    const collectionMap = new Map(collections.map((collection) => [getCollectionKey(collection), collection]));
+    const deepestCollection = [...collections]
+        .filter(Boolean)
+        .sort((left, right) => (right?.hierarchyLevel || 0) - (left?.hierarchyLevel || 0))[0];
+
+    const breadcrumbs = [];
+    const visited = new Set();
+    let currentCollection = deepestCollection;
+
+    while (currentCollection) {
+        const key = getCollectionKey(currentCollection);
+        if (!key || visited.has(key)) break;
+
+        visited.add(key);
+        breadcrumbs.unshift({
+            id: currentCollection.id || currentCollection._id,
+            name: currentCollection.name,
+            slug: currentCollection.slug,
+            hierarchyLevel: currentCollection.hierarchyLevel || 0,
+        });
+
+        if (!currentCollection.parent) break;
+
+        currentCollection = typeof currentCollection.parent === "object"
+            ? currentCollection.parent
+            : collectionMap.get(currentCollection.parent);
+    }
+
+    return breadcrumbs;
+};
+
+export const normalizeProductForDisplay = (product = {}) => {
+    const title = product?.name || product?.title || "";
+    const id = product?._id || product?.id || "";
+    const price = Number(product?.price?.amount ?? product?.price ?? 0) || 0;
+    const compareAtPrice = Number(product?.compareAtPrice?.amount ?? product?.compareAtPrice ?? 0) || 0;
+    const additionalInfoSections = normalizeAdditionalInfoSections(product?.additionalInfoSections || []);
+    const descriptionHtml = richTextToHTML(product?.description);
+    const descriptionText = richTextToPlainText(product?.description);
+    const rawMediaItems = Array.isArray(product?.mediaItems) ? product.mediaItems : [];
+
+    // Build gallery slides: new Payload shape is flat { id, alt, url, ... };
+    // legacy Wix shape was nested { media: { url, alt }, altText, isFeatured }.
+    const mediaItems = rawMediaItems
+        .map((item, index) => ({
+            id: item?.id || item?.media?.id || `${id || title}-media-${index}`,
+            src: resolveProductMediaUrl(item),
+            alt: item?.alt || item?.altText || item?.media?.alt || title || `Product image ${index + 1}`,
+        }))
+        .filter((item) => item.src);
+
+    // Prepend mainMedia as the first gallery slide when it is not already present
+    const mainMediaUrl = resolveProductMediaUrl(product?.mainMedia);
+    const mainMediaAlt = product?.mainMedia?.alt || title;
+
+    if (mainMediaUrl && !mediaItems.some((item) => item.src === mainMediaUrl)) {
+        mediaItems.unshift({
+            id: product?.mainMedia?.id || `${id || title}-main-media`,
+            src: mainMediaUrl,
+            alt: mainMediaAlt,
+        });
+    }
+
+    return {
+        ...product,
+        _id: id,
+        id,
+        name: title,
+        title,
+        price,
+        compareAtPrice: compareAtPrice || null,
+        formattedPrice: product?.formattedPrice || formatTotalPrice(price),
+        formattedCompareAtPrice: compareAtPrice ? formatTotalPrice(compareAtPrice) : "",
+        description: descriptionHtml,
+        descriptionHtml,
+        descriptionText,
+        additionalInfoSections,
+        size: additionalInfoSections.find((section) => section?.title === "Size")?.text || "—",
+        mainMedia: mainMediaUrl,
+        mainMediaUrl,
+        mediaItems,
+        collectionBreadcrumbs: buildCollectionBreadcrumbs(product?.collections || []),
+        stockLabel: product?.stock?.inStock ? "In stock" : "Out of stock",
+    };
+};
+
 export const findProductSize = (additionalInfoSections = []) => {
-    const size = additionalInfoSections?.find(x => x.title === "Size")?.description?.replace(/<[^>]*>/g, "").trim() || "—";
+    const sizeSection = additionalInfoSections?.find(x => x.title === "Size");
+    const size = richTextToPlainText(sizeSection?.description || sizeSection?.text || "") || "—";
     return size;
 }
 

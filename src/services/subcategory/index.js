@@ -59,8 +59,8 @@ export const fetchSelectedCategoryData = async (slug) => {
         // const sortedProducts = selectedCategory?.products || [];
         const sortedProducts = await queryProductsByCollectionIds(collectionIds);
 
-        console.log("sortedProducts", sortedProducts);
-        
+        // console.log("sortedProducts", sortedProducts);
+
 
         const data = {
             selectedCategory,

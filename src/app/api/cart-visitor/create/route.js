@@ -1,30 +1,22 @@
-import { createWixClientOAuth, logError } from "@/utils";
 import { NextResponse } from "next/server";
+import { logError } from "@/utils";
+import { getOrCreateVisitorCart } from "@/services/cart/payloadCart";
 
 export const POST = async () => {
   try {
-    const wixClient = await createWixClientOAuth();
-    const cartResponse = await wixClient.cart.createCart({
-      lineItems: [
-        {
-          catalogReference: {
-            appId: "215238eb-22a5-4c36-9e7b-e7c08025e04e",
-            catalogItemId: "1",
-          },
-          quantity: 1,
-        },
-      ],
-    });
+    const visitorId = crypto.randomUUID();
+    await getOrCreateVisitorCart(visitorId);
 
     return NextResponse.json(
       {
         message: "Cart created Successfully",
-        cart: cartResponse,
+        // _id matches what getCartId() stores in the cartId cookie
+        cart: { _id: visitorId },
       },
       { status: 200 }
     );
   } catch (error) {
-    logError(error);
+    logError("Error creating visitor cart:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

@@ -4,12 +4,12 @@ import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError, normalizeProductForDisplay } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
-import { checkProductInCart, fetchSavedProductData } from '@/services/products';
+import { checkProductInCart } from '@/services/products';
 import { BreadCrumbs } from '../common/BreadCrumbs';
 import { MatchItWithButton } from '../common/MatchItWithButton';
 
@@ -63,21 +63,21 @@ export const Product = ({ data, matchedProducts = [] }) => {
   const redirectWithLoader = useRedirectWithLoader();
 
   const { productData, productCollectionData } = data;
-  const { product } = productData;
+  const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
 
   const isProductCollection = productData?.isProductCollection || false;
 
-  useMemo(() => {
+  useEffect(() => {
     if (!isProductCollection || !productCollectionData) {
       setProductSetItems([]);
       return;
     }
 
     const items = productCollectionData.map(set => ({
-      id: set.product._id,
-      product: set.product.name,
+      id: set.product._id || set.product.id,
+      product: set.product.name || set.product.title,
       size: findProductSize(set.product.additionalInfoSections),
-      formattedPrice: set.product.formattedPrice,
+      formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
       price: set.product.price,
       quantity: set.quantity
     }));
@@ -91,6 +91,19 @@ export const Product = ({ data, matchedProducts = [] }) => {
     const productSize = findProductSize(product.additionalInfoSections);
     return [{ size: productSize, formattedPrice: product.formattedPrice }];
   }, [isProductCollection, product]);
+
+  const breadcrumbItems = useMemo(() => {
+    const items = [{ label: 'Home', to: '/' }];
+
+    product.collectionBreadcrumbs?.forEach((collection) => {
+      if (collection?.slug) {
+        items.push({ label: collection.name, to: `/subcategory/${collection.slug}` });
+      }
+    });
+
+    items.push({ label: product.name || product.title || 'Product' });
+    return items;
+  }, [product.collectionBreadcrumbs, product.name, product.title]);
 
   const totalPrice = useMemo(() => {
     if (isProductCollection) {
@@ -237,7 +250,7 @@ export const Product = ({ data, matchedProducts = [] }) => {
 
   useEffect(() => {
     setInitialData();
-  }, []);
+  }, [product._id, isProductCollection]);
 
   return (
     <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]'>
@@ -250,10 +263,7 @@ export const Product = ({ data, matchedProducts = [] }) => {
       <div className='xl:w-1/2 flex flex-col items-center relative'>
         <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
           <div className='w-full flex items-center my-8'>
-            <BreadCrumbs items={[
-              { label: 'Home', to: '/' },
-              { label: `${product.name}` }
-            ]} />
+            <BreadCrumbs items={breadcrumbItems} />
           </div>
 
           <h1 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[15px] lg:mb-[28px] sm:mt-[9px] sm:mb-[9px]'>

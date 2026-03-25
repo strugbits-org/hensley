@@ -265,7 +265,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data?.image || data?.mediaItem.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='w-full flex flex-col'>
@@ -405,7 +405,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data?.image || data?.mediaItem.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>

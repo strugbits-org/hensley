@@ -4,7 +4,7 @@ import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteButton } from './AddtoQuoteButton'
 import ProductDescription from '@/components/common/helpers/ProductDescription'
 import { QuantityControls } from '@/components/Product'
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError } from '@/utils'
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError, normalizeProductForDisplay } from '@/utils'
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
 import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
@@ -21,7 +21,8 @@ const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
 const AddToCart = ({ data, onClose }) => {
   const { productData } = data;
-  const { product, isProductCollection = false } = productData;
+  const { isProductCollection = false } = productData;
+  const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -103,7 +104,7 @@ const AddToCart = ({ data, onClose }) => {
   const handleAddToCart = async () => {
     try {
       setIsLoading(true);
-      const productId = product._id;
+      const productId = product._id || product.id;
       const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
       let lineItems = [];
 
@@ -181,17 +182,24 @@ const AddToCart = ({ data, onClose }) => {
       if (!isProductCollection) return;
 
       setIsLoadingCollections(true);
-      const productId = product._id;
+      const productId = product._id || product.id;
+      if (!productId) {
+        setIsLoadingCollections(false);
+        return;
+      }
 
       const collectionData = await fetchProductCollectionData(productId);
 
-      if (!collectionData) return;
+      if (!collectionData) {
+        setIsLoadingCollections(false);
+        return;
+      }
 
       const items = collectionData.map(set => ({
-        id: set.product._id,
-        product: set.product.name,
+        id: set.product._id || set.product.id,
+        product: set.product.name || set.product.title,
         size: findProductSize(set.product.additionalInfoSections),
-        formattedPrice: set.product.formattedPrice,
+        formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
         price: set.product.price,
         quantity: set.quantity
       }));
@@ -215,7 +223,7 @@ const AddToCart = ({ data, onClose }) => {
 
   useEffect(() => {
     setInitialData();
-  }, [isProductCollection]);
+  }, [isProductCollection, product._id, product.id]);
 
   return (
     <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
@@ -224,7 +232,7 @@ const AddToCart = ({ data, onClose }) => {
           <Loading custom={true} classes='absolute' />
         </div>
       )}
-      <AddToCartSlider data={productData} isOpen={data.open} />
+      <AddToCartSlider data={{ ...productData, product }} isOpen={data.open} />
       <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative'>
         <div className='w-full flex flex-col  gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
           <div className='w-full flex justify-between relative '>
@@ -236,7 +244,7 @@ const AddToCart = ({ data, onClose }) => {
             uppercase
             w-full
             max-w-[350px]
-            '>{product.name}</span>
+            '>{product.name || product.title}</span>
             <button onClick={onClose} className='close-button absolute top-0 right-0'>
               <svg preserveAspectRatio="xMidYMid meet" width="24.707" height="24.707" data-bbox="25.975 25.975 148.05 148.05" xmlns="http://www.w3.org/2000/svg" viewBox="25.975 25.975 148.05 148.05" role="presentation" aria-hidden="true">
                 <g>

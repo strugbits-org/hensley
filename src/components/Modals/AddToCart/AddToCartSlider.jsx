@@ -6,7 +6,7 @@ import { useKeenSlider } from 'keen-slider/react'
 import { PrimaryImage } from '@/components/common/PrimaryImage';
 
 export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent = false }) => {
-    const mediaItems = data.product.mediaItems;
+    const mediaItems = data?.product?.mediaItems || [];
     const [currentSlide, setCurrentSlide] = useState(0)
     const [isMounted, setIsMounted] = useState(false);
 
@@ -47,11 +47,11 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
         <div className={`relative w-full lg:h-full sm:max-w-[45%] ${isTent ? 'h-auto' : 'h-full'}`}>
             <div ref={sliderRef} className="keen-slider">
                 {mediaItems.map((item, index) => (
-                    <div key={item.id} className={`keen-slider__slide lg:!max-h-[400px] number-slide${index + 1} p-4 ${isTent ? '!max-h-[250px]' : '!max-h-[400px]'}`}>
+                    <div key={item.id || index} className={`keen-slider__slide lg:!max-h-[400px] number-slide${index + 1} p-4 ${isTent ? '!max-h-[250px]' : '!max-h-[400px]'}`}>
                         <PrimaryImage
-                            key={item.id}
+                            key={item.id || index}
                             url={item.src}
-                            alt={'slide image'}
+                            alt={item.alt || 'slide image'}
                             fit='fit'
                             customClasses={"h-full w-full object-contain"} />
                     </div>

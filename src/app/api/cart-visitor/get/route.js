@@ -1,20 +1,23 @@
 import { NextResponse } from "next/server";
-import { createWixClient } from "@/utils";
+import { logError } from "@/utils";
+import { getOrCreateVisitorCart } from "@/services/cart/payloadCart";
 
 export const POST = async (req) => {
-  const cartId = await req.json();
   try {
-    const wixClient = await createWixClient();
-    const cart = await wixClient.cart.getCart(cartId);
+    const visitorId = await req.json();
+
+    if (!visitorId) {
+      return NextResponse.json({ error: "visitorId is required" }, { status: 400 });
+    }
+
+    const cart = await getOrCreateVisitorCart(visitorId);
 
     return NextResponse.json(
-      {
-        message: "Cart fetched Successfully",
-        cart,
-      },
+      { message: "Cart fetched Successfully", cart },
       { status: 200 }
     );
   } catch (error) {
+    logError("Error getting visitor cart:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

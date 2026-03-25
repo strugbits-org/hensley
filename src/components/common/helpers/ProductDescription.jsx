@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import parse from 'html-react-parser';
+import { richTextToHTML, richTextToPlainText } from '@/utils';
 
 export default function ProductDescription({ text, maxChars = 200 }) {
     const [expanded, setExpanded] = useState(false);
-    const isLong = text.replace(/<[^>]+>/g, '').trim().length > maxChars;
-    const displayedText = expanded ? text : text.slice(0, maxChars) + (isLong ? '...' : '');
+    const htmlText = richTextToHTML(text);
+    const plainText = richTextToPlainText(text);
+    const isLong = plainText.length > maxChars;
+    const richContent = parse(htmlText);
+    const previewText = `${plainText.slice(0, maxChars)}${isLong ? '...' : ''}`;
 
-    if (!text) return null;
+    if (!htmlText && !plainText) return null;
     return (
         <div className='w-full flex flex-col gap-y-[15px]'>
             <h2 className='uppercase text-[16px] text-secondary-alt font-haasLight block'>Description</h2>
-            <div className='uppercase text-[16px] text-secondary-alt font-haasLight block'>
-                {parse(displayedText)}
+            <div className='uppercase text-[16px] text-secondary-alt font-haasLight block whitespace-pre-line'>
+                {(isLong && !expanded) ? previewText : richContent}
             </div>
             {isLong && (
                 <div>

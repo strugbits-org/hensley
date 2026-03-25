@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { createWixClientCart, logError } from "@/utils";
+import { logError } from "@/utils";
 import handleAuthentication from "@/services/auth/handleAuthentication";
+import { addToCart } from "@/services/cart/payloadCart";
 
 export const POST = async (req) => {
   try {
@@ -10,18 +11,26 @@ export const POST = async (req) => {
     }
 
     const body = await req.json();
-    const { memberTokens, productData } = body;
+    const { productData } = body;
 
-    const cartClient = await createWixClientCart(memberTokens);
+    // productData should contain { lineItems: [...] }
+    const lineItems = productData?.lineItems || [];
 
-    await cartClient.currentCart.addToCurrentCart(productData);
+    const updatedCart = await addToCart(
+      authenticatedUserData.memberId,
+      authenticatedUserData.token,
+      lineItems
+    );
 
     return NextResponse.json(
-      { message: "Cart updated Successfully" },
+      { 
+        message: "Cart updated Successfully",
+        cart: updatedCart 
+      },
       { status: 200 }
     );
   } catch (error) {
-    logError("Error", error);
+    logError("Error adding to cart:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logError } from "@/utils";
 import { payloadLogin } from "@/services/auth/payloadAuth";
+import { mergeVisitorCartToMember } from "@/services/cart/payloadCart";
 
 export const POST = async (req) => {
   try {
@@ -19,11 +20,13 @@ export const POST = async (req) => {
       throw new Error("Invalid response from authentication server");
     }
 
-    // Handle cart merge if cartId is provided
-    // TODO: Implement cart merge with new cart system when ready
+    // Merge visitor cart into member cart on login (non-fatal)
     if (cartId) {
-      // Cart merge logic will be implemented when cart system is migrated
-      console.log("Cart merge pending migration, cartId:", cartId);
+      try {
+        await mergeVisitorCartToMember(cartId, user.id, token);
+      } catch (mergeError) {
+        logError("Cart merge failed (non-fatal):", mergeError);
+      }
     }
 
     // Prepare response data matching the expected format

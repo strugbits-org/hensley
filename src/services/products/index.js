@@ -3,6 +3,7 @@ import { logError, mapProductSetItems } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
+import { queryProductsBySlug } from "../payloadCollections";
 
 const baseUrl = process.env.BASE_URL;
 
@@ -201,25 +202,37 @@ export const fetchProductPageDetails = async () => {
 
 export const fetchProductPageData = async (slug) => {
     try {
-        const productData = await fetchProductData(slug);
-        if (!productData || !productData.product) {
+        // Fetch Payload product and legacy Wix wrapper in parallel;
+        // Payload is the source of truth for product display data,
+        // Wix wrapper only supplies the _id needed for dependent collections/projects/matches.
+        const [coreProductData, wixProductData] = await Promise.all([
+            queryProductsBySlug(slug),
+            fetchProductData(slug).catch(() => null),
+        ]);
+
+        if (!coreProductData) {
             throw new Error("Product data not found");
         }
-        const productId = productData.product._id;
+
+        const wixProductId = wixProductData?.product?._id;
+
         const [
             productCollectionData,
             featuredProjectsData,
             matchedProducts,
             pageDetails
         ] = await Promise.all([
-            fetchProductCollectionData(productId),
-            fetchFeaturedProjects(productId),
-            fetchMatchedProducts(productId),
+            fetchProductCollectionData(wixProductId),
+            fetchFeaturedProjects(wixProductId),
+            fetchMatchedProducts(wixProductId),
             fetchProductPageDetails()
         ]);
 
         return {
-            productData,
+            productData: {
+                product: coreProductData,
+                isProductCollection: Boolean(productCollectionData),
+            },
             productCollectionData,
             featuredProjectsData,
             matchedProducts,

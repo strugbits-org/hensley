@@ -23,6 +23,8 @@ export const fetchCategoryPageDetails = async () => {
 
 export const fetchSelectedCollectionData = async (slug) => {
     try {
+        const getEntityId = (item) => item?._id || item?.id;
+
         const [ourCategoriesData, categoriesData, categoriesSortData, productBannersData, pageDetails] = await Promise.all([
             fetchOurCategoriesData(),
             fetchCategoriesData(),
@@ -36,10 +38,11 @@ export const fetchSelectedCollectionData = async (slug) => {
             throw new Error(`Category with slug "${slug}" not found`);
         }
 
-        const subCategoriesData = await fetchSubcategoriesData(selectedCategory._id);
+        const selectedCategoryId = getEntityId(selectedCategory);
+        const subCategoriesData = await fetchSubcategoriesData(selectedCategoryId);
         const subCategories = subCategoriesData?.subcategories || [];
-        const collectionIds = [selectedCategory._id, ...subCategories.map(item => item._id)];
-        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory._id);
+        const collectionIds = [selectedCategoryId, ...subCategories.map(getEntityId).filter(Boolean)];
+        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategoryId);
 
         const sortedProducts = await fetchSortedProducts({
             collectionIds,

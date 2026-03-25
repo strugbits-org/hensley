@@ -49,6 +49,7 @@ const CollapsibleSection = ({ title, children }) => {
 
 const FilterMenu = ({ items, selectedCategory, onFilterChange, selectedFilters = [], type }) => {
     const isCollapsible = type !== "subCategory";
+    const getEntityId = (item) => item?._id || item?.id;
 
     return (
         <div className="text-[#3E3E3E] font-sans w-full">
@@ -64,7 +65,7 @@ const FilterMenu = ({ items, selectedCategory, onFilterChange, selectedFilters =
                                     key={index}
                                     label={item.name}
                                     onChange={() => onFilterChange(item)}
-                                    checked={selectedFilters.some(filter => filter._id === item._id)}
+                                    checked={selectedFilters.some(filter => getEntityId(filter) === getEntityId(item))}
                                 />
                             ))}
                         </div>
@@ -75,7 +76,7 @@ const FilterMenu = ({ items, selectedCategory, onFilterChange, selectedFilters =
                                 key={index}
                                 label={item.name}
                                 onChange={() => onFilterChange(item)}
-                                checked={selectedFilters.some(filter => filter._id === item._id)}
+                                checked={selectedFilters.some(filter => getEntityId(filter) === getEntityId(item))}
                             />
                         ))}
                     </div>

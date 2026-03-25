@@ -12,6 +12,63 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { loaderActions } from '@/store/loaderStore';
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
+const CORE_API_PUBLIC_BASE = process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
+
+const toAbsoluteMediaUrl = (source) => {
+  if (!source) return "";
+  if (/^(https?:)?\/\//.test(source) || source.startsWith("wix:")) return source;
+
+  if (source.startsWith("/")) {
+    if (CORE_API_PUBLIC_BASE) {
+      return `${CORE_API_PUBLIC_BASE.replace(/\/$/, "")}${source}`;
+    }
+
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}${source}`;
+    }
+  }
+
+  return source;
+};
+
+const resolveCartItemMediaSrc = (item) => {
+  const product = typeof item?.product === "object" ? item.product : null;
+  const firstMediaItem = Array.isArray(product?.mediaItems) ? product.mediaItems[0] : null;
+
+  return toAbsoluteMediaUrl(
+    item?.image ||
+    item?.mediaItem?.src ||
+    product?.mainMedia?.url ||
+    product?.mainMedia ||
+    product?.featuredImage?.url ||
+    product?.featuredImage?.sizes?.thumbnail?.url ||
+    firstMediaItem?.url ||
+    firstMediaItem?.src ||
+    firstMediaItem?.media?.url ||
+    product?.media?.url ||
+    ""
+  );
+};
+
+const normalizeCartLineItem = (item) => {
+  const product = typeof item?.product === "object" ? item.product : null;
+  const mediaSrc = resolveCartItemMediaSrc(item);
+
+  return {
+    ...item,
+    _id: item?._id || item?.id,
+    id: item?.id || item?._id,
+    productId: item?.productId || product?.id || item?.product,
+    name: item?.name || product?.name || product?.title,
+    price: item?.price || item?.priceAtAdd || product?.price || 0,
+    quantity: Number(item?.quantity || 1),
+    customTextFields:
+      item?.customTextFields ||
+      item?.customTextFieldValues ||
+      [],
+    mediaItem: item?.mediaItem || { src: mediaSrc },
+  };
+};
 
 const Cart = () => {
   const [_cookies, setCookie] = useCookies(["cartQuantity"]);
@@ -23,7 +80,7 @@ const Cart = () => {
   const fetchCartItems = async () => {
     try {
       const response = await getProductsCart();
-      const lineItems = response?.lineItems || [];
+      const lineItems = (response?.lineItems || []).map(normalizeCartLineItem);
       setCartItems(lineItems);
 
       const total = calculateTotalCartQuantity(lineItems);
@@ -177,9 +234,11 @@ const Cart = () => {
           <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
           <div className='flex flex-col border-t border-primary-border'>
             {cartItems.map((item) => {
-              const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
-              const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-              const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
+              const descriptionLines = item.descriptionLines
+                ? (formatDescriptionLines(item.descriptionLines) || [])
+                : (Array.isArray(item.customTextFields) ? item.customTextFields : []);
+              const productCollection = descriptionLines.find(x => x?.title === "Set")?.value;
+              const isTentItem = descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
 
               if (productCollection) {
                 const productSetItems = productCollection.split("; ");

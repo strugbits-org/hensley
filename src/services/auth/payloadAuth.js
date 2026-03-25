@@ -8,7 +8,7 @@ import { PayloadSDK } from "@payloadcms/sdk";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
-const CORE_TENANT_ID = process.env.CORE_TENTANT_ID;
+const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID;
 
 // Initialize Payload SDK with API key auth
 const sdk = new PayloadSDK({

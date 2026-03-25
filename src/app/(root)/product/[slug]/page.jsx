@@ -3,7 +3,8 @@ import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import { fetchPageMetaData } from "@/services";
 import { fetchProductData, fetchProductPageData, fetchProductPaths } from "@/services/products";
-import { logError } from "@/utils";
+import { queryProductsBySlug } from "@/services/payloadCollections";
+import { logError, normalizeProductForDisplay, richTextToPlainText } from "@/utils";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }) {
@@ -12,15 +13,19 @@ export async function generateMetadata({ params }) {
 
     const [
       metaData,
-      productData
+      product
     ] = await Promise.all([
       fetchPageMetaData("product"),
-      fetchProductData(slug)
+      queryProductsBySlug(slug)
     ]);
 
     const { title, noFollowTag } = metaData;
-    const fullTitle = productData.product.name + " " + title;
-    const metadata = { title: fullTitle };
+    const normalizedProduct = normalizeProductForDisplay(product || {});
+    const fullTitle = `${normalizedProduct.name} ${title}`;
+    const metadata = {
+      title: fullTitle,
+      description: richTextToPlainText(product?.description).slice(0, 160) || undefined,
+    };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
       metadata.robots = "noindex,nofollow";
     }

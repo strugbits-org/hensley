@@ -39,13 +39,15 @@ export const ProductListing = ({ data }) => {
     const [bannersMobile, setBannersMobile] = useState([]);
     const [isMobile, setIsMobile] = useState(false);
 
+    const getEntityId = useCallback((item) => item?._id || item?.id, []);
+
     const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
         const activeCollectionIds = newFilters.length > 0
-            ? newFilters.map(f => f._id)
+            ? newFilters.map(getEntityId).filter(Boolean)
             : collectionIds;
 
         try {
-            const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, newFilters[0]._id) : sortIndex;
+            const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, getEntityId(newFilters[0])) : sortIndex;
             const newSortedProducts = await fetchSortedProducts({
                 collectionIds: activeCollectionIds,
                 limit: pageSize,
@@ -59,13 +61,13 @@ export const ProductListing = ({ data }) => {
                 setProducts(newSortedProducts.items);
             }
 
-            setHasMore(newSortedProducts.hasNextPage);
+            setHasMore(newSortedProducts.hasNextPage ?? newSortedProducts.hasNext ?? false);
             return newSortedProducts;
         } catch (error) {
             logError(`Error fetching ${isLoadMore ? 'more' : 'sorted'} products:`, error);
             return null;
         }
-    }, [collectionIds, selectedFilters, sortIndex]);
+    }, [collectionIds, selectedFilters, sortIndex, categoriesSortData, getEntityId]);
 
     const debouncedFetchForFilters = useDebounce((newFilters) => {
         fetchProducts({ newFilters, isLoadMore: false, newSkip: 0 })
@@ -73,9 +75,10 @@ export const ProductListing = ({ data }) => {
     }, 300);
 
     const handleFilterChange = (filter) => {
-        const isSelected = selectedFilters.some(f => f._id === filter._id);
+        const filterId = getEntityId(filter);
+        const isSelected = selectedFilters.some(f => getEntityId(f) === filterId);
         const newFilters = isSelected
-            ? selectedFilters.filter(f => f._id !== filter._id)
+            ? selectedFilters.filter(f => getEntityId(f) !== filterId)
             : [...selectedFilters, filter];
 
         setSelectedFilters(newFilters);
@@ -107,10 +110,10 @@ export const ProductListing = ({ data }) => {
             setBannersDesktop([]);
             setBannersMobile([]);
         }
-        console.log("products", sortedProducts);
+        // console.log("products", sortedProducts);
         
         setProducts(sortedProducts.docs);
-        setHasMore(sortedProducts.hasNextPage);
+        setHasMore(sortedProducts.hasNextPage ?? sortedProducts.hasNext ?? false);
         setIsLoading(false);
     }, [sortedProducts, productBannersData]);
 
@@ -158,10 +161,10 @@ export const ProductListing = ({ data }) => {
                     if (shouldInsertBanner || forceInsertBanner) bannerIndex = (bannerIndex + 1) % banners.length;
 
                     return (
-                        <React.Fragment key={productData._id}>
+                        <React.Fragment key={productData._id || productData.id || index}>
                             <li>
                                 <ProductCard
-                                    key={productData._id}
+                                    key={productData._id || productData.id || index}
                                     data={productData}
                                 />
                             </li>

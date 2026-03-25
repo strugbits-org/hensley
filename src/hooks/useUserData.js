@@ -17,7 +17,7 @@ function useUserData() {
     }
   }, [cookies]);
 
-  console.log("signedUserData", signedUserData);
+  // console.log("signedUserData", signedUserData);
   
 
   return {
