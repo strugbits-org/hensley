@@ -12,15 +12,15 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { loaderActions } from '@/store/loaderStore';
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
-const CORE_API_PUBLIC_BASE = process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
 
 const toAbsoluteMediaUrl = (source) => {
   if (!source) return "";
   if (/^(https?:)?\/\//.test(source) || source.startsWith("wix:")) return source;
 
   if (source.startsWith("/")) {
-    if (CORE_API_PUBLIC_BASE) {
-      return `${CORE_API_PUBLIC_BASE.replace(/\/$/, "")}${source}`;
+    if (CORE_API_BASE_URL) {
+      return `${CORE_API_BASE_URL.replace(/\/$/, "")}${source}`;
     }
 
     if (typeof window !== "undefined") {
@@ -81,6 +81,8 @@ const Cart = () => {
     try {
       const response = await getProductsCart();
       const lineItems = (response?.lineItems || []).map(normalizeCartLineItem);
+      console.log("lineItems", lineItems);
+      
       setCartItems(lineItems);
 
       const total = calculateTotalCartQuantity(lineItems);

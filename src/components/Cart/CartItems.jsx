@@ -5,6 +5,8 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
+
 const INFO_HEADERS = [
     'Product',
     'Size',
@@ -326,9 +328,8 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
     const productName = data?.productName?.original || data?.name;
 
     const productSize = () => {
-        if (!data.descriptionLines) return data.size;
-        const formattedDescription = formatDescriptionLines(data.descriptionLines);
-        return formattedDescription.find(x => x.title === "size")?.value;
+        if (!data.customTextFields) return data.size;
+        return data.customTextFields.find(x => x.title === "size")?.value;
     }
     const price = (data?.price?.amount || data.price) * data.quantity;
     const formattedPrice = formatTotalPrice(price);
@@ -405,7 +406,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>

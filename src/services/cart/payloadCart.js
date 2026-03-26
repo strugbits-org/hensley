@@ -47,19 +47,63 @@ const resolveLineItemImage = (item) => {
   );
 };
 
-const hydrateCartForClient = (cart) => {
+const hydrateCartForClient = async (cart) => {
   if (!cart || !Array.isArray(cart.lineItems)) return cart;
+
+  const productIds = [...new Set(
+    cart.lineItems
+      .map((item) => {
+        if (typeof item?.product === "string") return item.product;
+        if (typeof item?.product === "object") return item.product?.id || item.product?._id;
+        return null;
+      })
+      .filter(Boolean),
+  )];
+
+  let productMap = new Map();
+
+  // If relationship population is missing, fetch products explicitly by ID.
+  if (productIds.length > 0) {
+    try {
+      const sdk = getSDK(null);
+      const productsResult = await sdk.find({
+        collection: "products",
+        where: {
+          id: { in: productIds },
+        },
+        pagination: false,
+        depth: 1,
+      });
+
+      productMap = new Map(
+        (productsResult?.docs || []).map((product) => [product?.id || product?._id, product]),
+      );
+    } catch (error) {
+      logError("Error enriching cart product data:", error);
+    }
+  }
 
   return {
     ...cart,
     lineItems: cart.lineItems.map((item) => {
-      const product = typeof item?.product === "object" ? item.product : null;
+      const relationshipProduct = typeof item?.product === "object" ? item.product : null;
+      const productId =
+        (typeof item?.product === "string" ? item.product : null) ||
+        relationshipProduct?.id ||
+        relationshipProduct?._id;
+
+      const enrichedProduct = relationshipProduct || productMap.get(productId) || null;
+      const productShape = enrichedProduct ? { ...item, product: enrichedProduct } : item;
+
       return {
         ...item,
+        product: enrichedProduct || item.product,
         _id: item?._id || item?.id,
         id: item?.id || item?._id,
-        name: item?.name || product?.name || product?.title || "",
-        image: resolveLineItemImage(item),
+        productId,
+        name: item?.name || enrichedProduct?.name || enrichedProduct?.title || "",
+        price: Number(item?.priceAtAdd ?? item?.price ?? enrichedProduct?.price ?? 0) || 0,
+        image: resolveLineItemImage(productShape),
       };
     }),
   };
@@ -91,6 +135,42 @@ const getSDK = (token = null) => {
   });
 };
 
+const getCartDocId = (cart) => cart?.id || cart?._id;
+
+const patchCartByDocId = async (docId, data) => {
+  const response = await fetch(`${CORE_API_BASE_URL}/api/cart/${docId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${CORE_API_KEY}`,
+    },
+    body: JSON.stringify(data),
+    cache: "no-store",
+  });
+
+  const json = await response.json();
+  if (!response.ok) {
+    throw new Error(json?.errors?.[0]?.message || json?.message || "Failed to update cart");
+  }
+
+  return json?.doc || json;
+};
+
+const deleteCartByDocId = async (docId) => {
+  const response = await fetch(`${CORE_API_BASE_URL}/api/cart/${docId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${CORE_API_KEY}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    const json = await response.json().catch(() => null);
+    throw new Error(json?.errors?.[0]?.message || json?.message || "Failed to delete cart");
+  }
+};
+
 /**
  * Get or create cart for a member
  * @param {string} memberId - The member's ID
@@ -111,7 +191,7 @@ export const getOrCreateCart = async (memberId, token) => {
     });
 
     if (existingCarts.docs?.length > 0) {
-      return hydrateCartForClient(existingCarts.docs[0]);
+      return await hydrateCartForClient(existingCarts.docs[0]);
     }
 
     // Create new cart for member
@@ -125,7 +205,7 @@ export const getOrCreateCart = async (memberId, token) => {
       },
     });
 
-    return hydrateCartForClient(newCart);
+    return await hydrateCartForClient(newCart);
   } catch (error) {
     logError("Error getting/creating cart:", error);
     throw new Error(error.message || "Failed to get or create cart");
@@ -150,7 +230,7 @@ export const getMemberCart = async (memberId, token) => {
       depth: 2,
     });
 
-    return hydrateCartForClient(result.docs?.[0] || null);
+    return await hydrateCartForClient(result.docs?.[0] || null);
   } catch (error) {
     logError("Error getting cart:", error);
     throw new Error(error.message || "Failed to get cart");
@@ -210,22 +290,8 @@ export const addToCart = async (memberId, token, lineItems) => {
     const mergedItems = [...existingItems];
 
     for (const newItem of newItems) {
-      // Check if product already exists in cart
-      const existingIndex = mergedItems.findIndex((item) => {
-        const existingProductId =
-          typeof item.product === "object" ? item.product.id : item.product;
-        const existingVariantId =
-          typeof item.variant === "object" ? item.variant?.id : item.variant;
-
-        return (
-          existingProductId === newItem.product &&
-          existingVariantId === newItem.variant &&
-          JSON.stringify(item.selectedOptions) ===
-            JSON.stringify(newItem.selectedOptions) &&
-          JSON.stringify(item.customTextFieldValues) ===
-            JSON.stringify(newItem.customTextFieldValues)
-        );
-      });
+      const newItemKey = getComparableLineItemKey(newItem);
+      const existingIndex = mergedItems.findIndex((item) => getComparableLineItemKey(item) === newItemKey);
 
       if (existingIndex >= 0) {
         // Update quantity of existing item
@@ -239,7 +305,7 @@ export const addToCart = async (memberId, token, lineItems) => {
             typeof mergedItems[existingIndex].variant === "object"
               ? mergedItems[existingIndex].variant?.id
               : mergedItems[existingIndex].variant,
-          quantity: mergedItems[existingIndex].quantity + newItem.quantity,
+          quantity: Number(mergedItems[existingIndex].quantity || 0) + Number(newItem.quantity || 0),
         };
       } else {
         // Add new item
@@ -247,17 +313,8 @@ export const addToCart = async (memberId, token, lineItems) => {
       }
     }
 
-    // Normalize all items to use IDs instead of objects
-    const normalizedItems = mergedItems.map((item) => ({
-      product: typeof item.product === "object" ? item.product.id : item.product,
-      variant:
-        typeof item.variant === "object" ? item.variant?.id : item.variant,
-      quantity: item.quantity,
-      selectedOptions: item.selectedOptions,
-      customTextFieldValues: item.customTextFieldValues,
-      notes: item.notes,
-      addedAt: item.addedAt,
-    }));
+    // Normalize all items to use IDs and strip unsupported nested fields
+    const normalizedItems = mergedItems.map(normalizeItemToIds);
 
     // Update cart with merged items
     await sdk.update({
@@ -303,30 +360,10 @@ export const updateCartQuantity = async (memberId, token, updates) => {
       });
 
       if (update) {
-        return {
-          product:
-            typeof item.product === "object" ? item.product.id : item.product,
-          variant:
-            typeof item.variant === "object" ? item.variant?.id : item.variant,
-          quantity: update.quantity,
-          selectedOptions: item.selectedOptions,
-          customTextFieldValues: item.customTextFieldValues,
-          notes: item.notes,
-          addedAt: item.addedAt,
-        };
+        return normalizeItemToIds({ ...item, quantity: update.quantity });
       }
 
-      return {
-        product:
-          typeof item.product === "object" ? item.product.id : item.product,
-        variant:
-          typeof item.variant === "object" ? item.variant?.id : item.variant,
-        quantity: item.quantity,
-        selectedOptions: item.selectedOptions,
-        customTextFieldValues: item.customTextFieldValues,
-        notes: item.notes,
-        addedAt: item.addedAt,
-      };
+      return normalizeItemToIds(item);
     });
 
     await sdk.update({
@@ -365,17 +402,7 @@ export const removeFromCart = async (memberId, token, lineItemIds) => {
     // Filter out removed items
     const remainingItems = existingItems
       .filter((item) => !lineItemIds.includes(item.id))
-      .map((item) => ({
-        product:
-          typeof item.product === "object" ? item.product.id : item.product,
-        variant:
-          typeof item.variant === "object" ? item.variant?.id : item.variant,
-        quantity: item.quantity,
-        selectedOptions: item.selectedOptions,
-        customTextFieldValues: item.customTextFieldValues,
-        notes: item.notes,
-        addedAt: item.addedAt,
-      }));
+      .map(normalizeItemToIds);
 
     await sdk.update({
       collection: "cart",
@@ -427,15 +454,71 @@ export const clearCart = async (memberId, token) => {
 // ---------------------------------------------------------------------------
 // Shared helper — always returns a plain-ID object for Payload line items
 // ---------------------------------------------------------------------------
+const sanitizeCustomTextFieldValues = (customTextFieldValues) => {
+  if (!Array.isArray(customTextFieldValues)) return [];
+
+  return customTextFieldValues
+    .map((field) => ({
+      title: typeof field?.title === "string" ? field.title : String(field?.title || ""),
+      value: typeof field?.value === "string" ? field.value : String(field?.value || ""),
+    }))
+    .filter((field) => field.title);
+};
+
 const normalizeItemToIds = (item) => ({
   product: typeof item.product === "object" ? item.product.id : item.product,
   variant: typeof item.variant === "object" ? item.variant?.id : item.variant,
   quantity: item.quantity,
   selectedOptions: item.selectedOptions ?? null,
-  customTextFieldValues: item.customTextFieldValues ?? [],
+  customTextFieldValues: sanitizeCustomTextFieldValues(item.customTextFieldValues),
   notes: item.notes ?? null,
   addedAt: item.addedAt ?? null,
 });
+
+const normalizeSelectedOptionsForCompare = (value) => {
+  if (!value || typeof value !== "object") return null;
+
+  if (Array.isArray(value)) {
+    const normalizedArray = value
+      .map((item) => normalizeSelectedOptionsForCompare(item))
+      .filter((item) => item !== null && item !== undefined);
+    return normalizedArray.length ? normalizedArray : null;
+  }
+
+  const normalizedObject = Object.keys(value)
+    .sort()
+    .reduce((acc, key) => {
+      const normalizedValue = normalizeSelectedOptionsForCompare(value[key]);
+      if (normalizedValue !== null && normalizedValue !== undefined && normalizedValue !== "") {
+        acc[key] = normalizedValue;
+      }
+      return acc;
+    }, {});
+
+  return Object.keys(normalizedObject).length ? normalizedObject : null;
+};
+
+const normalizeCustomTextForCompare = (customTextFieldValues) => {
+  if (!Array.isArray(customTextFieldValues)) return [];
+
+  return customTextFieldValues
+    .map((field) => ({
+      title: String(field?.title || "").trim().toLowerCase(),
+      value: String(field?.value || "").trim(),
+    }))
+    .filter((field) => field.title)
+    .sort((left, right) => left.title.localeCompare(right.title));
+};
+
+const getComparableLineItemKey = (item) => {
+  const normalized = normalizeItemToIds(item);
+  return JSON.stringify({
+    product: normalized.product || null,
+    variant: normalized.variant || null,
+    selectedOptions: normalizeSelectedOptionsForCompare(normalized.selectedOptions),
+    customTextFieldValues: normalizeCustomTextForCompare(normalized.customTextFieldValues),
+  });
+};
 
 // API-key SDK (no member token) — used for all visitor operations
 const apiKeySDK = () => getSDK(null);
@@ -487,7 +570,7 @@ export const getVisitorCart = async (visitorId) => {
       depth: 2,
     });
 
-    return hydrateCartForClient(result.docs?.[0] || null);
+    return await hydrateCartForClient(result.docs?.[0] || null);
   } catch (error) {
     logError("Error getting visitor cart:", error);
     throw new Error(error.message || "Failed to get visitor cart");
@@ -507,21 +590,13 @@ export const addToVisitorCart = async (visitorId, lineItems) => {
     const mergedItems = [...existingItems];
 
     for (const newItem of newItems) {
-      const existingIndex = mergedItems.findIndex((item) => {
-        const pid = typeof item.product === "object" ? item.product.id : item.product;
-        const vid = typeof item.variant === "object" ? item.variant?.id : item.variant;
-        return (
-          pid === newItem.product &&
-          vid === newItem.variant &&
-          JSON.stringify(item.selectedOptions) === JSON.stringify(newItem.selectedOptions) &&
-          JSON.stringify(item.customTextFieldValues) === JSON.stringify(newItem.customTextFieldValues)
-        );
-      });
+      const newItemKey = getComparableLineItemKey(newItem);
+      const existingIndex = mergedItems.findIndex((item) => getComparableLineItemKey(item) === newItemKey);
 
       if (existingIndex >= 0) {
         mergedItems[existingIndex] = {
           ...normalizeItemToIds(mergedItems[existingIndex]),
-          quantity: mergedItems[existingIndex].quantity + newItem.quantity,
+          quantity: Number(mergedItems[existingIndex].quantity || 0) + Number(newItem.quantity || 0),
         };
       } else {
         mergedItems.push(newItem);
@@ -627,45 +702,43 @@ export const mergeVisitorCartToMember = async (visitorId, memberId, memberToken)
     }
 
     const memberCart = await getOrCreateCart(memberId, memberToken);
-    const sdk = apiKeySDK();
+    const memberCartId = getCartDocId(memberCart);
+    const visitorCartId = getCartDocId(visitorCart);
+
+    if (!memberCartId) {
+      throw new Error("Member cart ID not found for merge");
+    }
+
+    if (!visitorCartId) {
+      throw new Error("Visitor cart ID not found for merge");
+    }
 
     const existingItems = memberCart.lineItems || [];
     const mergedItems = [...existingItems];
 
     for (const visitorItem of visitorCart.lineItems) {
       const normalizedVisitor = normalizeItemToIds(visitorItem);
-      const existingIndex = mergedItems.findIndex((item) => {
-        const pid = typeof item.product === "object" ? item.product.id : item.product;
-        const vid = typeof item.variant === "object" ? item.variant?.id : item.variant;
-        return (
-          pid === normalizedVisitor.product &&
-          vid === normalizedVisitor.variant &&
-          JSON.stringify(item.selectedOptions) === JSON.stringify(normalizedVisitor.selectedOptions) &&
-          JSON.stringify(item.customTextFieldValues) === JSON.stringify(normalizedVisitor.customTextFieldValues)
-        );
-      });
+      const visitorItemKey = getComparableLineItemKey(normalizedVisitor);
+      const existingIndex = mergedItems.findIndex((item) => getComparableLineItemKey(item) === visitorItemKey);
 
       if (existingIndex >= 0) {
         mergedItems[existingIndex] = {
           ...normalizeItemToIds(mergedItems[existingIndex]),
-          quantity: mergedItems[existingIndex].quantity + normalizedVisitor.quantity,
+          quantity:
+            Number(mergedItems[existingIndex].quantity || 0) + Number(normalizedVisitor.quantity || 0),
         };
       } else {
         mergedItems.push(normalizedVisitor);
       }
     }
 
-    // Write merged items into member cart using the API-key SDK
-    // (member token may not have permission to update directly from client)
-    await sdk.update({
-      collection: "cart",
-      where: buildMemberCartWhere(memberId),
-      limit: 1,
-      data: { lineItems: mergedItems.map(normalizeItemToIds) },
+    // Write merged items into member cart by explicit document ID.
+    await patchCartByDocId(memberCartId, {
+      lineItems: mergedItems.map(normalizeItemToIds),
     });
 
-    // Remove visitor cart
-    await sdk.delete({ collection: "cart", where: buildVisitorCartWhere(visitorId) });
+    // Remove visitor cart by explicit document ID.
+    await deleteCartByDocId(visitorCartId);
   } catch (error) {
     logError("Error merging visitor cart to member:", error);
     throw new Error(error.message || "Failed to merge visitor cart");
