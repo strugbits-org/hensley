@@ -103,6 +103,9 @@ const hydrateCartForClient = async (cart) => {
         productId,
         name: item?.name || enrichedProduct?.name || enrichedProduct?.title || "",
         price: Number(item?.priceAtAdd ?? item?.price ?? enrichedProduct?.price ?? 0) || 0,
+        quantity: Number(item?.quantity) || 1,
+        // Map customTextFieldValues to customTextFields for compatibility with calculateTotalCartQuantity
+        customTextFields: item?.customTextFields || item?.customTextFieldValues || [],
         image: resolveLineItemImage(productShape),
       };
     }),

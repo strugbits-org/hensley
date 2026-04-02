@@ -26,7 +26,9 @@ export const POST = async (req) => {
     const formattedLineItems = formatLineItemsForQuote(lineItems);
 
     const cartLineItems = lineItems.map((item) => {
-      const formattedDescription = formatDescriptionLines(item.descriptionLines);
+      // Support both Wix format (descriptionLines) and Payload format (customTextFieldValues)
+      const rawDescriptionLines = item.descriptionLines || item.customTextFieldValues || item.customTextFields || [];
+      const formattedDescription = formatDescriptionLines(rawDescriptionLines);
       const size = formattedDescription.find(x => x.title === "size")?.value || "—";
       return {
         product: item,

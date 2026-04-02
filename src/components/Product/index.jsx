@@ -147,8 +147,9 @@ export const Product = ({ data, matchedProducts = [] }) => {
         let setData;
 
         if (productInCart) {
-          // Update existing cart item
-          const descriptionLines = formatDescriptionLines(productInCart.descriptionLines);
+          // Update existing cart item - support both Wix (descriptionLines) and Payload (customTextFieldValues) formats
+          const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
+          const descriptionLines = formatDescriptionLines(rawDescriptionLines);
           const existingSet = descriptionLines.find(x => x.title === "Set")?.value;
 
           setData = productSetItems.map((item) => {

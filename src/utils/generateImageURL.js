@@ -8,7 +8,11 @@ export const generateImageURL = ({
 }) => {
   if (!wix_url) return "";
 
-  const cleanUrl = wix_url?.split("#")[0];
+  // Handle object format { url: "..." } from Payload CMS
+  const urlString = typeof wix_url === 'object' ? (wix_url.url || wix_url.src || '') : wix_url;
+  if (!urlString || typeof urlString !== 'string') return typeof wix_url === 'string' ? wix_url : '';
+
+  const cleanUrl = urlString.split("#")[0];
 
   if (!cleanUrl.startsWith("wix:image://v1/") && !cleanUrl.startsWith("wix:vector://v1/")) {
     return wix_url;
@@ -39,7 +43,12 @@ export const generateImageURLAlternate = ({
   w = "1920",
 }) => {
   if (!wix_url) return "";
-  if (!wix_url.startsWith("wix:image://v1/")) return wix_url;
+  
+  // Handle object format { url: "..." } from Payload CMS
+  const urlString = typeof wix_url === 'object' ? (wix_url.url || wix_url.src || '') : wix_url;
+  if (!urlString || typeof urlString !== 'string') return typeof wix_url === 'string' ? wix_url : '';
+  
+  if (!urlString.startsWith("wix:image://v1/")) return urlString;
 
   const baseURL = "https://static.wixstatic.com/media/";
   const urlParts = wix_url.split('/');

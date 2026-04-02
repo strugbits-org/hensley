@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import handleAuthentication from "@/services/auth/handleAuthentication";
-import { createWixClient } from "@/utils";
+import { saveProduct } from "@/services/savedProducts/payloadSavedProducts";
+import { logError } from "@/utils";
 
 export const GET = async (req, context) => {
   try {
@@ -11,29 +12,18 @@ export const GET = async (req, context) => {
     }
 
     const { params } = context;
-    const id = params.id;
+    const productId = params.id;
 
-    const wixClient = await createWixClient();
-    const productsData = await wixClient.items.query("FullProductData").eq("product", id).find();
-    if (productsData.items.length === 0) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
-    }
-
-    const memberId = authenticatedUserData.memberId;
-    let product = productsData.items[0];
-    let membersData = product.members;
-
-    await wixClient.items.update("FullProductData", {
-      ...product,
-      members: membersData ? [...membersData, memberId] : [memberId],
-    });
-
-    return NextResponse.json(
-      { message: "Product saved successfully" },
-      { status: 200 }
+    const result = await saveProduct(
+      authenticatedUserData.memberId,
+      productId,
+      authenticatedUserData.token
     );
 
+    return NextResponse.json(result, { status: 200 });
+
   } catch (error) {
+    logError(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

@@ -221,8 +221,10 @@ export const calculateCartTotalPrice = (lineItems) => {
 export const formatDescriptionLines = (items) => {
     if (!items) return [];
     return items.reduce((acc, item) => {
-        const title = item.name?.translated || item.name?.original;
-        const value = item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
+        // Support both Wix format (name.translated/original, colorInfo, plainText) and
+        // Payload format (title, value)
+        const title = item.title || item.name?.translated || item.name?.original;
+        const value = item.value || item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
         acc.push({ title, value });
         return acc;
     }, []);
@@ -233,17 +235,22 @@ export function formatLineItemsForQuote(lineItems) {
     let counter = 0;
 
     for (const item of lineItems || []) {
-        const { productName, price, quantity, descriptionLines } = item;
-        const formattedDescriptionLines = formatDescriptionLines(descriptionLines);
+        // Support both Wix format and Payload format
+        const productName = item.productName || { original: item.name || '' };
+        const price = item.price?.amount !== undefined ? item.price : { amount: item.price || 0 };
+        const quantity = item.quantity || 1;
+        // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
+        const rawDescriptionLines = item.descriptionLines || item.customTextFieldValues || item.customTextFields || [];
+        const formattedDescriptionLines = formatDescriptionLines(rawDescriptionLines);
         const productCollection = formattedDescriptionLines.find(x => x.title === "Set")?.value;
         const isTentOrCover = formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
         if (!productCollection && !isTentOrCover) {
             formattedCartData.push({
                 id: `${counter++}`,
-                name: productName.original,
+                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
                 description: "—",
-                price: price.amount,
+                price: typeof price === 'number' ? price : (price.amount || 0),
                 quantity
             });
             continue;
@@ -253,7 +260,7 @@ export function formatLineItemsForQuote(lineItems) {
             const setItems = productCollection.split("; ");
             formattedCartData.push({
                 id: `${counter++}`,
-                name: productName.original,
+                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
                 description: "PRODUCT SET",
                 price: 0,
                 quantity: 1
@@ -261,7 +268,8 @@ export function formatLineItemsForQuote(lineItems) {
 
             for (const setItem of setItems) {
                 const [setName, size, setPrice, setQuantity] = setItem.split("~").map(v => v.trim());
-                const description = size && size !== "—" ? `${size} | SET OF ${productName.original}` : `SET OF ${productName.original}`;
+                const nameStr = typeof productName === 'string' ? productName : (productName.original || productName.translated || '');
+                const description = size && size !== "—" ? `${size} | SET OF ${nameStr}` : `SET OF ${nameStr}`;
                 const existing = formattedCartData.find(i => i.name === `${setName} - ` && i.description === description);
 
                 if (existing) {
@@ -281,9 +289,9 @@ export function formatLineItemsForQuote(lineItems) {
         if (isTentOrCover) {
             formattedCartData.push({
                 id: `${counter++}`,
-                name: productName.original,
+                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
                 description: generateDescriptionForQuote(formattedDescriptionLines, isTentOrCover),
-                price: price.amount,
+                price: typeof price === 'number' ? price : (price.amount || 0),
                 quantity
             });
         }

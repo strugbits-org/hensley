@@ -4,10 +4,45 @@ import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
 import { CustomLink } from './CustomLink';
 import { actions } from '@/store';
+import Image from 'next/image';
+
+const CORE_API_BASE_URL = process.env.NEXT_PUBLIC_CORE_API_BASE_URL || process.env.CORE_API_BASE_URL;
+
+// Helper to resolve product image URL from various formats
+const resolveImageUrl = (product) => {
+    if (!product) return null;
+    
+    const mainMedia = product.mainMedia;
+    
+    // Handle direct URL string
+    if (typeof mainMedia === 'string') {
+        // If it's a wix URL, use PrimaryImage; otherwise check if it needs base URL
+        if (mainMedia.startsWith('wix:') || mainMedia.startsWith('http')) {
+            return mainMedia;
+        }
+        // Relative URL from Payload CMS
+        if (mainMedia.startsWith('/')) {
+            return CORE_API_BASE_URL ? `${CORE_API_BASE_URL}${mainMedia}` : mainMedia;
+        }
+        return mainMedia;
+    }
+    
+    // Handle object format { url: "..." }
+    if (mainMedia && typeof mainMedia === 'object') {
+        const url = mainMedia.url || mainMedia.src || '';
+        if (url.startsWith('/') && CORE_API_BASE_URL) {
+            return `${CORE_API_BASE_URL}${url}`;
+        }
+        return url;
+    }
+    
+    return null;
+};
 
 function SecondaryProductCard({ data, type = 'listing' }) {
     const { product } = data;
     const { name } = product;
+    const imageUrl = resolveImageUrl(product);
 
     const handleAddToCart = () => {
         const isTent = actions.isTentProduct(product._id);
@@ -16,7 +51,13 @@ function SecondaryProductCard({ data, type = 'listing' }) {
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-[5px] pb-0 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
             <CustomLink to={`/product/${product.slug}`} className={`h-full overflow-hidden flex justify-center items-center p-4  ${type === 'listing' ? 'bg-white' : ''}`}>
-                <PrimaryImage timeout={50} alt={name} url={product.mainMedia} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
+                {imageUrl ? (
+                    imageUrl.startsWith('wix:') ? (
+                        <PrimaryImage timeout={50} alt={name} url={imageUrl} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
+                    ) : (
+                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
+                    )
+                ) : null}
             </CustomLink>
 
             <div className="max-w-full flex gap-2 py-[7px] justify-between items-center max-lg:flex-col">

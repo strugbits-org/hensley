@@ -77,12 +77,32 @@ export const queryProductsBySlug = async (slug) => {
             limit: 1,
             draft: false,
             locale: "en",
-            depth: 1,
+            depth: 2, // Increased to populate bundleItems.product
         });
 
         return result.docs?.[0] || null;
     } catch (error) {
         logError('Error querying product by slug:', error);
         throw error;
+    }
+}
+
+export const queryProductById = async (id) => {
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            where: {
+                id: { equals: id }
+            },
+            limit: 1,
+            draft: false,
+            locale: "en",
+            depth: 2, // Populate bundleItems.product
+        });
+
+        return result.docs?.[0] || null;
+    } catch (error) {
+        logError('Error querying product by ID:', error);
+        return null;
     }
 }

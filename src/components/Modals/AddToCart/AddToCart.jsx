@@ -21,14 +21,24 @@ const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
 const AddToCart = ({ data, onClose }) => {
   const { productData } = data;
-  const { isProductCollection = false } = productData;
   const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
+  
+  // Initial detection for collection/bundle products
+  // - isProductCollection: legacy Wix collection flag
+  // - product.type === 'bundle': Payload bundle products
+  const isPayloadBundle = product?.type === 'bundle';
+  const initialIsCollection = productData?.isProductCollection || isPayloadBundle;
+  
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+  const [isLoadingCollections, setIsLoadingCollections] = useState(true); // Start true to check for bundles
+  const [showCollectionView, setShowCollectionView] = useState(initialIsCollection);
   const [productInCart, setProductInCart] = useState();
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
+
+  // Use showCollectionView for rendering (dynamically set after fetching data)
+  const isProductCollection = showCollectionView;
 
   const productInfoSection = useMemo(() => {
     if (isProductCollection) {
@@ -112,7 +122,9 @@ const AddToCart = ({ data, onClose }) => {
         let setData;
 
         if (productInCart) {
-          const descriptionLines = formatDescriptionLines(productInCart.descriptionLines);
+          // Support both Wix (descriptionLines) and Payload (customTextFieldValues) formats
+          const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
+          const descriptionLines = formatDescriptionLines(rawDescriptionLines);
           const existingSet = descriptionLines.find(x => x.title === "Set")?.value;
 
           setData = productSetItems.map((item) => {
@@ -179,18 +191,20 @@ const AddToCart = ({ data, onClose }) => {
 
   const setInitialData = async () => {
     try {
-      if (!isProductCollection) return;
-
       setIsLoadingCollections(true);
       const productId = product._id || product.id;
       if (!productId) {
+        setShowCollectionView(false);
         setIsLoadingCollections(false);
         return;
       }
 
-      const collectionData = await fetchProductCollectionData(productId);
+      // Pass product data to fetchProductCollectionData for Payload bundle detection
+      // This will check both Payload bundles and legacy Wix collections
+      const collectionData = await fetchProductCollectionData(productId, product);
 
       if (!collectionData) {
+        setShowCollectionView(false);
         setIsLoadingCollections(false);
         return;
       }
@@ -205,9 +219,10 @@ const AddToCart = ({ data, onClose }) => {
       }));
 
       setProductSetItems(items);
+      setShowCollectionView(true); // Show collection view when data is found
       setIsLoadingCollections(false);
 
-      checkProductInCart(productId, isProductCollection)
+      checkProductInCart(productId, true) // Pass true since we have collection data
         .then(existInCart => {
           setProductInCart(existInCart);
         })
@@ -223,7 +238,7 @@ const AddToCart = ({ data, onClose }) => {
 
   useEffect(() => {
     setInitialData();
-  }, [isProductCollection, product._id, product.id]);
+  }, [product._id, product.id]);
 
   return (
     <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>

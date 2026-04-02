@@ -138,11 +138,12 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
             setCookie("userTokens", JSON.stringify(userTokens), cookieOptions);
             removeCookie("cartId", { path: "/" });
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 reset();
                 setIsSubmitting(false);
+                // Update cart quantity BEFORE redirect so navbar shows correct count
+                await updateCartQuantity();
                 redirectWithLoader('/account');
-                updateCartQuantity();
                 if (isLightbox && close) {
                     close();
                 }

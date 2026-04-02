@@ -196,7 +196,11 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                             <div className=''>
                                                 {cartItems.map((item, index) => {
                                                     const product = item.product;
-                                                    const descriptionLines = product.descriptionLines ? formatDescriptionLines(product.descriptionLines) : product.customTextFields;
+                                                    // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
+                                                    const rawDescriptionLines = product.descriptionLines || product.customTextFieldValues || product.customTextFields || [];
+                                                    const descriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name 
+                                                        ? formatDescriptionLines(rawDescriptionLines) 
+                                                        : rawDescriptionLines;
                                                     const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
                                                     const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 

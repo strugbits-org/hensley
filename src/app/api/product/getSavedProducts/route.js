@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import handleAuthentication from "@/services/auth/handleAuthentication";
-import queryCollection from "@/utils/fetchFunction";
+import { getSavedProducts } from "@/services/savedProducts/payloadSavedProducts";
 import { logError } from "@/utils";
 
 export const POST = async (req) => {
@@ -10,23 +10,15 @@ export const POST = async (req) => {
     if (!authenticatedUserData) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    const body = await req.json();
-
-    const payload = {
-      dataCollectionId: "FullProductData",
-      hasSome: [
-        {
-          key: "members",
-          values: [authenticatedUserData.memberId]
-        }
-      ],
-    };
     
-    if (body.includeProducts) {
-      payload.includeReferencedItems = ["product"];
-    }
+    const body = await req.json();
+    const includeProducts = body.includeProducts || false;
 
-    const data = await queryCollection(payload);
+    const data = await getSavedProducts(
+      authenticatedUserData.memberId,
+      authenticatedUserData.token,
+      includeProducts
+    );
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

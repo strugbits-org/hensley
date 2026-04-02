@@ -141,18 +141,39 @@ const Cart = () => {
       return item;
     }).join("; ");
 
-    data.catalogReference.options.customTextFields.Set = updatedSet;
-    data.descriptionLines = data.descriptionLines.map(line => {
-      if (line.name.original === "Set") {
-        const plainText = {
-          translated: updatedSet,
-          original: updatedSet
-        };
-
-        return { ...line, plainText };
+    // Support both Wix format (catalogReference, descriptionLines) and Payload format (customTextFieldValues/customTextFields)
+    if (data.catalogReference) {
+      // Wix format
+      data.catalogReference.options.customTextFields.Set = updatedSet;
+      data.descriptionLines = data.descriptionLines.map(line => {
+        if (line.name?.original === "Set") {
+          const plainText = {
+            translated: updatedSet,
+            original: updatedSet
+          };
+          return { ...line, plainText };
+        }
+        return line;
+      });
+    } else {
+      // Payload format - update customTextFieldValues or customTextFields
+      const updateField = (fields) => {
+        if (!Array.isArray(fields)) return fields;
+        return fields.map(field => {
+          if (field.title === "Set") {
+            return { ...field, value: updatedSet };
+          }
+          return field;
+        });
+      };
+      
+      if (data.customTextFieldValues) {
+        data.customTextFieldValues = updateField(data.customTextFieldValues);
       }
-      return line;
-    });
+      if (data.customTextFields) {
+        data.customTextFields = updateField(data.customTextFields);
+      }
+    }
 
     delete data.productSetItems;
     const updatedLineItems = cartItems.map(item =>
@@ -169,14 +190,37 @@ const Cart = () => {
           handleCollectionQuantityChange(data, quantity, id);
           return;
         }
-        const cartData = {
-          lineItems: [
-            {
-              catalogReference: data.catalogReference,
-              quantity: 1,
-            }
-          ]
-        };
+        
+        // Build cartData for both Wix and Payload formats
+        let lineItem;
+        if (data.catalogReference) {
+          // Wix format
+          lineItem = {
+            catalogReference: data.catalogReference,
+            quantity: 1,
+          };
+        } else {
+          // Payload format - build catalogReference from customTextFields
+          const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+          const customTextFields = (data.customTextFieldValues || data.customTextFields || [])
+            .reduce((acc, { title, value }) => {
+              acc[title] = value;
+              return acc;
+            }, {});
+          
+          lineItem = {
+            catalogReference: {
+              appId,
+              catalogItemId: data.productId || data.product?.id || data.product,
+              options: {
+                customTextFields,
+              },
+            },
+            quantity: 1,
+          };
+        }
+        
+        const cartData = { lineItems: [lineItem] };
         await updateProductInCart(data._id, cartData);
       } catch (error) {
         logError("Error while updating products quantity in cart:", error);

@@ -18,8 +18,8 @@ export const SavedProductsHandler = () => {
             logError("Error while fetching Saved Product", error);
         }
     };
-    // useEffect(() => {
-    //     fetchSavedProducts();
-    // }, []);
-    return;
+    useEffect(() => {
+        fetchSavedProducts();
+    }, []);
+    return null;
 }

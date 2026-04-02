@@ -75,10 +75,10 @@ function ProductCard({ data: product, type = 'listing', btnClass }) {
                 </div>
             </div>
 
-            {/* <SaveProductButton
-                key={product._id}
-                productData={data}
-            /> */}
+            <SaveProductButton
+                key={product._id || product.id}
+                productData={{ product }}
+            />
         </div>
     );
 }

@@ -3,7 +3,7 @@ import { logError, mapProductSetItems } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
-import { queryProductsBySlug } from "../payloadCollections";
+import { queryProductById, queryProductsBySlug } from "../payloadCollections";
 
 const baseUrl = process.env.BASE_URL;
 
@@ -91,8 +91,61 @@ export const fetchProductData = async (slug) => {
     }
 }
 
-export const fetchProductCollectionData = async (id) => {
+/**
+ * Map Payload bundle items to the expected productCollectionData format
+ */
+const mapBundleItemsToCollectionData = (bundleItems) => {
+    if (!Array.isArray(bundleItems) || bundleItems.length === 0) return null;
+
+    return bundleItems
+        .filter(item => item.product && typeof item.product === 'object')
+        .map(item => {
+            const product = item.product;
+            return {
+                product: {
+                    _id: product.id || product._id,
+                    id: product.id || product._id,
+                    name: product.title,
+                    title: product.title,
+                    price: product.price || 0,
+                    formattedPrice: product.price ? `$${product.price.toFixed(2)}` : '$0.00',
+                    additionalInfoSections: product.additionalInfoSections || [],
+                },
+                quantity: item.quantity || 1,
+                optional: item.optional || false,
+                variant: item.variant,
+            };
+        });
+};
+
+export const fetchProductCollectionData = async (id, productData = null) => {
     try {
+        // First check if this is a Payload bundle product
+        // productData may be passed directly from the modal with bundle info
+        let product = productData;
+        
+        // If productData has bundleItems, use them directly
+        if (product?.type === 'bundle' && Array.isArray(product.bundleItems) && product.bundleItems.length > 0) {
+            const bundleItems = mapBundleItemsToCollectionData(product.bundleItems);
+            if (bundleItems && bundleItems.length > 0) {
+                return bundleItems;
+            }
+        }
+        
+        // Try to fetch from Payload if we have an ID (could be a Payload product ID)
+        if (id) {
+            const payloadProduct = await queryProductById(id);
+            if (payloadProduct?.type === 'bundle' && 
+                Array.isArray(payloadProduct.bundleItems) && 
+                payloadProduct.bundleItems.length > 0) {
+                const bundleItems = mapBundleItemsToCollectionData(payloadProduct.bundleItems);
+                if (bundleItems && bundleItems.length > 0) {
+                    return bundleItems;
+                }
+            }
+        }
+
+        // Fall back to legacy Wix collection data
         const response = await queryCollection({
             dataCollectionId: "MultipleProductsSet",
             includeReferencedItems: ["products"],
@@ -199,7 +252,6 @@ export const fetchProductPageDetails = async () => {
     }
 };
 
-
 export const fetchProductPageData = async (slug) => {
     try {
         // Fetch Payload product and legacy Wix wrapper in parallel;
@@ -216,22 +268,34 @@ export const fetchProductPageData = async (slug) => {
 
         const wixProductId = wixProductData?.product?._id;
 
+        // Check if this is a Payload bundle product
+        const isPayloadBundle = coreProductData.type === 'bundle' && 
+            Array.isArray(coreProductData.bundleItems) && 
+            coreProductData.bundleItems.length > 0;
+
         const [
-            productCollectionData,
+            legacyProductCollectionData,
             featuredProjectsData,
             matchedProducts,
             pageDetails
         ] = await Promise.all([
-            fetchProductCollectionData(wixProductId),
+            // Only fetch legacy collection data if not a Payload bundle
+            isPayloadBundle ? Promise.resolve(null) : fetchProductCollectionData(wixProductId),
             fetchFeaturedProjects(wixProductId),
             fetchMatchedProducts(wixProductId),
             fetchProductPageDetails()
         ]);
 
+        // Use Payload bundle items or legacy collection data
+        const productCollectionData = isPayloadBundle 
+            ? mapBundleItemsToCollectionData(coreProductData.bundleItems)
+            : legacyProductCollectionData;
+
         return {
             productData: {
                 product: coreProductData,
                 isProductCollection: Boolean(productCollectionData),
+                isBundle: isPayloadBundle,
             },
             productCollectionData,
             featuredProjectsData,
@@ -342,7 +406,15 @@ export const checkProductInCart = async (productId, isProductCollection = false)
     try {
         if (!isProductCollection) return false;
         const cart = await getProductsCart();
-        const existingItem = cart.lineItems.find((item) => item.catalogReference.catalogItemId === productId);
+        if (!cart?.lineItems) return false;
+        
+        // Support both Payload format (productId, product.id) and legacy Wix format (catalogReference.catalogItemId)
+        const existingItem = cart.lineItems.find((item) => {
+            const itemProductId = item.productId || 
+                (typeof item.product === 'object' ? item.product?.id || item.product?._id : item.product) ||
+                item.catalogReference?.catalogItemId;
+            return itemProductId === productId;
+        });
         return existingItem || false;
     } catch (error) {
         logError("Error fetching cart items:", error);
