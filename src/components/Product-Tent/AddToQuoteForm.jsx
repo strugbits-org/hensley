@@ -191,6 +191,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         },
                     },
                     quantity: 1,
+                    price: productData.price || 0,
                 }]
             };
 

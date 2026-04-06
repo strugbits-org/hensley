@@ -186,6 +186,7 @@ export const AddToQuoteFormInline = ({ title, productData }) => {
                         },
                     },
                     quantity: 1,
+                    price: productData.price || 0,
                 }]
             };
 

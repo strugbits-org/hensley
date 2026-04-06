@@ -133,49 +133,64 @@ const Cart = () => {
     ) {
       return;
     }
-    const updatedSet = data.productSetItems.map(item => {
-      const set = item.split("~");
-      if (set[0] === id) {
-        return `${set[0]}~${set[1]}~${set[2]}~${numValue}`;
-      }
-      return item;
-    }).join("; ");
 
-    // Support both Wix format (catalogReference, descriptionLines) and Payload format (customTextFieldValues/customTextFields)
-    if (data.catalogReference) {
-      // Wix format
-      data.catalogReference.options.customTextFields.Set = updatedSet;
-      data.descriptionLines = data.descriptionLines.map(line => {
-        if (line.name?.original === "Set") {
-          const plainText = {
-            translated: updatedSet,
-            original: updatedSet
-          };
-          return { ...line, plainText };
+    // Check for new setItems format first
+    if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
+      data.setItems = data.setItems.map(item => {
+        if (item.productName === id || item.product === id) {
+          return { ...item, quantity: numValue };
         }
-        return line;
+        return item;
       });
-    } else {
-      // Payload format - update customTextFieldValues or customTextFields
-      const updateField = (fields) => {
-        if (!Array.isArray(fields)) return fields;
-        return fields.map(field => {
-          if (field.title === "Set") {
-            return { ...field, value: updatedSet };
-          }
-          return field;
-        });
-      };
-      
-      if (data.customTextFieldValues) {
-        data.customTextFieldValues = updateField(data.customTextFieldValues);
+    } else if (data.productSetItems) {
+      // Fall back to old string format
+      const updatedSet = data.productSetItems.map(item => {
+        const set = item.split("~");
+        if (set[0] === id) {
+          return `${set[0]}~${set[1]}~${set[2]}~${numValue}`;
+        }
+        return item;
+      }).join("; ");
+
+      // Support both Wix format (catalogReference, descriptionLines) and Payload format (customTextFieldValues/customTextFields)
+      if (data.catalogReference) {
+        // Wix format
+        data.catalogReference.options.customTextFields.Set = updatedSet;
+        if (data.descriptionLines) {
+          data.descriptionLines = data.descriptionLines.map(line => {
+            if (line.name?.original === "Set") {
+              const plainText = {
+                translated: updatedSet,
+                original: updatedSet
+              };
+              return { ...line, plainText };
+            }
+            return line;
+          });
+        }
+      } else {
+        // Payload format - update customTextFieldValues or customTextFields
+        const updateField = (fields) => {
+          if (!Array.isArray(fields)) return fields;
+          return fields.map(field => {
+            if (field.title === "Set") {
+              return { ...field, value: updatedSet };
+            }
+            return field;
+          });
+        };
+        
+        if (data.customTextFieldValues) {
+          data.customTextFieldValues = updateField(data.customTextFieldValues);
+        }
+        if (data.customTextFields) {
+          data.customTextFields = updateField(data.customTextFields);
+        }
       }
-      if (data.customTextFields) {
-        data.customTextFields = updateField(data.customTextFields);
-      }
+
+      delete data.productSetItems;
     }
 
-    delete data.productSetItems;
     const updatedLineItems = cartItems.map(item =>
       item._id === data._id ? data : item
     );
@@ -191,9 +206,24 @@ const Cart = () => {
           return;
         }
         
-        // Build cartData for both Wix and Payload formats
+        // Build cartData for both formats
         let lineItem;
-        if (data.catalogReference) {
+        
+        // Check for new setItems format
+        if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
+          const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+          lineItem = {
+            catalogReference: {
+              appId,
+              catalogItemId: data.productId || data.product?.id || data.product,
+              options: {
+                customTextFields: {},
+              },
+            },
+            setItems: data.setItems,
+            quantity: 1,
+          };
+        } else if (data.catalogReference) {
           // Wix format
           lineItem = {
             catalogReference: data.catalogReference,
@@ -283,11 +313,17 @@ const Cart = () => {
               const descriptionLines = item.descriptionLines
                 ? (formatDescriptionLines(item.descriptionLines) || [])
                 : (Array.isArray(item.customTextFields) ? item.customTextFields : []);
-              const productCollection = descriptionLines.find(x => x?.title === "Set")?.value;
-              const isTentItem = descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
+              
+              // Check for new itemType/setItems format first, then fall back to old string format
+              const isProductSet = item.itemType === "set" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
+              const productCollectionString = descriptionLines.find(x => x?.title === "Set")?.value;
+              const isProductCollection = isProductSet || Boolean(productCollectionString);
+              
+              const isTentItem = item.itemType === "tent" || descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
 
-              if (productCollection) {
-                const productSetItems = productCollection.split("; ");
+              if (isProductCollection) {
+                // Use new setItems if available, otherwise parse old string format
+                const productSetItems = productCollectionString ? productCollectionString.split("; ") : [];
                 const data = { ...item, productSetItems };
                 return (
                   <CartCollection key={item._id} data={data} actions={{ handleQuantityChange: (value, id, disabled) => handleCollectionQuantityChange(data, value, id, disabled), removeProduct }} />

@@ -96,18 +96,20 @@ const hydrateCartForClient = async (cart) => {
       const productShape = enrichedProduct ? { ...item, product: enrichedProduct } : item;
 
       return {
-        ...item,
-        product: enrichedProduct || item.product,
-        _id: item?._id || item?.id,
-        id: item?.id || item?._id,
-        productId,
-        name: item?.name || enrichedProduct?.name || enrichedProduct?.title || "",
-        price: Number(item?.priceAtAdd ?? item?.price ?? enrichedProduct?.price ?? 0) || 0,
-        quantity: Number(item?.quantity) || 1,
-        // Map customTextFieldValues to customTextFields for compatibility with calculateTotalCartQuantity
-        customTextFields: item?.customTextFields || item?.customTextFieldValues || [],
-        image: resolveLineItemImage(productShape),
-      };
+      ...item,
+      product: enrichedProduct || item.product,
+      _id: item?._id || item?.id,
+      id: item?.id || item?._id,
+      productId,
+      name: item?.name || enrichedProduct?.name || enrichedProduct?.title || "",
+      price: Number(item?.priceAtAdd ?? item?.price ?? enrichedProduct?.price ?? 0) || 0,
+      quantity: Number(item?.quantity) || 1,
+      itemType: item?.itemType || "product",
+      setItems: item?.setItems || [],
+      // Map customTextFieldValues to customTextFields for compatibility with calculateTotalCartQuantity
+      customTextFields: item?.customTextFields || item?.customTextFieldValues || [],
+      image: resolveLineItemImage(productShape),
+    };
     }),
   };
 };
@@ -241,16 +243,83 @@ export const getMemberCart = async (memberId, token) => {
 };
 
 /**
+ * Parse set items string to structured array
+ * Converts "Product~Size~Price~Quantity; ..." to setItems array
+ * @param {string} setString - The set string format
+ * @returns {Array} Array of setItems objects
+ */
+const parseSetItemsString = (setString) => {
+  if (!setString || typeof setString !== "string") return [];
+  
+  return setString.split("; ").filter(Boolean).map((itemStr) => {
+    const [productName, size, price, quantity] = itemStr.split("~");
+    return {
+      product: null, // Product ID not available from string format
+      productName: productName || "",
+      size: size || "",
+      quantity: parseInt(quantity, 10) || 1,
+      unitPrice: parseFloat(price) || 0,
+    };
+  });
+};
+
+/**
  * Transform frontend line item format to Payload format
  * @param {object} item - Frontend line item (Wix-compatible format)
  * @returns {object} Payload cart line item
  */
 const transformLineItem = (item) => {
-  const { catalogReference, quantity } = item;
+  const { catalogReference, quantity, price, priceAtAdd, setItems } = item;
 
   // Extract product ID from catalogReference
   const productId = catalogReference?.catalogItemId;
   const options = catalogReference?.options || {};
+
+  // Check if this is a product set (has Set in customTextFields or setItems array)
+  const setString = options.customTextFields?.Set || options.customTextFields?.set;
+  const hasSetItems = setItems && Array.isArray(setItems) && setItems.length > 0;
+  const isProductSet = Boolean(setString || hasSetItems);
+
+  if (isProductSet) {
+    // Handle product set with new itemType/setItems structure
+    let normalizedSetItems = [];
+    
+    if (hasSetItems) {
+      // Already in new format - normalize the structure
+      normalizedSetItems = setItems.map((si) => ({
+        product: si.product || si.productId || null,
+        productName: si.productName || si.name || si.product || "",
+        size: si.size || "",
+        quantity: parseInt(si.quantity, 10) || 1,
+        unitPrice: parseFloat(si.unitPrice || si.price || 0),
+      }));
+    } else if (setString) {
+      // Parse from old string format
+      normalizedSetItems = parseSetItemsString(setString);
+    }
+
+    // Build customTextFieldValues excluding 'Set' field (now redundant)
+    const customTextFieldValues = [];
+    if (options.customTextFields) {
+      Object.entries(options.customTextFields).forEach(([title, value]) => {
+        if (title.toLowerCase() !== "set") {
+          customTextFieldValues.push({ title, value: String(value) });
+        }
+      });
+    }
+
+    return {
+      product: productId,
+      variant: options.variantId || null,
+      quantity: quantity || 1,
+      itemType: "set",
+      setItems: normalizedSetItems,
+      selectedOptions: options.options || null,
+      customTextFieldValues,
+      priceAtAdd: priceAtAdd || price || null,
+      addedAt: new Date().toISOString(),
+    };
+  }
 
   // Build customTextFieldValues from options.customTextFields
   const customTextFieldValues = [];
@@ -267,8 +336,10 @@ const transformLineItem = (item) => {
     product: productId,
     variant: options.variantId || null,
     quantity: quantity || 1,
+    itemType: "product",
     selectedOptions,
     customTextFieldValues,
+    priceAtAdd: priceAtAdd || price || null, // Store price if provided
     addedAt: new Date().toISOString(),
   };
 };
@@ -468,15 +539,32 @@ const sanitizeCustomTextFieldValues = (customTextFieldValues) => {
     .filter((field) => field.title);
 };
 
-const normalizeItemToIds = (item) => ({
-  product: typeof item.product === "object" ? item.product.id : item.product,
-  variant: typeof item.variant === "object" ? item.variant?.id : item.variant,
-  quantity: item.quantity,
-  selectedOptions: item.selectedOptions ?? null,
-  customTextFieldValues: sanitizeCustomTextFieldValues(item.customTextFieldValues),
-  notes: item.notes ?? null,
-  addedAt: item.addedAt ?? null,
-});
+const normalizeItemToIds = (item) => {
+  const base = {
+    product: typeof item.product === "object" ? item.product.id : item.product,
+    variant: typeof item.variant === "object" ? item.variant?.id : item.variant,
+    quantity: item.quantity,
+    itemType: item.itemType || "product",
+    selectedOptions: item.selectedOptions ?? null,
+    customTextFieldValues: sanitizeCustomTextFieldValues(item.customTextFieldValues),
+    priceAtAdd: item.priceAtAdd ?? item.price ?? null,
+    notes: item.notes ?? null,
+    addedAt: item.addedAt ?? null,
+  };
+
+  // Include setItems if this is a set
+  if (item.itemType === "set" && Array.isArray(item.setItems)) {
+    base.setItems = item.setItems.map((si) => ({
+      product: typeof si.product === "object" ? si.product?.id : si.product || null,
+      productName: si.productName || "",
+      size: si.size || "",
+      quantity: parseInt(si.quantity, 10) || 1,
+      unitPrice: parseFloat(si.unitPrice || 0),
+    }));
+  }
+
+  return base;
+};
 
 const normalizeSelectedOptionsForCompare = (value) => {
   if (!value || typeof value !== "object") return null;

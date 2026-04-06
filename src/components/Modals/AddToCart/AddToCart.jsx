@@ -119,25 +119,54 @@ const AddToCart = ({ data, onClose }) => {
       let lineItems = [];
 
       if (isProductCollection) {
-        let setData;
+        let setItemsData;
 
         if (productInCart) {
-          // Support both Wix (descriptionLines) and Payload (customTextFieldValues) formats
-          const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
-          const descriptionLines = formatDescriptionLines(rawDescriptionLines);
-          const existingSet = descriptionLines.find(x => x.title === "Set")?.value;
+          // Check for new setItems format first, then fall back to string format
+          const existingSetItems = productInCart.setItems || [];
+          
+          if (existingSetItems.length > 0) {
+            // New format - merge with existing setItems
+            setItemsData = productSetItems.map((item) => {
+              const existingItem = existingSetItems.find((si) => si.productName === item.product);
+              const oldQuantity = existingItem ? parseInt(existingItem.quantity, 10) : 0;
+              return {
+                product: item.productId || null,
+                productName: item.product,
+                size: item.size,
+                quantity: oldQuantity + parseInt(item.quantity, 10),
+                unitPrice: parseFloat(item.price) || 0,
+              };
+            });
+          } else {
+            // Old format - parse from string and convert
+            const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
+            const descriptionLines = formatDescriptionLines(rawDescriptionLines);
+            const existingSet = descriptionLines.find(x => x.title === "Set")?.value || "";
 
-          setData = productSetItems.map((item) => {
-            const existingItem = existingSet.split("; ").find((field) => field.includes(item.product));
-            const oldQuantity = existingItem ? parseInt(existingItem.split("~")[3]) : 0;
-            return `${item.product}~${item.size}~${item.price}~${oldQuantity + parseInt(item.quantity)}`;
-          }).join("; ");
+            setItemsData = productSetItems.map((item) => {
+              const existingItemStr = existingSet.split("; ").find((field) => field.includes(item.product));
+              const oldQuantity = existingItemStr ? parseInt(existingItemStr.split("~")[3], 10) : 0;
+              return {
+                product: item.productId || null,
+                productName: item.product,
+                size: item.size,
+                quantity: oldQuantity + parseInt(item.quantity, 10),
+                unitPrice: parseFloat(item.price) || 0,
+              };
+            });
+          }
 
           await removeProductFromCart([productInCart._id]);
         } else {
-          setData = productSetItems.map((item) =>
-            `${item.product}~${item.size}~${item.price}~${item.quantity}`
-          ).join("; ");
+          // Create new cart item with structured setItems
+          setItemsData = productSetItems.map((item) => ({
+            product: item.productId || null,
+            productName: item.product,
+            size: item.size,
+            quantity: parseInt(item.quantity, 10),
+            unitPrice: parseFloat(item.price) || 0,
+          }));
         }
 
         lineItems = [{
@@ -145,10 +174,12 @@ const AddToCart = ({ data, onClose }) => {
             appId,
             catalogItemId: productId,
             options: {
-              customTextFields: { "Set": setData }
+              customTextFields: {}
             },
           },
+          setItems: setItemsData,
           quantity: 1,
+          price: product.price || 0,
         }];
       } else {
         const size = findProductSize(product.additionalInfoSections);
@@ -162,6 +193,7 @@ const AddToCart = ({ data, onClose }) => {
             },
           },
           quantity: cartQuantity,
+          price: product.price || 0,
         }];
       }
 

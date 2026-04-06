@@ -1,6 +1,6 @@
 "use server";
 import queryCollection from "@/utils/fetchFunction";
-import { getAuthToken, getCartId, getMemberTokens } from "../auth";
+import { getAuthToken, getCartId } from "../auth";
 import { createPriceQuoteVisitor } from "./QuoteApisVisitor";
 
 const baseUrl = process.env.BASE_URL;
@@ -8,7 +8,6 @@ const baseUrl = process.env.BASE_URL;
 export const createPriceQuote = async ({ lineItems, quoteDetails }) => {
   try {
     const authToken = await getAuthToken();
-    const memberTokens = await getMemberTokens();
 
     if (!authToken) {
       const cartId = await getCartId();
@@ -16,7 +15,7 @@ export const createPriceQuote = async ({ lineItems, quoteDetails }) => {
       return response;
     }
 
-    const payload = { memberTokens, lineItems, quoteDetails };
+    const payload = { lineItems, quoteDetails };
 
     const response = await fetch(`${baseUrl}/api/quote/create`, {
       method: "POST",

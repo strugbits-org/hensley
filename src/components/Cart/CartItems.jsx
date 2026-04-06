@@ -185,19 +185,38 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
 
     const productName = data?.productName?.original || data?.name;
 
-    const productInfoSection = data.productSetItems.map(item => {
-        const set = item.split("~");
-        const price = parseFloat(set[2]);
-        const quantity = parseInt(set[3]);
-
-        return {
-            product: set[0],
-            size: set[1],
-            price,
-            quantity,
-            formattedPrice: formatTotalPrice(price),
+    // Support both new structured setItems format and old string format
+    const productInfoSection = useMemo(() => {
+        // Check for new setItems format first
+        if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
+            return data.setItems.map(item => ({
+                product: item.productName || item.product || '',
+                size: item.size || '',
+                price: parseFloat(item.unitPrice) || 0,
+                quantity: parseInt(item.quantity, 10) || 1,
+                formattedPrice: formatTotalPrice(parseFloat(item.unitPrice) || 0),
+            }));
         }
-    });
+        
+        // Fall back to old string format (productSetItems)
+        if (data.productSetItems && Array.isArray(data.productSetItems)) {
+            return data.productSetItems.map(item => {
+                const set = item.split("~");
+                const price = parseFloat(set[2]);
+                const quantity = parseInt(set[3]);
+
+                return {
+                    product: set[0],
+                    size: set[1],
+                    price,
+                    quantity,
+                    formattedPrice: formatTotalPrice(price),
+                };
+            });
+        }
+        
+        return [];
+    }, [data.setItems, data.productSetItems]);
 
     const price = useMemo(() =>
         productInfoSection.reduce((acc, { price, quantity }) => acc + (price * quantity), 0),

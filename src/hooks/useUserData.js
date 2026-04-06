@@ -10,6 +10,7 @@ function useUserData() {
   useEffect(() => {
     if (cookies) {
       try {
+        console.log('[useUserData] cookies.userData:', cookies.userData);
         setUserData(cookies.userData);
       } catch (error) {
         logError("Error parsing user data from cookie", error);
@@ -17,7 +18,8 @@ function useUserData() {
     }
   }, [cookies]);
 
-  // console.log("signedUserData", signedUserData);
+  console.log('[useUserData] signedUserData:', signedUserData);
+  console.log('[useUserData] extracted email:', signedUserData?.loginEmail);
   
 
   return {
