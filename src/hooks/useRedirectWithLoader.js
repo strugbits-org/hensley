@@ -6,6 +6,11 @@ const useRedirectWithLoader = () => {
   const pathname = usePathname();
 
   const redirectWithLoader = (slug, ignoreSamePath) => {
+    // Clear any scroll locks from modals before navigation
+    if (typeof window !== 'undefined') {
+      document.body.classList.remove('overflow-hidden');
+    }
+    
     if (pathname === slug && ignoreSamePath) {
       loaderActions.show();
       setTimeout(() => loaderActions.hide(), 900);

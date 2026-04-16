@@ -11,7 +11,8 @@ import Loading from "@/app/loading";
 
 export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) => {
 
-    const { featuredProjectTitle } = pageDetails;
+    const featuredProjectTitle = pageDetails?.featuredProjectTitle || "Featured Projects";
+    const safeData = Array.isArray(data) ? data : [];
 
     const sliderInstance = React.useRef();
     const [isSliderReady, setIsSliderReady] = useState(false);
@@ -27,7 +28,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
                 slides: { perView: 1.2, spacing: 10, origin: "center" },
             },
             "(min-width: 1024px)": {
-                slides: { perView: data.length === 1 ? 1 : 1.2, spacing: 10, },
+                slides: { perView: safeData.length === 1 ? 1 : 1.2, spacing: 10, },
             },
         },
         created(slider) {
@@ -39,7 +40,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
         },
     });
 
-    if (!data || data.length === 0) return null;
+    if (safeData.length === 0) return null;
 
     return (
         <div className={`w-full py-20 bg-primary lg:py-6 ${classes}`}>
@@ -52,7 +53,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
                 </div>
             )}
             <div ref={sliderRef} className={`mt-[21px] relative keen-slider h-screen ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
-                {data.map((item, index) => {
+                {safeData.map((item, index) => {
                     const { portfolioRef } = item;
                     return (
                         <div key={index} className="keen-slider__slide relative group">
@@ -79,7 +80,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
                     );
                 })}
                 {/* Arrows */}
-                {(data.length >= 4) && (
+                {(safeData.length >= 4) && (
                     <>
                         {(loop || currentSlide?.rel > 0) && <button
                             onClick={() => sliderInstance.current?.prev()}

@@ -166,6 +166,10 @@ export const fetchProductCollectionData = async (id, productData = null) => {
 
 export const fetchFeaturedProjects = async (id) => {
     try {
+        if (!id || (typeof id !== "string" && typeof id !== "number")) {
+            return [];
+        }
+
         const response = await queryCollection({
             dataCollectionId: "PortfolioCollection",
             includeReferencedItems: ["portfolioRef"],
@@ -183,13 +187,11 @@ export const fetchFeaturedProjects = async (id) => {
             ],
             sortKey: "order"
         });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
 
-        return response.items;
+        return Array.isArray(response?.items) ? response.items : [];
     } catch (error) {
         logError(`Error fetching featured projects: ${error.message}`, error);
+        return [];
     }
 }
 

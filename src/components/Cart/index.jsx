@@ -81,7 +81,7 @@ const Cart = () => {
     try {
       const response = await getProductsCart();
       const lineItems = (response?.lineItems || []).map(normalizeCartLineItem);
-      console.log("lineItems", lineItems);
+      // console.log("lineItems", lineItems);
       
       setCartItems(lineItems);
 

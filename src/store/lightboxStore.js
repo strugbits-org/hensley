@@ -86,5 +86,9 @@ export const lightboxActions = {
         lightboxActions.resetBasicLightBoxDetails();
         lightboxActions.resetAddToCartModal();
         lightboxActions.resetMatchProductsLightBoxDetails();
+        // Ensure body scroll is restored
+        if (typeof window !== 'undefined') {
+            document.body.classList.remove('overflow-hidden');
+        }
     }
 };
