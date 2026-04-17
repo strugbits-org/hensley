@@ -4,10 +4,8 @@ import React, { useState } from 'react'
 import { useKeenSlider } from "keen-slider/react"
 import "keen-slider/keen-slider.min.css"
 import "./styles.css"
-import image from '@/assets/tent-page-1.png'
-import Image from "next/image"
-import { PrimaryImage } from '../common/PrimaryImage'
 import { generateImageURL } from '@/utils/generateImageURL'
+import { resolveProductMediaUrl } from '@/utils'
 
 const TentTypesSlider = ({ data }) => {
     const [currentSlide, setCurrentSlide] = useState(0)
@@ -39,7 +37,10 @@ const TentTypesSlider = ({ data }) => {
                     const isActive = currentSlide % data.length === idx
 
                     const { tent } = item;
-                    const imageURL = generateImageURL({ wix_url: tent?.mainMedia });
+                    const imageURL = typeof tent?.mainMedia === 'string'
+                        ? generateImageURL({ wix_url: tent?.mainMedia })
+                        : resolveProductMediaUrl(tent?.mainMedia);
+                    const tentName = tent?.name || tent?.title || "";
 
 
                     return (
@@ -55,8 +56,7 @@ const TentTypesSlider = ({ data }) => {
                                         <h3 className='w-full break-words 
                              text-[35px]
                              leading-[35px]
-                            text-white font-recklessRegular uppercase'>TENSION
-                                            TENTS</h3>
+                            text-white font-recklessRegular uppercase'>{tentName}</h3>
                                     </div>
                                 </div>
                             </div>

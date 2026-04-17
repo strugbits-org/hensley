@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId, useMemo } from 'react';
 import { CheckBox } from './CheckBox';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { formatDateNumeric, logError } from '@/utils';
+import { formatDateNumeric, logError, richTextToHTML } from '@/utils';
 import AirDatepicker from 'air-datepicker';
 import localeEn from 'air-datepicker/locale/en';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
@@ -14,66 +14,80 @@ import parse from 'html-react-parser';
 import { BreadCrumbs } from '../common/BreadCrumbs';
 import { MatchItWithButton } from '../common/MatchItWithButton';
 
-// Validation schema
-const schema = yup.object({
-    eventName: yup.string().required('Event name is required'),
-    eventDate: yup.string().required('Event date is required'),
-    removalDate: yup.string()
-        .required('Removal date is required')
-        .test('removal-after-event', 'Removal date must be after event date', function (value) {
-            const { eventDate } = this.parent;
-            if (!value || !eventDate) return true;
-            return new Date(value) >= new Date(eventDate);
-        }),
-    tentSize: yup.string(),
-    numberOfGuests: yup.string().required('Number of guests is required'),
-    carpetColor: yup.string(),
-    distanceFromTruck: yup.string(),
-    additionalInfo: yup.string(),
-    eventType: yup.string().nullable(),
-    datesFlexible: yup.string().nullable(),
-    tentType: yup.string().nullable(),
-    heating: yup.string().nullable(),
-    dj: yup.string().nullable(),
-    ceilingTreatment: yup.string().nullable(),
-    wallTreatment: yup.string().nullable(),
-    lightingNeeded: yup.string().nullable(),
-    ableToStake: yup.string().nullable(),
-    tentSurface: yup.string().nullable(),
-    levelSurface: yup.string().nullable(),
-    needFloor: yup.string().nullable()
-}).required();
+// ---------------------------------------------------------------------------
+// Helpers to build a Yup schema and initial state dynamically from the
+// quoteRequestFields array provided by the core backend tent config.
+// ---------------------------------------------------------------------------
 
-export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
-    
-    // Form state management
-    const [formData, setFormData] = useState({
-        eventName: '',
-        eventDate: '',
-        removalDate: '',
-        tentSize: '',
-        numberOfGuests: '',
-        carpetColor: '',
-        distanceFromTruck: '',
-        additionalInfo: '',
-        eventType: null,
-        datesFlexible: null,
-        tentType: null,
-        heating: null,
-        dj: null,
-        ceilingTreatment: null,
-        wallTreatment: null,
-        lightingNeeded: null,
-        ableToStake: null,
-        tentSurface: null,
-        levelSurface: null,
-        needFloor: null
+const INPUT_TYPES_WITH_OPTIONS = new Set(['radio', 'checkbox', 'select']);
+
+const buildDynamicSchema = (fields = []) => {
+    const shape = {};
+    fields.forEach((field) => {
+        const key = field.fieldKey;
+        if (!key) return;
+
+        if (field.inputType === 'number') {
+            let rule = yup.string();
+            if (field.required) rule = rule.required(`${field.label} is required`);
+            shape[key] = rule;
+        } else if (field.inputType === 'date') {
+            let rule = yup.string();
+            if (field.required) rule = rule.required(`${field.label} is required`);
+            shape[key] = rule;
+        } else if (INPUT_TYPES_WITH_OPTIONS.has(field.inputType)) {
+            shape[key] = yup.string().nullable();
+        } else {
+            let rule = yup.string();
+            if (field.required) rule = rule.required(`${field.label} is required`);
+            shape[key] = rule;
+        }
     });
 
+    // Cross-field validation: removalDate must be after eventDate when both exist
+    if (shape.removalDate && shape.eventDate) {
+        shape.removalDate = shape.removalDate.test(
+            'removal-after-event',
+            'Removal date must be after event date',
+            function (value) {
+                const { eventDate } = this.parent;
+                if (!value || !eventDate) return true;
+                return new Date(value) >= new Date(eventDate);
+            }
+        );
+    }
+
+    return yup.object(shape).required();
+};
+
+const buildDefaultValues = (fields = []) => {
+    const defaults = {};
+    fields.forEach((field) => {
+        if (!field.fieldKey) return;
+        defaults[field.fieldKey] = INPUT_TYPES_WITH_OPTIONS.has(field.inputType) ? null : '';
+    });
+    return defaults;
+};
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
+export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
+    const tentConfig = productData?.tentConfig || {};
+    const quoteFields = tentConfig.quoteRequestFields || [];
+    const quoteIntroText = tentConfig.quoteIntroText || 'Please fill the below RFP form & A tenting Specialist will provide a custom quote';
+    const quoteSubmitLabel = tentConfig.quoteSubmitLabel || 'Add to Quote';
+
+    const uid = useId();
+    const schema = useMemo(() => buildDynamicSchema(quoteFields), [quoteFields]);
+    const defaultValues = useMemo(() => buildDefaultValues(quoteFields), [quoteFields]);
+
+    const [formData, setFormData] = useState(defaultValues);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [datepickers, setDatepickers] = useState({});
     const redirectWithLoader = useRedirectWithLoader();
-    const [cookies, setCookie] = useCookies(["cartQuantity"]);
+    const [cookies, setCookie] = useCookies(['cartQuantity']);
 
     const {
         register,
@@ -84,134 +98,231 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
-        defaultValues: formData
+        defaultValues,
     });
 
-    // Initialize Air Datepickers
+    // ---- Air Datepicker initialisation for every date field ----
     useEffect(() => {
         const today = new Date();
-        const datePickerInstances = {};
+        const instances = {};
 
-        const baseConfig = {
-            minDate: today,
-            format: "MM/dd/yyyy",
-            autoClose: true,
-            locale: localeEn,
-            classes: "custom-date-picker",
-        };
+        const dateFields = quoteFields.filter((f) => f.inputType === 'date');
 
-        const datePickerConfigs = [
-            {
-                id: 'eventDate',
+        dateFields.forEach((field) => {
+            const elId = `${uid}-${field.fieldKey}`;
+            const el = document.getElementById(elId);
+            if (!el) return;
+
+            instances[field.fieldKey] = new AirDatepicker(el, {
+                minDate: today,
+                format: 'MM/dd/yyyy',
+                autoClose: true,
+                locale: localeEn,
+                classes: 'custom-date-picker',
                 onSelect: ({ date, datepicker }) => {
                     const dateStr = date ? formatDateNumeric(date) : '';
-                    setValue('eventDate', dateStr);
-                    handleInputChange('eventDate', dateStr);
-                    trigger('eventDate');
+                    setValue(field.fieldKey, dateStr);
+                    handleInputChange(field.fieldKey, dateStr);
+                    trigger(field.fieldKey);
                     datepicker.$el.value = dateStr;
-                    datePickerInstances.removalDate?.update({ minDate: date || today });
-                }
-            },
-            {
-                id: 'removalDate',
-                onSelect: ({ date, datepicker }) => {
-                    const dateStr = date ? formatDateNumeric(date) : '';
-                    setValue('removalDate', dateStr);
-                    handleInputChange('removalDate', dateStr);
-                    trigger('removalDate');
-                    datepicker.$el.value = dateStr;
-                }
-            }
-        ];
 
-        datePickerConfigs.forEach(({ id, onSelect }) => {
-            const element = document.getElementById(id);
-            if (element) {
-                datePickerInstances[id] = new AirDatepicker(element, {
-                    ...baseConfig,
-                    onSelect
-                });
-            }
+                    // If this is eventDate, push removalDate minDate forward
+                    if (field.fieldKey === 'eventDate' && instances.removalDate) {
+                        instances.removalDate.update({ minDate: date || today });
+                    }
+                },
+            });
         });
 
-        setDatepickers(datePickerInstances);
+        setDatepickers(instances);
 
         return () => {
-            Object.values(datePickerInstances).forEach(dp => {
-                if (dp && typeof dp.destroy === 'function') {
-                    dp.destroy();
-                }
+            Object.values(instances).forEach((dp) => {
+                if (dp && typeof dp.destroy === 'function') dp.destroy();
             });
         };
-    }, [setValue, trigger]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [quoteFields.length]);
 
     const handleInputChange = (field, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
+        setFormData((prev) => ({ ...prev, [field]: value }));
         setValue(field, value);
         trigger(field);
     };
 
+    // ---- Submission ----
     const onSubmit = async (data) => {
         setIsSubmitting(true);
 
         try {
             const productId = productData._id;
-            const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+            const appId = '215238eb-22a5-4c36-9e7b-e7c08025e04e';
+
+            // Build the customTextFields map dynamically from the form data
+            const customTextFields = {};
+            quoteFields.forEach((field) => {
+                const label = (field.label || field.fieldKey).toUpperCase();
+                const val = data[field.fieldKey];
+                customTextFields[label] = typeof val === 'string' ? val.toUpperCase() : val || '-';
+            });
+
             const cartData = {
-                lineItems: [{
-                    catalogReference: {
-                        appId,
-                        catalogItemId: productId,
-                        options: {
-                            customTextFields: {
-                                "EVENT NAME": data.eventName?.toUpperCase() || "-",
-                                "EVENT DATE": data.eventDate?.toUpperCase() || "-",
-                                "REMOVAL DATE": data.removalDate?.toUpperCase() || "-",
-                                "TENT SIZE (IF KNOWN)": data.tentSize?.toUpperCase() || "-",
-                                "EVENT TYPE": data.eventType?.toUpperCase() || "-",
-                                "NUMBER OF GUESTS": data.numberOfGuests?.toUpperCase() || "-",
-                                "ARE THE INSTALL/REMOVAL DATES FLEXIBLE?": data.datesFlexible?.toUpperCase() || "-",
-                                "TENT TYPE": data.tentType?.toUpperCase() || "-",
-                                "HEATING": data.heating?.toUpperCase() || "-",
-                                "DJ": data.dj?.toUpperCase() || "-",
-                                "CEILING TREATMENT": data.ceilingTreatment?.toUpperCase() || "-",
-                                "WALL TREATMENT": data.wallTreatment?.toUpperCase() || "-",
-                                "LIGHTING NEEDED": data.lightingNeeded?.toUpperCase() || "-",
-                                "ABLE TO STAKE": data.ableToStake?.toUpperCase() || "-",
-                                "TENT SURFACE": data.tentSurface?.toUpperCase() || "-",
-                                "LEVEL SURFACE": data.levelSurface?.toUpperCase() || "-",
-                                "DO YOU NEED A FLOOR": data.needFloor?.toUpperCase() || "-",
-                                "CARPET / ASTROTURF COLOR": data.carpetColor?.toUpperCase() || "-",
-                                "DISTANCE FROM TRUCK TO SITE": data.distanceFromTruck?.toUpperCase() || "-",
-                                "PLEASE PROVIDE ANY OTHER ADDITIONAL INFO": data.additionalInfo?.toUpperCase() || "-"
-                            }
+                lineItems: [
+                    {
+                        catalogReference: {
+                            appId,
+                            catalogItemId: productId,
+                            options: { customTextFields },
                         },
+                        quantity: 1,
+                        price: productData.price || 0,
                     },
-                    quantity: 1,
-                    price: productData.price || 0,
-                }]
+                ],
             };
 
             await AddProductToCart(cartData);
             const total = (cookies.cartQuantity || 0) + 1;
-            setCookie("cartQuantity", total, { path: "/" });
+            setCookie('cartQuantity', total, { path: '/' });
             setTimeout(() => {
                 reset();
-                Object.values(datepickers).forEach(dp => {
-                    if (dp && typeof dp.clear === 'function') {
-                        dp.clear();
-                    }
+                Object.values(datepickers).forEach((dp) => {
+                    if (dp && typeof dp.clear === 'function') dp.clear();
                 });
             }, 1000);
-            redirectWithLoader("/cart");
-
+            redirectWithLoader('/cart');
         } catch (error) {
-            logError("Error while adding item to cart:", error);
+            logError('Error while adding item to cart:', error);
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    // ---- Render helpers per input type ----
+    const descriptionHtml = typeof productData?.description === 'string'
+        ? productData.description
+        : richTextToHTML(productData?.description) || '';
+
+    // Determine the grid‑column span for a field (full, half, etc.)
+    const colSpan = (field) => {
+        if (INPUT_TYPES_WITH_OPTIONS.has(field.inputType)) return 'lg:col-span-2';
+        if (field.inputType === 'textarea') return 'lg:col-span-4 col-span-2';
+        if (field.fieldKey === 'eventDate' || field.fieldKey === 'removalDate') return 'lg:col-span-2';
+        return 'lg:col-span-4 col-span-2';
+    };
+
+    const renderField = (field) => {
+        const key = field.fieldKey;
+        const elId = `${uid}-${key}`;
+        const errorMsg = errors[key]?.message;
+        const errorCls = errorMsg ? 'border-b-red-500' : '';
+
+        switch (field.inputType) {
+            case 'text':
+            case 'number':
+                return (
+                    <div key={key} className={colSpan(field)}>
+                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
+                            {field.label}{field.required ? '*' : ''}
+                        </label>
+                        <input
+                            type={field.inputType === 'number' ? 'text' : 'text'}
+                            inputMode={field.inputType === 'number' ? 'numeric' : undefined}
+                            {...register(key)}
+                            value={formData[key] || ''}
+                            placeholder={field.placeholder || ''}
+                            onChange={(e) => handleInputChange(key, e.target.value)}
+                            className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
+                            disabled={isSubmitting}
+                        />
+                        {errorMsg && <p className="text-red-500 text-sm mt-1">{errorMsg}</p>}
+                    </div>
+                );
+
+            case 'textarea':
+                return (
+                    <div key={key} className={colSpan(field)}>
+                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
+                            {field.label}{field.required ? '*' : ''}
+                        </label>
+                        <textarea
+                            {...register(key)}
+                            value={formData[key] || ''}
+                            placeholder={field.placeholder || ''}
+                            onChange={(e) => handleInputChange(key, e.target.value)}
+                            className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
+                            rows={4}
+                            disabled={isSubmitting}
+                        />
+                        {errorMsg && <p className="text-red-500 text-sm mt-1">{errorMsg}</p>}
+                    </div>
+                );
+
+            case 'date':
+                return (
+                    <div key={key} className={colSpan(field)}>
+                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
+                            {field.label}{field.required ? '*' : ''}
+                        </label>
+                        <input
+                            id={elId}
+                            type="text"
+                            {...register(key)}
+                            value={formData[key] || ''}
+                            onChange={(e) => handleInputChange(key, e.target.value)}
+                            className={`datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
+                            placeholder="MM/DD/YYYY"
+                            readOnly
+                            disabled={isSubmitting}
+                        />
+                        {errorMsg && <p className="text-red-500 text-sm mt-1">{errorMsg}</p>}
+                    </div>
+                );
+
+            case 'select':
+                return (
+                    <div key={key} className={colSpan(field)}>
+                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
+                            {field.label}{field.required ? '*' : ''}
+                        </label>
+                        <select
+                            {...register(key)}
+                            value={formData[key] || ''}
+                            onChange={(e) => handleInputChange(key, e.target.value)}
+                            className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary uppercase ${errorCls}`}
+                            disabled={isSubmitting}
+                        >
+                            <option value="">Select…</option>
+                            {(field.options || []).map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                        {errorMsg && <p className="text-red-500 text-sm mt-1">{errorMsg}</p>}
+                    </div>
+                );
+
+            case 'radio':
+            case 'checkbox':
+                return (
+                    <CheckBox
+                        key={key}
+                        data={{
+                            label: field.label,
+                            options: (field.options || []).map((opt) =>
+                                typeof opt === 'string' ? opt : { label: opt.label, value: opt.value }
+                            ),
+                        }}
+                        classes={colSpan(field)}
+                        type={field.inputType}
+                        value={formData[key]}
+                        onChange={(newState) => handleInputChange(key, newState)}
+                        disabled={isSubmitting}
+                    />
+                );
+
+            default:
+                return null;
         }
     };
 
@@ -224,231 +335,25 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         { label: 'TENTS' }
                     ]} />
                     <MatchItWithButton product={{ ...productData, matchedProducts }} />
-
                 </div>
                 <h3 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] mb-4'>{title}</h3>
                 <div className="font-haasLight lg:text-[16px] lg:leading-[19px] text-[14px] leading-[17px] text-secondary-alt">
-                    {parse(productData?.description || '')}
+                    {descriptionHtml ? parse(descriptionHtml) : null}
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className='w-full grid lg:grid-cols-4 grid-cols-2 justify-between gap-x-[24px] gap-y-[39px] mt-[20px]'>
-                    <span className='lg:col-span-4 col-span-2 uppercase font-recklessRegular text-[30px]  leading-[30px]  text-secondary-alt'>Please fill the bellow RFP form & A tenting Specialist will provide a custom quote</span>
+                    <span className='lg:col-span-4 col-span-2 uppercase font-recklessRegular text-[30px] leading-[30px] text-secondary-alt'>
+                        {quoteIntroText}
+                    </span>
 
-                    <div className='lg:col-span-4 col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">Event Name</label>
-                        <input
-                            type="text"
-                            {...register('eventName')}
-                            value={formData.eventName}
-                            onChange={(e) => handleInputChange('eventName', e.target.value)}
-                            className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errors.eventName ? 'border-b-red-500' : ''}`}
-                            disabled={isSubmitting}
-                        />
-                        {errors.eventName && <p className="text-red-500 text-sm mt-1">{errors.eventName.message}</p>}
-                    </div>
-
-                    <div className='lg:col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">Event Date</label>
-                        <input
-                            id="eventDate"
-                            type="text"
-                            {...register('eventDate')}
-                            value={formData.eventDate}
-                            onChange={(e) => handleInputChange('eventDate', e.target.value)}
-                            className={`datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errors.eventDate ? 'border-b-red-500' : ''}`}
-                            placeholder="MM/DD/YYYY"
-                            readOnly
-                            disabled={isSubmitting}
-                        />
-                        {errors.eventDate && <p className="text-red-500 text-sm mt-1">{errors.eventDate.message}</p>}
-                    </div>
-
-                    <div className='lg:col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">Removal Date</label>
-                        <input
-                            id="removalDate"
-                            type="text"
-                            {...register('removalDate')}
-                            value={formData.removalDate}
-                            onChange={(e) => handleInputChange('removalDate', e.target.value)}
-                            className={`datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errors.removalDate ? 'border-b-red-500' : ''}`}
-                            placeholder="MM/DD/YYYY"
-                            readOnly
-                            disabled={isSubmitting}
-                        />
-                        {errors.removalDate && <p className="text-red-500 text-sm mt-1">{errors.removalDate.message}</p>}
-                    </div>
-
-                    <div className='lg:col-span-4 col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">tent size (if known)</label>
-                        <input
-                            type="text"
-                            {...register('tentSize')}
-                            value={formData.tentSize}
-                            onChange={(e) => handleInputChange('tentSize', e.target.value)}
-                            className="datepicker w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                            disabled={isSubmitting}
-                        />
-                    </div>
-
-                    <CheckBox
-                        data={{ label: "event type", options: ["RECEPTION", "SIT DOWN DINNER", "OTHER"] }}
-                        classes="lg:col-span-2"
-                        type="radio"
-                        value={formData.eventType}
-                        onChange={(newState, index, optionText) => handleInputChange('eventType', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <div className='lg:col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">NUMBER OF GUESTS*</label>
-                        <input
-                            type="text"
-                            {...register('numberOfGuests')}
-                            value={formData.numberOfGuests}
-                            onChange={(e) => handleInputChange('numberOfGuests', e.target.value)}
-                            className={`w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errors.numberOfGuests ? 'border-b-red-500' : ''}`}
-                            disabled={isSubmitting}
-                        />
-                        {errors.numberOfGuests && <p className="text-red-500 text-sm mt-1">{errors.numberOfGuests.message}</p>}
-                    </div>
-
-                    <CheckBox
-                        data={{ label: "are the install/removal dates flexible", options: ["yes", "no"] }}
-                        type="radio"
-                        value={formData.datesFlexible}
-                        onChange={(newState, index, optionText) => handleInputChange('datesFlexible', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "tent type", options: ["white walls", "no walls", "transparent"] }}
-                        type="radio"
-                        value={formData.tentType}
-                        onChange={(newState, index, optionText) => handleInputChange('tentType', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "heating", options: ["yes", "no"] }}
-                        type="radio"
-                        value={formData.heating}
-                        onChange={(newState, index, optionText) => handleInputChange('heating', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "DJ", options: ["yes", "no"] }}
-                        type="radio"
-                        value={formData.dj}
-                        onChange={(newState, index, optionText) => handleInputChange('dj', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "CEILLING TREATMENT", options: ["FULL SWAG", "PARTIAL SWAG", "CROWN RAFTER", "I AM NOT SURE"] }}
-                        type="radio"
-                        value={formData.ceilingTreatment}
-                        onChange={(newState, index, optionText) => handleInputChange('ceilingTreatment', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "WALL TREATMENT", options: ["FULL PLEAT", "MINIMAL PLEAT", "WALL POLE DRAPE", "OTHER"] }}
-                        type="radio"
-                        value={formData.wallTreatment}
-                        onChange={(newState, index, optionText) => handleInputChange('wallTreatment', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "LIGHTING NEEDED", options: ["yes", "no", "i don't know"] }}
-                        type="radio"
-                        value={formData.lightingNeeded}
-                        onChange={(newState, index, optionText) => handleInputChange('lightingNeeded', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "ABLE TO STAKE", options: ["yes", "no"] }}
-                        type="radio"
-                        value={formData.ableToStake}
-                        onChange={(newState, index, optionText) => handleInputChange('ableToStake', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "TENT SURFACE", options: ["dirt", "grass", "Concrete", "astfalt", "other"] }}
-                        type="radio"
-                        value={formData.tentSurface}
-                        onChange={(newState, index, optionText) => handleInputChange('tentSurface', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "level surface", options: ["yes", "no"] }}
-                        type="radio"
-                        value={formData.levelSurface}
-                        onChange={(newState, index, optionText) => handleInputChange('levelSurface', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <CheckBox
-                        data={{ label: "do you need a floor", options: ["yes", "no"] }}
-                        type="radio"
-                        value={formData.needFloor}
-                        onChange={(newState, index, optionText) => handleInputChange('needFloor', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
-
-                    <div className='lg:col-span-4 col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">CARPET / ASTROTURF COLOR</label>
-                        <input
-                            type="text"
-                            {...register('carpetColor')}
-                            value={formData.carpetColor}
-                            onChange={(e) => handleInputChange('carpetColor', e.target.value)}
-                            className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                            disabled={isSubmitting}
-                        />
-                    </div>
-
-                    <div className='lg:col-span-4 col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">TENT SIZE</label>
-                        <input
-                            type="text"
-                            value={formData.tentSize}
-                            onChange={(e) => handleInputChange('tentSize', e.target.value)}
-                            className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                            disabled={isSubmitting}
-                        />
-                    </div>
-
-                    <div className='lg:col-span-4 col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">DISTANCE FROM TRUCK TO SITE</label>
-                        <input
-                            type="text"
-                            {...register('distanceFromTruck')}
-                            value={formData.distanceFromTruck}
-                            onChange={(e) => handleInputChange('distanceFromTruck', e.target.value)}
-                            className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                            disabled={isSubmitting}
-                        />
-                    </div>
-
-                    <div className='lg:col-span-4 col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">PLEASE PROVIDE ANY OTHER ADDICIONAL INFO</label>
-                        <textarea
-                            {...register('additionalInfo')}
-                            value={formData.additionalInfo}
-                            onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
-                            className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                            rows={4}
-                            disabled={isSubmitting}
-                        ></textarea>
-                    </div>
+                    {quoteFields.map(renderField)}
                 </form>
             </div>
-            <AddToCartButton onClick={handleSubmit(onSubmit)} classes={'lg:!h-[200px] lg:!mt-3'} text={isSubmitting ? "Please wait..." : "add to quote"} disabled={isSubmitting} />
+            <AddToCartButton
+                onClick={handleSubmit(onSubmit)}
+                classes={'lg:!h-[200px] lg:!mt-3'}
+                text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
+                disabled={isSubmitting}
+            />
         </>
     );
 };

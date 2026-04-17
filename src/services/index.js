@@ -106,31 +106,19 @@ export const fetchTentListingPageDetails = async () => {
     const pageDetails = await queryCollection({ dataCollectionId: "tentListingPageDetails" });
 
     if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+      throw new Error(`Page details response does not contain items array`);
     }
 
     return pageDetails.items[0]
 
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching tent listing page details: ${error.message}`, error);
   }
 };
 
 export const fetchTentsData = async () => {
-  try {
-    const response = await queryCollection({
-      dataCollectionId: "TentsCollection",
-      includeReferencedItems: ["tent", "productData"],
-      sortKey: "orderNumber"
-    });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-    return response.items;
-  } catch (error) {
-    logError(`Error fetching tents data: ${error.message}`, error);
-  }
+  const { fetchAllTents } = await import("./tents");
+  return fetchAllTents();
 };
 
 export const fetchMasterClassTenting = async () => {

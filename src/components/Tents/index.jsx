@@ -15,8 +15,9 @@ const Tents = ({ data }) => {
         <>
             <TentsTypes data={tents} />
             {fullTentData.map((item) => {
+                const tentSlug = (item?.tentData?.slug || item?.tentData?.tent?.slug || "").replace(/^\//, "");
                 return (
-                    <div key={item?.tentData?.slug} id={(item?.tentData?.slug || "").replace(/[/]/g, "")}>
+                    <div key={tentSlug || item?.tentData?._id} id={tentSlug}>
                         <BannerStructures tent={item?.tentData} data={item?.tentData?.tent} />
                         <OurProjects data={item.portfolio} />
                         <FeaturedBlogs data={item?.blogs} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />

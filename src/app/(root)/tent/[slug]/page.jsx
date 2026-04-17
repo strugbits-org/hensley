@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
 
     const { title, noFollowTag } = metaData;
 
-    const fullTitle = tentData.title + title;
+    const fullTitle = (tentData?.title || slug) + title;
 
     const metadata = { title: fullTitle };
 
@@ -37,7 +37,13 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const tentsData = await fetchTentsData();
-    const paths = tentsData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
+    if (!Array.isArray(tentsData)) return [];
+
+    const paths = tentsData.map((data) => {
+      // Core API may return slug as "frame-tents" or "/frame-tents"
+      const rawSlug = data.slug || data.tent?.slug || "";
+      return { slug: rawSlug.replace(/^\//, "").trim() };
+    });
     return paths;
   } catch (error) {
     logError("Error generating static params(tent page):", error);

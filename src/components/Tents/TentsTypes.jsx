@@ -2,6 +2,7 @@ import React from 'react';
 import SectionTitle from '../common/SectionTitle';
 import TentTypesSlider from './TentTypesSlider';
 import { generateImageURL } from '@/utils/generateImageURL';
+import { resolveProductMediaUrl } from '@/utils';
 
 const TentsTypes = ({ data }) => {
     return (
@@ -10,7 +11,12 @@ const TentsTypes = ({ data }) => {
             <div className='lg:grid hidden w-full grid-cols-3 gap-x-[24px] px-[24px] py-[31px]'>
                 {data.map((item, index) => {
                     const { tent } = item;
-                    const imageURL = generateImageURL({ wix_url: tent?.mainMedia, w: 608, h: 687 });
+                    // Support both Wix and core API media formats
+                    const imageURL = typeof tent?.mainMedia === 'string'
+                        ? generateImageURL({ wix_url: tent?.mainMedia, w: 608, h: 687 })
+                        : resolveProductMediaUrl(tent?.mainMedia);
+
+                    const tentSlug = (tent?.slug || "").replace(/^\//, "");
 
                     return (
                         <div
@@ -32,7 +38,7 @@ const TentsTypes = ({ data }) => {
                                         {tent?.name}
                                     </h3>
                                 </div>
-                                <a href={`#${tent?.slug}`}>
+                                <a href={`#${tentSlug}`}>
                                     <svg xmlns="http://www.w3.org/2000/svg" width="120.423" height="120.676" viewBox="0 0 120.423 120.676">
                                         <g id="Group_3704" data-name="Group 3704" transform="translate(120.256 60.545) rotate(135)">
                                             <g id="Group_2072" data-name="Group 2072" transform="translate(0 0.117)">
