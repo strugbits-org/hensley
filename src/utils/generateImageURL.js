@@ -1,3 +1,28 @@
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
+
+const normalizePayloadAssetUrl = (value) => {
+  if (!value || typeof value !== "string") return "";
+
+  const normalizedBaseUrl = CORE_API_BASE_URL.replace(/\/$/, "");
+
+  if (value.startsWith('/api/media/')) {
+    return normalizedBaseUrl ? `${normalizedBaseUrl}${value}` : value;
+  }
+
+  try {
+    const parsed = new URL(value);
+    if (parsed.pathname.startsWith('/api/media/')) {
+      return normalizedBaseUrl
+        ? `${normalizedBaseUrl}${parsed.pathname}${parsed.search}${parsed.hash}`
+        : `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+  } catch {
+    return value;
+  }
+
+  return value;
+};
+
 export const generateImageURL = ({
   wix_url,
   original = false,
@@ -12,10 +37,11 @@ export const generateImageURL = ({
   const urlString = typeof wix_url === 'object' ? (wix_url.url || wix_url.src || '') : wix_url;
   if (!urlString || typeof urlString !== 'string') return typeof wix_url === 'string' ? wix_url : '';
 
-  const cleanUrl = urlString.split("#")[0];
+  const normalizedUrl = normalizePayloadAssetUrl(urlString);
+  const cleanUrl = normalizedUrl.split("#")[0];
 
   if (!cleanUrl.startsWith("wix:image://v1/") && !cleanUrl.startsWith("wix:vector://v1/")) {
-    return wix_url;
+    return normalizedUrl;
   }
 
   const isImage = cleanUrl.startsWith("wix:image://v1/");
@@ -47,11 +73,13 @@ export const generateImageURLAlternate = ({
   // Handle object format { url: "..." } from Payload CMS
   const urlString = typeof wix_url === 'object' ? (wix_url.url || wix_url.src || '') : wix_url;
   if (!urlString || typeof urlString !== 'string') return typeof wix_url === 'string' ? wix_url : '';
+
+  const normalizedUrl = normalizePayloadAssetUrl(urlString);
   
-  if (!urlString.startsWith("wix:image://v1/")) return urlString;
+  if (!normalizedUrl.startsWith("wix:image://v1/")) return normalizedUrl;
 
   const baseURL = "https://static.wixstatic.com/media/";
-  const urlParts = wix_url.split('/');
+  const urlParts = normalizedUrl.split('/');
   const imageId = urlParts[urlParts.length - 1].split('?')[0];
 
   return original

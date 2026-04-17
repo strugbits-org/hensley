@@ -3,6 +3,7 @@
 import { logError, sortByOrderNumber } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { generateWixDocumentUrl } from "@/utils/generateImageURL";
+import { queryActiveHeaderMenu } from "./payloadCollections";
 
 const BASE_URL = process.env.BASE_URL;
 
@@ -27,29 +28,24 @@ export const joinWaitList = async (payload) => {
 
 export const fetchHeaderData = async () => {
   try {
-    const [
-      header,
-      headerSubMenu,
-      headerMegaMenu
-    ] = await Promise.all([
-      queryCollection({ dataCollectionId: "Header" }),
-      queryCollection({ dataCollectionId: "HeaderSubMenu", includeReferencedItems: ["Header_menuItems"] }),
-      queryCollection({ dataCollectionId: "HeaderMegaMenu", includeReferencedItems: ["category", "HeaderSubMenu_categories"] })
-    ]);
+    const response = await queryActiveHeaderMenu();
 
-    if (!Array.isArray(header.items) || !Array.isArray(headerSubMenu.items) || !Array.isArray(headerMegaMenu.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    const response = {
-      header: sortByOrderNumber(header.items),
-      headerSubMenu: headerSubMenu.items,
-      headerMegaMenu: headerMegaMenu.items
+    return {
+      header: sortByOrderNumber(response?.header || []),
+      headerSubMenu: sortByOrderNumber(response?.headerSubMenu || []),
+      headerMegaMenu: sortByOrderNumber(response?.headerMegaMenu || []),
+      menuSource: response?.menuSource || "payload",
+      menuDocumentId: response?.menuDocumentId || null,
     };
-
-    return response;
   } catch (error) {
-    logError(`Error fetching home page data: ${error.message}`, error);
+    logError(`Error fetching header menu data: ${error.message}`, error);
+    return {
+      header: [],
+      headerSubMenu: [],
+      headerMegaMenu: [],
+      menuSource: "payload",
+      menuDocumentId: null,
+    };
   }
 };
 

@@ -1,5 +1,26 @@
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
+import { lightboxActions } from "@/store/lightboxStore";
+
+const resolveSubCategoryHref = (item = {}) => {
+    const directPath = item.slug || item.href || item.url;
+
+    if (directPath) return directPath;
+
+    const relatedCollection = item?.category || item?.collection || item?.productCollection || {};
+    const categorySlug = relatedCollection?.slug ? String(relatedCollection.slug).replace(/^\//, "") : "";
+
+    if (!categorySlug) return "";
+
+    const hasParent = Boolean(relatedCollection?.parent);
+    const hasHierarchy = relatedCollection?.hierarchyLevel !== undefined || relatedCollection?.level !== undefined || hasParent;
+    const hierarchyLevel = Number(relatedCollection?.hierarchyLevel ?? relatedCollection?.level ?? (hasParent ? 2 : 0));
+    const basePath = hasHierarchy
+        ? (!hasParent && hierarchyLevel <= 1 ? "/collections" : "/subcategory")
+        : (item.redirection ? item.redirection : "/subcategory");
+
+    return `${basePath}/${categorySlug}`;
+};
 
 export const SubCategoriesModal = ({ selectedMenu, closeModal }) => {
     const { data } = selectedMenu;
@@ -10,17 +31,40 @@ export const SubCategoriesModal = ({ selectedMenu, closeModal }) => {
             <div className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px] h-full"></div>
 
             <div className="flex flex-wrap justify-center gap-0 lg:gap-y-[62px] max-h-[75vh] overflow-auto hide-scrollbar">
-                {data.map(({ title, category, redirection }) => {
+                {data.map((item) => {
+                    const relatedCollection = item?.category || item?.collection || item?.productCollection || {};
+                    const collectionImage = relatedCollection.mainMedia || relatedCollection.media?.mainMedia || null;
+                    const { title, type, lightbox, target } = item;
+                    const href = resolveSubCategoryHref(item);
+
+                    const content = (
+                        <>
+                            <div className="relative bg-primary-alt rounded-full w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-[169px] lg:h-[169px] overflow-hidden">
+                                {collectionImage && <PrimaryImage timeout={0} url={collectionImage} alt={title} customClasses="h-full w-full object-cover" />}
+                            </div>
+                            <p className="mt-3 sm:mt-4 md:mt-5 lg:mt-[26px] text-xs uppercase tracking-wider text-secondary-alt font-haasRegular text-center">
+                                {title}
+                            </p>
+                        </>
+                    );
+
                     return (
                         <div key={title} className="w-1/5 flex flex-col items-center">
-                            <CustomLink to={`${redirection ? redirection : "/subcategory"}/${category.slug}`} onClick={closeModal}>
-                                <div className="relative bg-primary-alt rounded-full w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-[169px] lg:h-[169px] overflow-hidden">
-                                    {category.mainMedia && <PrimaryImage timeout={0} url={category.mainMedia} alt={title} customClasses="h-full w-full object-cover" />}
-                                </div>
-                                <p className="mt-3 sm:mt-4 md:mt-5 lg:mt-[26px] text-xs uppercase tracking-wider text-secondary-alt font-haasRegular text-center">
-                                    {title}
-                                </p>
-                            </CustomLink>
+                            {type === "lightbox" && lightbox ? (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        lightboxActions.showLightBox(lightbox);
+                                        closeModal?.();
+                                    }}
+                                >
+                                    {content}
+                                </button>
+                            ) : (
+                                <CustomLink to={href} target={target} onClick={closeModal}>
+                                    {content}
+                                </CustomLink>
+                            )}
                         </div>
                     );
                 })}
