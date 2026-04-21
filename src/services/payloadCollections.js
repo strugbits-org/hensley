@@ -658,29 +658,53 @@ export const normalizePayloadBlog = (blog) => {
 export const normalizePayloadProject = (project) => {
     if (!project || typeof project !== "object") return project;
     const coverImageUrl = resolveMediaUrl(project.coverImage);
+    const heroImageUrl = resolveMediaUrl(project.heroImage);
     const galleryImages = ensureArray(project.galleryImages).map((item) => {
         if (typeof item === "string") return item;
         const imgUrl = resolveMediaUrl(item?.image || item);
         return imgUrl;
     }).filter(Boolean);
+    const galleryImageObjects = ensureArray(project.galleryImages).map((item) => {
+        if (!item || typeof item === "string") return null;
+        const imgUrl = resolveMediaUrl(item?.image || item);
+        return imgUrl ? { url: imgUrl, caption: item?.caption || "" } : null;
+    }).filter(Boolean);
+    const excerpt = project.excerpt || (project.description ? project.description.slice(0, 120) + (project.description.length > 120 ? "..." : "") : "");
+    const testimonial = project.testimonial || null;
+    const meta = project.meta || {};
 
     return {
         ...project,
         _id: project.id || project._id,
         slug: project.slug || "",
         publishDate: project.publishDate || project.publishedDate || "",
+        eventDate: project.eventDate || "",
+        client: project.client || "",
+        location: project.location || "",
+        excerpt,
+        tags: ensureArray(project.tags),
+        isFeatured: project.isFeatured || false,
         order: project.order ?? 0,
         portfolioRef: {
             title: project.title || "",
             coverImage: { imageInfo: coverImageUrl },
+            heroImage: heroImageUrl || coverImageUrl,
             description: project.description || "",
+            excerpt,
             slug: project.slug || "",
+        },
+        testimonial,
+        meta: {
+            title: meta.title || "",
+            description: meta.description || "",
+            image: resolveMediaUrl(meta.image) || "",
         },
         markets: ensureArray(project.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(project.studios).map(normalizePayloadStudioRef),
         portfolioCategories: ensureArray(project.portfolioCategories).map(normalizePayloadProjectCategoryRef),
         storeProducts: ensureArray(project.storeProducts),
         galleryImages,
+        galleryImageObjects,
         isHidden: project.isHidden || false,
     };
 };
@@ -796,13 +820,16 @@ export const queryProjects = async ({ where = {}, sort = "order", limit, depth =
     }
 };
 
-export const queryProjectBySlug = async (slug) => {
+export const queryProjectBySlug = async (slug, { draft = false } = {}) => {
     try {
+        const whereClause = draft
+            ? { slug: { equals: slug } }
+            : { slug: { equals: slug }, isHidden: { not_equals: true }, _status: { equals: "published" } };
         const result = await sdk.find({
             collection: "projects",
-            where: { slug: { equals: slug }, isHidden: { not_equals: true }, _status: { equals: "published" } },
+            where: whereClause,
             limit: 1,
-            draft: false,
+            draft,
             locale: "en",
             depth: 2,
         });

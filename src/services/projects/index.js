@@ -88,10 +88,10 @@ export const fetchPortfolioPageData = async () => {
     }
 }
 
-export const fetchSelectedProject = async (slug) => {
+export const fetchSelectedProject = async (slug, { draft = false } = {}) => {
     try {
-        // Payload-first
-        const payloadProject = await queryProjectBySlug(slug);
+        // Payload-first — support draft preview
+        const payloadProject = await queryProjectBySlug(slug, { draft });
         if (payloadProject) {
             return normalizePayloadProject(payloadProject);
         }
@@ -146,10 +146,10 @@ export const fetchOtherProjects = async (slug) => {
     }
 }
 
-export const fetchProjectPageData = async (slug) => {
+export const fetchProjectPageData = async (slug, { draft = false } = {}) => {
     try {
         const [project, otherProjects, pageDetails] = await Promise.all([
-            fetchSelectedProject(slug),
+            fetchSelectedProject(slug, { draft }),
             fetchOtherProjects(slug),
             fetchProjectPageDetails()
         ]);
@@ -172,4 +172,23 @@ export const fetchProjectPageDetails = async () => {
   } catch (error) {
     logError(`Error fetching contact page data: ${error.message}`, error);
   }
+};
+
+export const fetchFeaturedProjects = async (limit = 3) => {
+    try {
+        const payloadProjects = await queryProjects({
+            where: { isFeatured: { equals: true } },
+            sort: "order",
+            limit,
+        });
+        if (payloadProjects.length) {
+            return payloadProjects.map(normalizePayloadProject);
+        }
+        // Fallback: return first N projects
+        const fallback = await queryProjects({ sort: "order", limit });
+        return fallback.map(normalizePayloadProject);
+    } catch (error) {
+        logError(`Error fetching featured projects: ${error.message}`, error);
+        return [];
+    }
 };

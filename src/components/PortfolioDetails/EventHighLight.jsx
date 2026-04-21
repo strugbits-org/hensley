@@ -2,14 +2,25 @@ import React from 'react'
 import { formatDate } from '@/utils';
 import { generateImageURLAlternate } from '@/utils/generateImageURL';
 
+const formatEventDate = (dateString) => {
+    if (!dateString) return "";
+    try {
+        return new Date(dateString).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    } catch {
+        return "";
+    }
+};
+
 const EventHighLight = ({ data }) => {
-    const { portfolioRef, markets, publishDate } = data;
-    const imageURL = generateImageURLAlternate({ wix_url: portfolioRef.coverImage.imageInfo });
+    const { portfolioRef, markets, publishDate, eventDate, client, location } = data;
+    // Prefer heroImage, fall back to coverImage
+    const bgImageUrl = generateImageURLAlternate({ wix_url: portfolioRef.heroImage || portfolioRef.coverImage.imageInfo });
+    const displayDate = eventDate ? formatEventDate(eventDate) : formatDate(publishDate);
 
     return (
         <div className='px-[24px] w-full'>
             <div className='w-full border-b py-[24px]'>
-                <div className='w-full h-screen bg-no-repeat bg-cover bg-center' style={{ backgroundImage: `url(${imageURL})` }}></div>
+                <div className='w-full h-screen bg-no-repeat bg-cover bg-center' style={{ backgroundImage: `url(${bgImageUrl})` }}></div>
             </div>
             <div className='flex lg:flex-row flex-col gap-x-[182px] xl:px-[182px] sm:px-[70px] lg:pt-[200px] lg:pb-[129px] py-[60px] justify-between relative'>
                 <div className='lg:w-1/2 flex flex-col gap-y-[15px]'>
@@ -17,10 +28,16 @@ const EventHighLight = ({ data }) => {
                     <span className='uppercase text-secondary-alt lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[32px] text-[25px] leading-[23px] font-recklessRegular block '>
                         {portfolioRef.title}
                     </span>
-                    <span className='font-haasRegular uppercase text-[18px] text-secondary-alt lg:hidden mt-[39px] mb-[20px] block'>{formatDate(publishDate)} </span>
+                    {client && (
+                        <span className='font-haasRegular uppercase text-[14px] text-secondary-alt block'>For {client}</span>
+                    )}
+                    {location && (
+                        <span className='font-haasRegular uppercase text-[14px] text-secondary-alt block'>{location}</span>
+                    )}
+                    <span className='font-haasRegular uppercase text-[18px] text-secondary-alt lg:hidden mt-[39px] mb-[20px] block'>{displayDate}</span>
                 </div>
                 <div className='lg:w-1/2 text-left flex flex-col lg:gap-y-[15px] '>
-                    <span className='font-haasRegular uppercase text-[18px] text-secondary-alt lg:block hidden'>{formatDate(publishDate)} </span>
+                    <span className='font-haasRegular uppercase text-[18px] text-secondary-alt lg:block hidden'>{displayDate}</span>
                     <span className='font-haasRegular uppercase text-[16px] text-secondary-alt text-left block whitespace-pre-line '>{portfolioRef.description}</span>
                 </div>
             </div>
