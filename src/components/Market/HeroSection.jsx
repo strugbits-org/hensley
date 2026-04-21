@@ -7,7 +7,9 @@ import { convertToHTML } from "@/utils/renderRichText";
 import { VideoPlayer } from "../common/helpers/VideoPlayer";
 
 function HeroSection({ data = {} }) {
-  const { title, tagline, image1, content1, buttonLabel, video, buttonLink } = data;
+  const { title, tagline, image1, content1, buttonLabel, video, buttonLink, featuredImage, heroBackground, content } = data;
+  const heroImage = image1 || heroBackground || featuredImage;
+  const bodyContent = content1 || content;
 
   return (
     <div className="w-full">
@@ -37,7 +39,7 @@ function HeroSection({ data = {} }) {
           </div>
         </div>
         <div className="w-full h-full lg:px-[24px] min-h-[500px]">
-          <PrimaryImage url={image1} alt="Hensley Events" customClasses=" w-full h-full object-cover" />
+          <PrimaryImage url={heroImage} alt="Hensley Events" customClasses=" w-full h-full object-cover" />
         </div>
       </div>
 
@@ -49,7 +51,7 @@ function HeroSection({ data = {} }) {
           </div>
           <div className="md:p-12 lg:pl-16 flex flex-col justify-center">
             {convertToHTML({
-              content: content1,
+              content: bodyContent,
               class_heading: "text-secondary-alt lg:uppercase text-[24px] lg:text-[35px] lg:leading-[35px] tracking-tight font-recklessRegular mb-4",
               class_p: "text-secondary-alt uppercase leading-[20px] text-sm lg:text-base font-haasRegular mb-3",
             })}

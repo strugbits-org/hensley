@@ -1,7 +1,27 @@
 import BlogDetails from "@/components/BlogDetails";
-import { fetchBlogs, fetchPostPageData } from "@/services/blogs";
+import { fetchBlogs, fetchPostPageData, fetchSelectedBlog } from "@/services/blogs";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
+
+export const generateMetadata = async ({ params }) => {
+  try {
+    const slug = decodeURIComponent(params.slug);
+    const blog = await fetchSelectedBlog(slug);
+    if (!blog) return {};
+    return {
+      title: blog.blogRef?.title || "",
+      description: blog.blogRef?.excerpt || "",
+      openGraph: {
+        title: blog.blogRef?.title || "",
+        description: blog.blogRef?.excerpt || "",
+        images: blog.blogRef?.coverImage ? [{ url: blog.blogRef.coverImage }] : [],
+      },
+    };
+  } catch (error) {
+    logError("Error generating metadata (blog post page):", error);
+    return {};
+  }
+};
 
 export const generateStaticParams = async () => {
   try {

@@ -2,9 +2,25 @@ import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { fetchBannerData, fetchBestSellers, fetchBlogsData, fetchMarketsData, fetchTestimonials } from "..";
 import { fetchProductsByCategory } from "../products";
+import {
+    queryProjects,
+    queryBlogs,
+    normalizePayloadProject,
+    normalizePayloadBlog,
+} from "../payloadCollections";
 
 export const fetchPortfolioDataForMarkets = async (id) => {
     try {
+        // Payload-first
+        const payloadProjects = await queryProjects({
+            where: { markets: { in: id } },
+            sort: "order",
+        });
+        if (payloadProjects.length) {
+            return payloadProjects.map(normalizePayloadProject);
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "PortfolioCollection",
             includeReferencedItems: ["portfolioRef"],
@@ -100,6 +116,16 @@ export const fetchSelectedMarketData = async (slug) => {
 
 export const fetchBlogsForMarket = async (ids) => {
     try {
+        // Payload-first
+        const payloadBlogs = await queryBlogs({
+            where: { markets: { in: ids } },
+            sort: "order",
+        });
+        if (payloadBlogs.length) {
+            return payloadBlogs.map(normalizePayloadBlog);
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "ManageBlogs",
             includeReferencedItems: ["blogRef", "author", "markets", "studios"],

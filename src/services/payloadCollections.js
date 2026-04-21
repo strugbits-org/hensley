@@ -40,7 +40,9 @@ const looksLikeMenuItem = (item) => {
         item.slug ||
         item.url ||
         item.href ||
+        item.internalUrl ||
         item.lightbox ||
+        item.lightboxId ||
         item.link ||
         item.collection ||
         item.productCollection ||
@@ -168,6 +170,7 @@ const getMenuCandidates = (entry = {}) => {
         "navigationItems",
         "entries",
         "children",
+        "nestedChildren",
         "subItems",
         "childItems",
         "subMenuItems",
@@ -239,10 +242,12 @@ const resolveMenuItemMeta = (item = {}, fallbackType = "slug") => {
     const lightbox = getFirstString(
         item.lightbox,
         item.lightBox,
+        item.lightboxId,
         item.modal,
         item.modalName,
         item.popup,
-        item.link?.lightbox
+        item.link?.lightbox,
+        item.link?.lightboxId
     );
 
     const directPath = getFirstString(
@@ -250,9 +255,11 @@ const resolveMenuItemMeta = (item = {}, fallbackType = "slug") => {
         item.href,
         item.path,
         item.slug,
+        item.internalUrl,
         item.externalUrl,
         item.link?.url,
-        item.link?.href
+        item.link?.href,
+        item.link?.internalUrl
     );
 
     const relationPath = getRelationPath(
@@ -275,12 +282,12 @@ const resolveMenuItemMeta = (item = {}, fallbackType = "slug") => {
 
     let type = rawType || fallbackType;
 
-    if (lightbox || type.includes("lightbox") || type.includes("modal")) {
-        type = "lightbox";
-    } else if (type === "markets" || title.toUpperCase() === "MARKETS") {
+    if (type === "markets" || title.toUpperCase() === "MARKETS" || lightbox === "markets") {
         type = "markets";
-    } else if (type === "tents" || title.toUpperCase() === "TENTS") {
+    } else if (type === "tents" || /(^|\b)tents?(\b|$)/i.test(title) || lightbox === "tents") {
         type = "tents";
+    } else if (lightbox || type.includes("lightbox") || type.includes("modal")) {
+        type = "lightbox";
     } else if (type.includes("external") || /^https?:/i.test(slug)) {
         type = "external";
     } else if (type.includes("sub")) {
@@ -564,3 +571,324 @@ export const queryProductById = async (id) => {
         return null;
     }
 }
+
+// ──────────────────────────────────────────────────────────────────────
+// Payload Media URL helper
+// ──────────────────────────────────────────────────────────────────────
+
+const resolveMediaUrl = (media) => {
+    if (!media) return "";
+    if (typeof media === "string") return media;
+    return media?.url || media?.sizes?.card?.url || media?.sizes?.thumbnail?.url || media?.thumbnailURL || "";
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Normalizers — convert Payload shapes → Wix shapes expected by components
+// ──────────────────────────────────────────────────────────────────────
+
+export const normalizePayloadMarketRef = (market) => {
+    if (!market || typeof market !== "object") return market;
+    return {
+        ...market,
+        _id: market.id || market._id,
+        category: market.title || market.category || "",
+        slug: market.slug?.startsWith("/") ? market.slug : `/${market.slug || ""}`,
+    };
+};
+
+const normalizePayloadStudioRef = (studio) => {
+    if (!studio || typeof studio !== "object") return studio;
+    return {
+        ...studio,
+        _id: studio.id || studio._id,
+        name: studio.name || "",
+    };
+};
+
+const normalizePayloadBlogCategoryRef = (cat) => {
+    if (!cat || typeof cat !== "object") return cat;
+    return {
+        ...cat,
+        _id: cat.id || cat._id,
+        label: cat.name || cat.label || "",
+        title: cat.name || cat.title || "",
+    };
+};
+
+const normalizePayloadProjectCategoryRef = (cat) => {
+    if (!cat || typeof cat !== "object") return cat;
+    return {
+        ...cat,
+        _id: cat.id || cat._id,
+        title: cat.name || cat.title || "",
+    };
+};
+
+export const normalizePayloadBlog = (blog) => {
+    if (!blog || typeof blog !== "object") return blog;
+    const coverImageUrl = resolveMediaUrl(blog.coverImage);
+    return {
+        ...blog,
+        _id: blog.id || blog._id,
+        slug: blog.slug || "",
+        publishDate: blog.publishedDate || blog.publishDate || "",
+        blogRef: {
+            title: blog.title || "",
+            coverImage: coverImageUrl,
+            publishedDate: blog.publishedDate || "",
+            excerpt: blog.excerpt || "",
+            richContent: blog.content || null,
+        },
+        author: blog.author
+            ? {
+                ...blog.author,
+                nickname: blog.author.nickname || blog.author.firstName || "",
+                firstName: blog.author.firstName || "",
+                lastName: blog.author.lastName || "",
+            }
+            : { nickname: "", firstName: "", lastName: "" },
+        markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
+        blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
+        storeProducts: ensureArray(blog.storeProducts),
+        isHidden: blog.isHidden || false,
+    };
+};
+
+export const normalizePayloadProject = (project) => {
+    if (!project || typeof project !== "object") return project;
+    const coverImageUrl = resolveMediaUrl(project.coverImage);
+    const galleryImages = ensureArray(project.galleryImages).map((item) => {
+        if (typeof item === "string") return item;
+        const imgUrl = resolveMediaUrl(item?.image || item);
+        return imgUrl;
+    }).filter(Boolean);
+
+    return {
+        ...project,
+        _id: project.id || project._id,
+        slug: project.slug || "",
+        publishDate: project.publishDate || project.publishedDate || "",
+        order: project.order ?? 0,
+        portfolioRef: {
+            title: project.title || "",
+            coverImage: { imageInfo: coverImageUrl },
+            description: project.description || "",
+            slug: project.slug || "",
+        },
+        markets: ensureArray(project.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(project.studios).map(normalizePayloadStudioRef),
+        portfolioCategories: ensureArray(project.portfolioCategories).map(normalizePayloadProjectCategoryRef),
+        storeProducts: ensureArray(project.storeProducts),
+        galleryImages,
+        isHidden: project.isHidden || false,
+    };
+};
+
+export const normalizePayloadBlogCategory = (cat) => {
+    if (!cat || typeof cat !== "object") return cat;
+    return {
+        ...cat,
+        _id: cat.id || cat._id,
+        label: cat.name || cat.label || "",
+        title: cat.name || cat.title || "",
+        orderNumber: cat.order ?? 0,
+    };
+};
+
+export const normalizePayloadProjectCategory = (cat) => {
+    if (!cat || typeof cat !== "object") return cat;
+    return {
+        ...cat,
+        _id: cat.id || cat._id,
+        title: cat.name || cat.title || "",
+        orderNumber: cat.order ?? 0,
+    };
+};
+
+export const normalizePayloadStudio = (studio) => {
+    if (!studio || typeof studio !== "object") return studio;
+    return {
+        ...studio,
+        _id: studio.id || studio._id,
+        name: studio.name || "",
+        orderNumber: studio.order ?? 0,
+    };
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Payload SDK queries — Blogs
+// ──────────────────────────────────────────────────────────────────────
+
+export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 2 } = {}) => {
+    try {
+        const result = await sdk.find({
+            collection: "blogs",
+            where: { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
+            sort,
+            limit: limit || 100,
+            pagination: !limit,
+            draft: false,
+            locale: "en",
+            depth,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError("Error querying blogs:", error);
+        return [];
+    }
+};
+
+export const queryBlogBySlug = async (slug) => {
+    try {
+        const result = await sdk.find({
+            collection: "blogs",
+            where: { slug: { equals: slug }, isHidden: { not_equals: true }, _status: { equals: "published" } },
+            limit: 1,
+            draft: false,
+            locale: "en",
+            depth: 2,
+        });
+        return result?.docs?.[0] || null;
+    } catch (error) {
+        logError("Error querying blog by slug:", error);
+        return null;
+    }
+};
+
+export const queryBlogCategories = async () => {
+    try {
+        const result = await sdk.find({
+            collection: "blog-categories",
+            pagination: false,
+            sort: "order",
+            draft: false,
+            locale: "en",
+            depth: 0,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError("Error querying blog categories:", error);
+        return [];
+    }
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Payload SDK queries — Projects
+// ──────────────────────────────────────────────────────────────────────
+
+export const queryProjects = async ({ where = {}, sort = "order", limit, depth = 2 } = {}) => {
+    try {
+        const result = await sdk.find({
+            collection: "projects",
+            where: { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
+            sort,
+            limit: limit || 100,
+            pagination: !limit,
+            draft: false,
+            locale: "en",
+            depth,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError("Error querying projects:", error);
+        return [];
+    }
+};
+
+export const queryProjectBySlug = async (slug) => {
+    try {
+        const result = await sdk.find({
+            collection: "projects",
+            where: { slug: { equals: slug }, isHidden: { not_equals: true }, _status: { equals: "published" } },
+            limit: 1,
+            draft: false,
+            locale: "en",
+            depth: 2,
+        });
+        return result?.docs?.[0] || null;
+    } catch (error) {
+        logError("Error querying project by slug:", error);
+        return null;
+    }
+};
+
+export const queryProjectCategories = async () => {
+    try {
+        const result = await sdk.find({
+            collection: "project-categories",
+            pagination: false,
+            sort: "order",
+            draft: false,
+            locale: "en",
+            depth: 0,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError("Error querying project categories:", error);
+        return [];
+    }
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Payload SDK queries — Studios
+// ──────────────────────────────────────────────────────────────────────
+
+export const queryStudios = async () => {
+    try {
+        const result = await sdk.find({
+            collection: "studios",
+            pagination: false,
+            sort: "order",
+            draft: false,
+            locale: "en",
+            depth: 0,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError("Error querying studios:", error);
+        return [];
+    }
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Payload SDK queries — Markets (for filter use)
+// ──────────────────────────────────────────────────────────────────────
+
+export const queryMarkets = async () => {
+    try {
+        const result = await sdk.find({
+            collection: "markets",
+            pagination: false,
+            sort: "order",
+            draft: false,
+            locale: "en",
+            depth: 0,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError("Error querying markets:", error);
+        return [];
+    }
+};
+
+// ──────────────────────────────────────────────────────────────────────
+// Payload SDK queries — Pages
+// ──────────────────────────────────────────────────────────────────────
+
+export const queryPageBySlug = async (slug) => {
+    try {
+        const result = await sdk.find({
+            collection: "pages",
+            where: { slug: { equals: slug }, _status: { equals: "published" } },
+            limit: 1,
+            draft: false,
+            locale: "en",
+            depth: 1,
+        });
+        return result?.docs?.[0] || null;
+    } catch (error) {
+        logError("Error querying page by slug:", error);
+        return null;
+    }
+};

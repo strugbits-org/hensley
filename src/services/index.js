@@ -3,9 +3,66 @@
 import { logError, sortByOrderNumber } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { generateWixDocumentUrl } from "@/utils/generateImageURL";
-import { queryActiveHeaderMenu } from "./payloadCollections";
+import {
+  queryActiveHeaderMenu,
+  queryStudios,
+  queryProjects,
+  queryBlogs,
+  normalizePayloadStudio,
+  normalizePayloadProject,
+  normalizePayloadBlog,
+} from "./payloadCollections";
 
 const BASE_URL = process.env.BASE_URL;
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
+const CORE_API_KEY = process.env.CORE_API_KEY || "";
+
+const resolveCoreMediaUrl = (media) => {
+  if (!media) return "";
+  if (typeof media === "string") return media;
+  return media?.url || media?.thumbnailURL || media?.sizes?.thumbnail?.url || "";
+};
+
+const normalizeMarketSlug = (value) => {
+  if (!value || typeof value !== "string") return "";
+  return value.startsWith("/") ? value : `/${value}`;
+};
+
+const resolveRelationshipId = (value) => {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) return resolveRelationshipId(value[0]);
+  if (typeof value === "object") return value.id || value._id || value.value || null;
+  return null;
+};
+
+const normalizeCoreMarketItem = (item = {}) => {
+  const slug = normalizeMarketSlug(item.slug || item.path || item.url);
+  const heroImage = resolveCoreMediaUrl(item.heroBackground || item.featuredImage);
+  const cardImage = resolveCoreMediaUrl(item.featuredImage || item.heroBackground);
+
+  return {
+    ...item,
+    _id: item._id || item.id,
+    id: item.id || item._id,
+    title: item.title || "",
+    slug,
+    orderNumber: item.orderNumber ?? item.order ?? 0,
+    description: item.description || "",
+    tagline: item.tagline || "",
+    image1: heroImage || cardImage,
+    featuredImage: cardImage || heroImage,
+    heroBackground: heroImage || cardImage,
+    headerCoverImage: cardImage || heroImage,
+    buttonLabel: item.buttonLabel || "DISCOVER",
+    buttonLabelMenu: item.buttonLabelHeader || item.buttonLabel || "SEE MORE",
+    buttonLink: item.buttonLink || (slug ? `/market${slug}` : ""),
+    content1: item.content || null,
+    video: resolveCoreMediaUrl(item.video),
+    bestSellerCollection: resolveRelationshipId(item.bestSellerCollection),
+    marketsOld: resolveRelationshipId(item.marketsOld),
+  };
+};
 
 export const joinWaitList = async (payload) => {
   try {
@@ -51,6 +108,29 @@ export const fetchHeaderData = async () => {
 
 export const fetchMarketsData = async () => {
   try {
+    if (CORE_API_BASE_URL) {
+      const response = await fetch(
+        `${CORE_API_BASE_URL}/api/products/market`,
+        {
+          headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {},
+          next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 },
+        }
+      );
+
+      if (response.ok) {
+        const json = await response.json();
+        const items = Array.isArray(json?.items)
+          ? json.items
+          : Array.isArray(json?.docs)
+            ? json.docs
+            : [];
+
+        if (items.length) {
+          return sortByOrderNumber(items.map(normalizeCoreMarketItem));
+        }
+      }
+    }
+
     const response = await queryCollection({ dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"], sortKey: "orderNumber" });
 
     if (!Array.isArray(response.items)) {
@@ -60,11 +140,19 @@ export const fetchMarketsData = async () => {
     return response.items;
   } catch (error) {
     logError(`Error fetching markets data: ${error.message}`, error);
+    return [];
   }
 };
 
 export const fetchStudiosData = async () => {
   try {
+    // Payload-first
+    const payloadStudios = await queryStudios();
+    if (payloadStudios.length) {
+      return payloadStudios.map(normalizePayloadStudio);
+    }
+
+    // Wix fallback
     const response = await queryCollection({ dataCollectionId: "Studios" });
 
     if (!Array.isArray(response.items)) {
@@ -79,23 +167,11 @@ export const fetchStudiosData = async () => {
 
 export const fetchSelectedMarketsData = async (slug) => {
   try {
-    const response = await queryCollection({
-      dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"], sortKey: "orderNumber",
-      eq: [
-        {
-          key: "slug",
-          value: `/${slug}`
-        }
-      ]
-    });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items[0];
+    const markets = await fetchMarketsData();
+    return markets.find((item) => item.slug === `/${slug}`) || null;
   } catch (error) {
-    logError(`Error fetching markets data: ${error.message}`, error);
+    logError(`Error fetching selected market data: ${error.message}`, error);
+    return null;
   }
 };
 
@@ -210,6 +286,13 @@ export const fetchHomePageDetails = async () => {
 
 export const fetchPortfolioData = async () => {
   try {
+    // Payload-first
+    const payloadProjects = await queryProjects({ sort: "order" });
+    if (payloadProjects.length) {
+      return payloadProjects.map(normalizePayloadProject);
+    }
+
+    // Wix fallback
     const response = await queryCollection({
       dataCollectionId: "PortfolioCollection",
       includeReferencedItems: ["portfolioRef"],
@@ -234,6 +317,13 @@ export const fetchPortfolioData = async () => {
 
 export const fetchBlogsData = async () => {
   try {
+    // Payload-first
+    const payloadBlogs = await queryBlogs({ sort: "-publishedDate" });
+    if (payloadBlogs.length) {
+      return payloadBlogs.map(normalizePayloadBlog);
+    }
+
+    // Wix fallback
     const response = await queryCollection({
       dataCollectionId: "ManageBlogs",
       includeReferencedItems: ["blogRef", "author", "markets", "studios"],
@@ -259,6 +349,16 @@ export const fetchBlogsData = async () => {
 
 export const fetchFeaturedBlogs = async (productId) => {
   try {
+    // Payload-first
+    const payloadBlogs = await queryBlogs({
+      where: { storeProducts: { contains: productId } },
+      sort: "-publishDate",
+    });
+    if (payloadBlogs.length) {
+      return payloadBlogs.map(normalizePayloadBlog);
+    }
+
+    // Wix fallback
     const response = await queryCollection({
       dataCollectionId: "ManageBlogs",
       includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
@@ -290,6 +390,16 @@ export const fetchFeaturedBlogs = async (productId) => {
 
 export const fetchFeaturedProjects = async (id) => {
   try {
+    // Payload-first
+    const payloadProjects = await queryProjects({
+      where: { storeProducts: { contains: id } },
+      sort: "order",
+    });
+    if (payloadProjects.length) {
+      return payloadProjects.map(normalizePayloadProject);
+    }
+
+    // Wix fallback
     const response = await queryCollection({
       dataCollectionId: "PortfolioCollection",
       includeReferencedItems: ["portfolioRef"],

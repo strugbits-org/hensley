@@ -51,7 +51,8 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
 
     const getMenuUrl = (item) => item?.slug || item?.href || item?.url || "";
 
-    const isMarketsMenu = (item) => item?.type === "markets" || item?.title === "MARKETS";
+    const isMarketsMenu = (item) => item?.type === "markets" || String(item?.title || "").toUpperCase() === "MARKETS";
+    const isTentsMenu = (item) => item?.type === "tents" || /(^|\b)tents?(\b|$)/i.test(String(item?.title || ""));
 
     const getSubItemsForMenu = (menuItem) => {
         if (!menuItem) return [];
@@ -133,8 +134,10 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         setSearchModal(false);
 
         const nextSubNavigation = getSubItemsForMenu(item);
+        const itemIsMarkets = isMarketsMenu(item);
+        const itemIsTents = isTentsMenu(item);
 
-        if (!nextSubNavigation.length && !isMarketsMenu(item) && item?.type !== "submenu" && item?.type !== "tents") {
+        if (!nextSubNavigation.length && !itemIsMarkets && !itemIsTents && item?.type !== "submenu") {
             if (runMenuAction(item, isMobile)) return;
         }
 
@@ -144,18 +147,21 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     const handleSubMenuClick = (item, isMobile = false) => {
         setSearchModal(false);
 
-        const nestedData = item?.type === 'tents'
+        const itemIsTents = isTentsMenu(item);
+        const itemIsMarkets = isMarketsMenu(item);
+
+        const nestedData = itemIsTents
             ? sortByOrderNumber(tentsData)
-            : item?.type === 'markets'
+            : itemIsMarkets
                 ? sortByOrderNumber(marketsData)
                 : getNestedItemsForSubMenu(item);
 
-        const shouldOpenNestedMenu = item?.type === 'submenu' || item?.type === 'tents' || item?.type === 'markets' || nestedData.length > 0;
+        const shouldOpenNestedMenu = item?.type === 'submenu' || itemIsTents || itemIsMarkets || nestedData.length > 0;
 
         if (shouldOpenNestedMenu) {
             const newMenu = {
                 title: item.title,
-                type: item?.type === 'markets' ? 'markets' : item?.type === 'tents' ? 'tents' : 'submenu',
+                type: itemIsMarkets ? 'markets' : itemIsTents ? 'tents' : 'submenu',
                 data: nestedData,
             };
 
@@ -169,7 +175,7 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
             }
         }
 
-        if (item?.type === "slug" || item?.type === "external" || item?.type === "lightbox" || (item?.useSlugForMobile && isMobile)) {
+        if (!itemIsTents && !itemIsMarkets && (item?.type === "slug" || item?.type === "external" || item?.type === "lightbox" || (item?.useSlugForMobile && isMobile))) {
             runMenuAction(item, isMobile);
         }
     }
@@ -209,10 +215,24 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                     data: sortByOrderNumber(marketsData)
                 });
             }
+        } else if (isTentsMenu(currentMenu)) {
+            const tentsNavigation = tentsData.map(item => ({
+                ...item,
+                slug: `/tent${item.slug}`,
+                type: 'slug'
+            }));
+            setSubNavigation(sortByOrderNumber(tentsNavigation) || []);
+            if (enableMarketModal) {
+                setSelectedMenu({
+                    title: currentMenu.title || 'TENTS',
+                    type: 'tents',
+                    data: sortByOrderNumber(tentsData)
+                });
+            }
         } else {
             setSubNavigation(getSubItemsForMenu(currentMenu));
         }
-    }, [activeMenu, enableMarketModal, header, headerSubMenu, marketsData]);
+    }, [activeMenu, enableMarketModal, header, headerSubMenu, marketsData, tentsData]);
 
     const closeAllModals = () => {
         setSearchModal(false);

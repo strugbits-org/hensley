@@ -1,11 +1,33 @@
 "use server";
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
+import {
+    queryBlogs,
+    queryProjects,
+    queryMarkets,
+    normalizePayloadBlog,
+    normalizePayloadProject,
+} from "../payloadCollections";
 
 const tentsCategoryId = "d27f504d-05a2-ec30-c018-cc403e815bfa";
 
 export const searchMarkets = async (query) => {
     try {
+        // Payload-first
+        const payloadMarkets = await queryMarkets();
+        if (payloadMarkets.length) {
+            const q = query.toLowerCase();
+            return payloadMarkets
+                .filter((m) => (m.title || "").toLowerCase().includes(q))
+                .map((m) => ({
+                    ...m,
+                    _id: m.id || m._id,
+                    category: m.title || m.category || "",
+                    slug: m.slug?.startsWith("/") ? m.slug : `/${m.slug || ""}`,
+                }));
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "MarketsCollection",
             contains: ["title", query],
@@ -48,6 +70,21 @@ export const searchTents = async (query) => {
 
 export const searchBlogs = async (query) => {
     try {
+        // Payload-first
+        const payloadBlogs = await queryBlogs({
+            where: {
+                or: [
+                    { title: { like: query } },
+                    { excerpt: { like: query } },
+                ],
+            },
+            sort: "-publishDate",
+        });
+        if (payloadBlogs.length) {
+            return payloadBlogs.map(normalizePayloadBlog);
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "ManageBlogs",
             includeReferencedItems: ["blogRef", "author", "markets", "studios"],
@@ -65,6 +102,21 @@ export const searchBlogs = async (query) => {
 
 export const searchProjects = async (query) => {
     try {
+        // Payload-first
+        const payloadProjects = await queryProjects({
+            where: {
+                or: [
+                    { title: { like: query } },
+                    { description: { like: query } },
+                ],
+            },
+            sort: "order",
+        });
+        if (payloadProjects.length) {
+            return payloadProjects.map(normalizePayloadProject);
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "PortfolioCollection",
             includeReferencedItems: ["portfolioRef", "markets", "studios", "author"],

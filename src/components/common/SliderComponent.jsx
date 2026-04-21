@@ -9,9 +9,9 @@ import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { CustomLink } from "./CustomLink";
 import Loading from "@/app/loading";
 
-export default function SliderComponent({ data, classes, pageDetails, loop = false }) {
-
-  const { buttonLabelPortfolioSlider } = pageDetails;
+export default function SliderComponent({ data = [], classes = "", pageDetails = {}, loop = false }) {
+  const sliderData = Array.isArray(data) ? data : [];
+  const { buttonLabelPortfolioSlider } = pageDetails ?? {};
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSliderReady, setIsSliderReady] = useState(false);
@@ -22,10 +22,10 @@ export default function SliderComponent({ data, classes, pageDetails, loop = fal
     loop,
     breakpoints: {
       "(max-width: 1024px)": {
-        slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 10, origin: "center" },
+        slides: { perView: sliderData.length > 1 ? 1.3 : 1, spacing: 10, origin: "center" },
       },
       "(max-width: 768px)": {
-        slides: { perView: data.length > 1 ? 1.3 : 1, spacing: 8, origin: "center" },
+        slides: { perView: sliderData.length > 1 ? 1.3 : 1, spacing: 8, origin: "center" },
       },
     },
     created(s) {
@@ -38,7 +38,7 @@ export default function SliderComponent({ data, classes, pageDetails, loop = fal
     },
   });
 
-  if (!data || data.length === 0) return null;
+  if (sliderData.length === 0) return null;
 
   return (
     <>
@@ -53,7 +53,7 @@ export default function SliderComponent({ data, classes, pageDetails, loop = fal
           className={`relative keen-slider h-screen py-20 lg:py-[0px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
         >
 
-          {data.map((slide, index) => {
+          {sliderData.map((slide, index) => {
             const { portfolioRef, titleAndDescription, image } = slide;
 
             // Compute fallback title from titleAndDescription
@@ -88,7 +88,7 @@ export default function SliderComponent({ data, classes, pageDetails, loop = fal
                 </div>
 
                 {/* Arrows */}
-                {(data.length >= 4) && (
+                {(sliderData.length >= 4) && (
                   <>
                     {(loop || currentSlide?.rel > 0) && <button
                       onClick={() => sliderInstance.current?.prev()}
@@ -107,7 +107,7 @@ export default function SliderComponent({ data, classes, pageDetails, loop = fal
                 )}
 
                 <span className="lg:block hidden absolute bottom-[48px] left-[48px] text-white font-recklessRegular text-[35px]">
-                  {currentSlide?.rel + 1}/{data.length}
+                  {(currentSlide?.rel ?? 0) + 1}/{sliderData.length}
                 </span>
               </div>
             );

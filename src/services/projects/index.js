@@ -2,20 +2,42 @@
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { fetchMarketsData } from "..";
+import {
+    queryProjects,
+    queryProjectBySlug,
+    queryProjectCategories,
+    queryMarkets,
+    queryStudios,
+    normalizePayloadProject,
+    normalizePayloadProjectCategory,
+    normalizePayloadStudio,
+} from "../payloadCollections";
+
+const normalizePayloadMarketForFilter = (m) => {
+    if (!m || typeof m !== "object") return m;
+    return {
+        ...m,
+        _id: m.id || m._id,
+        category: m.title || m.category || "",
+        slug: m.slug?.startsWith("/") ? m.slug : `/${m.slug || ""}`,
+    };
+};
 
 export const fetchProjects = async () => {
     try {
+        // Payload-first
+        const payloadProjects = await queryProjects({ sort: "order" });
+        if (payloadProjects.length) {
+            return payloadProjects.map(normalizePayloadProject);
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "PortfolioCollection",
             includeReferencedItems: ['portfolioRef', 'markets', 'studios', 'portfolioCategories'],
             sortKey: "order",
             limit: "infinite",
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ]
+            ne: [{ key: "isHidden", value: true }]
         });
         return response.items;
     } catch (error) {
@@ -26,6 +48,21 @@ export const fetchProjects = async () => {
 
 export const fetchCategoriesMarketsAndStudios = async () => {
     try {
+        // Payload-first
+        const [payloadCategories, payloadMarkets, payloadStudios] = await Promise.all([
+            queryProjectCategories(),
+            queryMarkets(),
+            queryStudios(),
+        ]);
+        if (payloadCategories.length || payloadMarkets.length || payloadStudios.length) {
+            return {
+                categories: payloadCategories.map(normalizePayloadProjectCategory),
+                markets: payloadMarkets.map(normalizePayloadMarketForFilter),
+                studios: payloadStudios.map(normalizePayloadStudio),
+            };
+        }
+
+        // Wix fallback
         const [categories, markets, studios] = await Promise.all([
             queryCollection({ dataCollectionId: "Portfolio/Collections", limit: "infinite" }),
             queryCollection({ dataCollectionId: "Markets", limit: "infinite" }),
@@ -34,11 +71,7 @@ export const fetchCategoriesMarketsAndStudios = async () => {
         return { categories: categories.items, markets: markets.items, studios: studios.items };
     } catch (error) {
         logError(`Error fetching categories, markets, and studios: ${error.message}`, error);
-        return {
-            categories: [],
-            markets: [],
-            studios: []
-        };
+        return { categories: [], markets: [], studios: [] };
     }
 }
 
@@ -57,21 +90,18 @@ export const fetchPortfolioPageData = async () => {
 
 export const fetchSelectedProject = async (slug) => {
     try {
+        // Payload-first
+        const payloadProject = await queryProjectBySlug(slug);
+        if (payloadProject) {
+            return normalizePayloadProject(payloadProject);
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "PortfolioCollection",
             includeReferencedItems: ['portfolioRef', 'markets', 'studios', "storeProducts"],
-            eq: [
-                {
-                    key: "slug",
-                    value: slug
-                }
-            ],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ]
+            eq: [{ key: "slug", value: slug }],
+            ne: [{ key: "isHidden", value: true }]
         });
 
         if (!Array.isArray(response.items) || response.items.length === 0) {
@@ -86,18 +116,22 @@ export const fetchSelectedProject = async (slug) => {
 
 export const fetchOtherProjects = async (slug) => {
     try {
+        // Payload-first
+        const payloadProjects = await queryProjects({
+            where: { slug: { not_equals: slug } },
+            sort: "order",
+        });
+        if (payloadProjects.length) {
+            return payloadProjects.map(normalizePayloadProject);
+        }
+
+        // Wix fallback
         const response = await queryCollection({
             dataCollectionId: "PortfolioCollection",
             includeReferencedItems: ['portfolioRef', 'markets', 'studios', "storeProducts"],
             ne: [
-                {
-                    key: "slug",
-                    value: slug
-                },
-                {
-                    key: "isHidden",
-                    value: true
-                }
+                { key: "slug", value: slug },
+                { key: "isHidden", value: true }
             ],
             sortKey: "order",
         });
