@@ -8,6 +8,7 @@ import {
   queryStudios,
   queryProjects,
   queryBlogs,
+  queryProductCollections,
   normalizePayloadStudio,
   normalizePayloadProject,
   normalizePayloadBlog,
@@ -20,7 +21,68 @@ const CORE_API_KEY = process.env.CORE_API_KEY || "";
 const resolveCoreMediaUrl = (media) => {
   if (!media) return "";
   if (typeof media === "string") return media;
+  if (media?.url && typeof media.url === "object") {
+    return resolveCoreMediaUrl(media.url);
+  }
+  if (media?.mainMedia) {
+    return resolveCoreMediaUrl(media.mainMedia);
+  }
+  if (media?.media?.mainMedia) {
+    return resolveCoreMediaUrl(media.media.mainMedia);
+  }
+  if (media?.value) {
+    return resolveCoreMediaUrl(media.value);
+  }
   return media?.url || media?.thumbnailURL || media?.sizes?.thumbnail?.url || "";
+};
+
+const isTruthyFlag = (value) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value !== 0;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    return ["true", "1", "yes", "featured", "on"].includes(normalized);
+  }
+  return false;
+};
+
+const resolveCollectionMedia = (collection = {}) => {
+  return (
+    resolveCoreMediaUrl(collection.mainMedia) ||
+    resolveCoreMediaUrl(collection.media?.mainMedia) ||
+    resolveCoreMediaUrl(collection.media?.featuredImage) ||
+    resolveCoreMediaUrl(collection.image) ||
+    resolveCoreMediaUrl(collection.featuredImage) ||
+    resolveCoreMediaUrl(collection.heroImage) ||
+    resolveCoreMediaUrl(collection.media)
+  );
+};
+
+const mapProductCollectionToCategoryCard = (collection = {}, index = 0) => {
+  const id = collection.id || collection._id || collection.slug || `collection-${index}`;
+  const name = collection.name || collection.title || "";
+  const slug = (collection.slug || "").replace(/^\/+/, "");
+  const fs = collection.featuredSettings || {};
+
+  return {
+    _id: id,
+    orderNumber: fs.featuredOrderNumber ?? collection.featuredOrderNumber ?? collection.orderNumber ?? collection.order ?? index,
+    rtl: Boolean(fs.rtl ?? collection.rtl),
+    title:
+      fs.title ||
+      collection.cardSubtitle ||
+      collection.subtitle ||
+      collection.shortDescription ||
+      collection.description ||
+      collection.excerpt ||
+      "",
+    categories: {
+      _id: id,
+      name,
+      slug,
+      mainMedia: resolveCollectionMedia(collection),
+    },
+  };
 };
 
 const normalizeMarketSlug = (value) => {
@@ -241,6 +303,26 @@ export const fetchFooterData = async () => {
 
 export const fetchOurCategoriesData = async () => {
   try {
+    const payloadCollections = await queryProductCollections();
+
+    if (Array.isArray(payloadCollections) && payloadCollections.length) {
+      const featuredCollections = payloadCollections
+        .filter((collection) =>
+          isTruthyFlag(
+            collection?.featured ??
+              collection?.isFeatured ??
+              collection?.showOnHome ??
+              collection?.homeFeatured
+          )
+        )
+        .map(mapProductCollectionToCategoryCard)
+        .sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
+
+      if (featuredCollections.length) {
+        return featuredCollections;
+      }
+    }
+
     const response = await queryCollection({
       dataCollectionId: "OurCategories",
       includeReferencedItems: ["categories"]
@@ -253,6 +335,7 @@ export const fetchOurCategoriesData = async () => {
     return sortByOrderNumber(response.items);
   } catch (error) {
     logError(`Error fetching our categories data: ${error.message}`, error);
+    return [];
   }
 }
 

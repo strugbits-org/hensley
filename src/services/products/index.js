@@ -3,6 +3,7 @@ import { logError, mapProductSetItems } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
+import { fetchOurCategoriesData } from "..";
 import { queryProductById, queryProductsBySlug } from "../payloadCollections";
 
 const baseUrl = process.env.BASE_URL;
@@ -279,13 +280,15 @@ export const fetchProductPageData = async (slug) => {
             legacyProductCollectionData,
             featuredProjectsData,
             matchedProducts,
-            pageDetails
+            pageDetails,
+            ourCategoriesData
         ] = await Promise.all([
             // Only fetch legacy collection data if not a Payload bundle
             isPayloadBundle ? Promise.resolve(null) : fetchProductCollectionData(wixProductId),
             fetchFeaturedProjects(wixProductId),
             fetchMatchedProducts(wixProductId),
-            fetchProductPageDetails()
+            fetchProductPageDetails(),
+            fetchOurCategoriesData()
         ]);
 
         // Use Payload bundle items or legacy collection data
@@ -302,7 +305,8 @@ export const fetchProductPageData = async (slug) => {
             productCollectionData,
             featuredProjectsData,
             matchedProducts,
-            pageDetails
+            pageDetails,
+            ourCategoriesData
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);

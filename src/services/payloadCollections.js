@@ -484,6 +484,9 @@ export const queryProductCollections = async () => {
         const result = await sdk.find({
             collection: 'product-collections',
             pagination: false, // Return all documents
+            draft: false,
+            locale: "en",
+            depth: 1,
         });
 
         return result.docs;

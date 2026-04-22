@@ -1,6 +1,7 @@
 import { Product } from "@/components/Product";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
+import OurCategories from "@/components/common/OurCategories";
 import { fetchPageMetaData } from "@/services";
 import { fetchProductData, fetchProductPageData, fetchProductPaths } from "@/services/products";
 import { queryProductsBySlug } from "@/services/payloadCollections";
@@ -50,7 +51,7 @@ export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchProductPageData(slug);
-    const { matchedProducts, featuredProjectsData, pageDetails } = data;
+    const { matchedProducts, featuredProjectsData, pageDetails, ourCategoriesData } = data;
     const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     if (!data) {
@@ -60,6 +61,10 @@ export default async function Page({ params }) {
     return (
       <>
         <Product data={data} matchedProducts={matchedProducts || []} />
+        <OurCategories
+          data={ourCategoriesData || []}
+          pageDetails={{ ourCategoriesTitle: pageDetails?.ourCategoriesTitle || "SHOP BY CATEGORY" }}
+        />
         <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" />
         <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
       </>
