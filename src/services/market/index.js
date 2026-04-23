@@ -5,9 +5,61 @@ import { fetchProductsByCategory } from "../products";
 import {
     queryProjects,
     queryBlogs,
+    queryMarkets,
     normalizePayloadProject,
     normalizePayloadBlog,
 } from "../payloadCollections";
+
+const resolveHowWeDoItImage = (item = {}) => {
+    if (!item) return "";
+    const image = item.image || item.image1 || item.mainMedia || item.media;
+
+    if (typeof image === "string") return image;
+    if (typeof image?.url === "string") return image.url;
+    if (typeof image?.mainMedia === "string") return image.mainMedia;
+    if (typeof image?.mainMedia?.url === "string") return image.mainMedia.url;
+    if (typeof image?.thumbnailURL === "string") return image.thumbnailURL;
+
+    return "";
+};
+
+const buildMarketLookupIds = (selectedMarket = {}) => {
+    const ids = [selectedMarket?._id, selectedMarket?.id, selectedMarket?.marketsOld]
+        .filter(Boolean)
+        .map(String);
+
+    return [...new Set(ids)];
+};
+
+const normalizeMarketHowWeDoItItems = (items = []) => {
+    if (!Array.isArray(items)) return [];
+
+    return items
+        .map((item) => ({
+            ...item,
+            title: item?.title || item?.heading || item?.name || item?.label || "",
+            description: item?.description || item?.content || item?.subtitle || "",
+            image: resolveHowWeDoItImage(item),
+        }))
+        .filter((item) => item.title || item.description || item.image);
+};
+
+const fetchPayloadHowWeDoItDataForMarket = async (slug) => {
+    try {
+        const docs = await queryMarkets({
+            where: { slug: { equals: slug } },
+            limit: 1,
+            depth: 1,
+        });
+
+        if (!docs.length) return [];
+
+        return normalizeMarketHowWeDoItItems(docs[0]?.howWeDoIt);
+    } catch (error) {
+        logError(`Error fetching payload how we do it data: ${error.message}`, error);
+        return [];
+    }
+};
 
 export const fetchPortfolioDataForMarkets = async (id) => {
     try {
@@ -66,9 +118,25 @@ export const fetchHowWeDoItDataForMarket = async (id) => {
             throw new Error(`Response does not contain items array`);
         }
 
-        return response.items;
+        const normalizedItems = normalizeMarketHowWeDoItItems(response.items);
+        if (normalizedItems.length) {
+            return normalizedItems;
+        }
+
+        // Some legacy datasets are not linked to market references.
+        const fallbackResponse = await queryCollection({
+            dataCollectionId: "HowWeDoItMarkets",
+            sortKey: "orderNumber"
+        });
+
+        if (!Array.isArray(fallbackResponse.items)) {
+            throw new Error(`Fallback response does not contain items array`);
+        }
+
+        return normalizeMarketHowWeDoItItems(fallbackResponse.items);
     } catch (error) {
         logError(`Error fetching how we do it data: ${error.message}`, error);
+        return [];
     }
 }
 
@@ -84,11 +152,13 @@ export const fetchSelectedMarketData = async (slug) => {
             throw new Error("Market not found");
         }
 
-        const ids = [selectedMarket?._id];
+        const ids = buildMarketLookupIds(selectedMarket);
+        const marketHowWeDoItData = normalizeMarketHowWeDoItItems(selectedMarket?.howWeDoIt);
 
-        const [portfolioData, howWeDoItData, bannerData, testimonials, blogsData, bestSellerProducts, marketPageDetails] = await Promise.all([
+        const [portfolioData, payloadHowWeDoItData, legacyHowWeDoItData, bannerData, testimonials, blogsData, bestSellerProducts, marketPageDetails] = await Promise.all([
             fetchPortfolioDataForMarkets(ids),
-            fetchHowWeDoItDataForMarket(ids),
+            marketHowWeDoItData.length ? Promise.resolve([]) : fetchPayloadHowWeDoItDataForMarket(slug),
+            marketHowWeDoItData.length ? Promise.resolve([]) : fetchHowWeDoItDataForMarket(ids),
             fetchBannerData(),
             fetchTestimonials(),
             fetchBlogsForMarket(ids),
@@ -102,7 +172,9 @@ export const fetchSelectedMarketData = async (slug) => {
             selectedMarket,
             bannerData,
             portfolioData: portfolioData || [],
-            howWeDoItData: howWeDoItData || [],
+            howWeDoItData: marketHowWeDoItData.length
+                ? marketHowWeDoItData
+                : (payloadHowWeDoItData.length ? payloadHowWeDoItData : (legacyHowWeDoItData || [])),
             bestSellers: bestSellerProducts || [],
             testimonials: testimonials || [],
             blogsData: blogsData || [],

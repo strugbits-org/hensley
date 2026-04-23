@@ -885,15 +885,27 @@ export const queryStudios = async () => {
 // Payload SDK queries — Markets (for filter use)
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryMarkets = async () => {
+export const queryMarkets = async (options = {}) => {
     try {
+        const {
+            where,
+            limit,
+            depth = 0,
+            pagination,
+            sort = "order",
+            draft = false,
+            locale = "en",
+        } = options;
+
         const result = await sdk.find({
             collection: "markets",
-            pagination: false,
-            sort: "order",
-            draft: false,
-            locale: "en",
-            depth: 0,
+            pagination: typeof pagination === "boolean" ? pagination : false,
+            sort,
+            draft,
+            locale,
+            depth,
+            ...(where ? { where } : {}),
+            ...(typeof limit === "number" ? { limit } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {

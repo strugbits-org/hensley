@@ -123,6 +123,7 @@ const normalizeCoreMarketItem = (item = {}) => {
     video: resolveCoreMediaUrl(item.video),
     bestSellerCollection: resolveRelationshipId(item.bestSellerCollection),
     marketsOld: resolveRelationshipId(item.marketsOld),
+    howWeDoIt: Array.isArray(item.howWeDoIt) ? item.howWeDoIt : [],
   };
 };
 
