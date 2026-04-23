@@ -38,12 +38,25 @@ export const ProductListing = ({ data }) => {
     const [bannersDesktop, setBannersDesktop] = useState([]);
     const [bannersMobile, setBannersMobile] = useState([]);
     const [isMobile, setIsMobile] = useState(false);
+    const isLoadingMoreRef = useRef(false);
 
     const getEntityId = useCallback((item) => item?._id || item?.id, []);
 
+    // Recursively collect IDs from a collection and all its populated children
+    const getCollectionIdsWithDescendants = useCallback((item) => {
+        const id = item?._id || item?.id;
+        const ids = id ? [id] : [];
+        const children = item?.children?.docs || (Array.isArray(item?.children) ? item.children : []);
+        children.forEach(child => {
+            if (child && typeof child === 'object') ids.push(...getCollectionIdsWithDescendants(child));
+            else if (typeof child === 'string') ids.push(child);
+        });
+        return ids;
+    }, []);
+
     const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
         const activeCollectionIds = newFilters.length > 0
-            ? newFilters.map(getEntityId).filter(Boolean)
+            ? newFilters.flatMap(getCollectionIdsWithDescendants).filter(Boolean)
             : collectionIds;
 
         try {
@@ -67,7 +80,7 @@ export const ProductListing = ({ data }) => {
             logError(`Error fetching ${isLoadMore ? 'more' : 'sorted'} products:`, error);
             return null;
         }
-    }, [collectionIds, selectedFilters, sortIndex, categoriesSortData, getEntityId]);
+    }, [collectionIds, selectedFilters, sortIndex, categoriesSortData, getEntityId, getCollectionIdsWithDescendants]);
 
     const debouncedFetchForFilters = useDebounce((newFilters) => {
         fetchProducts({ newFilters, isLoadMore: false, newSkip: 0 })
@@ -87,11 +100,13 @@ export const ProductListing = ({ data }) => {
     };
 
     const handleLoadMore = async () => {
-        if (!hasMore) return;
+        if (!hasMore || isLoadingMoreRef.current) return;
+        isLoadingMoreRef.current = true;
         await fetchProducts({
             isLoadMore: true,
             newSkip: products.length
         });
+        isLoadingMoreRef.current = false;
     };
 
     useEffect(() => {
@@ -110,10 +125,8 @@ export const ProductListing = ({ data }) => {
             setBannersDesktop([]);
             setBannersMobile([]);
         }
-        // console.log("products", sortedProducts);
-        
-        setProducts(sortedProducts.docs);
-        setHasMore(sortedProducts.hasNextPage ?? sortedProducts.hasNext ?? false);
+        setProducts(sortedProducts.items);
+        setHasMore(sortedProducts.hasNext ?? false);
         setIsLoading(false);
     }, [sortedProducts, productBannersData]);
 
@@ -177,11 +190,11 @@ export const ProductListing = ({ data }) => {
                     );
                 })}
             </ul>
-            {/* {!isLoading && hasMore && (
+            {!isLoading && hasMore && (
                 <AutoClickWrapper onIntersect={handleLoadMore}>
                     <Loading custom={true} classes='w-full flex justify-center p-6' />
                 </AutoClickWrapper>
-            )} */}
+            )}
 
             {isLoading && (<Loading custom={true} classes='w-full flex justify-center p-6' />)}
         </div>

@@ -1,8 +1,8 @@
 "use server";
 import { findSortIndexByCategory, logError } from "@/utils";
-import { fetchCategoriesData } from "../products";
 import { fetchOurCategoriesData } from "..";
 import queryCollection from "@/utils/fetchFunction";
+import { queryProductCollectionBySlug, queryProductCollections, queryProductsByCollectionIdsPaginated } from "../payloadCollections";
 
 
 export const fetchCategoryPageDetails = async () => {
@@ -23,32 +23,41 @@ export const fetchCategoryPageDetails = async () => {
 
 export const fetchSelectedCollectionData = async (slug) => {
     try {
-        const getEntityId = (item) => item?._id || item?.id;
-
-        const [ourCategoriesData, categoriesData, categoriesSortData, productBannersData, pageDetails] = await Promise.all([
+        const [ourCategoriesData, selectedCategory, categoriesSortData, productBannersData, pageDetails] = await Promise.all([
             fetchOurCategoriesData(),
-            fetchCategoriesData(),
+            queryProductCollectionBySlug(slug),
             fetchCategoriesSortStructure(),
             fetchProductBannersData(),
             fetchCategoryPageDetails()
         ]);
 
-        const selectedCategory = categoriesData.find(category => category.slug === slug);
         if (!selectedCategory) {
             throw new Error(`Category with slug "${slug}" not found`);
         }
 
-        const selectedCategoryId = getEntityId(selectedCategory);
-        const subCategoriesData = await fetchSubcategoriesData(selectedCategoryId);
-        const subCategories = subCategoriesData?.subcategories || [];
-        const collectionIds = [selectedCategoryId, ...subCategories.map(getEntityId).filter(Boolean)];
-        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategoryId);
+        const subCategories = selectedCategory?.children?.docs
+            || selectedCategory?.children
+            || [];
 
-        const sortedProducts = await fetchSortedProducts({
-            collectionIds,
+        // Recursively collect IDs from all descendant collections (grandchildren etc.)
+        const getAllDescendantIds = (collection) => {
+            const id = collection?.id || collection?._id;
+            const ids = id ? [id] : [];
+            const children = collection?.children?.docs || (Array.isArray(collection?.children) ? collection.children : []);
+            children.forEach(child => {
+                if (child && typeof child === 'object') ids.push(...getAllDescendantIds(child));
+                else if (typeof child === 'string') ids.push(child);
+            });
+            return ids;
+        };
+
+        const collectionIds = getAllDescendantIds(selectedCategory);
+        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory.id);
+
+        const sortedProducts = await queryProductsByCollectionIdsPaginated({
+            collections: collectionIds,
             limit: 12,
             skip: 0,
-            sortIndex
         });
 
         const data = {
@@ -121,73 +130,29 @@ export const fetchProductBannersData = async () => {
 
 export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip = 0, sortIndex }) => {
     try {
-        const payload = {
-            dataCollectionId: "FullProductData",
-            includeReferencedItems: ["product", "mainCategory"],
-            limit,
-            skip
-        };
-
-        if(collectionIds.length > 0) {
-            payload.hasSome = [
-                {
-                    key: "categories",
-                    values: collectionIds
-                }
-            ];
-        }
-
-        if (sortIndex) {
-            payload.sortKey = sortIndex;
-        }
-
-        const response = await queryCollection(payload);
-
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-        return {
-            items: response.items,
-            hasNext: response.paging.hasNext
-        };
-
+        return queryProductsByCollectionIdsPaginated({ collections: collectionIds, limit, skip });
     } catch (error) {
         logError(`Error fetching sorted products data: ${error.message}`, error);
+        return { items: [], hasNext: false };
     }
 };
 
 export const fetchCollectionPagePaths = async () => {
     try {
-        const tentId = "d27f504d-05a2-ec30-c018-cc403e815bfa";
-
-        const [collectionsData, customCollectionsData] = await Promise.all([
-            queryCollection({
-                dataCollectionId: "OurCategories",
-                includeReferencedItems: ["categories"],
-                ne: [{ key: "categories", value: tentId }]
-            }),
-            queryCollection({
-                dataCollectionId: "HeaderMegaMenu",
-                includeReferencedItems: ["category"],
-                eq: [{ key: "redirection", value: "/collections" }]
-            }),
-        ]);
-
-        // Extract slugs with a single helper function
-        const extractSlug = (item, property) => {
-            const slug = item[property]?.slug;
-            return slug ? { slug: slug.trim().replace("/", "") } : null;
-        };
-
-        // Process both collections in one pass and filter out nulls
-        const params = [
-            ...customCollectionsData.items.map(item => extractSlug(item, 'category')),
-            ...collectionsData.items.map(item => extractSlug(item, 'categories'))
-        ].filter(Boolean);
-
-        return params;
+        const allCollections = await queryProductCollections();
+        // Top-level collections (no parent) map to /collections/[slug]
+        const topLevel = allCollections.filter(c => !c.parent && c.slug);
+        const seen = new Set();
+        return topLevel.reduce((acc, c) => {
+            const slug = c.slug.trim().replace("/", "");
+            if (slug && !seen.has(slug)) {
+                seen.add(slug);
+                acc.push({ slug });
+            }
+            return acc;
+        }, []);
     } catch (error) {
         logError(`Error fetching collection page params: ${error.message}`, error);
-        return []; // Return empty array on error instead of undefined
+        return [];
     }
 };

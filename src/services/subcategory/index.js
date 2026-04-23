@@ -1,10 +1,9 @@
 "use server";
 import { findSortIndexByCategory, logError } from "@/utils";
-import { fetchCategoriesData } from "../products";
 import { fetchOurCategoriesData } from "..";
-import { fetchCategoriesSortStructure, fetchProductBannersData, fetchSortedProducts, fetchSubcategoriesData } from "../collections";
+import { fetchCategoriesSortStructure, fetchProductBannersData, fetchSortedProducts } from "../collections";
 import queryCollection from "@/utils/fetchFunction";
-import { queryProductCollectionBySlug, queryProductCollections, queryProductsByCollectionIds } from "../payloadCollections";
+import { queryProductCollectionBySlug } from "../payloadCollections";
 
 
 export const fetchsubCategoriesPageDetails = async () => {
@@ -24,9 +23,8 @@ export const fetchsubCategoriesPageDetails = async () => {
 
 export const fetchSelectedCategoryData = async (slug) => {
     try {
-        const [ourCategoriesData, categoriesData, categoriesSortData, productBannersData, pageDetails] = await Promise.all([
+        const [ourCategoriesData, categoriesSortData, productBannersData, pageDetails] = await Promise.all([
             fetchOurCategoriesData(),
-            fetchCategoriesData(),
             fetchCategoriesSortStructure(),
             fetchProductBannersData(),
             fetchsubCategoriesPageDetails()
@@ -46,21 +44,27 @@ export const fetchSelectedCategoryData = async (slug) => {
 
         // const subCategories = subCategoriesData?.subcategories || [];
 
-        const collectionIds = [selectedCategory.id, ...subCategories.map(x => x.id)];
-        // const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory._id);
+        // Recursively collect IDs from all descendant collections (grandchildren etc.)
+        const getAllDescendantIds = (collection) => {
+            const id = collection?.id || collection?._id;
+            const ids = id ? [id] : [];
+            const children = collection?.children?.docs || (Array.isArray(collection?.children) ? collection.children : []);
+            children.forEach(child => {
+                if (child && typeof child === 'object') ids.push(...getAllDescendantIds(child));
+                else if (typeof child === 'string') ids.push(child);
+            });
+            return ids;
+        };
 
-        // const sortedProducts = await fetchSortedProducts({
-        //     collectionIds,
-        //     limit: 12,
-        //     skip: 0,
-        //     sortIndex
-        // });
+        const collectionIds = getAllDescendantIds(selectedCategory);
+        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory.id);
 
-        // const sortedProducts = selectedCategory?.products || [];
-        const sortedProducts = await queryProductsByCollectionIds(collectionIds);
-
-        // console.log("sortedProducts", sortedProducts);
-
+        const sortedProducts = await fetchSortedProducts({
+            collectionIds,
+            limit: 12,
+            skip: 0,
+            sortIndex
+        });
 
         const data = {
             selectedCategory,
@@ -69,7 +73,7 @@ export const fetchSelectedCategoryData = async (slug) => {
             categoriesSortData,
             productBannersData,
             collectionIds,
-            sortIndex: 0,
+            sortIndex,
             sortedProducts,
             pageDetails
         }

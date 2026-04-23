@@ -506,7 +506,7 @@ export const queryProductCollectionBySlug = async (slug) => {
             limit: 1,
             draft: false,
             locale: "en",
-            depth: 1,
+            depth: 2,
         });
 
         return result.docs?.[0] || null;
@@ -532,6 +532,34 @@ export const queryProductsByCollectionIds = async (collections) => {
     } catch (error) {
         logError('Error querying products by collection IDs:', error);
         throw error;
+    }
+}
+
+export const queryProductsByCollectionIdsPaginated = async ({ collections = [], limit = 12, skip = 0 } = {}) => {
+    try {
+        const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
+        const query = {
+            collection: 'products',
+            limit,
+            page,
+            draft: false,
+            locale: "en",
+            depth: 1,
+        };
+
+        if (collections.length > 0) {
+            query.where = { collections: { in: collections } };
+        }
+
+        const result = await sdk.find(query);
+
+        return {
+            items: result.docs || [],
+            hasNext: result.hasNextPage ?? false,
+        };
+    } catch (error) {
+        logError('Error querying products by collection IDs (paginated):', error);
+        return { items: [], hasNext: false };
     }
 }
 
