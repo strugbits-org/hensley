@@ -12,7 +12,7 @@ function MatchedProductCard({ data, type = 'listing' }) {
     const { mainMedia, name, slug, sku, additionalInfoSections } = product;
 
     const handleAddToCart = () => {
-        const isTent = actions.isTentProduct(product._id);
+        const isTent = actions.isTentProduct(product);
         lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     }
     return (

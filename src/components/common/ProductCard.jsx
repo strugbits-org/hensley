@@ -18,7 +18,7 @@ function ProductCard({ data: product, type = 'listing', btnClass }) {
     
 
     const handleAddToCart = () => {
-        const isTent = actions.isTentProduct(product._id);
+        const isTent = actions.isTentProduct(product);
         const modalProductData = product?.product ? product : { product };
         lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: modalProductData });
     };

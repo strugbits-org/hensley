@@ -45,7 +45,7 @@ function SecondaryProductCard({ data, type = 'listing' }) {
     const imageUrl = resolveImageUrl(product);
 
     const handleAddToCart = () => {
-        const isTent = actions.isTentProduct(product._id);
+        const isTent = actions.isTentProduct(product);
         lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: data });
     };
     return (

@@ -31,6 +31,27 @@ const FIELD_CONFIGS = {
 };
 
 export const QuoteDetails = ({ data, content }) => {
+  const normalizedData = {
+    ...data,
+    orderStatus: data?.orderStatus || data?.orderType || "",
+    eventDate: data?.eventDate || "",
+    deliveryDate: data?.deliveryDate || "",
+    pickupDate: data?.pickupDate || "",
+    eventLocation: data?.eventLocation || "",
+    eventDescriptionPo: data?.eventDescription || data?.eventDescriptionPo || "",
+    billTo: data?.billTo || "",
+    streetAddress: data?.eventAddress?.streetAddress || data?.streetAddress || "",
+    addressLine2: data?.eventAddress?.addressLine2 || data?.addressLine2 || "",
+    city: data?.eventAddress?.city || data?.city || "",
+    state: data?.eventAddress?.state || data?.state || "",
+    zipCode: data?.eventAddress?.zipCode || data?.zipCode || "",
+    comments: data?.specialInstructions || data?.comments || "",
+    city1: data?.billingAddress?.city || data?.city1 || "",
+    state1: data?.billingAddress?.state || data?.state1 || "",
+    name: data?.contactName || data?.name || "",
+    email: data?.contactEmail || data?.email || "",
+    phoneNumber: data?.contactPhone || data?.phoneNumber || data?.phone || "",
+  };
   
   // Default content structure
   const defaultContent = {
@@ -83,7 +104,7 @@ export const QuoteDetails = ({ data, content }) => {
   };
 
   const renderField = (fieldId, gridClass = '') => {
-    const value = data?.[fieldId];
+    const value = normalizedData?.[fieldId];
     const displayValue = getDisplayValue(fieldId, value);
 
     return (
@@ -99,7 +120,7 @@ export const QuoteDetails = ({ data, content }) => {
   };
 
   const renderSpecialInstructionsField = (fieldId) => {
-    const value = data?.[fieldId];
+    const value = normalizedData?.[fieldId];
     const displayValue = getDisplayValue(fieldId, value);
 
     return (
@@ -148,7 +169,7 @@ export const QuoteDetails = ({ data, content }) => {
                           type="radio"
                           name="orderType"
                           value={type.id}
-                          checked={data?.orderStatus === type.id}
+                          checked={String(normalizedData?.orderStatus || '').toUpperCase() === String(type.id || '').toUpperCase()}
                           className="form-radio h-[34px] w-[34px] accent-[#57442D] focus:ring-[#57442D] pointer-events-none"
                           readOnly
                         />

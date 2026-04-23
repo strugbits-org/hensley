@@ -307,7 +307,18 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     }, [pathname, header, defaultActiveMenu]);
 
     useEffect(() => {
-        const ids = (tentsData || []).map(({ tent }) => tent?._id).filter(Boolean);
+        const ids = Array.from(new Set(
+            (tentsData || [])
+                .flatMap((item) => [
+                    item?._id,
+                    item?.id,
+                    item?.tent?._id,
+                    item?.tent?.id,
+                    item?.productData?._id,
+                    item?.productData?.id,
+                ])
+                .filter(Boolean)
+        ));
         actions.setTentsIds(ids);
     }, [tentsData]);
 

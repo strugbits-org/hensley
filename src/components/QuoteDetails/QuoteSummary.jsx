@@ -6,10 +6,53 @@ import PriceDisplay from './PriceDisplay';
 const QuoteSummary = ({ data }) => {
 
   const [totalPrice, setTotalPrice] = useState(0);
+
+  const normalizedLineItems = (data?.lineItems || []).map((item) => {
+    const product = typeof item?.product === 'object' && item?.product ? item.product : {};
+    const rawCustomFields = item?.customTextFieldValues || item?.customTextFields || product?.customTextFieldValues || product?.customTextFields || [];
+    const customTextFields = Array.isArray(rawCustomFields) && rawCustomFields[0]?.name
+      ? formatDescriptionLines(rawCustomFields)
+      : (rawCustomFields || []);
+
+    const resolvedName =
+      item?.productName?.original ||
+      item?.productName ||
+      item?.name ||
+      product?.name ||
+      product?.title ||
+      '';
+
+    const resolvedMainMedia =
+      item?.mediaItem?.src ||
+      item?.image ||
+      product?.mainMedia?.url ||
+      product?.mainMedia ||
+      '';
+
+    const resolvedUnitPrice = Number(
+      item?.unitPrice ??
+      item?.priceAtAdd ??
+      item?.price ??
+      product?.price ??
+      0
+    ) || 0;
+
+    return {
+      ...product,
+      ...item,
+      name: resolvedName,
+      productName: item?.productName || { original: resolvedName },
+      quantity: Number(item?.quantity || 1),
+      price: resolvedUnitPrice,
+      customTextFields,
+      mediaItem: { ...(item?.mediaItem || {}), src: resolvedMainMedia },
+    };
+  });
+
   useEffect(() => {
-    const total = calculateCartTotalPrice(data.lineItems.map(item => item.product));
+    const total = calculateCartTotalPrice(normalizedLineItems);
     setTotalPrice(formatTotalPrice(total));
-  }, [data]);
+  }, [data, normalizedLineItems]);
 
   return (
     <div className='w-full flex lg:flex-row flex-col'>
@@ -37,15 +80,16 @@ const QuoteSummary = ({ data }) => {
       </div>
       <div className='lg:w-[70%] border border-primary-border'>
 
-        {data.lineItems.map((item, index) => {
-          const product = item.product;
+        {normalizedLineItems.map((product, index) => {
           // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
           const rawDescriptionLines = product.descriptionLines || product.customTextFieldValues || product.customTextFields || [];
           const descriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name 
             ? formatDescriptionLines(rawDescriptionLines) 
             : rawDescriptionLines;
           const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-          const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
+          const isTentItem =
+            product.itemType === 'tent' ||
+            descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
           if (productCollection) {
             const productSetItems = productCollection.split("; ");
@@ -63,7 +107,7 @@ const QuoteSummary = ({ data }) => {
             )
           };
         })}
-        {data.lineItems.length === 0 && <div className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>No Items</div>}
+        {normalizedLineItems.length === 0 && <div className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>No Items</div>}
       </div>
     </div>
   )
