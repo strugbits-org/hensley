@@ -5,10 +5,12 @@ import queryCollection from "@/utils/fetchFunction";
 import { generateWixDocumentUrl } from "@/utils/generateImageURL";
 import {
   queryActiveHeaderMenu,
+  queryStorefrontFooter,
   queryStudios,
   queryProjects,
   queryBlogs,
   queryProductCollections,
+  mapStorefrontFooterBranches,
   normalizePayloadStudio,
   normalizePayloadProject,
   normalizePayloadBlog,
@@ -271,34 +273,85 @@ export const fetchMasterClassTenting = async () => {
   }
 };
 
+const mapStorefrontFooterToLayoutData = (footer) => {
+  const brandTitle = footer?.brand?.title || footer?.brand?.eyebrow || "";
+  const brandDetails = [footer?.brand?.description, footer?.bottomBar?.copyrightText].filter(Boolean).join("\n\n");
+  const footerLinks = sortByOrderNumber(
+    (footer?.bottomBar?.links || [])
+      .filter((item) => item?.label)
+      .map((item, index) => ({
+        _id: item.id || `${footer.id}-footer-link-${index}`,
+        orderNumber: item.orderNumber ?? index,
+        title: item.label,
+        link: item.href || item.internalUrl || item.externalUrl || "",
+        target: item.openInNewTab ? "_blank" : "",
+      }))
+  );
+
+  const socialLinks = sortByOrderNumber(
+    (footer?.socialLinks || []).map((item, index) => ({
+      ...item,
+      _id: item.id || `${footer.id}-social-link-${index}`,
+      orderNumber: item.orderNumber ?? index,
+      link: item.url,
+      target: "_blank",
+    }))
+  );
+
+  return {
+    footer,
+    footerData: {
+      newsletterHeading: footer?.newsletter?.label || "",
+      newsletterDescription: footer?.newsletter?.description || "",
+      newsletterPlaceholder: footer?.newsletter?.inputPlaceholder || "",
+      newsletterButtonLabel: footer?.newsletter?.submitLabel || "SUBMIT",
+      copyrightText1: brandTitle,
+      copyrightText2: brandDetails || footer?.bottomBar?.tagline || "",
+      logo: footer?.brand?.logo?.url || footer?.brand?.logo?.src || "",
+    },
+    socialLinks,
+    footerNaviationData: footerLinks,
+    branches: mapStorefrontFooterBranches(footer),
+  };
+};
+
+const fetchLegacyFooterData = async () => {
+  const [
+    footerData,
+    socialLinks,
+    footerNaviationData,
+    branches
+  ] = await Promise.all([
+    queryCollection({ dataCollectionId: "FooterCollection" }),
+    queryCollection({ dataCollectionId: "SocialLinks" }),
+    queryCollection({ dataCollectionId: "FooterNavigation" }),
+    queryCollection({ dataCollectionId: "Branches", sortKey: "orderNumber" }),
+  ]);
+
+  if (!Array.isArray(footerData.items) || !Array.isArray(footerNaviationData.items)) {
+    throw new Error(`Response does not contain items array`);
+  }
+
+  return {
+    footerData: footerData.items[0],
+    socialLinks: sortByOrderNumber(socialLinks.items),
+    footerNaviationData: sortByOrderNumber(footerNaviationData.items),
+    branches: sortByOrderNumber(branches.items),
+  };
+};
+
 export const fetchFooterData = async () => {
   try {
-    const [
-      footerData,
-      socialLinks,
-      footerNaviationData,
-      branches
-    ] = await Promise.all([
-      queryCollection({ dataCollectionId: "FooterCollection" }),
-      queryCollection({ dataCollectionId: "SocialLinks" }),
-      queryCollection({ dataCollectionId: "FooterNavigation" }),
-      queryCollection({ dataCollectionId: "Branches", sortKey: "orderNumber" }),
-    ]);
+    const storefrontFooter = await queryStorefrontFooter({ channel: "hensley", key: "default" });
 
-    if (!Array.isArray(footerData.items) || !Array.isArray(footerNaviationData.items)) {
-      throw new Error(`Response does not contain items array`);
+    if (storefrontFooter) {
+      return mapStorefrontFooterToLayoutData(storefrontFooter);
     }
 
-    const response = {
-      footerData: footerData.items[0],
-      socialLinks: sortByOrderNumber(socialLinks.items),
-      footerNaviationData: sortByOrderNumber(footerNaviationData.items),
-      branches: sortByOrderNumber(branches.items),
-    };
-
-    return response;
+    return await fetchLegacyFooterData();
   } catch (error) {
     logError(`Error fetching footer data: ${error.message}`, error);
+    return await fetchLegacyFooterData();
   }
 };
 

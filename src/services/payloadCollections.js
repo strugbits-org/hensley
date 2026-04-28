@@ -23,6 +23,13 @@ const toArray = (value) => Array.isArray(value)
             ? value.items
             : [];
 
+const buildCoreApiUrl = (path) => {
+    const baseUrl = (CORE_API_BASE_URL || "").replace(/\/$/, "");
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+
+    return `${baseUrl}${normalizedPath}`;
+};
+
 const getFirstString = (...values) => {
     for (const value of values) {
         if (typeof value === "string" && value.trim()) return value.trim();
@@ -476,6 +483,97 @@ export const queryActiveHeaderMenu = async () => {
             headerMegaMenu: [],
             menuSource: "payload",
         };
+    }
+};
+
+export const mapStorefrontFooterBranches = (footer = {}) => {
+    const formatDisplayDescription = (section, methods, serviceAreaMethod, availabilityMethod) => {
+        const descriptionLines = [];
+        const sectionTitle = getFirstString(section?.title);
+        const sectionDescription = getFirstString(section?.description);
+
+        if (serviceAreaMethod && sectionTitle) {
+            descriptionLines.push(sectionTitle);
+        } else if (sectionDescription && !/[.!?]$/.test(sectionDescription) && sectionDescription.length <= 40) {
+            descriptionLines.push(sectionDescription);
+        }
+
+        if (availabilityMethod) {
+            const value = getFirstString(availabilityMethod?.value);
+            if (value) {
+                descriptionLines.push(value);
+            }
+        }
+
+        methods.forEach((method) => {
+            if (method === serviceAreaMethod || method === availabilityMethod) {
+                return;
+            }
+
+            const value = getFirstString(method?.value);
+            const label = getFirstString(method?.label).toLowerCase();
+
+            if (!value) {
+                return;
+            }
+
+            if (label.includes("address")) {
+                const addressSegments = value
+                    .split(",")
+                    .map((segment) => segment.trim())
+                    .filter(Boolean);
+
+                if (addressSegments.length > 1) {
+                    descriptionLines.push(addressSegments[0], addressSegments.slice(1).join(", "));
+                    return;
+                }
+            }
+
+            descriptionLines.push(value);
+        });
+
+        return descriptionLines.filter(Boolean).join("\n");
+    };
+
+    return sortByOrderNumber(
+        ensureArray(footer?.sections)
+            .filter((section) => section?.sectionType === "contact" && section?.isVisible !== false)
+            .map((section) => {
+                const methods = ensureArray(section?.contactMethods)
+                    .filter((method) => method?.isVisible !== false);
+                const serviceAreaMethod = methods.find((method) => getFirstString(method?.label).toLowerCase().includes("service area"));
+                const availabilityMethod = methods.find((method) => getFirstString(method?.label).toLowerCase().includes("availability"));
+
+                return {
+                    title: getFirstString(serviceAreaMethod?.value) || getFirstString(section?.title),
+                    description: formatDisplayDescription(section, methods, serviceAreaMethod, availabilityMethod),
+                    orderNumber: section?.orderNumber ?? 0,
+                };
+            })
+            .filter((section) => section.title || section.description)
+    );
+};
+
+export const queryStorefrontFooter = async ({ channel = "hensley", key = "default" } = {}) => {
+    try {
+        if (!CORE_API_BASE_URL) {
+            throw new Error("CORE_API_BASE_URL is not configured");
+        }
+
+        const query = new URLSearchParams({ channel, key });
+        const response = await fetch(buildCoreApiUrl(`/api/footers/storefront?${query.toString()}`), {
+            headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {},
+        });
+
+        if (!response.ok) {
+            throw new Error(`Footer request failed with status ${response.status}`);
+        }
+
+        const result = await response.json();
+        return result?.item || null;
+    } catch (error) {
+        logError('Error querying storefront footer:', error);
+        return null;
     }
 };
 

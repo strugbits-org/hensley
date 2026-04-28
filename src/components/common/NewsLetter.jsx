@@ -13,12 +13,13 @@ const schema = yup.object({
 }).required();
 
 export const NewsLetter = ({ data }) => {
+    const newsletterData = data?.newsletter || data || {};
     const { 
-        newsletterPlaceholder, 
-        newsletterButtonLabel, 
-        newsletterHeading, 
-        newsletterDescription 
-    } = data;
+        newsletterPlaceholder = newsletterData?.inputPlaceholder,
+        newsletterButtonLabel = newsletterData?.submitLabel,
+        newsletterHeading = newsletterData?.label,
+        newsletterDescription = newsletterData?.description,
+    } = newsletterData;
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
