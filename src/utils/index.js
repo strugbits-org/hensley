@@ -243,7 +243,7 @@ export function formatLineItemsForQuote(lineItems) {
         const rawDescriptionLines = item.descriptionLines || item.customTextFieldValues || item.customTextFields || [];
         const formattedDescriptionLines = formatDescriptionLines(rawDescriptionLines);
         const productCollection = formattedDescriptionLines.find(x => x.title === "Set")?.value;
-        const isTentOrCover = formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
+        const isTentOrCover = item.itemType === "tent" || item.itemType === "pool_cover" || formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
         if (!productCollection && !isTentOrCover) {
             formattedCartData.push({

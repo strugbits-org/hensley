@@ -53,6 +53,21 @@ const parseSetItemsString = (setString) => {
   });
 };
 
+const extractPoolCoverImageIdsFromCustomFields = (fields = []) => {
+  const imageField = fields.find((field) => {
+    const title = String(field?.title || "").toUpperCase();
+    return title === "RELEVENT IMAGES" || title === "RELEVANT IMAGES";
+  });
+
+  if (!imageField?.value || typeof imageField.value !== "string") return [];
+
+  return imageField.value
+    .split("~~")
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .filter((value) => !value.includes("/") && !/^https?:/i.test(value) && !value.startsWith("wix:"));
+};
+
 /**
  * Normalize line item for quote submission
  */
@@ -97,13 +112,30 @@ const normalizeLineItem = (item) => {
   const setFieldValue = customTextFieldValues.find?.(f => f?.title?.toLowerCase() === "set")?.value;
   const hasSetItems = item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0;
   const isProductSet = item.itemType === "set" || Boolean(setFieldValue || hasSetItems);
+  const hasTentFields = normalizedCustomTextFields.some((field) => String(field?.title || '').toUpperCase() === 'TENT TYPE');
+  const hasPoolCoverFields = normalizedCustomTextFields.some((field) => String(field?.title || '').toUpperCase() === 'POOLCOVER');
+  const poolCoverRelevantImages = Array.isArray(item.poolCoverRelevantImages)
+    ? item.poolCoverRelevantImages
+        .map((media) => (typeof media === "object" ? media?.id : media))
+        .filter(Boolean)
+    : extractPoolCoverImageIdsFromCustomFields(normalizedCustomTextFields);
+
+  const poolCoverOptions = hasPoolCoverFields
+    ? normalizedCustomTextFields
+        .filter((field) => !['POOLCOVER', 'RELEVENT IMAGES', 'RELEVANT IMAGES'].includes(String(field?.title || '').toUpperCase()))
+        .map((field) => ({ option: field.title, value: field.value }))
+    : [];
+
+  const normalizedItemType = isProductSet
+    ? 'set'
+    : (item.itemType || (hasPoolCoverFields ? 'pool_cover' : (hasTentFields ? 'tent' : 'product')));
 
   const base = {
     product: productObj?.id || productObj?._id || item.product || item.productId || item.catalogReference?.catalogItemId,
     variant: typeof item.variant === "object" ? item.variant?.id : item.variant || item.catalogReference?.options?.variantId || null,
     quantity: Number(item.quantity) || 1,
     unitPrice: unitPrice,
-    itemType: isProductSet ? "set" : (item.itemType || "product"),
+    itemType: normalizedItemType,
     selectedOptions: item.selectedOptions || item.catalogReference?.options?.options || null,
     customTextFieldValues: normalizedCustomTextFields,
     notes: item.notes || null,
@@ -124,6 +156,11 @@ const normalizeLineItem = (item) => {
       // Parse from old string format
       base.setItems = parseSetItemsString(setFieldValue);
     }
+  }
+
+  if (normalizedItemType === 'pool_cover') {
+    base.poolCoverOptions = poolCoverOptions;
+    base.poolCoverRelevantImages = poolCoverRelevantImages;
   }
 
   return base;

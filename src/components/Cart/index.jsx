@@ -319,7 +319,7 @@ const Cart = () => {
               const productCollectionString = descriptionLines.find(x => x?.title === "Set")?.value;
               const isProductCollection = isProductSet || Boolean(productCollectionString);
               
-              const isTentItem = item.itemType === "tent" || descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
+              const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
 
               if (isProductCollection) {
                 // Use new setItems if available, otherwise parse old string format

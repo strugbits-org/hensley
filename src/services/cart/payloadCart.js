@@ -263,6 +263,21 @@ const parseSetItemsString = (setString) => {
   });
 };
 
+const extractPoolCoverImageIds = (customTextFields = {}) => {
+  const imagesValue =
+    customTextFields?.["RELEVENT IMAGES"] ||
+    customTextFields?.["RELEVANT IMAGES"] ||
+    "";
+
+  if (!imagesValue || typeof imagesValue !== "string") return [];
+
+  return imagesValue
+    .split("~~")
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .filter((value) => !value.includes("/") && !/^https?:/i.test(value) && !value.startsWith("wix:"));
+};
+
 /**
  * Transform frontend line item format to Payload format
  * @param {object} item - Frontend line item (Wix-compatible format)
@@ -329,19 +344,45 @@ const transformLineItem = (item) => {
     });
   }
 
+  const hasTentFields = customTextFieldValues.some((field) => String(field?.title || "").toUpperCase() === "TENT TYPE");
+  const hasPoolCoverFields = customTextFieldValues.some((field) => String(field?.title || "").toUpperCase() === "POOLCOVER");
+
+  let normalizedItemType = "product";
+  if (hasPoolCoverFields) {
+    normalizedItemType = "pool_cover";
+  } else if (hasTentFields) {
+    normalizedItemType = "tent";
+  }
+
   // Build selectedOptions from options.options (if any)
   const selectedOptions = options.options || null;
+  const poolCoverRelevantImages = extractPoolCoverImageIds(options.customTextFields || {});
+  const poolCoverOptions = hasPoolCoverFields
+    ? customTextFieldValues
+        .filter((field) => !["POOLCOVER", "RELEVENT IMAGES", "RELEVANT IMAGES"].includes(String(field?.title || "").toUpperCase()))
+        .map((field) => ({ option: field.title, value: field.value }))
+    : [];
 
-  return {
+  const normalizedUnitPrice = Number(priceAtAdd ?? price ?? 0) || 0;
+
+  const normalizedLineItem = {
     product: productId,
     variant: options.variantId || null,
     quantity: quantity || 1,
-    itemType: "product",
+    itemType: normalizedItemType,
     selectedOptions,
     customTextFieldValues,
-    priceAtAdd: priceAtAdd || price || null, // Store price if provided
+    unitPrice: normalizedUnitPrice,
+    priceAtAdd: normalizedUnitPrice || null, // Store price if provided
     addedAt: new Date().toISOString(),
   };
+
+  if (normalizedItemType === "pool_cover") {
+    normalizedLineItem.poolCoverOptions = poolCoverOptions;
+    normalizedLineItem.poolCoverRelevantImages = poolCoverRelevantImages;
+  }
+
+  return normalizedLineItem;
 };
 
 /**
@@ -540,6 +581,12 @@ const sanitizeCustomTextFieldValues = (customTextFieldValues) => {
 };
 
 const normalizeItemToIds = (item) => {
+  const poolCoverRelevantImages = Array.isArray(item.poolCoverRelevantImages)
+    ? item.poolCoverRelevantImages
+        .map((media) => (typeof media === "object" ? media?.id : media))
+        .filter(Boolean)
+    : [];
+
   const base = {
     product: typeof item.product === "object" ? item.product.id : item.product,
     variant: typeof item.variant === "object" ? item.variant?.id : item.variant,
@@ -547,10 +594,16 @@ const normalizeItemToIds = (item) => {
     itemType: item.itemType || "product",
     selectedOptions: item.selectedOptions ?? null,
     customTextFieldValues: sanitizeCustomTextFieldValues(item.customTextFieldValues),
+    unitPrice: Number(item.unitPrice ?? item.priceAtAdd ?? item.price ?? 0) || 0,
     priceAtAdd: item.priceAtAdd ?? item.price ?? null,
     notes: item.notes ?? null,
     addedAt: item.addedAt ?? null,
   };
+
+  if (item.itemType === "pool_cover") {
+    base.poolCoverOptions = Array.isArray(item.poolCoverOptions) ? item.poolCoverOptions : [];
+    base.poolCoverRelevantImages = poolCoverRelevantImages;
+  }
 
   // Include setItems if this is a set
   if (item.itemType === "set" && Array.isArray(item.setItems)) {

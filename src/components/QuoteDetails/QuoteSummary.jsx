@@ -89,6 +89,7 @@ const QuoteSummary = ({ data }) => {
           const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
           const isTentItem =
             product.itemType === 'tent' ||
+            product.itemType === 'pool_cover' ||
             descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
           if (productCollection) {
