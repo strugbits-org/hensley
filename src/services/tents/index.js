@@ -1,6 +1,6 @@
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
-import { fetchFeaturedProjects, fetchMatchedProducts } from "../products";
+import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
 import { fetchMasterClassTenting } from "..";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
@@ -94,6 +94,10 @@ export const fetchTentPageData = async (slug) => {
             throw new Error("Product data not found");
         }
         const productId = productData.tent._id;
+        const matchSourceProduct = {
+            ...productData.tent,
+            collections: productData.tent?.collections || productData.collections || productData.productData?.collections || [],
+        };
         const [
             featuredProjectsData,
             matchedProducts,
@@ -101,7 +105,7 @@ export const fetchTentPageData = async (slug) => {
             masterClassTentingURL,
         ] = await Promise.all([
             fetchFeaturedProjects(productId),
-            fetchMatchedProducts(productId),
+            fetchMatchedProductsForProduct({ payloadProduct: matchSourceProduct, wixProductId: productId }),
             fetchTentPageDetails(),
             fetchMasterClassTenting(),
         ]);

@@ -11,7 +11,6 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
 import { checkProductInCart } from '@/services/products';
 import { BreadCrumbs } from '../common/BreadCrumbs';
-import { MatchItWithButton } from '../common/MatchItWithButton';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -301,8 +300,6 @@ export const Product = ({ data, matchedProducts = [] }) => {
           <h1 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[15px] lg:mb-[28px] sm:mt-[9px] sm:mb-[9px]'>
             {product.name}
           </h1>
-
-          <MatchItWithButton product={{ ...product, matchedProducts }} />
 
           <div className='lg:mb-[48px] sm:mb-[10px] flex lg:justify-end gap-x-[28px]'>
             <span className='text-[35px] text-secondary-alt font-recklessRegular'>{totalPrice}</span>

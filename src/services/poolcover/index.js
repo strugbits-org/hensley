@@ -1,6 +1,6 @@
 import { logError } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
-import { fetchFeaturedProjects, fetchMatchedProducts } from "../products";
+import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
 
 const baseUrl = process.env.BASE_URL;
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
@@ -151,12 +151,16 @@ export const fetchPoolCoverPageData = async (slug) => {
             throw new Error("Product data not found");
         }
         const productId = productData.covers._id;
+        const matchSourceProduct = {
+            ...productData.covers,
+            collections: productData.covers?.collections || productData.collections || productData.productData?.collections || [],
+        };
         const [
             featuredProjectsData,
             matchedProducts
         ] = await Promise.all([
             fetchFeaturedProjects(productId),
-            fetchMatchedProducts(productId)
+            fetchMatchedProductsForProduct({ payloadProduct: matchSourceProduct, wixProductId: productId })
         ]);
 
         return {

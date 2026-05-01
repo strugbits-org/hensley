@@ -13,7 +13,6 @@ import { uploadRelevantImage } from '@/services/poolcover';
 import { AddToCartButton } from '../Product/AddtoQuoteButton';
 import parse from 'html-react-parser';
 import { BreadCrumbs } from '../common/BreadCrumbs';
-import { MatchItWithButton } from '../common/MatchItWithButton';
 
 const INPUT_TYPES_WITH_OPTIONS = new Set(['radio', 'checkbox', 'select']);
 
@@ -210,7 +209,6 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         { label: 'Home', to: '/' },
                         { label: 'POOLCOVER' }
                     ]} />
-                    <MatchItWithButton product={{ ...productData, matchedProducts }} />
                 </div>
                 <h3 className='uppercase text-secondary-alt font-recklessRegular 
                     lg:text-[90px] 

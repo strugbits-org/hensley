@@ -1,10 +1,10 @@
 "use server";
-import { logError, mapProductSetItems } from "@/utils";
+import { logError, mapProductSetItems, normalizeProductForDisplay } from "@/utils";
 import queryCollection from "@/utils/fetchFunction";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
 import { fetchOurCategoriesData } from "..";
-import { queryProductById, queryProductsBySlug } from "../payloadCollections";
+import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug } from "../payloadCollections";
 
 const baseUrl = process.env.BASE_URL;
 
@@ -239,6 +239,69 @@ export const fetchMatchedProducts = async (id) => {
     }
 }
 
+const getPayloadCollectionIds = (product = {}) => {
+    const collectionsSource = product?.collections || product?.productCollections || product?.productCollection || product?.collection;
+    const collections = Array.isArray(collectionsSource) ? collectionsSource : collectionsSource ? [collectionsSource] : [];
+
+    return collections
+        .map((collection) => {
+            if (typeof collection === "string") return collection;
+            if (collection && typeof collection === "object") {
+                return collection.id || collection._id || collection.value?.id || collection.value?._id;
+            }
+
+            return null;
+        })
+        .filter(Boolean);
+};
+
+const fetchMatchedProductsFromCollections = async (product = {}) => {
+    const productId = product?.id || product?._id;
+    const collectionIds = getPayloadCollectionIds(product);
+
+    if (!productId || collectionIds.length === 0) {
+        return [];
+    }
+
+    const response = await queryProductsByCollectionIds(collectionIds);
+    const relatedProducts = Array.isArray(response?.docs) ? response.docs : [];
+    const seenProductIds = new Set();
+
+    return relatedProducts
+        .filter((relatedProduct) => {
+            const relatedProductId = relatedProduct?.id || relatedProduct?._id;
+
+            if (!relatedProductId || relatedProductId === productId || seenProductIds.has(relatedProductId)) {
+                return false;
+            }
+
+            seenProductIds.add(relatedProductId);
+            return true;
+        })
+        .map((relatedProduct) => ({
+            product: normalizeProductForDisplay(relatedProduct),
+        }));
+};
+
+export const fetchMatchedProductsForProduct = async ({ payloadProduct = null, wixProductId = null } = {}) => {
+    try {
+        const collectionMatches = await fetchMatchedProductsFromCollections(payloadProduct);
+
+        if (collectionMatches.length > 0) {
+            return collectionMatches;
+        }
+
+        if (!wixProductId) {
+            return [];
+        }
+
+        return await fetchMatchedProducts(wixProductId);
+    } catch (error) {
+        logError(`Error fetching matched products for product page: ${error.message}`, error);
+        return wixProductId ? await fetchMatchedProducts(wixProductId) : [];
+    }
+};
+
 
 export const fetchProductPageDetails = async () => {
     try {
@@ -286,7 +349,7 @@ export const fetchProductPageData = async (slug) => {
             // Only fetch legacy collection data if not a Payload bundle
             isPayloadBundle ? Promise.resolve(null) : fetchProductCollectionData(wixProductId),
             fetchFeaturedProjects(wixProductId),
-            fetchMatchedProducts(wixProductId),
+            fetchMatchedProductsForProduct({ payloadProduct: coreProductData, wixProductId }),
             fetchProductPageDetails(),
             fetchOurCategoriesData()
         ]);
