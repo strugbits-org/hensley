@@ -1,4 +1,5 @@
 import { logError } from "@/utils";
+import { getPayloadMemberBadgeSlugs, payloadMemberHasBadge } from "./payloadBadges";
 import { payloadGetCurrentMember } from "./payloadAuth";
 
 export const isAuthenticated = async (token) => {
@@ -18,12 +19,17 @@ export const isAuthenticated = async (token) => {
       throw new Error("Unauthorized: Invalid token");
     }
 
+    const badgeSlugs = getPayloadMemberBadgeSlugs(memberData);
+
     const data = {
       memberId: memberData.id,
       firstName: memberData.firstName,
       lastName: memberData.lastName,
       phone: memberData.metadata?.phone || "",
       email: memberData.email,
+      badges: memberData.badges || [],
+      badgeSlugs,
+      isAdmin: payloadMemberHasBadge(memberData),
       token, // Include the token for use in subsequent API calls
     };
 

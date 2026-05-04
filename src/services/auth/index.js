@@ -1,7 +1,9 @@
 "use server";
 import { cookies } from "next/headers";
+import { logError } from "@/utils";
 import { createCart } from "../cart/CartApisVisitor";
 import queryCollection from "@/utils/fetchFunction";
+import { payloadMemberHasBadge } from "./payloadBadges";
 import { payloadGetCurrentMember } from "./payloadAuth";
 
 export const getAuthToken = async () => {
@@ -89,24 +91,18 @@ export const getCartId = async (createNew = true) => {
   }
 };
 
-export const checkIsAdmin = async (memberId) => {
+export const checkIsAdmin = async () => {
   try {
-    // TODO: Implement admin check with Payload CMS
-    // For now, we can check member metadata or a specific field
-    // when the admin role system is defined in Payload
     const authToken = await getAuthToken();
     if (!authToken) return false;
     
     const memberResponse = await payloadGetCurrentMember(authToken);
-    // Handle different response structures
     const user = memberResponse?.user || memberResponse;
     if (!user || !user.id) return false;
-    
-    // Check if user has admin role in metadata
-    const isAdmin = user.metadata?.isAdmin === true;
-    return isAdmin;
+
+    return payloadMemberHasBadge(user);
   } catch (error) {
-    console.error("Error checking admin status:", error);
+    logError("Error checking admin status:", error);
     return false;
   }
 };

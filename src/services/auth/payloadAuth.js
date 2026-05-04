@@ -5,6 +5,7 @@
  */
 
 import { PayloadSDK } from "@payloadcms/sdk";
+import { logError } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
@@ -71,12 +72,22 @@ export const payloadRegister = async (userData) => {
  */
 export const payloadGetCurrentMember = async (token) => {
   try {
-    const result = await sdk.me(
-      { collection: 'members' },
-      { headers: { 'Authorization': `Bearer ${token}` } }
+    const response = await fetch(
+      `${CORE_API_BASE_URL}/api/members/me`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }
     );
-    return result;
+
+    if (!response.ok) return null;
+
+    return await response.json();
   } catch (error) {
+    logError("Error fetching current member:", error);
     return null;
   }
 };

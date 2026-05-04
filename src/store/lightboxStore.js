@@ -7,10 +7,6 @@ export const lightboxState = proxy({
         forgotPassword: false,
         invalidate: false
     },
-    matchProductsLightBoxDetails: {
-        open: false,
-        productData: null
-    },
     basicLightBoxDetails: {
         open: false,
         title: '',
@@ -37,18 +33,6 @@ export const lightboxActions = {
     },
     toggleLightBox: (ligtbox) => {
         lightboxState.lightboxes[ligtbox] = !lightboxState.lightboxes[ligtbox];
-    },
-    setMatchProductsLightBoxDetails: (details) => {
-        lightboxState.matchProductsLightBoxDetails = details
-    },
-    resetMatchProductsLightBoxDetails: () => {
-        lightboxState.matchProductsLightBoxDetails.open = false;
-        setTimeout(() => {
-            lightboxState.matchProductsLightBoxDetails = {
-                open: false,
-                productData: null
-            }
-        }, 500);
     },
     setBasicLightBoxDetails: (details) => {
         lightboxState.basicLightBoxDetails = details
@@ -85,7 +69,6 @@ export const lightboxActions = {
         };
         lightboxActions.resetBasicLightBoxDetails();
         lightboxActions.resetAddToCartModal();
-        lightboxActions.resetMatchProductsLightBoxDetails();
         // Ensure body scroll is restored
         if (typeof window !== 'undefined') {
             document.body.classList.remove('overflow-hidden');
