@@ -12,6 +12,8 @@ import {
   normalizePayloadStudio,
   normalizePayloadProject,
   normalizePayloadBlog,
+  querySection,
+  sectionToObject,
 } from "./payloadCollections";
 
 const BASE_URL = process.env.BASE_URL;
@@ -319,6 +321,14 @@ export const fetchInstagramFeed = async () => {
 };
 
 export const fetchHomePageDetails = async () => {
+  try {
+    const section = await querySection('home-page-labels');
+    if (section) {
+      return sectionToObject(section);
+    }
+  } catch (error) {
+    logError('Error fetching home page details:', error);
+  }
   return {
     instaFeedHeading: "FOLLOW US ON INSTAGRAM",
     instaFeedTitle: "@hensleyeventresources",
@@ -385,15 +395,40 @@ export const fetchBestSellers = async () => {
 };
 
 export const fetchTestimonials = async () => {
+  try {
+    const section = await querySection('home-testimonials');
+    if (section) {
+      const fields = sectionToObject(section);
+      return fields.testimonials || [];
+    }
+  } catch (error) {
+    logError('Error fetching testimonials:', error);
+  }
   return [];
 };
 
 export const fetchBannerData = async () => {
+  try {
+    const section = await querySection('home-banner');
+    if (section) {
+      return sectionToObject(section);
+    }
+  } catch (error) {
+    logError('Error fetching banner data:', error);
+  }
   return null;
 };
 
 
 export const fetchContactPageData = async () => {
+  try {
+    const section = await querySection('contact-form-labels');
+    if (section) {
+      return { contactFormData: sectionToObject(section) };
+    }
+  } catch (error) {
+    logError('Error fetching contact page data:', error);
+  }
   return {
     contactFormData: {
       firstNameLabel: "First Name",

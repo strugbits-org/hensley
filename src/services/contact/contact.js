@@ -1,9 +1,9 @@
 "use server";
 
 import { logError } from "@/utils";
-import { mapStorefrontFooterBranches, queryStorefrontFooter } from "../payloadCollections";
+import { mapStorefrontFooterBranches, queryStorefrontFooter, querySection, sectionToObject } from "../payloadCollections";
 
-const hardcodedContactFormData = {
+const fallbackContactFormData = {
     firstNameLabel: "First Name",
     lastNameLabel: "Last Name",
     phoneLabel: "Phone Number",
@@ -13,15 +13,21 @@ const hardcodedContactFormData = {
 
 export const fetchContactPageData = async () => {
     try {
-        const storefrontFooter = await queryStorefrontFooter({ channel: "hensley", key: "default" });
+        const [storefrontFooter, contactSection] = await Promise.all([
+            queryStorefrontFooter({ channel: "hensley", key: "default" }),
+            querySection('contact-form-labels'),
+        ]);
         const footerBranches = mapStorefrontFooterBranches(storefrontFooter);
+        const contactFormData = contactSection
+            ? sectionToObject(contactSection)
+            : fallbackContactFormData;
 
         return {
-            contactFormData: hardcodedContactFormData,
+            contactFormData,
             branchesData: footerBranches.length ? footerBranches : [],
         };
     } catch (error) {
         logError(`Error fetching contact page data: ${error.message}`, error);
-        return { contactFormData: hardcodedContactFormData, branchesData: [] };
+        return { contactFormData: fallbackContactFormData, branchesData: [] };
     }
 };

@@ -1,14 +1,14 @@
 "use server";
 
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
+import { querySection, sectionToObject } from "@/services/payloadCollections";
 import { fetchBannerData, fetchBestSellers, fetchBlogsData, fetchHomePageDetails, fetchMarketsData, fetchOurCategoriesData, fetchPortfolioData, fetchTestimonials } from "..";
 
 export const fetchHomePageData = async () => {
   try {
     const [
       bannerData,
-      heroSectionData,
+      heroSection,
       homePageDetails,
       categoriesData,
       portfolioData,
@@ -18,7 +18,7 @@ export const fetchHomePageData = async () => {
       blogsData
     ] = await Promise.all([
       fetchBannerData(),
-      queryCollection({ dataCollectionId: "HeroSectionDataHome" }),
+      querySection('home-hero'),
       fetchHomePageDetails(),
       fetchOurCategoriesData(),
       fetchPortfolioData(),
@@ -28,12 +28,14 @@ export const fetchHomePageData = async () => {
       fetchBlogsData(),
     ]);
 
-    if (!Array.isArray(heroSectionData.items) || !homePageDetails || !categoriesData || !portfolioData || !bestSellers) {
-      throw new Error(`Response does not contain items array`);
+    const heroSectionData = sectionToObject(heroSection);
+
+    if (!homePageDetails || !categoriesData || !portfolioData || !bestSellers) {
+      throw new Error(`Response does not contain required data`);
     }
 
     const response = {
-      heroSectionData: heroSectionData.items[0],
+      heroSectionData,
       bannerData,
       homePageDetails,
       categoriesData,

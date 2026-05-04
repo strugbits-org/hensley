@@ -1060,3 +1060,62 @@ export const queryPageBySlug = async (slug) => {
         return null;
     }
 };
+
+// ── Payload Section Queries ──────────────────────────────────────────────────
+
+/**
+ * Fetch a single Section document by its key field.
+ * Returns null if not found.
+ */
+export const querySection = async (key) => {
+    try {
+        const result = await sdk.find({
+            collection: 'sections',
+            where: { key: { equals: key }, _status: { equals: 'published' } },
+            limit: 1,
+            draft: false,
+            depth: 1,
+        });
+        return result.docs?.[0] || null;
+    } catch (error) {
+        logError(`Error querying section "${key}":`, error);
+        return null;
+    }
+};
+
+/**
+ * Extract a single field value from a Section document by field name.
+ * Returns the appropriate value based on the field type.
+ */
+export const getSectionField = (section, name) => {
+    if (!section?.fields) return null;
+    const field = section.fields.find((f) => f.name === name);
+    if (!field) return null;
+    switch (field.type) {
+        case 'text': return field.textValue ?? null;
+        case 'longText': return field.longTextValue ?? null;
+        case 'richText': return field.richTextValue ?? null;
+        case 'number': return field.numberValue ?? null;
+        case 'boolean': return field.booleanValue ?? null;
+        case 'upload': return field.uploadValue ?? null;
+        case 'uploadMany': return field.uploadManyValue ?? null;
+        case 'relationship': return field.relationshipValue ?? null;
+        case 'json': return field.jsonValue ?? null;
+        case 'tags': return field.tagsValue ?? null;
+        case 'email': return field.emailValue ?? null;
+        case 'date': return field.dateValue ?? null;
+        case 'time': return field.timeValue ?? null;
+        default: return null;
+    }
+};
+
+/**
+ * Convert a Section document's fields array into a plain key→value object.
+ * Returns an empty object if section is null/undefined.
+ */
+export const sectionToObject = (section) => {
+    if (!section?.fields) return {};
+    return Object.fromEntries(
+        section.fields.map((f) => [f.name, getSectionField(section, f.name)])
+    );
+};

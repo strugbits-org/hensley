@@ -21,11 +21,14 @@ const CareerOpportunities = ({ data }) => {
   };
 
   const getWixVideoUrl = (wixVideoUri) => {
+    if (!wixVideoUri) return null;
     const match = wixVideoUri.match(/wix:video:\/\/v1\/([a-zA-Z0-9_]+)/);
     return match
       ? `https://video.wixstatic.com/video/${match[1]}/1080p/mp4/file.mp4`
       : wixVideoUri;
   };
+
+  const videoSrc = getWixVideoUrl(video);
 
   const paragraphs = detail
     ?.split(/\n\s*\n/)
@@ -66,10 +69,11 @@ const CareerOpportunities = ({ data }) => {
 
       <div className="w-full flex flex-col justify-center items-center border-t border-b border-primary-border">
         <div className="lg:w-[80%] w-[95%] pt-[24px] relative">
+          {videoSrc && (
           <div className="lg:h-[875px] sm:h-[408px] h-[263px] relative">
             <video
               ref={videoRef}
-              src={getWixVideoUrl(video)}
+              src={videoSrc}
               controls
               loop
               muted
@@ -110,6 +114,7 @@ const CareerOpportunities = ({ data }) => {
               </button>
             )}
           </div>
+          )}
 
           <div className="w-full flex justify-between lg:gap-x-[12px] sm:gap-x-[15px] gap-y-[12px] sm:flex-row flex-col py-[30px]">
             <h3 className="text-[35px] leading-[30px] lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[30px] text-secondary-alt uppercase font-recklessRegular">
