@@ -1,23 +1,11 @@
 "use server";
 import { findSortIndexByCategory, logError } from "@/utils";
 import { fetchOurCategoriesData } from "..";
-import queryCollection from "@/utils/fetchFunction";
 import { queryProductCollectionBySlug, queryProductCollections, queryProductsByCollectionIdsPaginated } from "../payloadCollections";
 
 
 export const fetchCategoryPageDetails = async () => {
-    try {
-        const pageDetails = await queryCollection({ dataCollectionId: "categoryPageDetails" });
-
-        if (!Array.isArray(pageDetails.items)) {
-            throw new Error(`PrivacyPolicy response does not contain items array`);
-        }
-
-        return pageDetails.items[0]
-
-    } catch (error) {
-        logError(`Error fetching contact page data: ${error.message}`, error);
-    }
+    return { ourCategoryTitle: "Our Categories" };
 };
 
 
@@ -78,55 +66,17 @@ export const fetchSelectedCollectionData = async (slug) => {
     }
 }
 
-export const fetchSubcategoriesData = async (categoryId) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "CategoriesStructure",
-            includeReferencedItems: ["subcategories"],
-            eq: [
-                {
-                    key: "category",
-                    value: categoryId
-                }
-            ]
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-        return response.items[0];
-    } catch (error) {
-        logError(`Error fetching subcategories data: ${error.message}`, error);
-    }
-}
+export const fetchSubcategoriesData = async () => {
+    return null;
+};
 
 export const fetchCategoriesSortStructure = async () => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "CategorySortStructure",
-            limit: 1000,
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-        return response.items;
-    } catch (error) {
-        logError(`Error fetching category sort structure: ${error.message}`, error);
-    }
-}
+    return [];
+};
 
 export const fetchProductBannersData = async () => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "PRODUCTSUBCATEGORYBANNERS",
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-        return response.items;
-    } catch (error) {
-        logError(`Error fetching product banners data: ${error.message}`, error);
-    }
-}
+    return [];
+};
 
 export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip = 0, sortIndex }) => {
     try {

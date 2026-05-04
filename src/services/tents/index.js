@@ -1,39 +1,25 @@
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
 import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
 import { fetchMasterClassTenting } from "..";
+import { queryBlogs, normalizePayloadBlog } from "../payloadCollections";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
 
 /**
  * Fetch a single tent product by slug from the core API.
- * Falls back to the legacy Wix collection if the core API is not configured.
  */
 export const fetchTentData = async (slug) => {
     try {
-        if (CORE_API_BASE_URL) {
-            const res = await fetch(
-                `${CORE_API_BASE_URL}/api/products/tent?slug=${encodeURIComponent(slug)}`,
-                { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
-            );
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/products/tent?slug=${encodeURIComponent(slug)}`,
+            { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
+        );
 
-            if (!res.ok) throw new Error(`Core tent API returned ${res.status}`);
-            const json = await res.json();
-            if (!json.item) throw new Error("Tent not found in core API");
+        if (!res.ok) throw new Error(`Core tent API returned ${res.status}`);
+        const json = await res.json();
+        if (!json.item) throw new Error("Tent not found in core API");
 
-            return normalizeTentItem(json.item);
-        }
-
-        // Legacy Wix fallback
-        const response = await queryCollection({
-            dataCollectionId: "TentsCollection",
-            includeReferencedItems: ["tent", "productData"],
-            eq: [{ key: "slug", value: `/${slug}` }],
-            sortKey: "orderNumber",
-        });
-
-        if (!Array.isArray(response.items)) throw new Error("Response does not contain items array");
-        return response.items[0];
+        return normalizeTentItem(json.item);
     } catch (error) {
         logError(`Error fetching tent data: ${error.message}`, error);
     }
@@ -44,28 +30,16 @@ export const fetchTentData = async (slug) => {
  */
 export const fetchAllTents = async () => {
     try {
-        if (CORE_API_BASE_URL) {
-            const res = await fetch(
-                `${CORE_API_BASE_URL}/api/products/tent`,
-                { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
-            );
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/products/tent`,
+            { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
+        );
 
-            if (!res.ok) throw new Error(`Core tent API returned ${res.status}`);
-            const json = await res.json();
-            if (!Array.isArray(json.items)) throw new Error("Core API did not return items array");
+        if (!res.ok) throw new Error(`Core tent API returned ${res.status}`);
+        const json = await res.json();
+        if (!Array.isArray(json.items)) throw new Error("Core API did not return items array");
 
-            return json.items.map(normalizeTentItem);
-        }
-
-        // Legacy Wix fallback
-        const response = await queryCollection({
-            dataCollectionId: "TentsCollection",
-            includeReferencedItems: ["tent", "productData"],
-            sortKey: "orderNumber",
-        });
-
-        if (!Array.isArray(response.items)) throw new Error("Response does not contain items array");
-        return response.items;
+        return json.items.map(normalizeTentItem);
     } catch (error) {
         logError(`Error fetching all tents: ${error.message}`, error);
         return [];
@@ -73,18 +47,10 @@ export const fetchAllTents = async () => {
 };
 
 export const fetchTentPageDetails = async () => {
-    try {
-        const pageDetails = await queryCollection({ dataCollectionId: "dynamicTentPageDetails" });
-
-        if (!Array.isArray(pageDetails.items)) {
-            throw new Error(`Page details response does not contain items array`);
-        }
-
-        return pageDetails.items[0];
-    } catch (error) {
-        logError(`Error fetching tent page details: ${error.message}`, error);
-        return {};
-    }
+    return {
+        matchItWithTitle: "MATCH IT WITH",
+        featuredProductTitle: "Products Featured in this Project Entry",
+    };
 };
 
 export const fetchTentPageData = async (slug) => {
@@ -124,22 +90,15 @@ export const fetchTentPageData = async (slug) => {
 
 export const fetchFeaturedBlogs = async (productId) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ["blogRef", "markets", "studios", "author", "storeProducts"],
-            ne: [{ key: "isHidden", value: true }],
-            hasSome: [{ key: "storeProducts", values: [productId] }],
-            sortKey: "publishDate",
-            sortOrder: "desc",
+        if (!productId) return [];
+        const payloadBlogs = await queryBlogs({
+            where: { storeProducts: { contains: productId } },
+            sort: "-publishedDate",
         });
-
-        if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error("Selected blog not found");
-        }
-
-        return response.items;
+        return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {
         logError(`Error fetching featured blogs: ${error.message}`, error);
+        return [];
     }
 };
 

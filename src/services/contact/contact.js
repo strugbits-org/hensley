@@ -1,41 +1,27 @@
 "use server";
 
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
 import { mapStorefrontFooterBranches, queryStorefrontFooter } from "../payloadCollections";
+
+const hardcodedContactFormData = {
+    firstNameLabel: "First Name",
+    lastNameLabel: "Last Name",
+    phoneLabel: "Phone Number",
+    emailLabel: "Email",
+    messageLabel: "Message",
+};
 
 export const fetchContactPageData = async () => {
     try {
-        const [contactFormData, storefrontFooter] = await Promise.all([
-            queryCollection({ dataCollectionId: "ContactForm" }),
-            queryStorefrontFooter({ channel: "hensley", key: "default" }),
-        ]);
-
-        if (!Array.isArray(contactFormData.items)) {
-            throw new Error(`ContactForm response does not contain items array`);
-        }
-
+        const storefrontFooter = await queryStorefrontFooter({ channel: "hensley", key: "default" });
         const footerBranches = mapStorefrontFooterBranches(storefrontFooter);
 
-        if (footerBranches.length) {
-            return {
-                contactFormData: contactFormData.items[0],
-                branchesData: footerBranches,
-            };
-        }
-
-        const branchesData = await queryCollection({ dataCollectionId: "Branches" });
-
-        if (!Array.isArray(branchesData.items)) {
-            throw new Error(`Branches response does not contain items array`);
-        }
-
         return {
-            contactFormData: contactFormData.items[0],
-            branchesData: branchesData.items,
+            contactFormData: hardcodedContactFormData,
+            branchesData: footerBranches.length ? footerBranches : [],
         };
-
     } catch (error) {
         logError(`Error fetching contact page data: ${error.message}`, error);
+        return { contactFormData: hardcodedContactFormData, branchesData: [] };
     }
 };

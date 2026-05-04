@@ -4,48 +4,28 @@ import queryCollection from "@/utils/fetchFunction";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
 import { fetchOurCategoriesData } from "..";
-import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug } from "../payloadCollections";
+import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProject, queryProductCollections } from "../payloadCollections";
 
 const baseUrl = process.env.BASE_URL;
 
 export const fetchProductsByCategory = async (id) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            includeReferencedItems: ["product"],
-            hasSome: [
-                {
-                    key: "categories",
-                    values: [id]
-                }
-            ],
-            sortKey: "order"
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
+        if (!id) return [];
+        const result = await queryProductsByCollectionIds([id]);
+        return Array.isArray(result?.docs) ? result.docs : [];
     } catch (error) {
         logError(`Error fetching products by category: ${error.message}`, error);
+        return [];
     }
 }
 
 export const fetchCategoriesData = async () => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "Stores/Collections",
-            limit: "infinite",
-            extendedLimit: 100,
-        });
-
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
+        const docs = await queryProductCollections();
+        return Array.isArray(docs) ? docs : [];
     } catch (error) {
         logError(`Error fetching category data: ${error.message}`, error);
+        return [];
     }
 }
 
@@ -133,7 +113,7 @@ export const fetchProductCollectionData = async (id, productData = null) => {
             }
         }
         
-        // Try to fetch from Payload if we have an ID (could be a Payload product ID)
+        // Try to fetch from Payload if we have an ID
         if (id) {
             const payloadProduct = await queryProductById(id);
             if (payloadProduct?.type === 'bundle' && 
@@ -146,22 +126,10 @@ export const fetchProductCollectionData = async (id, productData = null) => {
             }
         }
 
-        // Fall back to legacy Wix collection data
-        const response = await queryCollection({
-            dataCollectionId: "MultipleProductsSet",
-            includeReferencedItems: ["products"],
-            eq: [
-                {
-                    key: "product",
-                    value: id
-                }
-            ]
-        });
-        const productSetItems = mapProductSetItems(response.items[0]);
-        if (productSetItems.length === 0) return false;
-        return productSetItems;
+        return false;
     } catch (error) {
         logError(`Error fetching product collection data: ${error.message}`, error);
+        return false;
     }
 }
 
@@ -170,26 +138,11 @@ export const fetchFeaturedProjects = async (id) => {
         if (!id || (typeof id !== "string" && typeof id !== "number")) {
             return [];
         }
-
-        const response = await queryCollection({
-            dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ["portfolioRef"],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ],
-            hasSome: [
-                {
-                    key: "storeProducts",
-                    values: [id]
-                }
-            ],
-            sortKey: "order"
+        const payloadProjects = await queryProjects({
+            where: { storeProducts: { contains: id } },
+            sort: "order",
         });
-
-        return Array.isArray(response?.items) ? response.items : [];
+        return payloadProjects.map(normalizePayloadProject);
     } catch (error) {
         logError(`Error fetching featured projects: ${error.message}`, error);
         return [];
@@ -304,18 +257,10 @@ export const fetchMatchedProductsForProduct = async ({ payloadProduct = null, wi
 
 
 export const fetchProductPageDetails = async () => {
-    try {
-        const pageDetails = await queryCollection({ dataCollectionId: "dynamicProductPageDetails" });
-
-        if (!Array.isArray(pageDetails.items)) {
-            throw new Error(`PrivacyPolicy response does not contain items array`);
-        }
-
-        return pageDetails.items[0]
-
-    } catch (error) {
-        logError(`Error fetching contact page data: ${error.message}`, error);
-    }
+    return {
+        matchItWithTitle: "MATCH IT WITH",
+        featuredProductTitle: "Products Featured in this Project Entry",
+    };
 };
 
 export const fetchProductPageData = async (slug) => {
@@ -348,7 +293,7 @@ export const fetchProductPageData = async (slug) => {
         ] = await Promise.all([
             // Only fetch legacy collection data if not a Payload bundle
             isPayloadBundle ? Promise.resolve(null) : fetchProductCollectionData(wixProductId),
-            fetchFeaturedProjects(wixProductId),
+            fetchFeaturedProjects(coreProductData.id || coreProductData._id),
             fetchMatchedProductsForProduct({ payloadProduct: coreProductData, wixProductId }),
             fetchProductPageDetails(),
             fetchOurCategoriesData()
@@ -491,20 +436,8 @@ export const checkProductInCart = async (productId, isProductCollection = false)
 };
 
 export const fetchProductPaths = async () => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            limit: "infinite",
-            extendedLimit: 1000
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items.map(x => ({ slug: x.slug.trim().replace("/", "") }));
-    } catch (error) {
-        logError(`Error fetching products by category: ${error.message}`, error);
-    }
+    // Returns empty so Next.js generates product pages on-demand (ISR)
+    return [];
 }
 
 export const fetchAllProducts = async () => {

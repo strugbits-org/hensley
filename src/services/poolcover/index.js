@@ -1,5 +1,4 @@
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
 import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
 
 const baseUrl = process.env.BASE_URL;
@@ -78,66 +77,34 @@ const normalizePoolCoverItem = (item) => {
 
 export const fetchPoolCovers = async () => {
     try {
-        if (CORE_API_BASE_URL) {
-            const res = await fetch(
-                `${CORE_API_BASE_URL}/api/products/pool-cover`,
-                { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
-            );
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/products/pool-cover`,
+            { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
+        );
 
-            if (!res.ok) throw new Error(`Core pool-cover API returned ${res.status}`);
-            const json = await res.json();
-            if (!Array.isArray(json.items)) throw new Error("Core API did not return items array");
+        if (!res.ok) throw new Error(`Core pool-cover API returned ${res.status}`);
+        const json = await res.json();
+        if (!Array.isArray(json.items)) throw new Error("Core API did not return items array");
 
-            return json.items.map(normalizePoolCoverItem);
-        }
-
-        const response = await queryCollection({
-            dataCollectionId: "PoolCovers",
-            includeReferencedItems: ["covers", "productData"],
-        });
-
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
+        return json.items.map(normalizePoolCoverItem);
     } catch (error) {
         logError(`Error fetching covers data: ${error.message}`, error);
+        return [];
     }
 };
 
 export const fetchPoolCoverData = async (slug) => {
     try {
-        if (CORE_API_BASE_URL) {
-            const res = await fetch(
-                `${CORE_API_BASE_URL}/api/products/pool-cover?slug=${encodeURIComponent(slug)}`,
-                { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
-            );
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/products/pool-cover?slug=${encodeURIComponent(slug)}`,
+            { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
+        );
 
-            if (!res.ok) throw new Error(`Core pool-cover API returned ${res.status}`);
-            const json = await res.json();
-            if (!json.item) throw new Error("Pool cover not found in core API");
+        if (!res.ok) throw new Error(`Core pool-cover API returned ${res.status}`);
+        const json = await res.json();
+        if (!json.item) throw new Error("Pool cover not found in core API");
 
-            return normalizePoolCoverItem(json.item);
-        }
-
-        const response = await queryCollection({
-            dataCollectionId: "PoolCovers",
-            includeReferencedItems: ["covers", "productData"],
-            eq: [
-                {
-                    key: "slug",
-                    value: slug
-                }
-            ],
-            sortKey: "order"
-        });
-
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items[0];
+        return normalizePoolCoverItem(json.item);
     } catch (error) {
         logError(`Error fetching covers data: ${error.message}`, error);
     }

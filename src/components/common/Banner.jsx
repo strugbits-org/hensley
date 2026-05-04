@@ -4,6 +4,7 @@ import { PrimaryButton } from './PrimaryButton';
 import { CustomLink } from './CustomLink';
 
 export const Banner = ({ data }) => {
+    if (!data) return null;
     const { backgroundImage, title, subtitle, buttonLabel, mobileImage, buttonLink } = data;
     return (
         <div className='relative banner lg:h-[125vh] h-[100vh] lg:p-6 border border-primary-border'>

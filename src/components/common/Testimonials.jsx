@@ -11,6 +11,8 @@ export const Testimonials = ({ data, pageDetails, lgPreview = 1.4, cardClasses, 
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isSliderReady, setIsSliderReady] = useState(false);
 
+    if (!data?.length) return null;
+
     const [sliderRef] = useKeenSlider(
         {
             loop: true,

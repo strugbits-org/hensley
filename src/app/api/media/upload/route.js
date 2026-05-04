@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createWixClient, logError } from "@/utils";
+import { logError } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
 const CORE_API_KEY = process.env.CORE_API_KEY || "";
@@ -14,8 +14,6 @@ const toAbsoluteCoreUrl = (urlOrPath) => {
 const uploadToCore = async (file, fileBuffer) => {
   const formData = new FormData();
   formData.append('file', new Blob([fileBuffer], { type: file.type }), file.name);
-  // Payload only reads non-file multipart fields from `_payload` JSON.
-  // Sending plain `tenant` parts is ignored by the parser.
   if (CORE_TENANT_ID) {
     formData.append('_payload', JSON.stringify({ tenant: CORE_TENANT_ID }));
   }
@@ -44,7 +42,6 @@ const uploadToCore = async (file, fileBuffer) => {
 
   const uploadResult = await uploadResponse.json();
   
-  // Normalize core API response to match client expectations
   if (uploadResult.doc) {
     return {
       file: {
@@ -57,31 +54,6 @@ const uploadToCore = async (file, fileBuffer) => {
   return uploadResult;
 };
 
-const uploadToWix = async (file, fileBuffer) => {
-  const wixClient = await createWixClient();
-  const uploadUrlResponse = await wixClient.files.generateFileUploadUrl(file.type);
-
-  const uploadUrl = new URL(uploadUrlResponse.uploadUrl);
-  uploadUrl.searchParams.set('filename', file.name);
-
-  const uploadResponse = await fetch(uploadUrl.toString(), {
-    method: 'PUT',
-    headers: {
-      'Content-Type': file.type,
-    },
-    body: fileBuffer,
-  });
-
-  if (!uploadResponse.ok) {
-    const errorText = await uploadResponse.text();
-    console.error("Wix upload error response:", errorText);
-    throw new Error(`Wix upload failed: ${uploadResponse.status} ${uploadResponse.statusText} - ${errorText}`);
-  }
-
-  const uploadResult = await uploadResponse.json();
-  return uploadResult;
-};
-
 export const POST = async (req) => {
   try {
     const formData = await req.formData();
@@ -90,19 +62,12 @@ export const POST = async (req) => {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    const fileBuffer = await file.arrayBuffer();
-
-    // If CORE_API_BASE_URL is configured, upload to core backend
-    // Otherwise fall back to Wix
-    let uploadResult;
-    if (CORE_API_BASE_URL && CORE_API_KEY) {
-      if (!CORE_TENANT_ID) {
-        throw new Error("Missing CORE_TENANT_ID for core media upload");
-      }
-      uploadResult = await uploadToCore(file, fileBuffer);
-    } else {
-      uploadResult = await uploadToWix(file, fileBuffer);
+    if (!CORE_TENANT_ID) {
+      throw new Error("Missing CORE_TENANT_ID for core media upload");
     }
+
+    const fileBuffer = await file.arrayBuffer();
+    const uploadResult = await uploadToCore(file, fileBuffer);
 
     return NextResponse.json(uploadResult, { status: 200 });
   } catch (error) {

@@ -2,7 +2,6 @@
 import { cookies } from "next/headers";
 import { logError } from "@/utils";
 import { createCart } from "../cart/CartApisVisitor";
-import queryCollection from "@/utils/fetchFunction";
 import { payloadMemberHasBadge } from "./payloadBadges";
 import { payloadGetCurrentMember } from "./payloadAuth";
 
@@ -25,48 +24,28 @@ export const getMemberTokens = async () => {
 };
 
 export const fetchLoginPageDetails = async () => {
-  try {
-    const pageDetails = await queryCollection({ dataCollectionId: "LoginPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
-    }
-
-    return pageDetails.items[0]
-
-  } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
-  }
+  return {
+    newToHensleyText: "New to Hensley?",
+    submitButtonLabel: "SIGN IN",
+    createAccountButtonLabel: "CREATE ACCOUNT",
+    logo: null,
+    labels: { email: "Email", password: "Password" },
+    agreementContent: null,
+    forgetPasswordLabel: "Forgot your password?",
+  };
 };
 
 export const fetchSignupPageDetails = async () => {
-  try {
-    const pageDetails = await queryCollection({ dataCollectionId: "SignupPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
-    }
-
-    return pageDetails.items[0]
-
-  } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
-  }
+  return {
+    title: "Create Account",
+    submitButtonLabel: "CREATE ACCOUNT",
+    labels: {},
+    agreementContent: null,
+  };
 };
 
 export const fetchAccountPageDetails = async () => {
-  try {
-    const pageDetails = await queryCollection({ dataCollectionId: "MyaccountPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
-    }
-
-    return pageDetails.items[0]
-
-  } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
-  }
+  return {};
 };
 
 

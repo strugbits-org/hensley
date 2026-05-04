@@ -1,5 +1,4 @@
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
 import { fetchBannerData, fetchBestSellers, fetchBlogsData, fetchMarketsData, fetchTestimonials } from "..";
 import { fetchProductsByCategory } from "../products";
 import {
@@ -63,82 +62,20 @@ const fetchPayloadHowWeDoItDataForMarket = async (slug) => {
 
 export const fetchPortfolioDataForMarkets = async (id) => {
     try {
-        // Payload-first
         const payloadProjects = await queryProjects({
             where: { markets: { in: id } },
             sort: "order",
         });
-        if (payloadProjects.length) {
-            return payloadProjects.map(normalizePayloadProject);
-        }
-
-        // Wix fallback
-        const response = await queryCollection({
-            dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ["portfolioRef"],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ],
-            hasSome: [
-                {
-                    key: "markets",
-                    values: id
-                }
-            ],
-            sortKey: "order"
-        });
-
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
+        return payloadProjects.map(normalizePayloadProject);
     } catch (error) {
         logError(`Error fetching portfolio data: ${error.message}`, error);
+        return [];
+    }
+};
     }
 };
 
-export const fetchHowWeDoItDataForMarket = async (id) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "HowWeDoItMarkets",
-            hasSome: [
-                {
-                    key: "markets",
-                    values: id
-                }
-            ],
-            sortKey: "orderNumber"
-        });
-
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        const normalizedItems = normalizeMarketHowWeDoItItems(response.items);
-        if (normalizedItems.length) {
-            return normalizedItems;
-        }
-
-        // Some legacy datasets are not linked to market references.
-        const fallbackResponse = await queryCollection({
-            dataCollectionId: "HowWeDoItMarkets",
-            sortKey: "orderNumber"
-        });
-
-        if (!Array.isArray(fallbackResponse.items)) {
-            throw new Error(`Fallback response does not contain items array`);
-        }
-
-        return normalizeMarketHowWeDoItItems(fallbackResponse.items);
-    } catch (error) {
-        logError(`Error fetching how we do it data: ${error.message}`, error);
-        return [];
-    }
-}
+export const fetchHowWeDoItDataForMarket = async () => [];
 
 export const fetchSelectedMarketData = async (slug) => {
     try {
@@ -155,16 +92,16 @@ export const fetchSelectedMarketData = async (slug) => {
         const ids = buildMarketLookupIds(selectedMarket);
         const marketHowWeDoItData = normalizeMarketHowWeDoItItems(selectedMarket?.howWeDoIt);
 
-        const [portfolioData, payloadHowWeDoItData, legacyHowWeDoItData, bannerData, testimonials, blogsData, bestSellerProducts, marketPageDetails] = await Promise.all([
+        const [portfolioData, payloadHowWeDoItData, bannerData, testimonials, blogsData, bestSellerProducts] = await Promise.all([
             fetchPortfolioDataForMarkets(ids),
             marketHowWeDoItData.length ? Promise.resolve([]) : fetchPayloadHowWeDoItDataForMarket(slug),
-            marketHowWeDoItData.length ? Promise.resolve([]) : fetchHowWeDoItDataForMarket(ids),
             fetchBannerData(),
             fetchTestimonials(),
             fetchBlogsForMarket(ids),
             fetchProductsByCategory(bestSellerCollection),
-            queryCollection({ dataCollectionId: "MarketPageDetails" }),
         ]);
+
+        const marketPageDetails = {};
 
 
         const response = {
@@ -174,7 +111,7 @@ export const fetchSelectedMarketData = async (slug) => {
             portfolioData: portfolioData || [],
             howWeDoItData: marketHowWeDoItData.length
                 ? marketHowWeDoItData
-                : (payloadHowWeDoItData.length ? payloadHowWeDoItData : (legacyHowWeDoItData || [])),
+                : (payloadHowWeDoItData.length ? payloadHowWeDoItData : []),
             bestSellers: bestSellerProducts || [],
             testimonials: testimonials || [],
             blogsData: blogsData || [],
@@ -188,32 +125,13 @@ export const fetchSelectedMarketData = async (slug) => {
 
 export const fetchBlogsForMarket = async (ids) => {
     try {
-        // Payload-first
         const payloadBlogs = await queryBlogs({
             where: { markets: { in: ids } },
             sort: "order",
         });
-        if (payloadBlogs.length) {
-            return payloadBlogs.map(normalizePayloadBlog);
-        }
-
-        // Wix fallback
-        const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ["blogRef", "author", "markets", "studios"],
-            hasSome: [
-                {
-                    key: "markets",
-                    values: ids
-                }
-            ],
-            sortKey: "order"
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-        return response.items;
+        return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {
         logError(`Error fetching blogs for market: ${error.message}`, error);
+        return [];
     }
 }

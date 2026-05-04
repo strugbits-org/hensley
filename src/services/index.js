@@ -1,8 +1,6 @@
 "use server";
 
 import { logError, sortByOrderNumber } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
-import { generateWixDocumentUrl } from "@/utils/generateImageURL";
 import {
   queryActiveHeaderMenu,
   queryStorefrontFooter,
@@ -173,36 +171,23 @@ export const fetchHeaderData = async () => {
 
 export const fetchMarketsData = async () => {
   try {
-    if (CORE_API_BASE_URL) {
-      const response = await fetch(
-        `${CORE_API_BASE_URL}/api/products/market`,
-        {
-          headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {},
-          next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 },
-        }
-      );
-
-      if (response.ok) {
-        const json = await response.json();
-        const items = Array.isArray(json?.items)
-          ? json.items
-          : Array.isArray(json?.docs)
-            ? json.docs
-            : [];
-
-        if (items.length) {
-          return sortByOrderNumber(items.map(normalizeCoreMarketItem));
-        }
+    const response = await fetch(
+      `${CORE_API_BASE_URL}/api/products/market`,
+      {
+        headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {},
+        next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 },
       }
-    }
+    );
 
-    const response = await queryCollection({ dataCollectionId: "MarketsCollection", includeReferencedItems: ["marketsOld"], sortKey: "orderNumber" });
+    if (!response.ok) throw new Error(`Markets API returned ${response.status}`);
+    const json = await response.json();
+    const items = Array.isArray(json?.items)
+      ? json.items
+      : Array.isArray(json?.docs)
+        ? json.docs
+        : [];
 
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items;
+    return sortByOrderNumber(items.map(normalizeCoreMarketItem));
   } catch (error) {
     logError(`Error fetching markets data: ${error.message}`, error);
     return [];
@@ -211,22 +196,11 @@ export const fetchMarketsData = async () => {
 
 export const fetchStudiosData = async () => {
   try {
-    // Payload-first
     const payloadStudios = await queryStudios();
-    if (payloadStudios.length) {
-      return payloadStudios.map(normalizePayloadStudio);
-    }
-
-    // Wix fallback
-    const response = await queryCollection({ dataCollectionId: "Studios" });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items;
+    return payloadStudios.map(normalizePayloadStudio);
   } catch (error) {
     logError(`Error fetching studios data: ${error.message}`, error);
+    return [];
   }
 };
 
@@ -243,18 +217,10 @@ export const fetchSelectedMarketsData = async (slug) => {
 
 
 export const fetchTentListingPageDetails = async () => {
-  try {
-    const pageDetails = await queryCollection({ dataCollectionId: "tentListingPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`Page details response does not contain items array`);
-    }
-
-    return pageDetails.items[0]
-
-  } catch (error) {
-    logError(`Error fetching tent listing page details: ${error.message}`, error);
-  }
+  return {
+    featuredProductTitle: "Products Featured in this Project Entry",
+    downloadBtnLabel: "Download Master Class Tenting Guide",
+  };
 };
 
 export const fetchTentsData = async () => {
@@ -263,14 +229,7 @@ export const fetchTentsData = async () => {
 };
 
 export const fetchMasterClassTenting = async () => {
-  try {
-    const response = await queryCollection({ dataCollectionId: "MasterClassTenting101" });
-    const url = response?.items[0]?.masterClassTenting101 || "";
-    const folderId = "0e0ac59a-ee22-4893-94f5-fe2986338ea7";
-    return generateWixDocumentUrl(folderId, url);
-  } catch (error) {
-    logError(`Error fetching master class tenting data: ${error.message}`, error);
-  }
+  return process.env.MASTER_CLASS_TENTING_URL || "";
 };
 
 const mapStorefrontFooterToLayoutData = (footer) => {
@@ -315,43 +274,20 @@ const mapStorefrontFooterToLayoutData = (footer) => {
   };
 };
 
-const fetchLegacyFooterData = async () => {
-  const [
-    footerData,
-    socialLinks,
-    footerNaviationData,
-    branches
-  ] = await Promise.all([
-    queryCollection({ dataCollectionId: "FooterCollection" }),
-    queryCollection({ dataCollectionId: "SocialLinks" }),
-    queryCollection({ dataCollectionId: "FooterNavigation" }),
-    queryCollection({ dataCollectionId: "Branches", sortKey: "orderNumber" }),
-  ]);
-
-  if (!Array.isArray(footerData.items) || !Array.isArray(footerNaviationData.items)) {
-    throw new Error(`Response does not contain items array`);
-  }
-
-  return {
-    footerData: footerData.items[0],
-    socialLinks: sortByOrderNumber(socialLinks.items),
-    footerNaviationData: sortByOrderNumber(footerNaviationData.items),
-    branches: sortByOrderNumber(branches.items),
-  };
-};
-
 export const fetchFooterData = async () => {
   try {
     const storefrontFooter = await queryStorefrontFooter({ channel: "hensley", key: "default" });
-
-    if (storefrontFooter) {
-      return mapStorefrontFooterToLayoutData(storefrontFooter);
-    }
-
-    return await fetchLegacyFooterData();
+    if (!storefrontFooter) throw new Error("Footer not found in bps-core");
+    return mapStorefrontFooterToLayoutData(storefrontFooter);
   } catch (error) {
     logError(`Error fetching footer data: ${error.message}`, error);
-    return await fetchLegacyFooterData();
+    return {
+      footer: null,
+      footerData: {},
+      socialLinks: [],
+      footerNaviationData: [],
+      branches: [],
+    };
   }
 };
 
@@ -359,34 +295,19 @@ export const fetchOurCategoriesData = async () => {
   try {
     const payloadCollections = await queryProductCollections();
 
-    if (Array.isArray(payloadCollections) && payloadCollections.length) {
-      const featuredCollections = payloadCollections
-        .filter((collection) =>
-          isTruthyFlag(
-            collection?.featured ??
-              collection?.isFeatured ??
-              collection?.showOnHome ??
-              collection?.homeFeatured
-          )
+    const featuredCollections = (Array.isArray(payloadCollections) ? payloadCollections : [])
+      .filter((collection) =>
+        isTruthyFlag(
+          collection?.featured ??
+            collection?.isFeatured ??
+            collection?.showOnHome ??
+            collection?.homeFeatured
         )
-        .map(mapProductCollectionToCategoryCard)
-        .sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
+      )
+      .map(mapProductCollectionToCategoryCard)
+      .sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
 
-      if (featuredCollections.length) {
-        return featuredCollections;
-      }
-    }
-
-    const response = await queryCollection({
-      dataCollectionId: "OurCategories",
-      includeReferencedItems: ["categories"]
-    });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return sortByOrderNumber(response.items);
+    return featuredCollections;
   } catch (error) {
     logError(`Error fetching our categories data: ${error.message}`, error);
     return [];
@@ -394,286 +315,100 @@ export const fetchOurCategoriesData = async () => {
 }
 
 export const fetchInstagramFeed = async () => {
-  try {
-    const response = await queryCollection({ dataCollectionId: "InstagramFeed" });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items;
-  } catch (error) {
-    logError(`Error fetching instagram feed data: ${error.message}`, error);
-  }
+  return [];
 };
 
 export const fetchHomePageDetails = async () => {
-  try {
-    const response = await queryCollection({ dataCollectionId: "HomePageDetails" });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items[0] || {};
-  } catch (error) {
-    logError(`Error fetching home page data: ${error.message}`, error);
-  }
+  return {
+    instaFeedHeading: "FOLLOW US ON INSTAGRAM",
+    instaFeedTitle: "@hensleyeventresources",
+    instaFeedIcon: null,
+    instaFeedButtonLabel: "FOLLOW US",
+    instaFeedButtonAction: "https://www.instagram.com/hensleyeventresources/",
+    bestSellerTitle: "BEST SELLERS",
+    hensleyNewsTitle: "HENSLEY NEWS",
+    marketsTitle: "OUR MARKETS",
+    ourCategoriesTitle: "OUR CATEGORIES",
+    ourProjectsTitle: "OUR PROJECTS",
+    testimonialsTitle: "WHAT PEOPLE SAY",
+  };
 };
 
 export const fetchPortfolioData = async () => {
   try {
-    // Payload-first
     const payloadProjects = await queryProjects({ sort: "order" });
-    if (payloadProjects.length) {
-      return payloadProjects.map(normalizePayloadProject);
-    }
-
-    // Wix fallback
-    const response = await queryCollection({
-      dataCollectionId: "PortfolioCollection",
-      includeReferencedItems: ["portfolioRef"],
-      ne: [
-        {
-          key: "isHidden",
-          value: true
-        }
-      ],
-      sortKey: "order"
-    });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items;
+    return payloadProjects.map(normalizePayloadProject);
   } catch (error) {
     logError(`Error fetching portfolio data: ${error.message}`, error);
+    return [];
   }
 };
 
 export const fetchBlogsData = async () => {
   try {
-    // Payload-first
     const payloadBlogs = await queryBlogs({ sort: "-publishedDate" });
-    if (payloadBlogs.length) {
-      return payloadBlogs.map(normalizePayloadBlog);
-    }
-
-    // Wix fallback
-    const response = await queryCollection({
-      dataCollectionId: "ManageBlogs",
-      includeReferencedItems: ["blogRef", "author", "markets", "studios"],
-      ne: [
-        {
-          key: "isHidden",
-          value: true
-        }
-      ],
-      sortKey: "publishDate",
-      sortOrder: "desc"
-    });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items;
+    return payloadBlogs.map(normalizePayloadBlog);
   } catch (error) {
     logError(`Error fetching blogs data: ${error.message}`, error);
+    return [];
   }
 };
 
 export const fetchFeaturedBlogs = async (productId) => {
   try {
-    // Payload-first
     const payloadBlogs = await queryBlogs({
       where: { storeProducts: { contains: productId } },
       sort: "-publishDate",
     });
-    if (payloadBlogs.length) {
-      return payloadBlogs.map(normalizePayloadBlog);
-    }
-
-    // Wix fallback
-    const response = await queryCollection({
-      dataCollectionId: "ManageBlogs",
-      includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
-      ne: [
-        {
-          key: "isHidden",
-          value: true
-        }
-      ],
-      hasSome: [
-        {
-          key: "storeProducts",
-          values: [productId]
-        }
-      ],
-      sortKey: "publishDate",
-      sortOrder: "desc",
-    });
-
-    if (!Array.isArray(response.items) || response.items.length === 0) {
-      throw new Error(`Selected blog not found`);
-    }
-
-    return response.items;
+    return payloadBlogs.map(normalizePayloadBlog);
   } catch (error) {
-    logError(`Error fetching other blogs: ${error.message}`, error);
+    logError(`Error fetching featured blogs: ${error.message}`, error);
+    return [];
   }
 }
 
 export const fetchFeaturedProjects = async (id) => {
   try {
-    // Payload-first
     const payloadProjects = await queryProjects({
       where: { storeProducts: { contains: id } },
       sort: "order",
     });
-    if (payloadProjects.length) {
-      return payloadProjects.map(normalizePayloadProject);
-    }
-
-    // Wix fallback
-    const response = await queryCollection({
-      dataCollectionId: "PortfolioCollection",
-      includeReferencedItems: ["portfolioRef"],
-      ne: [
-        {
-          key: "isHidden",
-          value: true
-        }
-      ],
-      hasSome: [
-        {
-          key: "storeProducts",
-          values: [id]
-        }
-      ],
-      sortKey: "order"
-    });
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items;
+    return payloadProjects.map(normalizePayloadProject);
   } catch (error) {
     logError(`Error fetching featured projects: ${error.message}`, error);
+    return [];
   }
 }
 
-export const fetchBestSellers = async (slug = '/') => {
-  try {
-    const response = await queryCollection({
-      dataCollectionId: "BestSellers",
-      includeReferencedItems: ["product", "productData"],
-      eq: [
-        {
-          key: "slug",
-          value: slug
-        }
-      ],
-      sortKey: "orderNumber"
-    });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    const data = response.items.map(item => {
-      return {
-        ...item.productData,
-        product: item.product,
-      }
-    });
-    return data;
-  } catch (error) {
-    logError(`Error fetching best sellers data: ${error.message}`, error);
-  }
+export const fetchBestSellers = async () => {
+  return [];
 };
 
 export const fetchTestimonials = async () => {
-  try {
-    const response = await queryCollection({ dataCollectionId: "WhatPeopleSay", sortKey: "order" });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items;
-  } catch (error) {
-    logError(`Error fetching testimonials data: ${error.message}`, error);
-  }
+  return [];
 };
 
 export const fetchBannerData = async () => {
-  try {
-    const response = await queryCollection({ dataCollectionId: "BannerHomePage" });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`Response does not contain items array`);
-    }
-
-    return response.items[0];
-  } catch (error) {
-    logError(`Error fetching banner data: ${error.message}`, error);
-  }
+  return null;
 };
 
 
 export const fetchContactPageData = async () => {
-  try {
-    const [contactFormData] = await Promise.all([
-      queryCollection({ dataCollectionId: "ContactForm" }),
-    ]);
-
-    if (!Array.isArray(contactFormData.items)) {
-      throw new Error(`ContactForm response does not contain items array`);
-    }
-
-    return {
-      contactFormData: contactFormData.items[0],
-    };
-
-  } catch (error) {
-    logError(`Error fetching contact form data: ${error.message}`, error);
-  }
+  return {
+    contactFormData: {
+      firstNameLabel: "First Name",
+      lastNameLabel: "Last Name",
+      phoneLabel: "Phone Number",
+      emailLabel: "Email",
+      messageLabel: "Message",
+    },
+  };
 };
 
 export const fetchAllPagesMetaData = async () => {
-  try {
-    const response = await queryCollection({ dataCollectionId: "PageSEOConfigurationMeta", sortKey: "order" });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`response does not contain items array`);
-    }
-
-    return response.items;
-  } catch (error) {
-    logError(`Error fetching page meta data: ${error.message}`, error);
-  }
+  return [];
 };
 
 export const fetchPageMetaData = async (slug) => {
-  try {
-    const response = await queryCollection({
-      dataCollectionId: "PageSEOConfigurationMeta",
-      eq: [
-        {
-          key: "slug",
-          value: slug
-        }
-      ]
-    });
-
-    if (!Array.isArray(response.items)) {
-      throw new Error(`response does not contain items array`);
-    }
-
-    return response.items[0];
-  } catch (error) {
-    logError(`Error fetching page meta data: ${error.message}`, error);
-  }
+  return {};
 };

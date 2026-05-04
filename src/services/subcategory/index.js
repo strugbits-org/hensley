@@ -2,23 +2,11 @@
 import { findSortIndexByCategory, logError } from "@/utils";
 import { fetchOurCategoriesData } from "..";
 import { fetchCategoriesSortStructure, fetchProductBannersData, fetchSortedProducts } from "../collections";
-import queryCollection from "@/utils/fetchFunction";
-import { queryProductCollectionBySlug } from "../payloadCollections";
+import { queryProductCollectionBySlug, queryProductCollections } from "../payloadCollections";
 
 
 export const fetchsubCategoriesPageDetails = async () => {
-    try {
-        const pageDetails = await queryCollection({ dataCollectionId: "subCategoryPageDetails" });
-
-        if (!Array.isArray(pageDetails.items)) {
-            throw new Error(`PrivacyPolicy response does not contain items array`);
-        }
-
-        return pageDetails.items[0]
-
-    } catch (error) {
-        logError(`Error fetching contact page data: ${error.message}`, error);
-    }
+    return { ourCategoriesTitle: "Our Categories" };
 };
 
 export const fetchSelectedCategoryData = async (slug) => {
@@ -86,11 +74,18 @@ export const fetchSelectedCategoryData = async (slug) => {
 
 export const fetchSubCategoryPagePaths = async () => {
     try {
-        const response = await queryCollection({ dataCollectionId: "Stores/Collections", limit: "infinite", extendedLimit: 100 });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-        return response.items.map(x => ({ slug: x.slug.trim().replace("/", "") }));
+        const allCollections = await queryProductCollections();
+        const seen = new Set();
+        return (Array.isArray(allCollections) ? allCollections : [])
+            .filter(c => c.slug)
+            .reduce((acc, c) => {
+                const slug = c.slug.trim().replace("/", "");
+                if (slug && !seen.has(slug)) {
+                    seen.add(slug);
+                    acc.push({ slug });
+                }
+                return acc;
+            }, []);
     } catch (error) {
         logError(`Error fetching sub category page params: ${error.message}`, error);
         return [];
@@ -98,22 +93,5 @@ export const fetchSubCategoryPagePaths = async () => {
 };
 
 export const fetchAllCategoriesForSorting = async () => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "CategorySortStructure",
-            includeReferencedItems: ["collections"],
-            increasedLimit: 100,
-            limit: "infinite",
-        });
-
-        if (!response?.items?.length) {
-            return [];
-        }
-
-        return response.items.filter(item => item.sortTitle?.length > 0).sort((a, b) => a.collections.name.localeCompare(b.collections.name));
-
-    } catch (error) {
-        logError("Error fetching all categories from Stores/Collections:", error);
-        return [];
-    }
+    return [];
 };
