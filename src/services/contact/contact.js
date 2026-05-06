@@ -4,11 +4,13 @@ import { logError } from "@/utils";
 import { mapStorefrontFooterBranches, queryStorefrontFooter, querySection, sectionToObject } from "../payloadCollections";
 
 const fallbackContactFormData = {
+    title: "Send your message",
     firstNameLabel: "First Name",
     lastNameLabel: "Last Name",
     phoneLabel: "Phone Number",
     emailLabel: "Email",
     messageLabel: "Message",
+    submitButtonLabel: "Send Message",
 };
 
 export const fetchContactPageData = async () => {
