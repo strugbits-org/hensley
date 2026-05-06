@@ -92,11 +92,14 @@ const InputField = ({
     );
 };
 
-const Login = ({ classes, close, isLightbox = true, data = '' }) => {
+const Login = ({ classes, close, isLightbox = true, data = {} }) => {
 
-    const { newToHensleyText, submitButtonLabel, createAccountButtonLabel, logo, labels, agreementContent, forgetPasswordLabel } = data;
+    console.log("data", data);
+    
 
-    const { email, password } = labels;
+    const { newToHensleyText, submitButtonLabel, createAccountButtonLabel, logo, labels = {}, agreementContent, forgetPasswordLabel } = data || {};
+
+    const { email, password } = labels || {};
 
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -203,7 +206,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                 )}
 
                 <Image
-                    src={wixImageToUrl(logo)}
+                    src={logo ? wixImageToUrl(logo) : "/logo-placeholder.png"}
                     width={212}
                     height={33}
                     className="lg:block hidden"
