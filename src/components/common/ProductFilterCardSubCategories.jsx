@@ -22,7 +22,7 @@ const ProductFilterCardSubCategories = ({ data }) => {
             ALL SUB-CATEGORIES
           </h3>
           <PrimaryImage
-            url="https://static.wixstatic.com/shapes/0e0ac5_3bd320dac8514b3ebaa8d424375b0ac2.svg"
+            url="/icons/0e0ac5_3bd320dac8514b3ebaa8d424375b0ac2.svg"
             customClasses={`w-[16px] h-[16px] lg:h-[24px] lg:w-[24px] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
           />
         </div>

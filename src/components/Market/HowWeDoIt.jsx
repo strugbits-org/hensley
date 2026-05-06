@@ -2,8 +2,8 @@ import React from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { CardsSlider } from '../common/CardsSliderComponent'
 
-const HowWeDoIt = ({ data, pageDetails }) => {
-    const { howWeDoItTitle } = pageDetails;
+const HowWeDoIt = ({ data, pageDetails = {} }) => {
+    const { howWeDoItTitle } = pageDetails || {};
 
     return (
         <div className='bg-primary w-full'>

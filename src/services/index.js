@@ -1,4 +1,5 @@
 "use server";
+import { getPayloadClient } from '@/utils';
 
 import { logError, sortByOrderNumber } from "@/utils";
 import {
@@ -483,5 +484,28 @@ export const fetchAllPagesMetaData = async () => {
 };
 
 export const fetchPageMetaData = async (slug) => {
+  try {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: 'page-seo',
+      where: {
+        slug: { equals: slug },
+        tenant: { equals: 1 }
+      },
+      limit: 1
+    });
+    const doc = result.docs[0];
+    if (doc) {
+      return {
+        title: doc.pageTitle || '',
+        description: doc.description || '',
+        keywords: doc.keywords || ''
+      };
+    }
+  } catch (error) {
+    console.error('Error fetching page meta data', error);
+  }
   return {};
 };
+
+

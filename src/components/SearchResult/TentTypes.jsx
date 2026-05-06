@@ -32,7 +32,7 @@ const TentCards = ({ data }) => {
                     className='z-10 self-start lg:block hidden group-hover:w-[400px] group-hover:h-[400px] transition-all duration-300 ease-in-out'
                     height={34}
                     width={34}
-                    src={"https://static.wixstatic.com/shapes/0e0ac5_7f17be7b63744aaf83be995827c7ff34.svg"}
+                    src={"/icons/0e0ac5_7f17be7b63744aaf83be995827c7ff34.svg"}
                 />
 
             </div>

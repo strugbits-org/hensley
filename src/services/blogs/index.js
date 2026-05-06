@@ -6,7 +6,8 @@ import {
     queryBlogCategories,
     queryMarkets,
     queryStudios,
-    queryPageBySlug,
+    querySection,
+    sectionToObject,
     normalizePayloadBlog,
     normalizePayloadBlogCategory,
     normalizePayloadMarketRef,
@@ -92,15 +93,12 @@ export const fetchPostPageData = async (slug) => {
 
 export const fetchPostPageDetails = async () => {
   try {
-    const page = await queryPageBySlug("post");
-    if (page) {
-      const blocks = page.layout || page.blocks || [];
-      const customSection = blocks.find(
-        (b) => b.blockType === "customSection" || b.blockName === "post-listing"
-      ) || blocks[0] || page;
+    const section = await querySection("post-page-title");
+    if (section) {
+      const details = sectionToObject(section);
       return {
-        hensleyNewsTitle: customSection.hensleyNewsTitle || page.hensleyNewsTitle || "",
-        featuredProductTitle: customSection.featuredProductTitle || page.featuredProductTitle || "",
+        hensleyNewsTitle: details.hensleyNewsTitle || "",
+        featuredProductTitle: details.featuredProductTitle || "",
       };
     }
     return {};
@@ -113,14 +111,11 @@ export const fetchPostPageDetails = async () => {
 
 export const fetchBlogPageDetails = async () => {
   try {
-    const page = await queryPageBySlug("blog");
-    if (page) {
-      const blocks = page.layout || page.blocks || [];
-      const customSection = blocks.find(
-        (b) => b.blockType === "customSection" || b.blockName === "blog-listing"
-      ) || blocks[0] || page;
+    const section = await querySection("blog-page-title");
+    if (section) {
+      const details = sectionToObject(section);
       return {
-        hensleyNewsTitle: customSection.hensleyNewsTitle || page.hensleyNewsTitle || "",
+        hensleyNewsTitle: details.hensleyNewsTitle || "",
       };
     }
     return {};

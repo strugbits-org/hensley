@@ -5,9 +5,33 @@ import {
     queryProjects,
     queryBlogs,
     queryMarkets,
+    querySection,
+    sectionToObject,
     normalizePayloadProject,
     normalizePayloadBlog,
 } from "../payloadCollections";
+
+const fallbackMarketPageDetails = {
+    bestSellerTitle: "BEST SELLERS",
+    marketsTitle: "OUR MARKETS",
+    howWeDoItTitle: "HOW WE DO IT",
+    testimonialsTitle: "WHAT PEOPLE SAY",
+    hensleyNewsTitle: "HENSLEY NEWS",
+    buttonLabelPortfolioSlider: "OUR PROJECTS",
+};
+
+export const fetchMarketPageDetails = async () => {
+    try {
+        const section = await querySection("market-page-details");
+        if (section) {
+            const details = sectionToObject(section);
+            return { ...fallbackMarketPageDetails, ...details };
+        }
+    } catch (error) {
+        logError(`Error fetching market page details: ${error.message}`, error);
+    }
+    return fallbackMarketPageDetails;
+};
 
 const resolveHowWeDoItImage = (item = {}) => {
     if (!item) return "";
@@ -72,8 +96,6 @@ export const fetchPortfolioDataForMarkets = async (id) => {
         return [];
     }
 };
-    }
-};
 
 export const fetchHowWeDoItDataForMarket = async () => [];
 
@@ -92,17 +114,15 @@ export const fetchSelectedMarketData = async (slug) => {
         const ids = buildMarketLookupIds(selectedMarket);
         const marketHowWeDoItData = normalizeMarketHowWeDoItItems(selectedMarket?.howWeDoIt);
 
-        const [portfolioData, payloadHowWeDoItData, bannerData, testimonials, blogsData, bestSellerProducts] = await Promise.all([
+        const [portfolioData, payloadHowWeDoItData, bannerData, testimonials, blogsData, bestSellerProducts, marketPageDetails] = await Promise.all([
             fetchPortfolioDataForMarkets(ids),
             marketHowWeDoItData.length ? Promise.resolve([]) : fetchPayloadHowWeDoItDataForMarket(slug),
             fetchBannerData(),
             fetchTestimonials(),
             fetchBlogsForMarket(ids),
             fetchProductsByCategory(bestSellerCollection),
+            fetchMarketPageDetails(),
         ]);
-
-        const marketPageDetails = {};
-
 
         const response = {
             otherMarketsData: otherMarketsData || [],
@@ -115,7 +135,7 @@ export const fetchSelectedMarketData = async (slug) => {
             bestSellers: bestSellerProducts || [],
             testimonials: testimonials || [],
             blogsData: blogsData || [],
-            marketPageDetails: marketPageDetails?.items[0] || {},
+            marketPageDetails: marketPageDetails || {},
         };
         return response;
     } catch (error) {

@@ -7,7 +7,7 @@ import { convertToHTML } from "@/utils/renderRichText";
 import { VideoPlayer } from "../common/helpers/VideoPlayer";
 
 function HeroSection({ data = {} }) {
-  const { title, tagline, image1, content1, buttonLabel, video, buttonLink, featuredImage, heroBackground, content } = data;
+  const { title, tagline, image1, content1, buttonLabel, video, buttonLink, featuredImage, heroBackground, content } = data || {};
   const heroImage = image1 || heroBackground || featuredImage;
   const bodyContent = content1 || content;
 

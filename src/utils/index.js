@@ -80,6 +80,40 @@ export const createWixClientCart = async (memberTokens) => {
 
 // -------------------------------------------------------------- WIX Clients END --------------------------------------------------------------
 
+/**
+ * Resolve a media value coming from Payload (object or string) to a fully-qualified URL.
+ * Handles the depth-1 populated upload object shape ({ url, sizes, ... }) and prefixes
+ * relative `/api/media/...` paths with CORE_API_BASE_URL.
+ */
+export const resolveCoreMediaUrl = (media) => {
+    if (!media) return "";
+    if (typeof media === "string") {
+        if (media.startsWith("/api/media/") && CORE_API_BASE_URL) {
+            return `${CORE_API_BASE_URL.replace(/\/$/, "")}${media}`;
+        }
+        return media;
+    }
+    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0]);
+    if (typeof media !== "object") return "";
+
+    const candidate = media.url
+        || media.src
+        || media.thumbnailURL
+        || media?.sizes?.card?.url
+        || media?.sizes?.thumbnail?.url
+        || media?.mainMedia?.url
+        || media?.media?.url
+        || "";
+
+    if (!candidate) return "";
+    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate);
+
+    if (candidate.startsWith("/api/media/") && CORE_API_BASE_URL) {
+        return `${CORE_API_BASE_URL.replace(/\/$/, "")}${candidate}`;
+    }
+    return candidate;
+};
+
 export const sortByOrderNumber = (array, options = {}) => {
     const {
         ascending = true,
@@ -591,3 +625,4 @@ export const findProductSize = (additionalInfoSections = []) => {
 }
 
 export const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+export const CORE_TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || 1;

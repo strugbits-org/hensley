@@ -55,7 +55,7 @@ export default function OurProjects({ data, loop = true }) {
                                 <div className="flex justify-center md:justify-end w-full flex-shrink-0 gap-2">
                                     <div>
                                         <PrimaryImage
-                                            url={"https://static.wixstatic.com/shapes/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}
+                                            url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}
                                             alt={portfolioRef.title}
                                             customClasses="hidden md:block fill-primary-alt h-[132px] transition-all duration-500 ease-in-out lg:group-hover:w-full lg:group-hover:h-full"
                                         />
@@ -94,3 +94,4 @@ export default function OurProjects({ data, loop = true }) {
         </>
     );
 }
+

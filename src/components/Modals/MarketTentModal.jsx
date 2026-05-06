@@ -42,7 +42,7 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
                                 </div>
                                 <hr className="border-primary-alt my-4" />
                                 <div className="hidden lg:block relative grow mt-8">
-                                    <PrimaryImage url={"https://static.wixstatic.com/shapes/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"} alt={title} customClasses="absolute fill-primary-alt left-0 bottom-0 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-full group-hover:h-full" />
+                                    <PrimaryImage url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"} alt={title} customClasses="absolute fill-primary-alt left-0 bottom-0 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-full group-hover:h-full" />
                                 </div>
 
                             </div>
@@ -54,3 +54,4 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
         </div>
     )
 }
+

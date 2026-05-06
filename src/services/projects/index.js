@@ -10,7 +10,8 @@ import {
     normalizePayloadProject,
     normalizePayloadProjectCategory,
     normalizePayloadStudio,
-    queryPageBySlug,
+    querySection,
+    sectionToObject,
 } from "../payloadCollections";
 
 const normalizePayloadMarketForFilter = (m) => {
@@ -102,11 +103,13 @@ export const fetchProjectPageData = async (slug, { draft = false } = {}) => {
 
 export const fetchProjectPageDetails = async () => {
   try {
-    const page = await queryPageBySlug('project');
-    if (page) {
-      const blocks = page.layout || page.blocks || [];
-      const customSection = blocks.find(b => b.blockType === 'customSection') || blocks[0] || page;
-      return { hensleyNewsTitle: customSection.hensleyNewsTitle || page.hensleyNewsTitle || '' };
+    const section = await querySection("project-page-title");
+    if (section) {
+      const details = sectionToObject(section);
+      return {
+        otherProjectsTitle: details.otherProjectsTitle || "",
+        featuredProductTitle: details.featuredProductTitle || "",
+      };
     }
     return {};
   } catch (error) {

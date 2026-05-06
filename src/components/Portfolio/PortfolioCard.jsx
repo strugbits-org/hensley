@@ -13,7 +13,7 @@ function PortfolioCard({ data }) {
         studios = []
     } = data;
 
-    const arrowImageUrl = "https://static.wixstatic.com/media/0e0ac5_87d58241be704c008a2500d6691fb318~mv2.png";
+    const arrowImageUrl = "/icons/0e0ac5_87d58241be704c008a2500d6691fb318.png";
 
     return (
         <div className="relative group border border-primary-border pb-6">
@@ -65,3 +65,4 @@ function PortfolioCard({ data }) {
 }
 
 export default PortfolioCard;
+

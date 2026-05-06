@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Image from 'next/image';
 import FormHeading from './FormHeading';
 import Button from './Button';
 import { useForm } from 'react-hook-form';
@@ -12,6 +13,8 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 import { convertToHTMLRichContent } from '@/utils/renderRichText';
+import eyeOpenIcon from '@/assets/icons/eye-open.svg';
+import eyeClosedIcon from '@/assets/icons/eye-closed.svg';
 
 // Validation schema
 const schema = yup.object({
@@ -47,34 +50,39 @@ const FIELD_CONFIGS = {
 
 export const SignupForm = ({ content, data }) => {
 
-  const { submitButtonLabel, labels, agreementContent, title } = data;
+  const {
+    submitButtonLabel,
+    submittingButtonLabel,
+    labels,
+    agreementContent,
+    title,
+    successTitle,
+    successDescription,
+    successButtonText,
+    errorTitle,
+    errorDescription,
+    errorButtonText,
+  } = data;
 
   const defaultContent = {
     labels: { ...labels },
     buttons: {
-      submit: submitButtonLabel,
-      submitting: "creating account..."
-    },
-    agreement: {
-      text: "By continuing, you are agreeing with",
-      termsLink: "Blueprint Studios Terms & Conditions",
-      privacyLink: "Privacy Policy",
-      termsUrl: "/terms",
-      privacyUrl: "/privacy"
+      submit: submitButtonLabel || "CREATE ACCOUNT",
+      submitting: submittingButtonLabel || "CREATING ACCOUNT...",
     },
     messages: {
       success: {
-        title: "Account Created Successfully!",
-        description: "Welcome! Your account has been created. You can now sign in with your credentials.",
-        buttonText: "Continue",
-        buttonLink: "/signin"
+        title: successTitle || "ACCOUNT CREATED",
+        description: successDescription || "Your account has been created. You can now sign in with your credentials.",
+        buttonText: successButtonText || "SIGN IN",
+        buttonLink: "/login",
       },
       error: {
-        title: "Account Creation Failed",
-        description: "There was an error creating your account. Please try again.",
-        buttonText: "Try Again"
-      }
-    }
+        title: errorTitle || "SIGNUP FAILED",
+        description: errorDescription || "Something went wrong while creating your account. Please try again.",
+        buttonText: errorButtonText || "TRY AGAIN",
+      },
+    },
   };
 
   const formContent = { ...defaultContent, ...content };
@@ -181,8 +189,19 @@ export const SignupForm = ({ content, data }) => {
             type="button"
             className={"absolute right-3 top-10 cursor-pointer"}
             onClick={() => togglePasswordVisibility(fieldId)}
+            aria-label={
+              (isPasswordField && showPassword) || (isConfirmPasswordField && showConfirmPassword)
+                ? "Hide password"
+                : "Show password"
+            }
           >
-            <img className="size-6" src={(isPasswordField && showPassword) || (isConfirmPasswordField && showConfirmPassword) ? "https://static.wixstatic.com/shapes/0e0ac5_e14dd77953084aec9c7994033fda7882.svg" : "https://static.wixstatic.com/shapes/0e0ac5_130c9cc93100439b8627738cde9c26c7.svg"} />
+            <Image
+              className="size-6"
+              src={(isPasswordField && showPassword) || (isConfirmPasswordField && showConfirmPassword) ? eyeOpenIcon : eyeClosedIcon}
+              alt=""
+              width={24}
+              height={24}
+            />
           </button>
         )}
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -211,7 +230,11 @@ export const SignupForm = ({ content, data }) => {
 
           <div className='lg:col-span-2 w-full flex flex-col justify-center items-center gap-4'>
             <div className='w-full sm:max-w-[370px] sm:my-[60px]'>
-              {convertToHTMLRichContent({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
+              {convertToHTMLRichContent({ 
+                content: agreementContent, 
+                class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center',
+                class_a: 'text-[12px] text-secondary underline hover:opacity-70 transition-opacity duration-200' 
+              })}
             </div>
           </div>
         </form>

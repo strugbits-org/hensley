@@ -10,7 +10,7 @@ import HowWeDoIt from './HowWeDoIt'
 
 export const MarketPage = ({ data }) => {
 
-    const { marketPageDetails, selectedMarket, otherMarketsData, portfolioData, howWeDoItData, bannerData, bestSellers, testimonials, blogsData } = data;
+    const { marketPageDetails, selectedMarket, otherMarketsData, portfolioData, howWeDoItData, bannerData, bestSellers, testimonials, blogsData } = data || {};
 
     return (
         <>
