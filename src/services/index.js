@@ -8,6 +8,8 @@ import {
   queryProjects,
   queryBlogs,
   queryProductCollections,
+  queryProductCollectionBySlug,
+  queryProductsByCollectionIds,
   mapStorefrontFooterBranches,
   normalizePayloadStudio,
   normalizePayloadProject,
@@ -100,6 +102,25 @@ const resolveRelationshipId = (value) => {
   if (Array.isArray(value)) return resolveRelationshipId(value[0]);
   if (typeof value === "object") return value.id || value._id || value.value || null;
   return null;
+};
+
+const getCollectionWithChildrenIds = (collection) => {
+  if (!collection || typeof collection !== "object") return [];
+
+  const collectionId = collection.id || collection._id;
+  const ids = collectionId ? [collectionId] : [];
+  const children = collection?.children?.docs || (Array.isArray(collection?.children) ? collection.children : []);
+
+  children.forEach((child) => {
+    if (typeof child === "string") {
+      ids.push(child);
+      return;
+    }
+
+    ids.push(...getCollectionWithChildrenIds(child));
+  });
+
+  return [...new Set(ids.filter(Boolean))];
 };
 
 const normalizeCoreMarketItem = (item = {}) => {
@@ -398,7 +419,21 @@ export const fetchFeaturedProjects = async (id) => {
 }
 
 export const fetchBestSellers = async () => {
-  return [];
+  try {
+    const bestSellerCollection = await queryProductCollectionBySlug("best-sellers");
+    if (!bestSellerCollection) return [];
+
+    const collectionIds = getCollectionWithChildrenIds(bestSellerCollection);
+    if (!collectionIds.length) return [];
+
+    const productsResponse = await queryProductsByCollectionIds(collectionIds);
+    const products = Array.isArray(productsResponse?.docs) ? productsResponse.docs : [];
+
+    return products;
+  } catch (error) {
+    logError(`Error fetching best sellers data: ${error.message}`, error);
+    return [];
+  }
 };
 
 export const fetchTestimonials = async () => {
