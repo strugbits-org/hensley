@@ -14,6 +14,8 @@ import {
   normalizePayloadBlog,
   querySection,
   sectionToObject,
+  queryTestimonialsByType,
+  queryInstagramFeedItems,
 } from "./payloadCollections";
 
 const BASE_URL = process.env.BASE_URL;
@@ -317,6 +319,11 @@ export const fetchOurCategoriesData = async () => {
 }
 
 export const fetchInstagramFeed = async () => {
+  try {
+    return await queryInstagramFeedItems();
+  } catch (error) {
+    logError('Error fetching instagram feed items:', error);
+  }
   return [];
 };
 
@@ -396,11 +403,7 @@ export const fetchBestSellers = async () => {
 
 export const fetchTestimonials = async () => {
   try {
-    const section = await querySection('home-testimonials');
-    if (section) {
-      const fields = sectionToObject(section);
-      return fields.testimonials || [];
-    }
+    return await queryTestimonialsByType(undefined, 'client');
   } catch (error) {
     logError('Error fetching testimonials:', error);
   }

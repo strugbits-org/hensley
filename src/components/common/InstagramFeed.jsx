@@ -26,6 +26,10 @@ const privateRoutes = [
 ];
 
 function InstagramFeed({ data, details }) {
+
+  console.log("data", data);
+  
+
   const { instaFeedHeading, instaFeedTitle, instaFeedIcon, instaFeedButtonLabel, instaFeedButtonAction } = details;
   const [isSliderReady, setIsSliderReady] = useState(false);
 
@@ -76,7 +80,7 @@ function InstagramFeed({ data, details }) {
               {instaFeedHeading}
             </h3>
             <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-3 mb-10 gap-2 lg:gap-4">
-              <PrimaryImage type="svg" url={instaFeedIcon} customClasses={"size-[18px] lg:size-[30px]"} />
+              <PrimaryImage url={instaFeedIcon} customClasses={"size-[18px] lg:size-[30px]"} />
               <h3 className="text-secondary-alt text-[18px] lg:text-[35px] font-recklessRegular">
                 {instaFeedTitle}
               </h3>
@@ -104,7 +108,7 @@ function InstagramFeed({ data, details }) {
                     className={`keen-slider__slide  flex flex-col md:p-[10px]`}
                   >
                     <div className="h-[325px] lg:h-[448px] relative">
-                      <PrimaryImage type="insta" url={dt.image} customClasses={"h-full w-full object-cover"} />
+                      <PrimaryImage url={dt.image} customClasses={"h-full w-full object-cover"} />
                     </div>
                   </CustomLink>
                 );

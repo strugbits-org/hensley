@@ -20,7 +20,7 @@ function DreamTeam({ dreamTeamData = [], pageTitle }) {
                 <div className='flex flex-col gap-2 px-3'>
                   <PrimaryImage
                     timeout={0}
-                    url={dt.image}
+                    url={dt.photo?.url || dt.image}
                     customClasses="h-full w-full object-cover"
                   />
                   <div>
@@ -28,7 +28,7 @@ function DreamTeam({ dreamTeamData = [], pageTitle }) {
                       {dt.name}
                     </h3>
                     <p className="uppercase font-haasRegular text-[12px] md:text-[12px] lg:text-[16px] leading-[20px] text-secondary-alt lg:mt-[6px] mt-[3px]">
-                      {dt.title || ""}
+                      {dt.jobTitle || dt.title || ""}
                     </p>
                   </div>
                 </div>

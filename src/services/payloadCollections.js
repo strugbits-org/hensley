@@ -3,6 +3,7 @@ import { logError, sortByOrderNumber } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
+const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID || "";
 
 // Initialize Payload SDK with auth header
 const sdk = new PayloadSDK({
@@ -701,6 +702,64 @@ export const queryProductById = async (id) => {
     }
 }
 
+export const queryProductsByIds = async (ids = []) => {
+    if (!ids || !ids.length) return [];
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            where: { id: { in: ids } },
+            pagination: false,
+            draft: false,
+            locale: 'en',
+            depth: 1,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError('Error querying products by IDs:', error);
+        return [];
+    }
+};
+
+export const queryAllProducts = async ({ depth = 1 } = {}) => {
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            pagination: false,
+            draft: false,
+            locale: 'en',
+            depth,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError('Error querying all products:', error);
+        return [];
+    }
+};
+
+export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip = 0, depth = 1, sort } = {}) => {
+    try {
+        const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
+        const result = await sdk.find({
+            collection: 'products',
+            where: { ...where, _status: { equals: 'published' } },
+            limit,
+            page,
+            draft: false,
+            locale: 'en',
+            depth,
+            ...(sort ? { sort } : {}),
+        });
+        return {
+            docs: ensureArray(result?.docs),
+            totalDocs: result?.totalDocs || 0,
+            hasNextPage: result?.hasNextPage || false,
+        };
+    } catch (error) {
+        logError('Error querying products:', error);
+        return { docs: [], totalDocs: 0, hasNextPage: false };
+    }
+};
+
 // ──────────────────────────────────────────────────────────────────────
 // Payload Media URL helper
 // ──────────────────────────────────────────────────────────────────────
@@ -1119,3 +1178,75 @@ export const sectionToObject = (section) => {
         section.fields.map((f) => [f.name, getSectionField(section, f.name)])
     );
 };
+
+// ── New First-Class Collection Queries ───────────────────────────────────────
+
+export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
+    try {
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/how-we-do-it?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=10`,
+            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
+        );
+        const data = await res.json();
+        return data.docs || [];
+    } catch (error) {
+        logError(`Error querying how-we-do-it: ${error.message}`, error);
+        return [];
+    }
+}
+
+export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
+    try {
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/dream-team-members?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=100`,
+            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
+        );
+        const data = await res.json();
+        return data.docs || [];
+    } catch (error) {
+        logError(`Error querying dream-team-members: ${error.message}`, error);
+        return [];
+    }
+}
+
+export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
+    try {
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/partner-brands?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=10`,
+            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
+        );
+        const data = await res.json();
+        return data.docs || [];
+    } catch (error) {
+        logError(`Error querying partner-brands: ${error.message}`, error);
+        return [];
+    }
+}
+
+export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 'client') {
+    try {
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/testimonials?where[tenant][equals]=${tenantId}&where[type][equals]=${type}&where[_status][equals]=published&sort=order&limit=20`,
+            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
+        );
+        const data = await res.json();
+        return data.docs || [];
+    } catch (error) {
+        logError(`Error querying testimonials (type=${type}): ${error.message}`, error);
+        return [];
+    }
+}
+
+export async function queryInstagramFeedItems(tenantId = CORE_TENANT_ID) {
+    try {
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/instagram-feed-items?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=12`,
+            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
+        );
+        const data = await res.json();
+        return data.docs || [];
+    } catch (error) {
+        logError(`Error querying instagram-feed-items: ${error.message}`, error);
+        return [];
+    }
+}

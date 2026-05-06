@@ -1,28 +1,26 @@
 "use server";
 
 import { logError } from "@/utils";
-import { querySection, sectionToObject } from "@/services/payloadCollections";
+import { querySection, sectionToObject, queryHowWeDoIt, queryTestimonialsByType } from "@/services/payloadCollections";
 
 export const fetchCareersPageData = async () => {
     try {
         const [
             careersHeroSection,
-            howWeDoItSection,
-            careersWhoWorksSection,
+            howWeDoItData,
+            employeeTestimonialsData,
         ] = await Promise.all([
             querySection('careers-hero'),
-            querySection('how-we-do-it'),
-            querySection('careers-who-works'),
+            queryHowWeDoIt(),
+            queryTestimonialsByType(undefined, 'employee'),
         ]);
 
         const heroSectionData = sectionToObject(careersHeroSection);
-        const howWeDoItFields = sectionToObject(howWeDoItSection);
-        const whoWorksFields = sectionToObject(careersWhoWorksSection);
 
         const response = {
             heroSectionData,
-            howWeDoItData: howWeDoItFields.items || [],
-            whoWorksCareersPageData: whoWorksFields.testimonials || [],
+            howWeDoItData: howWeDoItData || [],
+            whoWorksCareersPageData: employeeTestimonialsData || [],
             lastSectionCareersPageData: {},
             jobsData: [],
         };

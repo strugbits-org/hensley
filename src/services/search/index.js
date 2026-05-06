@@ -6,6 +6,7 @@ import {
     queryMarkets,
     normalizePayloadBlog,
     normalizePayloadProject,
+    queryProductsFromPayload,
 } from "../payloadCollections";
 export const searchMarkets = async (query) => {
     try {
@@ -89,71 +90,22 @@ export const searchProjects = async (query) => {
 
 export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipProducts = [] }) => {
     try {
-        const poolCoverId = "d35d73d6-63ef-c6c1-c071-2cbb88f7ffe3";
-        const baseFilters = {
-            dataCollectionId: "FullProductData",
-            includeReferencedItems: ["product"],
-            ne: [
-                { key: "productSetItem", value: true },
-                { key: "product", value: poolCoverId }
-            ],
-            limit: pageLimit,
-            skip: skip,
-            sortOrder: "asc",
-            sortKey: "title",
-            not: ["product", skipProducts]
-        };
+        if (!term || !term.trim()) return [];
+        const t = term.trim();
 
-        let items = [];
+        const [byTitle, bySlug] = await Promise.all([
+            queryProductsFromPayload({ where: { title: { like: t } }, limit: pageLimit, skip, depth: 1 }),
+            queryProductsFromPayload({ where: { slug: { like: t } }, limit: Math.min(pageLimit, 50), depth: 1 }),
+        ]);
 
-        const response = await queryCollection({
-            ...baseFilters,
-            startsWith: [{ key: "title", value: term }]
-        });
+        const seen = new Set(skipProducts);
+        const items = [];
 
-        const data = response.items?.filter(item => typeof item.product !== "string") || [];
-        items = items.concat(data);
-        if (items.length >= pageLimit) return items;
-
-        const fetchProducts = async ({ searchKey, limit, excludeIds = [], searchPrefix = " ", correctionEnabled = false, searchType = "and" }) => {
-            const response = await queryCollection({
-                ...baseFilters,
-                search: [searchKey, term],
-                limit,
-                searchPrefix,
-                ne: [...baseFilters.ne, ...excludeIds.map(id => ({ key: "product", value: id }))],
-                correctionEnabled,
-                searchType
-            });
-            return response.items?.filter(item => typeof item.product !== "string") || [];
-        };
-
-        const searchStrategies = [
-            { searchKey: "title", searchPrefix: " ", correctionEnabled: false, searchType: "and" },
-            { searchKey: "title", searchPrefix: "", correctionEnabled: false, searchType: "and" },
-            { searchKey: "title", searchPrefix: " ", correctionEnabled: false, searchType: "or" },
-            { searchKey: "title", searchPrefix: "", correctionEnabled: false, searchType: "or" },
-            { searchKey: "title", searchPrefix: " ", correctionEnabled: true, searchType: "and" },
-            { searchKey: "title", searchPrefix: "", correctionEnabled: true, searchType: "and" },
-            { searchKey: "title", searchPrefix: " ", correctionEnabled: true, searchType: "or" },
-            { searchKey: "title", searchPrefix: "", correctionEnabled: true, searchType: "or" },
-            { searchKey: "content", searchPrefix: "", correctionEnabled: false, searchType: "and" },
-            { searchKey: "content", searchPrefix: "", correctionEnabled: false, searchType: "or" }
-        ];
-
-        for (const strategy of searchStrategies) {
-            if (items.length >= pageLimit) break;
-
-            const excludeIds = items.map(({ product }) => product?._id);
-            const newLimit = pageLimit - items.length;
-            const newItems = await fetchProducts({
-                ...strategy,
-                limit: newLimit,
-                excludeIds
-            });
-
-            items = items.concat(newItems);
-
+        for (const doc of [...byTitle.docs, ...bySlug.docs]) {
+            const id = doc.id || doc._id;
+            if (!id || seen.has(id)) continue;
+            seen.add(id);
+            items.push({ product: doc, slug: doc.slug, title: doc.title });
             if (items.length >= pageLimit) break;
         }
 

@@ -1,7 +1,7 @@
 "use server";
 
 import { logError } from "@/utils";
-import { querySection, sectionToObject, queryProjects, normalizePayloadProject } from "@/services/payloadCollections";
+import { querySection, sectionToObject, queryProjects, normalizePayloadProject, queryHowWeDoIt, queryDreamTeamMembers, queryPartnerBrands } from "@/services/payloadCollections";
 
 const fetchPortfolioItems = async () => {
   try {
@@ -19,31 +19,28 @@ export const fetchAboutPageData = async () => {
     const [
       aboutPageLabelsSection,
       aboutHeroSection,
-      aboutDreamTeamSection,
-      aboutMeetFamilySection,
-      howWeDoItSection,
+      dreamTeamData,
+      partnerBrandsData,
+      howWeDoItData,
       portfolioData,
     ] = await Promise.all([
       querySection('about-page-labels'),
       querySection('about-hero'),
-      querySection('about-dream-team'),
-      querySection('about-meet-family'),
-      querySection('how-we-do-it'),
+      queryDreamTeamMembers(),
+      queryPartnerBrands(),
+      queryHowWeDoIt(),
       fetchPortfolioItems(),
     ]);
 
     const aboutPageDetails = sectionToObject(aboutPageLabelsSection);
     const heroSectionData = sectionToObject(aboutHeroSection);
-    const dreamTeamFields = sectionToObject(aboutDreamTeamSection);
-    const familyFields = sectionToObject(aboutMeetFamilySection);
-    const howWeDoItFields = sectionToObject(howWeDoItSection);
 
     const response = {
       aboutPageDetails,
       heroSectionData,
-      dreamTeamData: dreamTeamFields.team || [],
-      familySectionData: familyFields.family || [],
-      howWeDoItData: howWeDoItFields.items || [],
+      dreamTeamData: dreamTeamData || [],
+      familySectionData: partnerBrandsData || [],
+      howWeDoItData: howWeDoItData || [],
       portfolioData: portfolioData || [],
     };
 

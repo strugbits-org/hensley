@@ -1,7 +1,8 @@
 "use server";
-import queryCollection from "@/utils/fetchFunction";
+import { logError } from "@/utils";
 import { getAuthToken, getCartId } from "../auth";
 import { createPriceQuoteVisitor } from "./QuoteApisVisitor";
+import { queryPageBySlug } from "../payloadCollections";
 
 const baseUrl = process.env.BASE_URL;
 
@@ -80,16 +81,16 @@ export const fetchQuote = async (id) => {
 
 export const fetchQuoteHistoryPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "QuoteHistoryPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const page = await queryPageBySlug('quote-history');
+    if (page) {
+      const blocks = page.layout || page.blocks || [];
+      const customSection = blocks.find(b => b.blockType === 'customSection') || blocks[0] || page;
+      return { hensleyNewsTitle: customSection.hensleyNewsTitle || page.hensleyNewsTitle || '' };
     }
-
-    return pageDetails.items[0]
-
+    return {};
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching quote history page details: ${error.message}`, error);
+    return {};
   }
 };
 
@@ -97,15 +98,15 @@ export const fetchQuoteHistoryPageDetails = async () => {
 
 export const fetchQuotePageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "QuoteRequestPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const page = await queryPageBySlug('quote-request');
+    if (page) {
+      const blocks = page.layout || page.blocks || [];
+      const customSection = blocks.find(b => b.blockType === 'customSection') || blocks[0] || page;
+      return { hensleyNewsTitle: customSection.hensleyNewsTitle || page.hensleyNewsTitle || '' };
     }
-
-    return pageDetails.items[0]
-
+    return {};
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching quote page details: ${error.message}`, error);
+    return {};
   }
 };
