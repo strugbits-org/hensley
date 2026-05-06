@@ -2,6 +2,8 @@
 import React, { useRef, useState } from "react";
 import SectionTitle from "../common/SectionTitle";
 
+import { resolveCoreMediaUrl } from "@/utils";
+
 const CareerOpportunities = ({ data }) => {
   const { subtitle, title, buttonLabel, detail, video } = data;
 
@@ -22,10 +24,13 @@ const CareerOpportunities = ({ data }) => {
 
   const getWixVideoUrl = (wixVideoUri) => {
     if (!wixVideoUri) return null;
-    const match = wixVideoUri.match(/wix:video:\/\/v1\/([a-zA-Z0-9_]+)/);
+    const resolvedUrl = resolveCoreMediaUrl(wixVideoUri);
+    if (!resolvedUrl.startsWith('wix:')) return resolvedUrl;
+    
+    const match = resolvedUrl.match(/wix:video:\/\/v1\/([a-zA-Z0-9_]+)/);
     return match
       ? `https://video.wixstatic.com/video/${match[1]}/1080p/mp4/file.mp4`
-      : wixVideoUri;
+      : resolvedUrl;
   };
 
   const videoSrc = getWixVideoUrl(video);

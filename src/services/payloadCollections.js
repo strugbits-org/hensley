@@ -3,10 +3,10 @@ import { logError, sortByOrderNumber } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
-const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID || "";
+export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID || "";
 
 // Initialize Payload SDK with auth header
-const sdk = new PayloadSDK({
+export const sdk = new PayloadSDK({
     baseURL: CORE_API_BASE_URL + "/api",
     baseInit: {
         headers: {

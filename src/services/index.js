@@ -1,8 +1,9 @@
 "use server";
-import { getPayloadClient } from '@/utils';
 
 import { logError, sortByOrderNumber } from "@/utils";
 import {
+  sdk,
+  CORE_TENANT_ID,
   queryActiveHeaderMenu,
   queryStorefrontFooter,
   queryStudios,
@@ -21,9 +22,8 @@ import {
   queryInstagramFeedItems,
 } from "./payloadCollections";
 
-const BASE_URL = process.env.BASE_URL;
-const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
 const CORE_API_KEY = process.env.CORE_API_KEY || "";
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
 
 const resolveCoreMediaUrl = (media) => {
   if (!media) return "";
@@ -485,14 +485,14 @@ export const fetchAllPagesMetaData = async () => {
 
 export const fetchPageMetaData = async (slug) => {
   try {
-    const payload = await getPayloadClient();
-    const result = await payload.find({
+    const result = await sdk.find({
       collection: 'page-seo',
       where: {
         slug: { equals: slug },
-        tenant: { equals: 1 }
+        tenant: { equals: CORE_TENANT_ID }
       },
-      limit: 1
+      limit: 1,
+      draft: false
     });
     const doc = result.docs[0];
     if (doc) {
