@@ -11,7 +11,10 @@ import Loading from "@/app/loading";
 
 export default function SliderComponent({ data = [], classes = "", pageDetails = {}, loop = false }) {
   const sliderData = Array.isArray(data) ? data : [];
-  const { buttonLabelPortfolioSlider } = pageDetails ?? {};
+  const { ourProjectsTitle } = pageDetails ?? {};
+
+  console.log("pageDetails", pageDetails);
+  
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSliderReady, setIsSliderReady] = useState(false);
@@ -82,7 +85,7 @@ export default function SliderComponent({ data = [], classes = "", pageDetails =
                   </h2>
                   <CustomLink to={`/project/${portfolioRef?.slug || slide?.slug}`}>
                     <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
-                      {buttonLabelPortfolioSlider}
+                      {ourProjectsTitle}
                     </PrimaryButton>
                   </CustomLink>
                 </div>

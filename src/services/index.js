@@ -359,7 +359,7 @@ export const fetchHomePageDetails = async () => {
   }
   return {
     instaFeedHeading: "FOLLOW US ON INSTAGRAM",
-    instaFeedTitle: "@hensleyeventresources",
+    instaFeedTitle: "STAY CONNECTED FEED",
     instaFeedIcon: null,
     instaFeedButtonLabel: "FOLLOW US",
     instaFeedButtonAction: "https://www.instagram.com/hensleyeventresources/",
