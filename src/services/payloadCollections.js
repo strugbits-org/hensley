@@ -1250,3 +1250,61 @@ export async function queryInstagramFeedItems(tenantId = CORE_TENANT_ID) {
         return [];
     }
 }
+
+// ── Banner Queries ────────────────────────────────────────────────────────────
+
+/**
+ * Fetch the active hero banner for the given tenant.
+ * Returns a single banner object shaped for the Banner component:
+ * { title, subtitle, backgroundImage, mobileImage, buttonLabel, buttonLink }
+ */
+export async function queryHeroBanner(tenantId = CORE_TENANT_ID) {
+    try {
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/hero-banners?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=1&depth=1`,
+            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
+        );
+        const data = await res.json();
+        const banner = data.docs?.[0];
+        if (!banner) return null;
+        return {
+            title: banner.title ?? null,
+            subtitle: banner.subtitle ?? null,
+            backgroundImage: banner.backgroundImage ?? null,
+            mobileImage: banner.mobileImage ?? null,
+            buttonLabel: banner.buttonLabel ?? null,
+            buttonLink: banner.buttonLink ?? null,
+        };
+    } catch (error) {
+        logError(`Error querying hero banner: ${error.message}`, error);
+        return null;
+    }
+}
+
+/**
+ * Fetch all published product banners for the given tenant.
+ * Returns an array shaped for the ProductBanner component:
+ * [{ _id, title, image, url, isDesktop, isMobile, orderDesktop, orderMobile }]
+ */
+export async function queryProductBanners(tenantId = CORE_TENANT_ID) {
+    try {
+        const res = await fetch(
+            `${CORE_API_BASE_URL}/api/product-banners?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=orderDesktop&limit=50&depth=1`,
+            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
+        );
+        const data = await res.json();
+        return (data.docs || []).map((banner) => ({
+            _id: banner.id,
+            title: banner.title,
+            image: banner.image ?? null,
+            url: banner.url ?? null,
+            isDesktop: banner.isDesktop ?? true,
+            isMobile: banner.isMobile ?? true,
+            orderDesktop: banner.orderDesktop ?? 0,
+            orderMobile: banner.orderMobile ?? 0,
+        }));
+    } catch (error) {
+        logError(`Error querying product banners: ${error.message}`, error);
+        return [];
+    }
+}

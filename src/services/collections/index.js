@@ -1,7 +1,7 @@
 "use server";
 import { findSortIndexByCategory, logError } from "@/utils";
 import { fetchOurCategoriesData } from "..";
-import { queryProductCollectionBySlug, queryProductCollections, queryProductsByCollectionIdsPaginated } from "../payloadCollections";
+import { queryProductCollectionBySlug, queryProductCollections, queryProductsByCollectionIdsPaginated, queryProductBanners } from "../payloadCollections";
 
 
 export const fetchCategoryPageDetails = async () => {
@@ -75,7 +75,12 @@ export const fetchCategoriesSortStructure = async () => {
 };
 
 export const fetchProductBannersData = async () => {
-    return [];
+    try {
+        return await queryProductBanners();
+    } catch (error) {
+        logError('Error fetching product banners data:', error);
+        return [];
+    }
 };
 
 export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip = 0, sortIndex }) => {

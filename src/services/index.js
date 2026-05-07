@@ -20,6 +20,7 @@ import {
   sectionToObject,
   queryTestimonialsByType,
   queryInstagramFeedItems,
+  queryHeroBanner,
 } from "./payloadCollections";
 
 const CORE_API_KEY = process.env.CORE_API_KEY || "";
@@ -448,10 +449,7 @@ export const fetchTestimonials = async () => {
 
 export const fetchBannerData = async () => {
   try {
-    const section = await querySection('home-banner');
-    if (section) {
-      return sectionToObject(section);
-    }
+    return await queryHeroBanner();
   } catch (error) {
     logError('Error fetching banner data:', error);
   }
