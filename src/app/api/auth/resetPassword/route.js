@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { logError } from "@/utils";
 import { payloadResetPassword } from "@/services/auth/payloadAuth";
 
+export const dynamic = "force-dynamic";
+
 export const PUT = async (req) => {
   try {
     const { searchParams } = new URL(req.url);

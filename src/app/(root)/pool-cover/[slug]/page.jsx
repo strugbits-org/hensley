@@ -8,7 +8,8 @@ import { notFound } from "next/navigation";
 
 export const generateStaticParams = async () => {
   try {
-    const poolCovers = await fetchPoolCovers();
+    // const poolCovers = await fetchPoolCovers();
+    const poolCovers = [];
     const paths = poolCovers.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
     return paths;
   } catch (error) {
