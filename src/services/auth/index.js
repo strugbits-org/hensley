@@ -173,7 +173,7 @@ export const checkIsAdmin = async () => {
   try {
     const authToken = await getAuthToken();
     if (!authToken) return false;
-    
+
     const memberResponse = await payloadGetCurrentMember(authToken);
     const user = memberResponse?.user || memberResponse;
     if (!user || !user.id) return false;

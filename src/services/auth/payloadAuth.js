@@ -73,7 +73,7 @@ export const payloadRegister = async (userData) => {
 export const payloadGetCurrentMember = async (token) => {
   try {
     const response = await fetch(
-      `${CORE_API_BASE_URL}/api/members/me`,
+      `${CORE_API_BASE_URL}/api/members/me?depth=1`,
       {
         method: 'GET',
         headers: {

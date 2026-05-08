@@ -134,14 +134,18 @@ const Cart = () => {
       return;
     }
 
+    let updatedData = { ...data };
+
     // Check for new setItems format first
     if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
-      data.setItems = data.setItems.map(item => {
-        if (item.productName === id || item.product === id) {
-          return { ...item, quantity: numValue };
-        }
-        return item;
-      });
+      updatedData = {
+        ...data,
+        setItems: data.setItems.map(item =>
+          (item.productName === id || item.product === id)
+            ? { ...item, quantity: numValue }
+            : item
+        ),
+      };
     } else if (data.productSetItems) {
       // Fall back to old string format
       const updatedSet = data.productSetItems.map(item => {
@@ -155,47 +159,49 @@ const Cart = () => {
       // Support both Wix format (catalogReference, descriptionLines) and Payload format (customTextFieldValues/customTextFields)
       if (data.catalogReference) {
         // Wix format
-        data.catalogReference.options.customTextFields.Set = updatedSet;
-        if (data.descriptionLines) {
-          data.descriptionLines = data.descriptionLines.map(line => {
-            if (line.name?.original === "Set") {
-              const plainText = {
-                translated: updatedSet,
-                original: updatedSet
-              };
-              return { ...line, plainText };
-            }
-            return line;
-          });
-        }
+        updatedData = {
+          ...data,
+          catalogReference: {
+            ...data.catalogReference,
+            options: {
+              ...data.catalogReference.options,
+              customTextFields: {
+                ...data.catalogReference.options.customTextFields,
+                Set: updatedSet,
+              },
+            },
+          },
+          descriptionLines: data.descriptionLines
+            ? data.descriptionLines.map(line =>
+                line.name?.original === "Set"
+                  ? { ...line, plainText: { translated: updatedSet, original: updatedSet } }
+                  : line
+              )
+            : data.descriptionLines,
+        };
       } else {
         // Payload format - update customTextFieldValues or customTextFields
         const updateField = (fields) => {
           if (!Array.isArray(fields)) return fields;
-          return fields.map(field => {
-            if (field.title === "Set") {
-              return { ...field, value: updatedSet };
-            }
-            return field;
-          });
+          return fields.map(field =>
+            field.title === "Set" ? { ...field, value: updatedSet } : field
+          );
         };
-        
-        if (data.customTextFieldValues) {
-          data.customTextFieldValues = updateField(data.customTextFieldValues);
-        }
-        if (data.customTextFields) {
-          data.customTextFields = updateField(data.customTextFields);
-        }
-      }
 
-      delete data.productSetItems;
+        updatedData = {
+          ...data,
+          customTextFieldValues: data.customTextFieldValues ? updateField(data.customTextFieldValues) : data.customTextFieldValues,
+          customTextFields: data.customTextFields ? updateField(data.customTextFields) : data.customTextFields,
+        };
+        delete updatedData.productSetItems;
+      }
     }
 
     const updatedLineItems = cartItems.map(item =>
-      item._id === data._id ? data : item
+      item._id === updatedData._id ? updatedData : item
     );
     setCartItems(updatedLineItems);
-    updateCollectionProducts(data);
+    updateCollectionProducts(updatedData);
   }, [cartItems]);
 
   const updateCollectionProducts = useCallback(

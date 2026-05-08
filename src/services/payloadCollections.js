@@ -741,7 +741,7 @@ export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip =
         const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
         const result = await sdk.find({
             collection: 'products',
-            where: { ...where, _status: { equals: 'published' } },
+            where,
             limit,
             page,
             draft: false,

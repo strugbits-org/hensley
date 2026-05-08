@@ -37,8 +37,8 @@ export async function generateMetadata({ params }) {
 
 export const generateStaticParams = async () => {
   try {
-    // const tentsData = await fetchTentsData();
-    const tentsData = [];
+    const tentsData = await fetchTentsData();
+    // const tentsData = [];
     if (!Array.isArray(tentsData)) return [];
 
     const paths = tentsData.map((data) => {

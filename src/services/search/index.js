@@ -33,10 +33,11 @@ export const searchTents = async (query) => {
         if (!tents?.length) return [];
         const q = query.toLowerCase();
         return tents
-            .filter(t =>
-                (t.title || t.tent?.name || "").toLowerCase().includes(q) ||
-                (t.tent?.description || "").toLowerCase().includes(q)
-            )
+            .filter(t => {
+                const name = typeof t.title === "string" ? t.title : typeof t.tent?.name === "string" ? t.tent.name : "";
+                const desc = typeof t.tent?.description === "string" ? t.tent.description : "";
+                return name.toLowerCase().includes(q) || desc.toLowerCase().includes(q);
+            })
             .map(t => ({
                 product: {
                     _id: t.id || t._id,
@@ -105,7 +106,15 @@ export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipPro
             const id = doc.id || doc._id;
             if (!id || seen.has(id)) continue;
             seen.add(id);
-            items.push({ product: doc, slug: doc.slug, title: doc.title });
+            items.push({
+                product: {
+                    ...doc,
+                    _id: id,
+                    name: doc.name || doc.title || "",
+                },
+                slug: doc.slug,
+                title: doc.title,
+            });
             if (items.length >= pageLimit) break;
         }
 
