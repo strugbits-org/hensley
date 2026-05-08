@@ -29,8 +29,8 @@ export async function generateMetadata({ params }) {
 
 export const generateStaticParams = async () => {
   try {
-    // const projectData = await fetchProjects();
-    const projectData = [];
+    const projectData = await fetchProjects();
+    // const projectData = [];
     const paths = projectData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
     return paths;
   } catch (error) {

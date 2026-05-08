@@ -42,9 +42,9 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
         setProjectsData(projects);
         setTentsData(tents);
 
-        setTimeout(() => {
-            fetchSavedProducts();
-        }, 1000);
+        // setTimeout(() => {
+        //     fetchSavedProducts();
+        // }, 1000);
     };
 
     useEffect(() => {

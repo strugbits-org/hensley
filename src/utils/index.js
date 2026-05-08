@@ -1,13 +1,6 @@
-import { ApiKeyStrategy, createClient, OAuthStrategy } from "@wix/sdk";
-import { collections, items } from "@wix/data";
-import { members, badges } from "@wix/members";
-import { cart, currentCart } from "@wix/ecom";
-import { contacts } from "@wix/crm";
-import { submissions } from "@wix/forms";
 import parse from 'html-react-parser';
 import { generateImageURL, generateImageURLAlternate } from "./generateImageURL";
 import * as cheerio from "cheerio";
-import { files } from "@wix/media";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
@@ -16,69 +9,6 @@ export const logError = (...args) => {
     if (isDebugMode) console.error(...args);
 };
 
-export const createWixClient = async () => {
-    try {
-        const wixClient = createClient({
-            modules: {
-                collections,
-                items,
-                submissions,
-                members,
-                cart,
-                currentCart,
-                contacts,
-                files,
-                badges
-            },
-            auth: ApiKeyStrategy({
-                siteId: process.env.SITE_ID_WIX,
-                apiKey: process.env.API_KEY_WIX,
-            })
-        });
-        return wixClient;
-    } catch (error) {
-        logError("Error creating wix client: ", error);
-    }
-};
-
-export const createWixClientOAuth = async () => {
-    try {
-        const wixClient = createClient({
-            modules: {
-                collections,
-                items,
-                submissions,
-                members,
-                cart,
-                currentCart,
-                files,
-                badges
-            },
-            auth: OAuthStrategy({ clientId: process.env.CLIENT_ID_WIX }),
-        });
-        return wixClient;
-    } catch (error) {
-        logError("Error creating OAuth wix client: ", error);
-    }
-};
-
-export const createWixClientCart = async (memberTokens) => {
-    try {
-        const wixClient = createClient({
-            modules: { currentCart },
-            auth: OAuthStrategy({
-                clientId: process.env.CLIENT_ID_WIX,
-                tokens: memberTokens,
-            }),
-        });
-
-        return wixClient;
-    } catch (error) {
-        logError("Error creating cart wix client: ", error);
-    }
-};
-
-// -------------------------------------------------------------- WIX Clients END --------------------------------------------------------------
 
 /**
  * Resolve a media value coming from Payload (object or string) to a fully-qualified URL.
@@ -215,9 +145,16 @@ export const mapProductSetItems = (data) => {
 
 export const calculateTotalCartQuantity = (lineItems) => {
     const totalQuantity = lineItems.reduce((total, currentItem) => {
-        const fallbackSetValue = currentItem?.catalogReference?.options?.customTextFields?.Set || currentItem?.customTextFields?.find(x => x.title === "Set")?.value;
-        const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
-        const productCollection = descriptionLines.find(x => x.title === "Set")?.value || fallbackSetValue;
+        // New format: setItems array
+        if (currentItem.itemType === "set" || (Array.isArray(currentItem.setItems) && currentItem.setItems.length > 0)) {
+            const setQuantity = (currentItem.setItems || []).reduce((acc, si) => {
+                return acc + (parseInt(si.quantity, 10) || 1);
+            }, 0);
+            return total + setQuantity;
+        }
+
+        const descriptionLines = formatDescriptionLines(currentItem.customTextFields || currentItem.customTextFieldValues || []);
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
 
         if (!productCollection) return total + currentItem.quantity;
         const collectionQuantity = productCollection.split('; ').reduce((acc, item) => {
@@ -232,13 +169,19 @@ export const calculateTotalCartQuantity = (lineItems) => {
 
 export const calculateCartTotalPrice = (lineItems) => {
     const totalPrice = lineItems.reduce((total, currentItem) => {
-        const fallbackSetValue = currentItem?.catalogReference?.options?.customTextFields?.Set || currentItem?.customTextFields?.find(x => x.title === "Set")?.value;
+        // New format: setItems array
+        if (currentItem.itemType === "set" || (Array.isArray(currentItem.setItems) && currentItem.setItems.length > 0)) {
+            const setTotal = (currentItem.setItems || []).reduce((acc, si) => {
+                return acc + (parseFloat(si.unitPrice || 0) * (parseInt(si.quantity, 10) || 1));
+            }, 0);
+            return total + setTotal;
+        }
 
-        const descriptionLines = formatDescriptionLines(currentItem.descriptionLines);
-        const productCollection = descriptionLines.find(x => x.title === "Set")?.value || fallbackSetValue;
+        const descriptionLines = formatDescriptionLines(currentItem.customTextFields || currentItem.customTextFieldValues || []);
+        const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
 
         if (!productCollection) {
-            return total + ((currentItem?.price?.amount || currentItem.price) * currentItem.quantity);
+            return total + (currentItem.price * currentItem.quantity);
         }
 
         const collectionTotalPrice = productCollection.split('; ').reduce((acc, item) => {
@@ -255,10 +198,8 @@ export const calculateCartTotalPrice = (lineItems) => {
 export const formatDescriptionLines = (items) => {
     if (!items) return [];
     return items.reduce((acc, item) => {
-        // Support both Wix format (name.translated/original, colorInfo, plainText) and
-        // Payload format (title, value)
-        const title = item.title || item.name?.translated || item.name?.original;
-        const value = item.value || item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
+        const title = item.title;
+        const value = item.value;
         acc.push({ title, value });
         return acc;
     }, []);
@@ -269,41 +210,26 @@ export function formatLineItemsForQuote(lineItems) {
     let counter = 0;
 
     for (const item of lineItems || []) {
-        // Support both Wix format and Payload format
-        const productName = item.productName || { original: item.name || '' };
-        const price = item.price?.amount !== undefined ? item.price : { amount: item.price || 0 };
+        const name = item.name || '';
+        const price = item.price || 0;
         const quantity = item.quantity || 1;
-        // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
-        const rawDescriptionLines = item.descriptionLines || item.customTextFieldValues || item.customTextFields || [];
+        const rawDescriptionLines = item.customTextFieldValues || item.customTextFields || [];
         const formattedDescriptionLines = formatDescriptionLines(rawDescriptionLines);
         const productCollection = formattedDescriptionLines.find(x => x.title === "Set")?.value;
         const isTentOrCover = item.itemType === "tent" || item.itemType === "pool_cover" || formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
         if (!productCollection && !isTentOrCover) {
-            formattedCartData.push({
-                id: `${counter++}`,
-                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
-                description: "—",
-                price: typeof price === 'number' ? price : (price.amount || 0),
-                quantity
-            });
+            formattedCartData.push({ id: `${counter++}`, name, description: "—", price, quantity });
             continue;
         }
 
         if (productCollection) {
             const setItems = productCollection.split("; ");
-            formattedCartData.push({
-                id: `${counter++}`,
-                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
-                description: "PRODUCT SET",
-                price: 0,
-                quantity: 1
-            });
+            formattedCartData.push({ id: `${counter++}`, name, description: "PRODUCT SET", price: 0, quantity: 1 });
 
             for (const setItem of setItems) {
                 const [setName, size, setPrice, setQuantity] = setItem.split("~").map(v => v.trim());
-                const nameStr = typeof productName === 'string' ? productName : (productName.original || productName.translated || '');
-                const description = size && size !== "—" ? `${size} | SET OF ${nameStr}` : `SET OF ${nameStr}`;
+                const description = size && size !== "—" ? `${size} | SET OF ${name}` : `SET OF ${name}`;
                 const existing = formattedCartData.find(i => i.name === `${setName} - ` && i.description === description);
 
                 if (existing) {
@@ -323,9 +249,9 @@ export function formatLineItemsForQuote(lineItems) {
         if (isTentOrCover) {
             formattedCartData.push({
                 id: `${counter++}`,
-                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
+                name,
                 description: generateDescriptionForQuote(formattedDescriptionLines, isTentOrCover),
-                price: typeof price === 'number' ? price : (price.amount || 0),
+                price,
                 quantity
             });
         }
@@ -512,9 +438,9 @@ export const resolveProductMediaUrl = (media) => {
         : media?.src || media?.url || media?.media?.url || media?.mainMedia?.url || media?.mainMedia;
 
     if (!source) return "";
-    if (/^(https?:)?\/\//.test(source) || source.startsWith("wix:")) return source;
+    if (/^https?:\/\//.test(source)) return source;
 
-    return `${CORE_API_BASE_URL}${source}`;
+    return `${CORE_API_BASE_URL.replace(/\/$/, "")}${source}`;
 };
 
 const normalizeAdditionalInfoSections = (sections = []) => {
@@ -566,20 +492,18 @@ const buildCollectionBreadcrumbs = (collections = []) => {
 export const normalizeProductForDisplay = (product = {}) => {
     const title = product?.name || product?.title || "";
     const id = product?._id || product?.id || "";
-    const price = Number(product?.price?.amount ?? product?.price ?? 0) || 0;
-    const compareAtPrice = Number(product?.compareAtPrice?.amount ?? product?.compareAtPrice ?? 0) || 0;
+    const price = Number(product?.price ?? 0) || 0;
+    const compareAtPrice = Number(product?.compareAtPrice ?? 0) || 0;
     const additionalInfoSections = normalizeAdditionalInfoSections(product?.additionalInfoSections || []);
     const descriptionHtml = richTextToHTML(product?.description);
     const descriptionText = richTextToPlainText(product?.description);
     const rawMediaItems = Array.isArray(product?.mediaItems) ? product.mediaItems : [];
 
-    // Build gallery slides: new Payload shape is flat { id, alt, url, ... };
-    // legacy Wix shape was nested { media: { url, alt }, altText, isFeatured }.
     const mediaItems = rawMediaItems
         .map((item, index) => ({
-            id: item?.id || item?.media?.id || `${id || title}-media-${index}`,
+            id: item?.id || `${id || title}-media-${index}`,
             src: resolveProductMediaUrl(item),
-            alt: item?.alt || item?.altText || item?.media?.alt || title || `Product image ${index + 1}`,
+            alt: item?.alt || title || `Product image ${index + 1}`,
         }))
         .filter((item) => item.src);
 

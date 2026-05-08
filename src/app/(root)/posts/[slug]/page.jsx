@@ -25,8 +25,8 @@ export const generateMetadata = async ({ params }) => {
 
 export const generateStaticParams = async () => {
   try {
-    // const blogData = await fetchBlogs();
-    const blogData = [];
+    const blogData = await fetchBlogs();
+    // const blogData = [];
     const paths = blogData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
     return paths;
   } catch (error) {
@@ -40,8 +40,12 @@ export default async function Page({ params }) {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchPostPageData(slug);
 
+    if (!data?.blog) return notFound();
+
+    const { blog, otherBlogs, pageDetails } = data;
+
     return (
-      <BlogDetails data={data} />
+      <BlogDetails data={{ blog, otherBlogs, ...pageDetails }} />
     );
   } catch (error) {
     logError("Error fetching category page data:", error);

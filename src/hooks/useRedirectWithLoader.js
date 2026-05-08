@@ -11,9 +11,11 @@ const useRedirectWithLoader = () => {
       document.body.classList.remove('overflow-hidden');
     }
     
-    if (pathname === slug && ignoreSamePath) {
-      loaderActions.show();
-      setTimeout(() => loaderActions.hide(), 900);
+    if (pathname === slug) {
+      if (ignoreSamePath) {
+        loaderActions.show();
+        setTimeout(() => loaderActions.hide(), 900);
+      }
     } else {
       loaderActions.show();
       router.push(slug);
