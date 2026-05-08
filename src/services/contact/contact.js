@@ -16,7 +16,7 @@ const fallbackContactFormData = {
 export const fetchContactPageData = async () => {
     try {
         const [storefrontFooter, contactSection] = await Promise.all([
-            queryStorefrontFooter({ channel: "hensley", key: "default" }),
+            queryStorefrontFooter({ channel: "her", key: "default" }),
             querySection('contact-form-labels'),
         ]);
         const footerBranches = mapStorefrontFooterBranches(storefrontFooter);

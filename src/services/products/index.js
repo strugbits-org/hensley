@@ -5,6 +5,7 @@ import { getProductsCart } from "../cart/CartApis";
 import { fetchOurCategoriesData } from "..";
 import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProject, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload } from "../payloadCollections";
 
+
 const baseUrl = process.env.BASE_URL;
 
 export const fetchProductsByCategory = async (id) => {
@@ -209,12 +210,14 @@ export const fetchProductPageData = async (slug) => {
             featuredProjectsData,
             matchedProducts,
             pageDetails,
-            ourCategoriesData
+            ourCategoriesData,
+            allCollections,
         ] = await Promise.all([
             fetchFeaturedProjects(coreProductData.id || coreProductData._id),
             fetchMatchedProductsForProduct({ payloadProduct: coreProductData }),
             fetchProductPageDetails(),
-            fetchOurCategoriesData()
+            fetchOurCategoriesData(),
+            queryProductCollections(),
         ]);
 
         // Use Payload bundle items for collection data
@@ -232,7 +235,8 @@ export const fetchProductPageData = async (slug) => {
             featuredProjectsData,
             matchedProducts,
             pageDetails,
-            ourCategoriesData
+            ourCategoriesData,
+            allCollections: Array.isArray(allCollections) ? allCollections : [],
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);

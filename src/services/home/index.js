@@ -1,7 +1,7 @@
 "use server";
 
 import { logError } from "@/utils";
-import { querySection, sectionToObject } from "@/services/payloadCollections";
+import { querySection, queryProductCollections, sectionToObject } from "@/services/payloadCollections";
 import { fetchBannerData, fetchBestSellers, fetchBlogsData, fetchHomePageDetails, fetchMarketsData, fetchOurCategoriesData, fetchPortfolioData, fetchTestimonials } from "..";
 
 export const fetchHomePageData = async () => {
@@ -15,7 +15,8 @@ export const fetchHomePageData = async () => {
       bestSellers,
       testimonials,
       marketsData,
-      blogsData
+      blogsData,
+      allCollections,
     ] = await Promise.all([
       fetchBannerData(),
       querySection('home-hero'),
@@ -26,6 +27,7 @@ export const fetchHomePageData = async () => {
       fetchTestimonials(),
       fetchMarketsData(),
       fetchBlogsData(),
+      queryProductCollections(),
     ]);
 
     const heroSectionData = sectionToObject(heroSection);
@@ -43,7 +45,8 @@ export const fetchHomePageData = async () => {
       bestSellers,
       testimonials,
       marketsData,
-      blogsData
+      blogsData,
+      allCollections: Array.isArray(allCollections) ? allCollections : [],
     };
 
     return response;

@@ -11,6 +11,7 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
 import { checkProductInCart } from '@/services/products';
 import { BreadCrumbs } from '../common/BreadCrumbs';
+import { ProductBadge, resolveProductRibbon } from '../common/ProductBadge';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -51,7 +52,7 @@ export const QuantityControls = ({ quantity, onQuantityChange }) => (
   </div>
 );
 
-export const Product = ({ data, matchedProducts = [] }) => {
+export const Product = ({ data, matchedProducts = [], allCollections = [] }) => {
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
   const [productSetItems, setProductSetItems] = useState([]);
@@ -63,6 +64,7 @@ export const Product = ({ data, matchedProducts = [] }) => {
 
   const { productData, productCollectionData } = data;
   const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
+  const ribbon = resolveProductRibbon(productData?.product, allCollections);
 
   const isProductCollection = productData?.isProductCollection || false;
 
@@ -297,6 +299,13 @@ export const Product = ({ data, matchedProducts = [] }) => {
             <BreadCrumbs items={breadcrumbItems} />
           </div>
 
+          {ribbon && (
+            <div className='mb-3'>
+              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full'>
+                {ribbon}
+              </span>
+            </div>
+          )}
           <h1 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[15px] lg:mb-[28px] sm:mt-[9px] sm:mb-[9px]'>
             {product.name}
           </h1>

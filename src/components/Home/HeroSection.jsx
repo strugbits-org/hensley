@@ -4,7 +4,7 @@ import { PrimaryButton } from "../common/PrimaryButton"
 export const HeroSection = ({ data }) => {
    
     const { title, subTitle, estd, backgroundVideo, buttonLabel, buttonAction } = data;
-    const videoSrc = process.env.CORE_API_BASE_URL + backgroundVideo.url;    
+    const videoSrc = backgroundVideo?.url ? (process.env.CORE_API_BASE_URL + backgroundVideo.url) : null;
 
     return (
         <div className="relative h-screen isolate pt-24 lg:pt-40 px-6 lg:px-8 flex items-center">

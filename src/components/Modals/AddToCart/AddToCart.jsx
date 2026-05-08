@@ -10,6 +10,7 @@ import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
 import Loading from '@/app/loading'
 import { checkProductInCart, fetchProductCollectionData } from '@/services/products'
+import { resolveProductRibbon } from '@/components/common/ProductBadge'
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -19,9 +20,10 @@ const INFO_HEADERS = [
 ];
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const AddToCart = ({ data, onClose }) => {
+const AddToCart = ({ data, onClose, allCollections = [] }) => {
   const { productData } = data;
   const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
+  const ribbon = resolveProductRibbon(productData?.product, allCollections);
   
   // Initial detection for collection/bundle products
   // - isProductCollection: legacy Wix collection flag
@@ -273,13 +275,20 @@ const AddToCart = ({ data, onClose }) => {
   }, [product._id, product.id]);
 
   return (
-    <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
+    <div className='relative sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
       {isLoadingCollections && (
         <div className='absolute inset-x-4 inset-y-0 bg-secondary-alt opacity-30 z-[999] flex justify-center items-center'>
           <Loading custom={true} classes='absolute' />
         </div>
       )}
-      <AddToCartSlider data={{ ...productData, product }} isOpen={data.open} />
+      <div className='relative sm:max-w-[45%] w-full sm:h-full flex-shrink-0'>
+        <AddToCartSlider data={{ ...productData, product }} isOpen={data.open} noWidthConstraint />
+        {ribbon && (
+          <span className='absolute top-3 left-3 z-20 bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full pointer-events-none'>
+            {ribbon}
+          </span>
+        )}
+      </div>
       <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative'>
         <div className='w-full flex flex-col  gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
           <div className='w-full flex justify-between relative '>

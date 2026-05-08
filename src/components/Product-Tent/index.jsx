@@ -7,9 +7,11 @@ import { AddToQuoteForm } from './AddToQuoteForm';
 import { SaveProductButton } from '../common/SaveProductButton';
 import ProductSlider_tab from '../Product/ProductSlider_tab';
 import { DownloadButton } from '../common/DownloadButton';
+import { resolveProductRibbon } from '../common/ProductBadge';
 
-const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [] }) => {
+const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [], allCollections = [] }) => {
   const { tent, gallery = [] } = productData;
+  const ribbon = resolveProductRibbon(tent, allCollections);
 
   // Build a slider-compatible product object from the tent data
   const sliderProduct = {
@@ -26,6 +28,13 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [] 
           <ProductSlider_tab product={sliderProduct} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
+          {ribbon && (
+            <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px]'>
+              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full'>
+                {ribbon}
+              </span>
+            </div>
+          )}
           <AddToQuoteForm title={productData?.title} productData={tent} matchedProducts={matchedProducts} />
           <SaveProductButton
             key={productData._id}

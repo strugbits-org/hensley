@@ -11,10 +11,7 @@ import Loading from "@/app/loading";
 
 export default function SliderComponent({ data = [], classes = "", pageDetails = {}, loop = false }) {
   const sliderData = Array.isArray(data) ? data : [];
-  const { ourProjectsTitle } = pageDetails ?? {};
-
-  console.log("pageDetails", pageDetails);
-  
+  const { ourProjectsTitle } = pageDetails ?? {};  
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSliderReady, setIsSliderReady] = useState(false);

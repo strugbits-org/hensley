@@ -555,7 +555,7 @@ export const mapStorefrontFooterBranches = (footer = {}) => {
     );
 };
 
-export const queryStorefrontFooter = async ({ channel = "hensley", key = "default" } = {}) => {
+export const queryStorefrontFooter = async ({ channel = "her", key = "default" } = {}) => {
     try {
         if (!CORE_API_BASE_URL) {
             throw new Error("CORE_API_BASE_URL is not configured");

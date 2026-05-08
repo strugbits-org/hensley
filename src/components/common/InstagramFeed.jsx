@@ -25,7 +25,7 @@ const privateRoutes = [
   "product-sorting"
 ];
 
-function InstagramFeed({ data, details }) {  
+function InstagramFeed({ data, details }) {
 
   const { instaFeedHeading, instaFeedTitle, instaFeedIcon, instaFeedButtonLabel, instaFeedButtonAction } = details;
   const [isSliderReady, setIsSliderReady] = useState(false);

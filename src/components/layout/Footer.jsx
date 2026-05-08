@@ -1,4 +1,3 @@
-import logo from '@/assets/logo-footer.png';
 import facebookIcon from '@/assets/icons/facebook.png';
 import instagramIcon from '@/assets/icons/instagram.png';
 import linkedinIcon from '@/assets/icons/linkedin.png';

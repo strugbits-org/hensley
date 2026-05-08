@@ -5,6 +5,7 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { CustomLink } from './CustomLink';
 import { actions } from '@/store';
 import Image from 'next/image';
+import { ProductBadge, resolveProductRibbon } from './ProductBadge';
 
 const CORE_API_BASE_URL = process.env.NEXT_PUBLIC_CORE_API_BASE_URL || process.env.CORE_API_BASE_URL;
 
@@ -39,10 +40,11 @@ const resolveImageUrl = (product) => {
     return null;
 };
 
-function SecondaryProductCard({ data, type = 'listing' }) {
+function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
     const { product } = data;
     const { name } = product;
     const imageUrl = resolveImageUrl(product);
+    const ribbon = resolveProductRibbon(product, allCollections);
 
     const handleAddToCart = () => {
         const isTent = actions.isTentProduct(product);
@@ -50,6 +52,7 @@ function SecondaryProductCard({ data, type = 'listing' }) {
     };
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-[5px] pb-0 justify-between h-full ${type !== 'listing' ? 'bg-white col-span-1.5 md:col-span-2' : ''}`}>
+            <ProductBadge ribbon={ribbon} />
             <CustomLink to={`/product/${product.slug}`} className={`h-full overflow-hidden flex justify-center items-center p-4  ${type === 'listing' ? 'bg-white' : ''}`}>
                 {imageUrl ? (
                     imageUrl.startsWith('wix:') ? (

@@ -28,12 +28,6 @@ const EventHighLight = ({ data }) => {
                     <span className='uppercase text-secondary-alt lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[32px] text-[25px] leading-[23px] font-recklessRegular block '>
                         {portfolioRef.title}
                     </span>
-                    {client && (
-                        <span className='font-haasRegular uppercase text-[14px] text-secondary-alt block'>For {client}</span>
-                    )}
-                    {location && (
-                        <span className='font-haasRegular uppercase text-[14px] text-secondary-alt block'>{location}</span>
-                    )}
                     <span className='font-haasRegular uppercase text-[18px] text-secondary-alt lg:hidden mt-[39px] mb-[20px] block'>{displayDate}</span>
                 </div>
                 <div className='lg:w-1/2 text-left flex flex-col lg:gap-y-[15px] '>

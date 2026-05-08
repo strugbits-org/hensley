@@ -8,7 +8,7 @@ import { useKeenSlider } from 'keen-slider/react'
 import MatchedProductCard from './MatchedProductCard';
 import Loading from '@/app/loading';
 
-export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false }) => {
+export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false, allCollections = [] }) => {
     const { matchProductsTitle } = pageDetails;
     const [isSliderReady, setIsSliderReady] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
@@ -68,6 +68,7 @@ export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center
                                 <MatchedProductCard
                                     type='slider'
                                     data={productData}
+                                    allCollections={allCollections}
                                 />
                             </div>
                         );

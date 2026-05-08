@@ -1,6 +1,7 @@
 import SearchResult from "@/components/SearchResult";
 import { fetchPageMetaData } from "@/services";
 import { fetchSearchPageDetails } from "@/services/search";
+import { queryProductCollections } from "@/services/payloadCollections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -20,15 +21,17 @@ export async function generateMetadata() {
 
 export default async function Page() {
   try {
-    
-    const response = await fetchSearchPageDetails();
+    const [response, allCollections] = await Promise.all([
+      fetchSearchPageDetails(),
+      queryProductCollections().catch(() => []),
+    ]);
     const {searchPageDetails} = response;
 
     return (
       <>
         <div className='h-[130px] hidden lg:block'></div>
         <Suspense>
-          <SearchResult pageDetails={searchPageDetails}/>
+          <SearchResult pageDetails={searchPageDetails} allCollections={allCollections} />
         </Suspense>
       </>
     );

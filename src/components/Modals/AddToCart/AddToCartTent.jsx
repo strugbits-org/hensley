@@ -3,8 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteFormInline } from '@/components/Product-Tent/AddToQuoteFormInline'
 import { normalizeProductForDisplay } from '@/utils'
+import { resolveProductRibbon } from '@/components/common/ProductBadge'
 
-const AddToCartTent = ({ data, onClose }) => {
+const AddToCartTent = ({ data, onClose, allCollections = [] }) => {
   const { productData } = data;
   const [hydratedTentProduct, setHydratedTentProduct] = useState(null);
 
@@ -92,11 +93,23 @@ const AddToCartTent = ({ data, onClose }) => {
 
   const tentProduct = hydratedTentProduct || baseTentProduct;
 
+  // Resolve ribbon from the original raw product data (before hydration may strip it),
+  // falling back to whatever is on tentProduct itself.
+  const rawSourceProduct = productData?.product || productData?.tent || productData?.productData || productData || {};
+  const ribbon = resolveProductRibbon(rawSourceProduct, allCollections) || resolveProductRibbon(tentProduct, allCollections);
+
   const sliderData = useMemo(() => ({ product: tentProduct }), [tentProduct]);
 
   return (
     <div className='relative w-full sm:w-[850px] h-[700px] sm:h-[450px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999] box-border'>
-      <AddToCartSlider data={sliderData} isOpen={data.open} isTent={true} />
+      <div className='relative sm:max-w-[45%] w-full flex-shrink-0 h-auto'>
+        <AddToCartSlider data={sliderData} isOpen={data.open} isTent={true} noWidthConstraint />
+        {ribbon && (
+          <span className='absolute top-3 left-3 z-20 bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full pointer-events-none'>
+            {ribbon}
+          </span>
+        )}
+      </div>
       <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] overflow-y-auto hide-scrollbar'>
         <AddToQuoteFormInline title={productData?.title || tentProduct?.title} productData={tentProduct} />
       </div>

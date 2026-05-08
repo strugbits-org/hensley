@@ -8,7 +8,7 @@ import { useSnapshot } from 'valtio';
 import { logError } from '@/utils';
 import React, { useEffect, useState } from 'react'
 
-function SavedProducts() {
+function SavedProducts({ allCollections = [] }) {
     const pageSize = 5;
     const { savedProducts } = useSnapshot(states);
     const [pageLimit, setPageLimit] = useState(pageSize);
@@ -70,6 +70,7 @@ function SavedProducts() {
                                     key={productData._id}
                                     data={productData}
                                     type="listing"
+                                    allCollections={allCollections}
                                 />
                             );
                         })

@@ -11,11 +11,12 @@ export const fetchsubCategoriesPageDetails = async () => {
 
 export const fetchSelectedCategoryData = async (slug) => {
     try {
-        const [ourCategoriesData, categoriesSortData, productBannersData, pageDetails] = await Promise.all([
+        const [ourCategoriesData, categoriesSortData, productBannersData, pageDetails, allCollections] = await Promise.all([
             fetchOurCategoriesData(),
             fetchCategoriesSortStructure(),
             fetchProductBannersData(),
-            fetchsubCategoriesPageDetails()
+            fetchsubCategoriesPageDetails(),
+            queryProductCollections(),
         ]);
 
         // const selectedCategory = categoriesData.find(category => category.slug === slug);
@@ -63,7 +64,8 @@ export const fetchSelectedCategoryData = async (slug) => {
             collectionIds,
             sortIndex,
             sortedProducts,
-            pageDetails
+            pageDetails,
+            allCollections: Array.isArray(allCollections) ? allCollections : [],
         }
 
         return data;

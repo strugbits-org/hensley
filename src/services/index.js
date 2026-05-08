@@ -303,7 +303,8 @@ const mapStorefrontFooterToLayoutData = (footer) => {
 
 export const fetchFooterData = async () => {
   try {
-    const storefrontFooter = await queryStorefrontFooter({ channel: "hensley", key: "default" });
+    const storefrontFooter = await queryStorefrontFooter({ channel: "her", key: "default" });
+    
     if (!storefrontFooter) throw new Error("Footer not found in bps-core");
     return mapStorefrontFooterToLayoutData(storefrontFooter);
   } catch (error) {

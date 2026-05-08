@@ -28,7 +28,7 @@ const useDebounce = (callback, delay) => {
 };
 
 function Listing({ data }) {
-  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData } = data;
+  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, allCollections = [] } = data;
   let bannerIndex = -1;
   const pageSize = 16;
 
@@ -179,6 +179,7 @@ function Listing({ data }) {
                     <ProductCard
                       key={productData._id}
                       data={productData}
+                      allCollections={allCollections}
                     />
                   </li>
                   {(shouldInsertBanner || forceInsertBanner) && (
