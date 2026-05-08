@@ -4,6 +4,8 @@ import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
 import { generateImageURL } from '@/utils/generateImageURL';
 
 const EventHighLight = ({ data }) => {
+    console.log("data", data);
+    
     const { author, blogRef, markets, studios } = data;
     const imageURL = generateImageURL({ wix_url: blogRef.coverImage }) || "";
     
@@ -18,7 +20,7 @@ const EventHighLight = ({ data }) => {
     return (
         <div className='px-[24px] w-full'>
             <div className='w-full border-b py-[24px]'>
-                <div className='w-full h-[609px] bg-no-repeat bg-center' style={{ backgroundImage: `url(${imageURL})` }}></div>
+                <div className='w-full h-[609px] bg-no-repeat bg-cover bg-center' style={{ backgroundImage: `url("${imageURL}")` }}></div>
             </div>
             <div className='flex lg:flex-row flex-col gap-x-[182px] lg:px-0 sm:px-[70px] px-[20px] py-[40px] justify-between relative'>
                 <div className='lg:w-1/2 flex flex-col gap-y-[15px]'>

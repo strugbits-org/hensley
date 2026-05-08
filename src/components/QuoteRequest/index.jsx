@@ -151,11 +151,6 @@ export const QuoteRequest = ({ content, data = "" }) => {
   // Build full name from available data
   const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
 
-  // Debug logs
-  console.log('[QuoteRequest] useUserData:', { firstName, lastName, email, phone, memberId });
-  console.log('[QuoteRequest] isLoggedIn:', isLoggedIn);
-  console.log('[QuoteRequest] fullName:', fullName);
-
   const {
     register,
     handleSubmit,
@@ -313,18 +308,6 @@ export const QuoteRequest = ({ content, data = "" }) => {
     // Email should be read-only for logged-in users
     const isEmailField = fieldId === 'email';
     const shouldBeReadOnly = isEmailField && isLoggedIn;
-
-    // Debug log for email field
-    if (isEmailField) {
-      console.log('[QuoteRequest] Email field render:', { 
-        fieldId, 
-        isEmailField, 
-        isLoggedIn, 
-        shouldBeReadOnly,
-        configReadOnly: config.readOnly,
-        finalReadOnly: config.readOnly || shouldBeReadOnly
-      });
-    }
 
     return (
       <div key={fieldId} className={gridClass}>

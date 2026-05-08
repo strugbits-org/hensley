@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { fetchAllTents, fetchTentData } from "@/services/tents";
 import { logError } from "@/utils";
 
+export const dynamic = "force-dynamic";
+
 export const GET = async (req) => {
   try {
     const { searchParams } = new URL(req.url);

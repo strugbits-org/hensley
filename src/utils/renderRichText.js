@@ -1,5 +1,5 @@
 import parse from 'html-react-parser';
-import { generateImageURLById, generateVideoURL } from './generateImageURL';
+import { generateImageURL, generateImageURLById, generateVideoURL } from './generateImageURL';
 
 // --- Lexical (Payload CMS) → Wix Rich Text Adapter ---
 
@@ -141,6 +141,84 @@ const convertLexicalNode = (node) => {
                     containerData: { alignment: 'CENTER' },
                 },
             };
+        }
+
+        case 'block': {
+            const { blockType, ...fields } = node.fields || {};
+
+            if (blockType === 'mediaBlock' && fields.media) {
+                const media = fields.media;
+                const mediaUrl = media.url || media.sizes?.tablet?.url || media.sizes?.card?.url || '';
+                return {
+                    type: 'IMAGE',
+                    id,
+                    imageData: {
+                        image: {
+                            src: { url: mediaUrl, id: mediaUrl },
+                            width: media.width,
+                            height: media.height,
+                        },
+                        altText: media.alt || '',
+                        caption: fields.caption || '',
+                        containerData: { alignment: 'CENTER' },
+                    },
+                };
+            }
+
+            if (blockType === 'galleryBlock' && Array.isArray(fields.images)) {
+                return {
+                    type: 'GALLERY_BLOCK',
+                    id,
+                    galleryBlockData: {
+                        images: fields.images.map((item) => {
+                            const img = item.image || {};
+                            return {
+                                url: img.url || img.sizes?.tablet?.url || img.sizes?.card?.url || '',
+                                width: img.width,
+                                height: img.height,
+                                alt: img.alt || '',
+                                caption: item.caption || '',
+                            };
+                        }),
+                        layout: fields.layout || 'grid',
+                        columns: parseInt(fields.columns || '3', 10),
+                    },
+                };
+            }
+
+            if (blockType === 'sliderBlock' && Array.isArray(fields.slides)) {
+                return {
+                    type: 'SLIDER_BLOCK',
+                    id,
+                    sliderBlockData: {
+                        slides: fields.slides.map((slide) => {
+                            const img = slide.image || {};
+                            return {
+                                url: img.url || img.sizes?.tablet?.url || img.sizes?.card?.url || '',
+                                width: img.width,
+                                height: img.height,
+                                alt: img.alt || '',
+                                caption: slide.caption || '',
+                                link: slide.link || '',
+                            };
+                        }),
+                        autoplay: fields.autoplay || false,
+                    },
+                };
+            }
+
+            if (blockType === 'bannerBlock' && fields.content) {
+                return {
+                    type: 'BANNER_BLOCK',
+                    id,
+                    bannerBlockData: {
+                        style: fields.style || 'info',
+                        nodes: convertLexicalToWixNodes(fields.content),
+                    },
+                };
+            }
+
+            return null;
         }
 
         default:
@@ -584,7 +662,10 @@ export const convertToHTMLRichContent = ({
         else if (node.type === 'IMAGE') {
             const imageData = node.imageData;
             const image = imageData.image;
-            const imageSrc = generateImageURLById({ id: image.src?.url || image.src.id });
+            const rawSrc = image.src?.url || image.src?.id || '';
+            const imageSrc = rawSrc.startsWith('/api/media/')
+                ? generateImageURL({ wix_url: rawSrc })
+                : generateImageURLById({ id: rawSrc });
 
             // Build image attributes
             const width = image.width ? `width="${image.width}"` : '';
@@ -594,6 +675,7 @@ export const convertToHTMLRichContent = ({
 
             html += `<div className="image-container ${class_image_container}" style="text-align: ${alignment};">`;
             html += `<img className="${class_image}" src="${imageSrc}" ${altText} ${width} ${height} />`;
+            if (imageData.caption) html += `<p class="text-xs text-center mt-1 text-secondary-alt font-haasRegular">${imageData.caption}</p>`;
             html += '</div>';
         }
         else if (node.type === 'GALLERY') {
@@ -622,6 +704,62 @@ export const convertToHTMLRichContent = ({
             html += `</div>`;
             html += `</div>`;
             html += `</div>`;
+            html += `</div>`;
+        }
+        else if (node.type === 'GALLERY_BLOCK') {
+            const { images, layout, columns } = node.galleryBlockData;
+            const colClass = `grid-cols-${columns}`;
+            html += `<div class="gallery-block-container w-full my-6">`;
+            html += `<div class="grid ${colClass} gap-4">`;
+            images.forEach(img => {
+                const src = img.url.startsWith('/api/media/')
+                    ? generateImageURL({ wix_url: img.url })
+                    : generateImageURLById({ id: img.url });
+                const altAttr = img.alt ? `alt="${img.alt}"` : '';
+                html += `<div class="gallery-block-item">`;
+                html += `<img class="${class_image} w-full h-auto object-cover" src="${src}" ${altAttr} />`;
+                if (img.caption) html += `<p class="text-xs text-center mt-1 text-secondary-alt font-haasRegular">${img.caption}</p>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+            html += `</div>`;
+        }
+        else if (node.type === 'SLIDER_BLOCK') {
+            const { slides } = node.sliderBlockData;
+            html += `<div class="slider-block-container w-full my-6 overflow-x-auto">`;
+            html += `<div class="flex gap-4">`;
+            slides.forEach(slide => {
+                const src = slide.url.startsWith('/api/media/')
+                    ? generateImageURL({ wix_url: slide.url })
+                    : generateImageURLById({ id: slide.url });
+                const altAttr = slide.alt ? `alt="${slide.alt}"` : '';
+                const wrapper = slide.link ? `<a href="${slide.link}" target="_blank" rel="noopener noreferrer">` : '';
+                const wrapperClose = slide.link ? `</a>` : '';
+                html += `<div class="slider-block-slide flex-shrink-0">`;
+                html += wrapper;
+                html += `<img class="${class_image} w-full h-auto object-cover" src="${src}" ${altAttr} />`;
+                html += wrapperClose;
+                if (slide.caption) html += `<p class="text-xs text-center mt-1 text-secondary-alt font-haasRegular">${slide.caption}</p>`;
+                html += `</div>`;
+            });
+            html += `</div>`;
+            html += `</div>`;
+        }
+        else if (node.type === 'BANNER_BLOCK') {
+            const { style, nodes: bannerNodes } = node.bannerBlockData;
+            const bannerColors = {
+                info: 'bg-blue-50 border-blue-400 text-blue-800',
+                warning: 'bg-yellow-50 border-yellow-400 text-yellow-800',
+                error: 'bg-red-50 border-red-400 text-red-800',
+                success: 'bg-green-50 border-green-400 text-green-800',
+            };
+            const colorClass = bannerColors[style] || bannerColors.info;
+            html += `<div class="banner-block border-l-4 px-4 py-3 my-4 ${colorClass}">`;
+            bannerNodes.forEach(bannerNode => {
+                if (bannerNode.type === 'PARAGRAPH' && bannerNode.nodes.length > 0) {
+                    html += `<p>${processTextNodes(bannerNode.nodes)}</p>`;
+                }
+            });
             html += `</div>`;
         }
 

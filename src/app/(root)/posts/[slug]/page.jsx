@@ -25,7 +25,8 @@ export const generateMetadata = async ({ params }) => {
 
 export const generateStaticParams = async () => {
   try {
-    const blogData = await fetchBlogs();
+    // const blogData = await fetchBlogs();
+    const blogData = [];
     const paths = blogData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
     return paths;
   } catch (error) {
