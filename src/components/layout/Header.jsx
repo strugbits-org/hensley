@@ -26,9 +26,12 @@ const userMenu = [
     { icon: cartIcon, slug: '/cart', type: 'cart' },
 ];
 
-export const Header = ({ data, marketsData, tentsData }) => {
+export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
+    const { header = [], headerSubMenu = [], headerMegaMenu = [] } = data || {};
+    const defaultActiveMenu = header[0]?.title || "RENTALS";
+
     const [cookies, setCookie, removeCookie] = useCookies(["cartQuantity", "authToken"]);
-    const [activeMenu, setActiveMenu] = useState("RENTALS");
+    const [activeMenu, setActiveMenu] = useState(defaultActiveMenu);
     const [subNavigation, setSubNavigation] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState(false);
     const [searchModal, setSearchModal] = useState(false);
@@ -39,14 +42,73 @@ export const Header = ({ data, marketsData, tentsData }) => {
     const router = useRouter();
 
     const [activeSubMenuItem, setActiveSubMenuItem] = useState({});
-
-    const { header, headerSubMenu, headerMegaMenu } = data;
     const redirectWithLoader = useRedirectWithLoader();
 
     useEffect(() => {
         const quantity = cookies?.cartQuantity !== undefined ? String(cookies.cartQuantity) : "0";
         setCartTotalQuantity(quantity);
     }, [cookies.cartQuantity]);
+
+    const getMenuUrl = (item) => item?.slug || item?.href || item?.url || "";
+
+    const isMarketsMenu = (item) => item?.type === "markets" || String(item?.title || "").toUpperCase() === "MARKETS";
+    const isTentsMenu = (item) => item?.type === "tents" || /(^|\b)tents?(\b|$)/i.test(String(item?.title || ""));
+
+    const getSubItemsForMenu = (menuItem) => {
+        if (!menuItem) return [];
+
+        if (Array.isArray(menuItem.children) && menuItem.children.length) {
+            return sortByOrderNumber(menuItem.children);
+        }
+
+        return sortByOrderNumber(
+            headerSubMenu.filter(item => item.Header_menuItems?.some(subItem => subItem._id === menuItem?._id))
+        );
+    };
+
+    const getNestedItemsForSubMenu = (item) => {
+        if (!item) return [];
+
+        if (Array.isArray(item.data) && item.data.length) {
+            return sortByOrderNumber(item.data);
+        }
+
+        if (Array.isArray(item.children) && item.children.length) {
+            return sortByOrderNumber(item.children);
+        }
+
+        return sortByOrderNumber(
+            headerMegaMenu.filter(x => x.HeaderSubMenu_categories?.some(y => y._id === item?._id))
+        );
+    };
+
+    const runMenuAction = (item, isMobile = false) => {
+        if (!item) return false;
+
+        const destination = getMenuUrl(item);
+
+        if (item.type === "lightbox" && item.lightbox) {
+            lightboxActions.showLightBox(item.lightbox);
+            if (isMobile && isMobileMenuOpen) toggleMobileMenu();
+            return true;
+        }
+
+        if ((item.type === "external" || item.target === "_blank") && destination) {
+            if (typeof window !== 'undefined') {
+                window.open(destination, item.target || "_blank", "noopener,noreferrer");
+            }
+            if (isMobile && isMobileMenuOpen) toggleMobileMenu();
+            return true;
+        }
+
+        if ((item.type === "slug" || item.type === "internal" || (item?.useSlugForMobile && isMobile)) && destination) {
+            redirectWithLoader(destination);
+            if (isMobile && isMobileMenuOpen) toggleMobileMenu();
+            return true;
+        }
+
+        return false;
+    };
 
     const handleClickUserMenu = (item, isMobile) => {
         if (item.type === 'search') {
@@ -67,38 +129,54 @@ export const Header = ({ data, marketsData, tentsData }) => {
         toggleMobileMenu();
     }
 
-    const handleMainMenuClick = (item) => {
+    const handleMainMenuClick = (item, isMobile = false) => {
         setSelectedMenu(false);
         setSearchModal(false);
-        setActiveMenu(false);
-        setTimeout(() => {
-            setActiveMenu(item.title);
-        }, 50);
+
+        const nextSubNavigation = getSubItemsForMenu(item);
+        const itemIsMarkets = isMarketsMenu(item);
+        const itemIsTents = isTentsMenu(item);
+
+        if (!nextSubNavigation.length && !itemIsMarkets && !itemIsTents && item?.type !== "submenu") {
+            if (runMenuAction(item, isMobile)) return;
+        }
+
+        setActiveMenu(item?.title || defaultActiveMenu);
     }
 
     const handleSubMenuClick = (item, isMobile = false) => {
         setSearchModal(false);
-        const currentSubMenu = headerMegaMenu.filter(x => x.HeaderSubMenu_categories.some(y => y._id === item._id));
-        const newMenu = {
-            title: item.title,
-            type: item.type,
-            data: item.type !== 'tents' ? sortByOrderNumber(currentSubMenu) : sortByOrderNumber(tentsData)
-        };
 
-        if (selectedMenu) {
-            setSelectedMenu(false);
-            setTimeout(() => {
+        const itemIsTents = isTentsMenu(item);
+        const itemIsMarkets = isMarketsMenu(item);
+
+        const nestedData = itemIsTents
+            ? sortByOrderNumber(tentsData)
+            : itemIsMarkets
+                ? sortByOrderNumber(marketsData)
+                : getNestedItemsForSubMenu(item);
+
+        const shouldOpenNestedMenu = item?.type === 'submenu' || itemIsTents || itemIsMarkets || nestedData.length > 0;
+
+        if (shouldOpenNestedMenu) {
+            const newMenu = {
+                title: item.title,
+                type: itemIsMarkets ? 'markets' : itemIsTents ? 'tents' : 'submenu',
+                data: nestedData,
+            };
+
+            if (selectedMenu) {
+                setSelectedMenu(false);
+                setTimeout(() => {
+                    setSelectedMenu(newMenu);
+                }, 50);
+            } else {
                 setSelectedMenu(newMenu);
-            }, 50);
-        } else {
-            setSelectedMenu(newMenu);
+            }
         }
 
-        if (item.type === "slug" || (item?.useSlugForMobile && isMobile)) {
-            redirectWithLoader(item.slug);
-            if (isMobile) toggleMobileMenu();
-        } else if (item.type === "lightbox") {
-            lightboxActions.showLightBox(item.lightbox);
+        if (!itemIsTents && !itemIsMarkets && (item?.type === "slug" || item?.type === "external" || item?.type === "lightbox" || (item?.useSlugForMobile && isMobile))) {
+            runMenuAction(item, isMobile);
         }
     }
 
@@ -116,7 +194,14 @@ export const Header = ({ data, marketsData, tentsData }) => {
     }
 
     useEffect(() => {
-        if (activeMenu === 'MARKETS') {
+        const currentMenu = header.find(item => item.title === activeMenu) || header[0];
+
+        if (!currentMenu) {
+            setSubNavigation([]);
+            return;
+        }
+
+        if (isMarketsMenu(currentMenu)) {
             const marketsNavigation = marketsData.map(item => ({
                 ...item,
                 slug: `/market${item.slug}`,
@@ -125,22 +210,37 @@ export const Header = ({ data, marketsData, tentsData }) => {
             setSubNavigation(sortByOrderNumber(marketsNavigation) || []);
             if (enableMarketModal) {
                 setSelectedMenu({
-                    title: 'MARKETS',
+                    title: currentMenu.title || 'MARKETS',
                     type: 'markets',
                     data: sortByOrderNumber(marketsData)
                 });
             }
+        } else if (isTentsMenu(currentMenu)) {
+            const tentsNavigation = tentsData.map(item => ({
+                ...item,
+                slug: `/tent${item.slug}`,
+                type: 'slug'
+            }));
+            setSubNavigation(sortByOrderNumber(tentsNavigation) || []);
+            if (enableMarketModal) {
+                setSelectedMenu({
+                    title: currentMenu.title || 'TENTS',
+                    type: 'tents',
+                    data: sortByOrderNumber(tentsData)
+                });
+            }
         } else {
-            const currentMenu = header.find(item => item.title === activeMenu);
-            const currentSubMenu = headerSubMenu.filter(item => item.Header_menuItems.some(subItem => subItem._id === currentMenu?._id));
-            if (currentMenu) setSubNavigation(sortByOrderNumber(currentSubMenu));
+            setSubNavigation(getSubItemsForMenu(currentMenu));
         }
-    }, [activeMenu]);
+    }, [activeMenu, enableMarketModal, header, headerSubMenu, marketsData, tentsData]);
 
     const closeAllModals = () => {
         setSearchModal(false);
         setSelectedMenu(false);
         setIsMobileMenuOpen(false);
+        if (typeof window !== 'undefined') {
+            document.body.classList.remove('overflow-hidden');
+        }
     }
 
     const fetchCartItems = async () => {
@@ -166,9 +266,9 @@ export const Header = ({ data, marketsData, tentsData }) => {
         }
     };
 
-    useEffect(() => {
-        fetchCartItems();
-    }, []);
+    // useEffect(() => {
+    //     fetchCartItems();
+    // }, []);
 
     useEffect(() => {
         const findActiveSubMenu = () => {
@@ -190,21 +290,37 @@ export const Header = ({ data, marketsData, tentsData }) => {
         const activeMapping = {
             MARKETS: ["/market"],
             ABOUT: ["/about", "/blog", "/careers", "/contact", "/posts", "/project", "/projects"],
-        }
+        };
         const basePath = '/' + pathname.split('/')[1];
-        const matchedMenu = Object.keys(activeMapping).find(menu =>
+        const matchedFromMenu = header.find(item => {
+            const itemPath = getMenuUrl(item);
+            return itemPath && (itemPath === basePath || itemPath === pathname);
+        })?.title;
+        const matchedMenu = matchedFromMenu || Object.keys(activeMapping).find(menu =>
             activeMapping[menu].includes(basePath)
         );
-        setActiveMenu(matchedMenu ? matchedMenu : "RENTALS");
+
+        setActiveMenu(matchedMenu ? matchedMenu : defaultActiveMenu);
         setTimeout(() => {
             setEnableMarketModal(true);
         }, 100);
-    }, [pathname]);
+    }, [pathname, header, defaultActiveMenu]);
 
     useEffect(() => {
-        const ids = tentsData.map(({ tent }) => tent._id);
+        const ids = Array.from(new Set(
+            (tentsData || [])
+                .flatMap((item) => [
+                    item?._id,
+                    item?.id,
+                    item?.tent?._id,
+                    item?.tent?.id,
+                    item?.productData?._id,
+                    item?.productData?.id,
+                ])
+                .filter(Boolean)
+        ));
         actions.setTentsIds(ids);
-    }, []);
+    }, [tentsData]);
 
     return (
         <>

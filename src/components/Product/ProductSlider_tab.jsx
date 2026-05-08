@@ -9,14 +9,14 @@ const ProductSlider_tab = ({ product }) => {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [loaded, setLoaded] = useState(false)
 
-  const mediaItems = useMemo(() => product?.mediaItems || [], [product?.mediaItems])
+  const mediaItems = useMemo(() => product?.mediaItems || [], [product])
 
   const sliderConfig = useMemo(() => ({
     loop: true,
     slides: {
-      perView: product.length >= 3 ? 2.4 : 2,
+      perView: mediaItems.length >= 3 ? 2.4 : 2,
       spacing: 10,
-      origin: product.length >= 3 ? 'center' : 'auto',
+      origin: mediaItems.length >= 3 ? 'center' : 'auto',
     },
     breakpoints: {
       "(max-width: 768px)": {
@@ -33,7 +33,7 @@ const ProductSlider_tab = ({ product }) => {
     created() {
       setLoaded(true)
     },
-  }), [])
+  }), [mediaItems.length])
 
   const [sliderRef, instanceRef] = useKeenSlider(sliderConfig)
 

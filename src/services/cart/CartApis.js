@@ -1,6 +1,6 @@
 "use server";
 import { AddProductToCartVisitor, getProductsCartVisitor, removeProductFromCartVisitor, updateProductsQuantityCartVisitor } from "./CartApisVisitor";
-import { getAuthToken, getCartId, getMemberTokens } from "../auth";
+import { getAuthToken, getCartId } from "../auth";
 import { logError } from "@/utils";
 
 const baseUrl = process.env.BASE_URL;
@@ -11,7 +11,6 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const authToken = await getAuthToken();
-      const memberTokens = await getMemberTokens();
 
       if (!authToken) {
         const cartId = await getCartId();
@@ -25,7 +24,7 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
           "Content-Type": "application/json",
           Authorization: authToken,
         },
-        body: JSON.stringify(memberTokens),
+        body: JSON.stringify({}),
         cache: "no-store",
       });
 
@@ -56,17 +55,13 @@ export const AddProductToCart = async (productData) => {
   try {
     const authToken = await getAuthToken();
 
-    const memberTokens = await getMemberTokens();
-    const payload = {
-      memberTokens,
-      productData,
-    };
-
     if (!authToken) {
       const cartId = await getCartId();
       const response = AddProductToCartVisitor(cartId, productData);
       return response;
     }
+
+    const payload = { productData };
 
     const response = await fetch(`${baseUrl}/api/cart/add`, {
       method: "POST",
@@ -90,17 +85,14 @@ export const AddProductToCart = async (productData) => {
 export const updateProductsQuantityCart = async (lineItems) => {
   try {
     const authToken = await getAuthToken();
-    const memberTokens = await getMemberTokens();
-    const payload = {
-      memberTokens,
-      lineItems,
-    };
 
     if (!authToken) {
       const cartId = await getCartId();
       const response = updateProductsQuantityCartVisitor(cartId, lineItems);
       return response;
     }
+
+    const payload = { lineItems };
 
     const response = await fetch(`${baseUrl}/api/cart/updateQuantity`, {
       method: "POST",
@@ -124,7 +116,6 @@ export const updateProductsQuantityCart = async (lineItems) => {
 export const removeProductFromCart = async (lineItemIds) => {
   try {
     const authToken = await getAuthToken();
-    const memberTokens = await getMemberTokens();
 
     if (!authToken) {
       const cartId = await getCartId();
@@ -132,10 +123,8 @@ export const removeProductFromCart = async (lineItemIds) => {
       return response;
     }
 
-    const payload = {
-      memberTokens,
-      lineItemIds,
-    };
+    const payload = { lineItemIds };
+
     const response = await fetch(`${baseUrl}/api/cart/remove`, {
       method: "POST",
       headers: {
@@ -159,18 +148,13 @@ export const updateProductInCart = async (id, productData) => {
   try {
     const authToken = await getAuthToken();
 
-    const memberTokens = await getMemberTokens();
-    const payload = {
-      memberTokens,
-      id,
-      productData,
-    };
-
     if (!authToken) {
       const cartId = await getCartId();
       const response = AddProductToCartVisitor(cartId, id, productData);
       return response;
     }
+
+    const payload = { id, productData };
 
     const response = await fetch(`${baseUrl}/api/cart/update`, {
       method: "POST",

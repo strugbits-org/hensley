@@ -33,6 +33,23 @@ const correctSearchTerm = async (searchTerm, keywords) => {
   return result.length ? result[0].item : searchTerm;
 };
 
+const isSupportedHasSomeValue = (value) => (
+  typeof value === "string" || typeof value === "number" || value instanceof Date
+);
+
+const normalizeHasSomeValues = (values = []) => values
+  .map((value) => {
+    if (isSupportedHasSomeValue(value)) return value;
+
+    if (value && typeof value === "object") {
+      const candidate = value._id ?? value.id ?? value.value ?? null;
+      return isSupportedHasSomeValue(candidate) ? candidate : null;
+    }
+
+    return null;
+  })
+  .filter((value) => value !== null && value !== undefined && value !== "");
+
 const queryCollection = async (payload) => {
   if (!payload?.dataCollectionId) {
     return { error: "Missing dataCollectionId", status: 400 };
@@ -77,8 +94,11 @@ const queryCollection = async (payload) => {
     }
 
     // Apply filters
-    if (not?.length === 2 && Array.isArray(not[1]) && not[1].length > 0) {
-      dataQuery = dataQuery.not(client.items.filter().hasSome(not[0], not[1]));
+    if (not?.length === 2 && Array.isArray(not[1])) {
+      const normalizedNotValues = normalizeHasSomeValues(not[1]);
+      if (normalizedNotValues.length > 0) {
+        dataQuery = dataQuery.not(client.items.filter().hasSome(not[0], normalizedNotValues));
+      }
     }
 
     if (contains?.length === 2) {
@@ -97,7 +117,10 @@ const queryCollection = async (payload) => {
 
     // Apply all hasSome filters
     hasSome.forEach(filter => {
-      dataQuery = dataQuery.hasSome(filter.key, filter.values);
+      const normalizedValues = normalizeHasSomeValues(filter?.values);
+      if (filter?.key && normalizedValues.length > 0) {
+        dataQuery = dataQuery.hasSome(filter.key, normalizedValues);
+      }
     });
 
     // Apply all startsWith filters

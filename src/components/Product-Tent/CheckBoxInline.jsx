@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+const getOptionLabel = (option) => (typeof option === 'object' ? option.label : option);
+const getOptionValue = (option) => (typeof option === 'object' ? option.value : option);
+
 export const CheckBoxInline = ({
     data,
     classes = "",
@@ -17,14 +20,15 @@ export const CheckBoxInline = ({
 
     const checkedStates = value !== null ? value : internalState;
 
-    const handleChange = (option) => {
+    const handleChange = (optionValue) => {
         let newState;
 
         if (type === "checkbox") {
-            newState = [...checkedStates];
-            newState[option] = !newState[option];
+            const idx = options.findIndex((o) => getOptionValue(o) === optionValue);
+            newState = [...(Array.isArray(checkedStates) ? checkedStates : options.map(() => false))];
+            newState[idx] = !newState[idx];
         } else {
-            newState = option;
+            newState = optionValue;
         }
 
         if (value === null) {
@@ -32,15 +36,17 @@ export const CheckBoxInline = ({
         }
 
         if (onChange) {
-            onChange(newState, option, options[option]);
+            onChange(newState);
         }
     };
 
-    const isChecked = (option) => {        
+    const isChecked = (option) => {
+        const optionValue = getOptionValue(option);
         if (type === "checkbox") {
-            return Array.isArray(checkedStates) ? checkedStates[option] : false;
+            const idx = options.findIndex((o) => getOptionValue(o) === optionValue);
+            return Array.isArray(checkedStates) ? checkedStates[idx] : false;
         } else {
-            return checkedStates === option;
+            return checkedStates === optionValue;
         }
     };
 
@@ -55,7 +61,7 @@ export const CheckBoxInline = ({
                         type={type}
                         name={type === "radio" ? `radio-${label}` : undefined}
                         className="sr-only"
-                        onChange={() => handleChange(option)}
+                        onChange={() => handleChange(getOptionValue(option))}
                         checked={isChecked(option)}
                     />
                     <div className="relative w-3 h-3 border-[1.5px] border-secondary-alt bg-transparent flex-shrink-0">
@@ -66,7 +72,7 @@ export const CheckBoxInline = ({
                         )}
                     </div>
                     <span className="lg:text-[12px] leading-[19px] font-haasLight sm:text-[12px] ml-[8px] text-[#2B2218] uppercase select-none">
-                        {option}
+                        {getOptionLabel(option)}
                     </span>
                 </label>
             ))}

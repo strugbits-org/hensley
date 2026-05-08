@@ -1,17 +1,26 @@
 import React from 'react'
 import { Button } from './Button'
-import { getAdditionalInfoSection } from '@/utils';
+import { getAdditionalInfoSection, resolveProductMediaUrl } from '@/utils';
 import { generateImageURL } from '@/utils/generateImageURL';
 import { CustomLink } from '../common/CustomLink';
+
 const BannerStructures = ({ tent, data = {} }) => {
     const { additionalInfoSections = [] } = data;
     const info = getAdditionalInfoSection(additionalInfoSections, "INFO");
     const pros = getAdditionalInfoSection(additionalInfoSections, "PROS");
     const cons = getAdditionalInfoSection(additionalInfoSections, "CONS");
 
+    // Support both Wix media URLs and core API media URLs
+    const bgUrl = typeof data.mainMedia === 'string'
+        ? generateImageURL({ wix_url: data.mainMedia })
+        : resolveProductMediaUrl(data.mainMedia);
+
+    // Derive the tent slug for linking, stripping any leading slash
+    const tentSlug = (data.slug || tent?.tent?.slug || tent?.slug || "").replace(/^\//, "");
+    const tentName = data.name || tent?.tent?.name || tent?.title || "";
 
     return (
-        <div className='w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] sm:h-[950px] bg-cover bg-center ' style={{ backgroundImage: `url(${generateImageURL({ wix_url: data.mainMedia })})` }}
+        <div className='w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] sm:h-[950px] bg-cover bg-center ' style={{ backgroundImage: `url(${bgUrl})` }}
         >
             <div className='lg:px-[10px] lg:max-w-[1557px] sm:max-w-[490px] lg:mt-[197px]  w-full flex flex-col justify-center items-center'>
 
@@ -21,8 +30,8 @@ const BannerStructures = ({ tent, data = {} }) => {
                     sm:leading-[70px]
                     text-[45px]
                     leading-[55px]
-                    text-white font-recklessRegular uppercase '>{tent?.tent?.name || ""}</h3>
-                    <CustomLink to={`/tent/${tent?.tent?.slug}`} >
+                    text-white font-recklessRegular uppercase '>{tentName}</h3>
+                    <CustomLink to={`/tent/${tentSlug}`} >
                         <Button text="add to quote" classes={"xl:!height-[130px] xl:!w-[450px] lg:!w-[300px] lg:!h-[130px] lg:block hidden"} />
                     </CustomLink>
                 </div>
@@ -48,7 +57,7 @@ const BannerStructures = ({ tent, data = {} }) => {
                     </div>
                 </div>
             </div>
-            <CustomLink to={`/tent/${tent?.tent?.slug}`} >
+            <CustomLink to={`/tent/${tentSlug}`} >
                 <Button text="add to quote" classes={"lg:!hidden !block sm:!w-[492px] sm:!h-[90px]"} />
             </CustomLink>
         </div>

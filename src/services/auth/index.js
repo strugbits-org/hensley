@@ -1,8 +1,10 @@
 "use server";
 import { cookies } from "next/headers";
+import { logError } from "@/utils";
 import { createCart } from "../cart/CartApisVisitor";
-import queryCollection from "@/utils/fetchFunction";
-import { createWixClient } from "@/utils";
+import { payloadMemberHasBadge } from "./payloadBadges";
+import { payloadGetCurrentMember } from "./payloadAuth";
+import { querySection, sectionToObject } from "../payloadCollections";
 
 export const getAuthToken = async () => {
   const cookieStore = cookies();
@@ -24,47 +26,125 @@ export const getMemberTokens = async () => {
 
 export const fetchLoginPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "LoginPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("login-page-details");
+    const details = sectionToObject(section);
+    if (section) {
+      return {
+        newToHensleyText: details.newToHensleyText || "NEW TO HENSLEY?",
+        submitButtonLabel: details.submitButtonLabel || "SIGN IN",
+        submittingButtonLabel: details.submittingButtonLabel || "SIGNING IN...",
+        createAccountButtonLabel: details.createAccountButtonLabel || "CREATE YOUR ACCOUNT",
+        mobileTitle: details.mobileTitle || "Login",
+        logo: details.logo || null,
+        labels: {
+          email: details.emailLabel || "Email",
+          password: details.passwordLabel || "Password",
+        },
+        placeholders: {
+          email: details.emailPlaceholder || "example@myemail.com",
+          password: details.passwordPlaceholder || "********",
+        },
+        agreementContent: details.agreementContent || null,
+        forgetPasswordLabel: details.forgetPasswordLabel || "Forgot your password?",
+      };
     }
-
-    return pageDetails.items[0]
-
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError("Error fetching login page details:", error);
   }
+
+  return {
+    newToHensleyText: "NEW TO HENSLEY?",
+    submitButtonLabel: "SIGN IN",
+    submittingButtonLabel: "SIGNING IN...",
+    createAccountButtonLabel: "CREATE YOUR ACCOUNT",
+    mobileTitle: "Login",
+    logo: null,
+    labels: { email: "Email", password: "Password" },
+    placeholders: { email: "example@myemail.com", password: "********" },
+    agreementContent: null,
+    forgetPasswordLabel: "Forgot your password?",
+  };
 };
 
 export const fetchSignupPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "SignupPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("signup-page-details");
+    const details = sectionToObject(section);
+    if (section) {
+      return {
+        title: details.title || "CREATE ACCOUNT",
+        submitButtonLabel: details.submitButtonLabel || "CREATE ACCOUNT",
+        submittingButtonLabel: details.submittingButtonLabel || "CREATING ACCOUNT...",
+        labels: {
+          firstName: details.firstNameLabel || "FIRST NAME*",
+          lastName: details.lastNameLabel || "LAST NAME*",
+          email: details.emailLabel || "Email",
+          phone: details.phoneLabel || "PHONE NUMBER*",
+          password: details.passwordLabel || "PASSWORD*",
+          confirmPassword: details.confirmPasswordLabel || "CONFIRM PASSWORD",
+        },
+        successTitle: details.successTitle || "ACCOUNT CREATED",
+        successDescription: details.successDescription || "Your account has been created. You can now sign in with your credentials.",
+        successButtonText: details.successButtonText || "SIGN IN",
+        errorTitle: details.errorTitle || "SIGNUP FAILED",
+        errorDescription: details.errorDescription || "Something went wrong while creating your account. Please try again.",
+        errorButtonText: details.errorButtonText || "TRY AGAIN",
+        agreementContent: details.agreementContent || null,
+      };
     }
-
-    return pageDetails.items[0]
-
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError("Error fetching signup page details:", error);
   }
+
+  return {
+    title: "CREATE ACCOUNT",
+    submitButtonLabel: "CREATE ACCOUNT",
+    submittingButtonLabel: "CREATING ACCOUNT...",
+    labels: {
+      firstName: "FIRST NAME*",
+      lastName: "LAST NAME*",
+      email: "Email",
+      phone: "PHONE NUMBER*",
+      password: "PASSWORD*",
+      confirmPassword: "CONFIRM PASSWORD",
+    },
+    successTitle: "ACCOUNT CREATED",
+    successDescription: "Your account has been created. You can now sign in with your credentials.",
+    successButtonText: "SIGN IN",
+    errorTitle: "SIGNUP FAILED",
+    errorDescription: "Something went wrong while creating your account. Please try again.",
+    errorButtonText: "TRY AGAIN",
+    agreementContent: null,
+  };
 };
 
 export const fetchAccountPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "MyaccountPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("account-page-details");
+    const details = sectionToObject(section);
+    if (section) {
+      return {
+        title: details.title || "MY ACCOUNT",
+        description: details.description || "View and edit your personal info below.",
+        subTitle: details.subTitle || "ACCOUNT",
+        personalInfoDescription: details.personalInfoDescription || "Update your personal information.",
+        emailTitle: details.emailTitle || "Login Email:",
+        emailNote: details.emailNote || "Your Login email can't be changed",
+        discardButtonLabel: details.discardButtonLabel || "DISCARD",
+        updateButtonLabel: details.updateButtonLabel || "UPDATE INFO",
+        labels: {
+          firstName: details.firstNameLabel || "FIRST NAME*",
+          lastName: details.lastNameLabel || "LAST NAME*",
+          email: details.emailLabel || "EMAIL*",
+          phone: details.phoneLabel || "PHONE",
+        },
+      };
     }
-
-    return pageDetails.items[0]
-
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError("Error fetching account page details:", error);
   }
+
+  return {};
 };
 
 
@@ -89,15 +169,18 @@ export const getCartId = async (createNew = true) => {
   }
 };
 
-export const checkIsAdmin = async (memberId) => {
+export const checkIsAdmin = async () => {
   try {
-    const wixClient = await createWixClient();
-    const response = await wixClient.badges.listBadgesPerMember([memberId]);
-    const badgeIds = response?.memberBadgeIds[0]?.badgeIds || [];
-    const adminBadgeId = process.env.ADMIN_BADGE_ID;
-    const isAdmin = badgeIds.includes(adminBadgeId);
-    return isAdmin;
+    const authToken = await getAuthToken();
+    if (!authToken) return false;
+    
+    const memberResponse = await payloadGetCurrentMember(authToken);
+    const user = memberResponse?.user || memberResponse;
+    if (!user || !user.id) return false;
+
+    return payloadMemberHasBadge(user);
   } catch (error) {
-    throw new Error(error);
+    logError("Error checking admin status:", error);
+    return false;
   }
 };

@@ -61,8 +61,8 @@ export const CardsSlider = ({ data, cardCss, loop = false }) => {
               <div className="h-[425px] relative overflow-hidden">
                 <PrimaryImage url={slide.image} customClasses={"h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"} alt={slide.heading} />
                 <div className="hidden lg:block ">
-                  <PrimaryImage url={"https://static.wixstatic.com/shapes/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"} alt={"Arrow"} customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-[90%] group-hover:h-[90%]" />
-                  <PrimaryImage url={"https://static.wixstatic.com/shapes/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"} alt={"Arrow"} customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] group-hover:invisible" />
+                  <PrimaryImage url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"} alt={"Arrow"} customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-[90%] group-hover:h-[90%]" />
+                  <PrimaryImage url={"/icons/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"} alt={"Arrow"} customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] group-hover:invisible" />
                 </div>
               </div>
               <div>

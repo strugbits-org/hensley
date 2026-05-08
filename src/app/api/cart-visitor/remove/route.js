@@ -1,23 +1,20 @@
 import { NextResponse } from "next/server";
-import { createWixClient, logError } from "@/utils";
+import { logError } from "@/utils";
+import { removeFromVisitorCart } from "@/services/cart/payloadCart";
 
 export const POST = async (req) => {
   try {
     const body = await req.json();
-    const { cartId, lineItemIds } = body;
+    const { cartId: visitorId, lineItemIds } = body;
 
-    const wixClient = await createWixClient();
-    await wixClient.cart.removeLineItems(
-      cartId,
-      lineItemIds
-    );
+    const updatedCart = await removeFromVisitorCart(visitorId, lineItemIds);
 
     return NextResponse.json(
-      { message: "Cart item removed Successfully" },
+      { message: "Cart item removed Successfully", cart: updatedCart },
       { status: 200 }
     );
   } catch (error) {
-    logError(error);
+    logError("Error removing from visitor cart:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

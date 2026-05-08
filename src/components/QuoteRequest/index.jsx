@@ -144,11 +144,17 @@ export const QuoteRequest = ({ content, data = "" }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [datepickers, setDatepickers] = useState({});
-  const { firstName, lastName, email, phone } = useUserData();
+  const { firstName, lastName, email, phone, memberId } = useUserData();
 
-  // Check if user data exists
-  const hasUserData = firstName && lastName && email && phone;
-  const fullName = hasUserData ? `${firstName} ${lastName}`.trim() : '';
+  // Check if user is logged in (has email from member data)
+  const isLoggedIn = Boolean(email);
+  // Build full name from available data
+  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
+
+  // Debug logs
+  console.log('[QuoteRequest] useUserData:', { firstName, lastName, email, phone, memberId });
+  console.log('[QuoteRequest] isLoggedIn:', isLoggedIn);
+  console.log('[QuoteRequest] fullName:', fullName);
 
   const {
     register,
@@ -160,22 +166,22 @@ export const QuoteRequest = ({ content, data = "" }) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      ...(hasUserData && {
-        name: fullName,
-        email: email,
-        phone: phone
+      ...(isLoggedIn && {
+        name: fullName || '',
+        email: email || '',
+        phone: phone || ''
       })
     }
   });
 
   // Set form values when user data is available
   useEffect(() => {
-    if (hasUserData) {
-      setValue('name', fullName);
+    if (isLoggedIn) {
+      if (fullName) setValue('name', fullName);
       setValue('email', email);
-      setValue('phone', phone);
+      if (phone) setValue('phone', phone);
     }
-  }, [firstName, lastName, email, phone, setValue, fullName, hasUserData]);
+  }, [firstName, lastName, email, phone, setValue, fullName, isLoggedIn]);
 
   // Initialize Air Datepickers
   useEffect(() => {
@@ -304,8 +310,21 @@ export const QuoteRequest = ({ content, data = "" }) => {
     const config = FIELD_CONFIGS[fieldId];
     const error = errors[fieldId]?.message;
 
-    const isOrderByField = FORM_STRUCTURE.orderBy.includes(fieldId);
-    const shouldBeReadOnly = isOrderByField && hasUserData;
+    // Email should be read-only for logged-in users
+    const isEmailField = fieldId === 'email';
+    const shouldBeReadOnly = isEmailField && isLoggedIn;
+
+    // Debug log for email field
+    if (isEmailField) {
+      console.log('[QuoteRequest] Email field render:', { 
+        fieldId, 
+        isEmailField, 
+        isLoggedIn, 
+        shouldBeReadOnly,
+        configReadOnly: config.readOnly,
+        finalReadOnly: config.readOnly || shouldBeReadOnly
+      });
+    }
 
     return (
       <div key={fieldId} className={gridClass}>

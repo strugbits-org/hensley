@@ -3,38 +3,93 @@ import { CheckBox } from './CheckBox';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { logError } from '@/utils';
+import { logError, richTextToHTML } from '@/utils';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
-import { AddToQuote } from '../Product-Tent/AddtoQuoteButton';
 import { FiPlus } from 'react-icons/fi';
 import { MdClose } from 'react-icons/md';
 import { uploadRelevantImage } from '@/services/poolcover';
 import { AddToCartButton } from '../Product/AddtoQuoteButton';
 import parse from 'html-react-parser';
 import { BreadCrumbs } from '../common/BreadCrumbs';
-import { MatchItWithButton } from '../common/MatchItWithButton';
 
-// Validation schema
-const schema = yup.object({
-    approxSize: yup.string().required('Approximate size is required'),
-    coverType: yup.string().nullable(),
-    poolEdge: yup.string().nullable(),
-}).required();
+const INPUT_TYPES_WITH_OPTIONS = new Set(['radio', 'checkbox', 'select']);
+
+const buildDynamicSchema = (fields = []) => {
+    const shape = {};
+    fields.forEach((field) => {
+        const key = field.fieldKey;
+        if (!key) return;
+
+        if (INPUT_TYPES_WITH_OPTIONS.has(field.inputType)) {
+            shape[key] = yup.string().nullable();
+        } else {
+            let rule = yup.string();
+            if (field.required) rule = rule.required(`${field.label} is required`);
+            shape[key] = rule;
+        }
+    });
+
+    return yup.object(shape).required();
+};
+
+const buildDefaultValues = (fields = []) => {
+    const defaults = {};
+    fields.forEach((field) => {
+        if (!field.fieldKey) return;
+        defaults[field.fieldKey] = INPUT_TYPES_WITH_OPTIONS.has(field.inputType) ? null : '';
+    });
+    return defaults;
+};
 
 export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
+    const poolConfig = productData?.poolCoverConfig || {};
+    const presetRelevantImages = poolConfig.relevantImages || [];
+    const fallbackFields = [
+        {
+            label: 'PLEASE SHARE THE APPROX. SIZE OF THE AREA YOU YOUR POOL IS',
+            fieldKey: 'approxSize',
+            inputType: 'textarea',
+            required: true,
+            options: [],
+        },
+        {
+            label: 'HOW IS YOUR POOL EDGE?',
+            fieldKey: 'poolEdge',
+            inputType: 'radio',
+            required: false,
+            options: [
+                { label: 'FLAT', value: 'FLAT' },
+                { label: 'RAISED', value: 'RAISED' },
+            ],
+        },
+        {
+            label: 'HOW MUCH OF THE POOL ARE YOU LOOKING TO COVER?',
+            fieldKey: 'coverType',
+            inputType: 'radio',
+            required: false,
+            options: [
+                { label: 'ENTIRE POOL', value: 'ENTIRE POOL' },
+                { label: 'PARTIAL POOL COVERING', value: 'PARTIAL POOL COVERING' },
+            ],
+        },
+    ];
 
-    const [formData, setFormData] = useState({
-        approxSize: '',
-        coverType: null,
-        poolEdge: null,
-    });
+    const quoteFields = poolConfig.quoteRequestFields?.length ? poolConfig.quoteRequestFields : fallbackFields;
+    const quoteIntroText = poolConfig.quoteIntroText || 'Please fill the below RFP form and a specialist will provide a custom quote';
+    const quoteSubmitLabel = poolConfig.quoteSubmitLabel || 'Add to Quote';
+
+    const schema = buildDynamicSchema(quoteFields);
+    const defaultValues = buildDefaultValues(quoteFields);
+
+    const [formData, setFormData] = useState(defaultValues);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const redirectWithLoader = useRedirectWithLoader();
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [relevantImages, setRelevantImages] = useState([]);
+    const [selectedPresetImages, setSelectedPresetImages] = useState(new Set());
     const [uploading, setUploading] = useState(false);
 
     const {
@@ -45,7 +100,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
         trigger,
     } = useForm({
         resolver: yupResolver(schema),
-        defaultValues: formData
+        defaultValues
     });
 
     const handleInputChange = (field, value) => {
@@ -62,7 +117,25 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
         try {
             const productId = productData._id;
             const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
-            const images = relevantImages.map(x => x.src);
+            
+            // Combine uploaded image IDs and selected preset image IDs.
+            const uploadedImageIds = relevantImages
+                .map((x) => x.id)
+                .filter(Boolean);
+            const selectedPresetImageIds = Array.from(selectedPresetImages).filter(Boolean);
+            const allImageIds = Array.from(new Set([...uploadedImageIds, ...selectedPresetImageIds]));
+
+            const customTextFields = {};
+            quoteFields.forEach((field) => {
+                const label = (field.label || field.fieldKey).toUpperCase();
+                const val = data[field.fieldKey];
+                customTextFields[label] = typeof val === 'string' ? val.toUpperCase() : val || '-';
+            });
+
+            if (allImageIds.length) {
+                customTextFields["RELEVENT IMAGES"] = allImageIds.join("~~");
+            }
+            customTextFields["POOLCOVER"] = "true";
 
             const cartData = {
                 lineItems: [{
@@ -70,13 +143,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         appId,
                         catalogItemId: productId,
                         options: {
-                            customTextFields: {
-                                "PLEASE SHARE THE APPROX. SIZE OF THE AREA YOUR POOL IS": data.approxSize?.toUpperCase() || "-",
-                                "HOW IS YOUR POOL EDGE?": data.poolEdge?.toUpperCase() || "-",
-                                "HOW MUCH OF THE POOL ARE YOU LOOKING TO COVER?": data.coverType?.toUpperCase() || "-",
-                                "RELEVENT IMAGES": images.join("~~"),
-                                "POOLCOVER": "true"
-                            }
+                            customTextFields,
                         },
                     },
                     quantity: 1,
@@ -88,6 +155,8 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             setCookie("cartQuantity", total, { path: "/" });
             setTimeout(() => {
                 reset();
+                setFormData(defaultValues);
+                setSelectedPresetImages(new Set());
             }, 1000);
             redirectWithLoader("/cart");
 
@@ -120,6 +189,18 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
         setRelevantImages(prev => prev.filter(image => image.id !== imageId));
     };
 
+    const handleTogglePresetImage = (imageId) => {
+        setSelectedPresetImages(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(imageId)) {
+                newSet.delete(imageId);
+            } else {
+                newSet.add(imageId);
+            }
+            return newSet;
+        });
+    };
+
     return (
         <>
             <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
@@ -128,7 +209,6 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         { label: 'Home', to: '/' },
                         { label: 'POOLCOVER' }
                     ]} />
-                    <MatchItWithButton product={{ ...productData, matchedProducts }} />
                 </div>
                 <h3 className='uppercase text-secondary-alt font-recklessRegular 
                     lg:text-[90px] 
@@ -138,7 +218,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                     '>{title}</h3>
 
                 <div className="font-haasRegular lg:text-[16px] lg:leading-[19px] text-[14px] leading-[17px] text-secondary-alt">
-                    {parse(productData?.description || '')}
+                    {parse(richTextToHTML(productData?.description) || '')}
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className='w-full grid grid-cols-2 justify-between gap-x-[24px] gap-y-[39px] mt-[20px]'>
                     <span className='lg:col-span-4 
@@ -147,35 +227,72 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                font-recklessRegular
                text-[30px] 
                leading-[30px] 
-               text-secondary-alt'>Please fill the bellow RFP form & A tenting Specialist will provide a custom quote</span>
+               text-secondary-alt'>{quoteIntroText}</span>
 
-                    <div className='lg:col-span-4 col-span-2'>
-                        <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">PLEASE SHARE THE APPROX. SIZE OF THE AREA YOU YOUR POOL IS</label>
-                        <textarea
-                            {...register('approxSize')}
-                            value={formData.additionalInfo}
-                            onChange={(e) => handleInputChange('approxSize', e.target.value)}
-                            className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
-                            rows={4}
-                            disabled={isSubmitting}
-                        ></textarea>
-                    </div>
+                    {quoteFields.map((field) => {
+                        const key = field.fieldKey;
+                        const options = (field.options || []).map((opt) => typeof opt === 'string' ? { label: opt, value: opt } : opt);
+                        const spanClass = field.inputType === 'textarea' ? 'lg:col-span-4 col-span-2' : 'lg:col-span-2 col-span-2';
 
-                    <CheckBox
-                        data={{ label: "HOW IS YOUR POOL EDGE?", options: ["FLAT", "RAISED"] }}
-                        type="radio"
-                        value={formData.poolEdge}
-                        onChange={(newState, index, optionText) => handleInputChange('poolEdge', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
+                        if (field.inputType === 'radio' || field.inputType === 'checkbox') {
+                            return (
+                                <CheckBox
+                                    key={key}
+                                    data={{ label: field.label, options: options.map((x) => x.label) }}
+                                    type={field.inputType}
+                                    value={formData[key]}
+                                    onChange={(newState) => handleInputChange(key, newState)}
+                                    disabled={isSubmitting}
+                                />
+                            );
+                        }
 
-                    <CheckBox
-                        data={{ label: "HOW MUCH OF THE POOL ARE YOU LOOKING TO COVER?", options: ["ENTIRE POOL", "PARTIAL POOL COVERING"] }}
-                        type="radio"
-                        value={formData.coverType}
-                        onChange={(newState, index, optionText) => handleInputChange('coverType', newState, index, optionText)}
-                        disabled={isSubmitting}
-                    />
+                        if (field.inputType === 'select') {
+                            return (
+                                <div key={key} className={spanClass}>
+                                    <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">{field.label}</label>
+                                    <select
+                                        {...register(key)}
+                                        value={formData[key] || ''}
+                                        onChange={(e) => handleInputChange(key, e.target.value)}
+                                        className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary uppercase"
+                                        disabled={isSubmitting}
+                                    >
+                                        <option value="">Select...</option>
+                                        {options.map((opt) => (
+                                            <option key={`${key}-${opt.value}`} value={opt.value}>{opt.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            );
+                        }
+
+                        const isTextarea = field.inputType === 'textarea';
+                        return (
+                            <div key={key} className={spanClass}>
+                                <label className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-2">{field.label}</label>
+                                {isTextarea ? (
+                                    <textarea
+                                        {...register(key)}
+                                        value={formData[key] || ''}
+                                        onChange={(e) => handleInputChange(key, e.target.value)}
+                                        className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
+                                        rows={4}
+                                        disabled={isSubmitting}
+                                    />
+                                ) : (
+                                    <input
+                                        type="text"
+                                        {...register(key)}
+                                        value={formData[key] || ''}
+                                        onChange={(e) => handleInputChange(key, e.target.value)}
+                                        className="w-full border-b font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
+                                        disabled={isSubmitting}
+                                    />
+                                )}
+                            </div>
+                        );
+                    })}
 
                     <div className='lg:col-span-4 col-span-2'>
                         <label htmlFor="file-upload" className="cursor-pointer">
@@ -195,6 +312,36 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                             disabled={isSubmitting || uploading}
                         />
                     </div>
+
+                    {presetRelevantImages.length > 0 && (
+                        <div className='lg:col-span-4 col-span-2'>
+                            <span className="block text-[14px] leading-[17px] font-haasBold uppercase font-medium text-secondary-alt mb-3">Or select from our reference images:</span>
+                            <div className="grid grid-cols-5 gap-2">
+                                {presetRelevantImages.map((image) => (
+                                    <button
+                                        key={image.id}
+                                        onClick={() => handleTogglePresetImage(image.id)}
+                                        type="button"
+                                        className={`relative col-span-1 h-[120px] cursor-pointer p-2 transition-all duration-200 border-2 ${
+                                            selectedPresetImages.has(image.id)
+                                                ? 'bg-secondary-alt border-secondary-alt'
+                                                : 'bg-white border-gray-300 hover:border-secondary-alt'
+                                        }`}
+                                    >
+                                        {selectedPresetImages.has(image.id) && (
+                                            <div className="absolute top-1 right-1 bg-white rounded-full p-1">
+                                                <svg className="w-4 h-4 text-secondary-alt" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                </svg>
+                                            </div>
+                                        )}
+                                        <img src={image.src} alt={image.alt} className="h-full w-full object-contain" />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className={`lg:col-span-4 col-span-2 grid grid-cols-5 gap-2 ${relevantImages.length === 0 ? 'hidden' : ''}`}>
                         {relevantImages.map((image) => (
                             <div key={image.id} className="group relative col-span-1 h-[120px] cursor-pointer p-2 bg-white ">

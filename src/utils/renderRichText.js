@@ -1,6 +1,169 @@
 import parse from 'html-react-parser';
 import { generateImageURLById, generateVideoURL } from './generateImageURL';
 
+// --- Lexical (Payload CMS) → Wix Rich Text Adapter ---
+
+const LEXICAL_FORMAT_BOLD = 1;
+const LEXICAL_FORMAT_ITALIC = 2;
+const LEXICAL_FORMAT_UNDERLINE = 8;
+const LEXICAL_FORMAT_STRIKETHROUGH = 4;
+
+const isLexicalContent = (content) =>
+    content && typeof content === 'object' && content.root && Array.isArray(content.root?.children);
+
+const lexicalFormatToDecorations = (format = 0) => {
+    const decorations = [];
+    if (format & LEXICAL_FORMAT_BOLD) decorations.push({ type: 'BOLD' });
+    if (format & LEXICAL_FORMAT_ITALIC) decorations.push({ type: 'ITALIC' });
+    if (format & LEXICAL_FORMAT_UNDERLINE) decorations.push({ type: 'UNDERLINE' });
+    if (format & LEXICAL_FORMAT_STRIKETHROUGH) decorations.push({ type: 'STRIKETHROUGH' });
+    return decorations;
+};
+
+const convertLexicalTextNode = (node) => ({
+    type: 'TEXT',
+    id: node.id || Math.random().toString(36).slice(2),
+    textData: {
+        text: node.text || '',
+        decorations: lexicalFormatToDecorations(node.format),
+    },
+});
+
+const convertLexicalLinkNode = (node) => {
+    const children = (node.children || []).map(convertLexicalChildNode).filter(Boolean);
+    return children.map((child) => ({
+        ...child,
+        textData: {
+            ...child.textData,
+            decorations: [
+                ...(child.textData?.decorations || []),
+                {
+                    type: 'LINK',
+                    linkData: {
+                        link: {
+                            url: node.fields?.url || node.url || '#',
+                            target: node.fields?.newTab || node.newTab ? 'BLANK' : 'SELF',
+                        },
+                    },
+                },
+            ],
+        },
+    }));
+};
+
+const convertLexicalChildNode = (node) => {
+    if (!node) return null;
+    if (node.type === 'text') return convertLexicalTextNode(node);
+    if (node.type === 'linebreak') return { type: 'TEXT', id: Math.random().toString(36).slice(2), textData: { text: '\n', decorations: [] } };
+    if (node.type === 'link' || node.type === 'autolink') return null; // handled inline
+    return null;
+};
+
+const flattenLexicalChildren = (children = []) => {
+    const result = [];
+    for (const child of children) {
+        if (child.type === 'link' || child.type === 'autolink') {
+            result.push(...convertLexicalLinkNode(child));
+        } else {
+            const converted = convertLexicalChildNode(child);
+            if (converted) result.push(converted);
+        }
+    }
+    return result;
+};
+
+const headingTagToLevel = (tag) => {
+    const match = typeof tag === 'string' && tag.match(/h(\d)/i);
+    return match ? parseInt(match[1], 10) : 2;
+};
+
+const convertLexicalNode = (node) => {
+    if (!node || typeof node !== 'object') return null;
+    const id = node.id || Math.random().toString(36).slice(2);
+
+    switch (node.type) {
+        case 'paragraph':
+            return {
+                type: 'PARAGRAPH',
+                id,
+                nodes: flattenLexicalChildren(node.children || []),
+            };
+
+        case 'heading':
+            return {
+                type: 'HEADING',
+                id,
+                headingData: { level: headingTagToLevel(node.tag) },
+                nodes: flattenLexicalChildren(node.children || []),
+            };
+
+        case 'list': {
+            const isOrdered = node.listType === 'number' || node.tag === 'ol';
+            return {
+                type: isOrdered ? 'ORDERED_LIST' : 'BULLETED_LIST',
+                id,
+                nodes: (node.children || []).map((listItem) => ({
+                    type: 'LIST_ITEM',
+                    id: listItem.id || Math.random().toString(36).slice(2),
+                    nodes: (listItem.children || []).map((para) => ({
+                        type: 'PARAGRAPH',
+                        id: para.id || Math.random().toString(36).slice(2),
+                        nodes: para.type === 'paragraph' || para.type === 'listitem'
+                            ? flattenLexicalChildren(para.children || [])
+                            : flattenLexicalChildren([para]),
+                    })),
+                })),
+            };
+        }
+
+        case 'quote':
+            return {
+                type: 'PARAGRAPH',
+                id,
+                nodes: flattenLexicalChildren(node.children || []),
+            };
+
+        case 'horizontalrule':
+            return { type: 'DIVIDER', id };
+
+        case 'upload': {
+            const mediaUrl = node.value?.url || node.value?.sizes?.card?.url || '';
+            return {
+                type: 'IMAGE',
+                id,
+                imageData: {
+                    image: {
+                        src: { url: mediaUrl, id: mediaUrl },
+                        width: node.value?.width,
+                        height: node.value?.height,
+                    },
+                    altText: node.value?.alt || '',
+                    containerData: { alignment: 'CENTER' },
+                },
+            };
+        }
+
+        default:
+            return null;
+    }
+};
+
+const convertLexicalToWixNodes = (lexicalContent) => {
+    if (!isLexicalContent(lexicalContent)) return [];
+    return (lexicalContent.root.children || [])
+        .map(convertLexicalNode)
+        .filter(Boolean);
+};
+
+// --- End Lexical Adapter ---
+
+const getRichTextNodes = (content) => {
+    if (isLexicalContent(content)) return convertLexicalToWixNodes(content);
+    if (Array.isArray(content?.nodes)) return content.nodes;
+    if (Array.isArray(content)) return content;
+    return [];
+};
+
 export const renderNode = (node) => {
 
     const HeadingComponent = ({ level, children }) => {
@@ -87,10 +250,19 @@ export const renderNode = (node) => {
 };
 
 export const convertToHTML = ({ content = "", class_p = "", class_ul = "", class_heading = "" }) => {
+    if (!content) return null;
     if (typeof content === 'string') return content;
+
+    const nodes = getRichTextNodes(content);
+    if (nodes.length === 0) {
+        if (typeof content?.html === 'string') return parse(content.html);
+        if (typeof content?.text === 'string') return content.text;
+        return null;
+    }
+
     let html = "";
 
-    content.nodes.forEach(node => {
+    nodes.forEach(node => {
         if (node.type === 'PARAGRAPH') {
             if (node.nodes.length > 0) {
                 html += `<p className="${class_p}">`;
@@ -221,10 +393,19 @@ export const convertToHTMLRichContent = ({
     class_table_row = "",
     class_table_cell = ""
 }) => {
+    if (!content) return null;
     if (typeof content === 'string') return content;
+
+    const nodes = getRichTextNodes(content);
+    if (nodes.length === 0) {
+        if (typeof content?.html === 'string') return parse(content.html);
+        if (typeof content?.text === 'string') return content.text;
+        return null;
+    }
+
     let html = "";
 
-    const processTextNodes = (nodes) => {
+    const processTextNodes = (nodes = []) => {
         let textHTML = "";
         nodes.forEach(textNode => {
             if (textNode.type === 'TEXT') {
@@ -287,7 +468,7 @@ export const convertToHTMLRichContent = ({
         return cellHTML;
     };
 
-    content.nodes.forEach(node => {
+    nodes.forEach(node => {
         if (node.type === 'PARAGRAPH') {
             if (node.nodes.length > 0) {
                 html += `<p className="${class_p}">`;

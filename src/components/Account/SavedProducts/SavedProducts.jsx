@@ -3,13 +3,16 @@ import AutoClickWrapper from '@/components/common/helpers/AutoClickWrapper';
 import SecondaryProductCard from '@/components/common/SecondaryProductCard'
 import { fetchSavedProductData } from '@/services/products';
 import { loaderActions } from '@/store/loaderStore';
+import { actions, states } from '@/store';
+import { useSnapshot } from 'valtio';
 import { logError } from '@/utils';
 import React, { useEffect, useState } from 'react'
 
-function SavedProducts() {
+function SavedProducts({ allCollections = [] }) {
     const pageSize = 5;
-    const [savedProducts, setSavedProducts] = useState([]);
+    const { savedProducts } = useSnapshot(states);
     const [pageLimit, setPageLimit] = useState(pageSize);
+    const [mounted, setMounted] = useState(false);
 
     const data = {
         heading: "SAVED PRODUCTS",
@@ -17,8 +20,9 @@ function SavedProducts() {
 
     const fetchSavedProducts = async () => {
         try {
-            const savedProducts = await fetchSavedProductData(true);
-            setSavedProducts(savedProducts);
+            const products = await fetchSavedProductData(true);
+            // Sync with global store - component will re-render via useSnapshot
+            actions.setSavedProducts(products);
             loaderActions.hide();
         } catch (error) {
             logError("Error while fetching Saved Product", error);
@@ -26,12 +30,30 @@ function SavedProducts() {
     };
 
     useEffect(() => {
+        setMounted(true);
         fetchSavedProducts();
     }, []);
 
     const handleAutoSeeMore = () => {
         setPageLimit((prev) => prev + pageSize);
     }
+
+    // Show loading state until mounted to avoid hydration mismatch
+    if (!mounted) {
+        return (
+            <div className='MyAccount w-full max-lg:mb-[85px] '>
+                <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
+                    <h2 className='uppercase text-[140px] font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.heading}</h2>
+                </div>
+                <div className='pl-[23px] pr-[18px] pt-[23px] pb-[96px] max-lg:p-3 max-md:pt-[30px]'>
+                    <div className='grid grid-cols-5 max-2xl:grid-cols-3 max-lg:grid-cols-3 max-md:grid-cols-2 gap-x-6 max-lg:gap-x-3 max-md:gap-x-[10px] gap-y-5 max-lg:gap-y-3 border-none border-0 border-transparent'>
+                        <div className='w-full col-span-5 max-2xl:col-span-3 max-lg:col-span-3 max-md:col-span-2 text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>Loading...</div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className='MyAccount w-full max-lg:mb-[85px] '>
             <div className='heading w-full pt-[51px] pb-[54px] flex justify-center items-center border-b border-b-[#E0D6CA] max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
@@ -48,8 +70,7 @@ function SavedProducts() {
                                     key={productData._id}
                                     data={productData}
                                     type="listing"
-                                    savedProducts={savedProducts}
-                                    setSavedProducts={setSavedProducts}
+                                    allCollections={allCollections}
                                 />
                             );
                         })

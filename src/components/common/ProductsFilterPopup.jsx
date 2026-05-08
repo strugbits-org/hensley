@@ -3,7 +3,7 @@ import FilterMenu from './MenuFilter';
 import { PrimaryImage } from './PrimaryImage';
 export const ProductsFilterPopup = ({ selectedCategory, subCategories, onFilterChange, selectedFilters, type = 'popup', hidden = false }) => {
     const [isActive, setIsActive] = useState(false);
-    const filterIcon = isActive ? "https://static.wixstatic.com/shapes/0e0ac5_afdc5e19d5f849fa973b191220040065.svg" : "https://static.wixstatic.com/shapes/0e0ac5_4aae04aee0b3485b8d8e621d030eecbe.svg";
+    const filterIcon = isActive ? "/icons/0e0ac5_afdc5e19d5f849fa973b191220040065.svg" : "/icons/0e0ac5_4aae04aee0b3485b8d8e621d030eecbe.svg";
     if (hidden) return null;
     return (
         <div className={`z-10 absolute right-6 ${type !== "subCategory" ? 'lg:hidden' : 'top-0'}`}>

@@ -129,7 +129,7 @@ const AddressBlock = ({ title, description = "" }) => {
     return (
         <div className='font-haasRegular uppercase text-[14px] leading-[18px]'>
             <p><b>{title}</b></p>
-            <p>{description}</p>
+            <p className='whitespace-pre-line'>{description}</p>
         </div>)
 }
 

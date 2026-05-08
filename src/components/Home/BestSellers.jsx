@@ -16,6 +16,7 @@ export const BestSellers = ({
     classes,
     headingClasses,
     buttonHide = false,
+    allCollections = [],
 }) => {
     const { bestSellerTitle } = pageDetails;
     const sliderInstance = useRef();
@@ -88,6 +89,7 @@ export const BestSellers = ({
                                 type="slider"
                                 data={productData}
                                 btnClass="border border-secondary-alt"
+                                allCollections={allCollections}
                             />
                         </div>
                     ))}

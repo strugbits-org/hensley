@@ -28,7 +28,7 @@ const useDebounce = (callback, delay) => {
 };
 
 function Listing({ data }) {
-  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData } = data;
+  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, allCollections = [] } = data;
   let bannerIndex = -1;
   const pageSize = 16;
 
@@ -39,14 +39,27 @@ function Listing({ data }) {
   const [bannersDesktop, setBannersDesktop] = useState([]);
   const [bannersMobile, setBannersMobile] = useState([]);
   const [isMobile, setIsMobile] = useState(false);
+  const isLoadingMoreRef = useRef(false);
+
+  // Recursively collect IDs from a collection and all its populated children
+  const getCollectionIdsWithDescendants = useCallback((item) => {
+    const id = item?._id || item?.id;
+    const ids = id ? [id] : [];
+    const children = item?.children?.docs || (Array.isArray(item?.children) ? item.children : []);
+    children.forEach(child => {
+      if (child && typeof child === 'object') ids.push(...getCollectionIdsWithDescendants(child));
+      else if (typeof child === 'string') ids.push(child);
+    });
+    return ids;
+  }, []);
 
   const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
     const activeCollectionIds = newFilters.length > 0
-      ? newFilters.map(f => f._id)
+      ? newFilters.flatMap(getCollectionIdsWithDescendants).filter(Boolean)
       : collectionIds;
 
     try {
-      const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, newFilters[0]._id) : sortIndex;
+      const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, newFilters[0]._id || newFilters[0].id) : sortIndex;
       const newSortedProducts = await fetchSortedProducts({
         collectionIds: activeCollectionIds,
         limit: pageSize,
@@ -60,13 +73,13 @@ function Listing({ data }) {
         setProducts(newSortedProducts.items);
       }
 
-      setHasMore(newSortedProducts.hasNext);
+      setHasMore(newSortedProducts.hasNext ?? false);
       return newSortedProducts;
     } catch (error) {
       logError(`Error fetching ${isLoadMore ? 'more' : 'sorted'} products:`, error);
       return null;
     }
-  }, [collectionIds, selectedFilters, sortIndex]);
+  }, [collectionIds, selectedFilters, sortIndex, categoriesSortData, getCollectionIdsWithDescendants]);
 
   const debouncedFetchForFilters = useDebounce((newFilters) => {
     fetchProducts({ newFilters, isLoadMore: false, newSkip: 0 })
@@ -74,9 +87,10 @@ function Listing({ data }) {
   }, 300);
 
   const handleFilterChange = (filter) => {
-    const isSelected = selectedFilters.some(f => f._id === filter._id);
+    const filterId = filter?._id || filter?.id;
+    const isSelected = selectedFilters.some(f => (f._id || f.id) === filterId);
     const newFilters = isSelected
-      ? selectedFilters.filter(f => f._id !== filter._id)
+      ? selectedFilters.filter(f => (f._id || f.id) !== filterId)
       : [...selectedFilters, filter];
 
     setSelectedFilters(newFilters);
@@ -85,11 +99,13 @@ function Listing({ data }) {
   };
 
   const handleLoadMore = async () => {
-    if (!hasMore) return;
+    if (!hasMore || isLoadingMoreRef.current) return;
+    isLoadingMoreRef.current = true;
     await fetchProducts({
       isLoadMore: true,
       newSkip: products.length
     });
+    isLoadingMoreRef.current = false;
   };
 
   useEffect(() => {
@@ -163,6 +179,7 @@ function Listing({ data }) {
                     <ProductCard
                       key={productData._id}
                       data={productData}
+                      allCollections={allCollections}
                     />
                   </li>
                   {(shouldInsertBanner || forceInsertBanner) && (

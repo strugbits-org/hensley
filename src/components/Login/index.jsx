@@ -4,8 +4,7 @@ import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { calculateTotalCartQuantity, logError } from '@/utils';
-import { PrimaryImage } from '../common/PrimaryImage';
+import { calculateTotalCartQuantity, logError, resolveCoreMediaUrl } from '@/utils';
 import { CustomLink } from '../common/CustomLink';
 import { toast } from 'sonner';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
@@ -14,6 +13,10 @@ import { useCookies } from 'react-cookie';
 import { getProductsCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
 import { convertToHTMLRichContent } from '@/utils/renderRichText';
+import eyeOpenIcon from '@/assets/icons/eye-open.svg';
+import eyeClosedIcon from '@/assets/icons/eye-closed.svg';
+import closeIcon from '@/assets/icons/close.svg';
+import logoFallback from '@/assets/hens-logo.png';
 
 // Validation schema
 const schema = yup.object({
@@ -80,8 +83,9 @@ const InputField = ({
                         className={`absolute right-4 top-1/2 -translate-y-1/2 transition-opacity duration-200 ${disabled ? 'cursor-not-allowed' : ''}`}
                         onClick={onToggle}
                         disabled={disabled}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                        <img className="size-6" src={showPassword ? "https://static.wixstatic.com/shapes/0e0ac5_e14dd77953084aec9c7994033fda7882.svg" : "https://static.wixstatic.com/shapes/0e0ac5_130c9cc93100439b8627738cde9c26c7.svg"} />
+                        <Image className="size-6" src={showPassword ? eyeOpenIcon : eyeClosedIcon} alt="" width={24} height={24} />
                     </button>
                 )}
             </div>
@@ -92,11 +96,24 @@ const InputField = ({
     );
 };
 
-const Login = ({ classes, close, isLightbox = true, data = '' }) => {
+const Login = ({ classes, close, isLightbox = true, data = {} }) => {
 
-    const { newToHensleyText, submitButtonLabel, createAccountButtonLabel, logo, labels, agreementContent, forgetPasswordLabel } = data;
+    const {
+        newToHensleyText,
+        submitButtonLabel,
+        submittingButtonLabel,
+        createAccountButtonLabel,
+        mobileTitle,
+        logo,
+        labels = {},
+        placeholders = {},
+        agreementContent,
+        forgetPasswordLabel,
+    } = data || {};
 
-    const { email, password } = labels;
+    const { email, password } = labels || {};
+    const logoUrl = resolveCoreMediaUrl(logo);
+    const logoAlt = (logo && typeof logo === "object" && logo.alt) || "Hensley Logo";
 
     const [showPassword, setShowPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -111,15 +128,6 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
     } = useForm({
         resolver: yupResolver(schema)
     });
-
-    const wixImageToUrl = (wixImage) => {
-        if (!wixImage?.startsWith("wix:image://v1/")) return wixImage;
-
-        const parts = wixImage.replace("wix:image://v1/", "").split("/");
-        const mediaId = parts[0]; // "e3c477_..."
-        return `https://static.wixstatic.com/media/${mediaId}`;
-    };
-
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
@@ -138,11 +146,12 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
             setCookie("userTokens", JSON.stringify(userTokens), cookieOptions);
             removeCookie("cartId", { path: "/" });
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 reset();
                 setIsSubmitting(false);
+                // Update cart quantity BEFORE redirect so navbar shows correct count
+                await updateCartQuantity();
                 redirectWithLoader('/account');
-                updateCartQuantity();
                 if (isLightbox && close) {
                     close();
                 }
@@ -193,26 +202,29 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                 className='w-full flex flex-col gap-y-[35px] border border-black justify- items-center bg-primary-alt opacity-[0.5px] lg:px-[30px] sm:px-[120px] px-[36px] pt-[50px] pb-[55px] relative'
             >
                 {isLightbox && (
-                    <button onClick={isSubmitting ? undefined : handleClose}>
-                        <PrimaryImage
-                            url={"https://static.wixstatic.com/media/0e0ac5_823b38fd131f45499b4a78acdd4cb214~mv2.png"}
-                            customClasses={`lg:block hidden absolute left-11 top-11 transition-opacity duration-200  ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-70'}`}
-                        />
+                    <button
+                        type="button"
+                        onClick={isSubmitting ? undefined : handleClose}
+                        aria-label="Close"
+                        className={`lg:block hidden absolute left-11 top-11 transition-opacity duration-200 ${isSubmitting ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:opacity-70'}`}
+                    >
+                        <Image src={closeIcon} alt="" width={24} height={24} />
                     </button>
                 )}
 
                 <Image
-                    src={wixImageToUrl(logo)}
+                    src={logoUrl || logoFallback}
                     width={212}
                     height={33}
                     className="lg:block hidden"
-                    alt="Hensley Logo"
+                    alt={logoAlt}
+                    unoptimized={typeof logoUrl === "string" && logoUrl.length > 0}
                 />
 
 
 
                 <h3 className='lg:hidden block uppercase text-[55px] leading-[30px] text-secondary-alt font-recklessRegular'>
-                    Login
+                    {mobileTitle || "Login"}
                 </h3>
 
                 {/* Email Field */}
@@ -220,7 +232,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                     <InputField
                         id="email"
                         label={email}
-                        placeholder="example@myemail.com"
+                        placeholder={placeholders.email || "example@myemail.com"}
                         borderColor="secondary-alt"
                         type="email"
                         register={register("email")}
@@ -241,7 +253,7 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                     </label>
                     <InputField
                         id="password"
-                        placeholder="********"
+                        placeholder={placeholders.password || "********"}
                         borderColor="secondary-alt"
                         type={showPassword ? "text" : "password"}
                         classes={'col-span-2 !gap-y-0'}
@@ -262,10 +274,10 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                    transition-all duration-300 hover:bg-secondary-alt 
                    ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    <span className={`font-haasLight uppercase text-[16px] hover:border-secondary-alt  
-                         transition-all duration-300 tracking-[5px] 
+                    <span className={`font-haasLight uppercase text-[16px] hover:border-secondary-alt
+                         transition-all duration-300 tracking-[5px]
                          ${!isSubmitting ? 'group-hover:[letter-spacing:8px] group-hover:font-haasBold group-hover:text-primary' : ''}`}>
-                        {isSubmitting ? 'Signing in...' : submitButtonLabel}
+                        {isSubmitting ? (submittingButtonLabel || 'Signing in...') : submitButtonLabel}
                     </span>
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -306,7 +318,11 @@ const Login = ({ classes, close, isLightbox = true, data = '' }) => {
                         </a>
                     </span> */}
                     <div className='w-full sm:max-w-[370px] '>
-                        {convertToHTMLRichContent({ content: agreementContent, class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center' })}
+                        {convertToHTMLRichContent({ 
+                            content: agreementContent, 
+                            class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center',
+                            class_a: 'text-[12px] text-secondary underline hover:opacity-70 transition-opacity duration-200'
+                        })}
                     </div>
                 </div>
 

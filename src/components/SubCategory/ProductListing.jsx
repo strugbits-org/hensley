@@ -38,14 +38,29 @@ export const ProductListing = ({ data }) => {
     const [bannersDesktop, setBannersDesktop] = useState([]);
     const [bannersMobile, setBannersMobile] = useState([]);
     const [isMobile, setIsMobile] = useState(false);
+    const isLoadingMoreRef = useRef(false);
+
+    const getEntityId = useCallback((item) => item?._id || item?.id, []);
+
+    // Recursively collect IDs from a collection and all its populated children
+    const getCollectionIdsWithDescendants = useCallback((item) => {
+        const id = item?._id || item?.id;
+        const ids = id ? [id] : [];
+        const children = item?.children?.docs || (Array.isArray(item?.children) ? item.children : []);
+        children.forEach(child => {
+            if (child && typeof child === 'object') ids.push(...getCollectionIdsWithDescendants(child));
+            else if (typeof child === 'string') ids.push(child);
+        });
+        return ids;
+    }, []);
 
     const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
         const activeCollectionIds = newFilters.length > 0
-            ? newFilters.map(f => f._id)
+            ? newFilters.flatMap(getCollectionIdsWithDescendants).filter(Boolean)
             : collectionIds;
 
         try {
-            const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, newFilters[0]._id) : sortIndex;
+            const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, getEntityId(newFilters[0])) : sortIndex;
             const newSortedProducts = await fetchSortedProducts({
                 collectionIds: activeCollectionIds,
                 limit: pageSize,
@@ -59,13 +74,13 @@ export const ProductListing = ({ data }) => {
                 setProducts(newSortedProducts.items);
             }
 
-            setHasMore(newSortedProducts.hasNext);
+            setHasMore(newSortedProducts.hasNextPage ?? newSortedProducts.hasNext ?? false);
             return newSortedProducts;
         } catch (error) {
             logError(`Error fetching ${isLoadMore ? 'more' : 'sorted'} products:`, error);
             return null;
         }
-    }, [collectionIds, selectedFilters, sortIndex]);
+    }, [collectionIds, selectedFilters, sortIndex, categoriesSortData, getEntityId, getCollectionIdsWithDescendants]);
 
     const debouncedFetchForFilters = useDebounce((newFilters) => {
         fetchProducts({ newFilters, isLoadMore: false, newSkip: 0 })
@@ -73,9 +88,10 @@ export const ProductListing = ({ data }) => {
     }, 300);
 
     const handleFilterChange = (filter) => {
-        const isSelected = selectedFilters.some(f => f._id === filter._id);
+        const filterId = getEntityId(filter);
+        const isSelected = selectedFilters.some(f => getEntityId(f) === filterId);
         const newFilters = isSelected
-            ? selectedFilters.filter(f => f._id !== filter._id)
+            ? selectedFilters.filter(f => getEntityId(f) !== filterId)
             : [...selectedFilters, filter];
 
         setSelectedFilters(newFilters);
@@ -84,11 +100,13 @@ export const ProductListing = ({ data }) => {
     };
 
     const handleLoadMore = async () => {
-        if (!hasMore) return;
+        if (!hasMore || isLoadingMoreRef.current) return;
+        isLoadingMoreRef.current = true;
         await fetchProducts({
             isLoadMore: true,
             newSkip: products.length
         });
+        isLoadingMoreRef.current = false;
     };
 
     useEffect(() => {
@@ -108,7 +126,7 @@ export const ProductListing = ({ data }) => {
             setBannersMobile([]);
         }
         setProducts(sortedProducts.items);
-        setHasMore(sortedProducts.hasNext);
+        setHasMore(sortedProducts.hasNext ?? false);
         setIsLoading(false);
     }, [sortedProducts, productBannersData]);
 
@@ -156,10 +174,10 @@ export const ProductListing = ({ data }) => {
                     if (shouldInsertBanner || forceInsertBanner) bannerIndex = (bannerIndex + 1) % banners.length;
 
                     return (
-                        <React.Fragment key={productData._id}>
+                        <React.Fragment key={productData._id || productData.id || index}>
                             <li>
                                 <ProductCard
-                                    key={productData._id}
+                                    key={productData._id || productData.id || index}
                                     data={productData}
                                 />
                             </li>

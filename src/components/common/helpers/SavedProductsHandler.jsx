@@ -21,5 +21,5 @@ export const SavedProductsHandler = () => {
     useEffect(() => {
         fetchSavedProducts();
     }, []);
-    return;
+    return null;
 }

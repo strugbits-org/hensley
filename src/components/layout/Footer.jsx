@@ -1,10 +1,39 @@
-import logo from '@/assets/logo-footer.png';
+import facebookIcon from '@/assets/icons/facebook.png';
+import instagramIcon from '@/assets/icons/instagram.png';
+import linkedinIcon from '@/assets/icons/linkedin.png';
+import twitterIcon from '@/assets/icons/twitter.png';
 import { NewsLetter } from '../common/NewsLetter';
 import { CustomLink } from '../common/CustomLink';
 import { PrimaryImage } from '../common/PrimaryImage';
 
 export const Footer = ({ data }) => {
-  const { footerData, socialLinks, footerNaviationData, branches } = data;
+  const { footer, footerData, socialLinks = [], footerNaviationData = [], branches = [] } = data || {};
+  const brandHeading = footerData?.copyrightText1 || footer?.brand?.title || footer?.brand?.eyebrow || '';
+  const brandCopy = footerData?.copyrightText2 || footer?.bottomBar?.tagline || '';
+  const logoUrl = footer?.brand?.logo?.url || footer?.brand?.logo?.src || footerData?.logo || '';
+
+  const socialIconMap = {
+    facebook: facebookIcon,
+    instagram: instagramIcon,
+    linkedin: linkedinIcon,
+    x: twitterIcon,
+    twitter: twitterIcon,
+  };
+
+  const renderSocialIcon = (item) => {
+    const platform = (item?.platform || item?.title || '').toLowerCase();
+    const iconAsset = socialIconMap[platform];
+
+    if (iconAsset) {
+      return <img className='h-6 w-6 object-contain' src={iconAsset.src} alt={item?.label || item?.title || platform} />;
+    }
+
+    if (item?.icon) {
+      return <PrimaryImage min_h={24} min_w={24} fit='fit' url={item.icon} defaultDimensions={{ height: '24px', width: '24px' }} alt={item?.label || item?.title || 'social icon'} />;
+    }
+
+    return <span className='text-primary text-sm font-haasMedium uppercase'>{(item?.platform || item?.title || '').slice(0, 1)}</span>;
+  };
 
   return (
     <footer className='relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]'>
@@ -16,7 +45,7 @@ export const Footer = ({ data }) => {
           {branches.map((address, index) => (
             <div className='w-2/5 lg:w-1/3' key={index}>
               <h2 className='text-sm font-haasMedium uppercase text-primary mb-1 break-words'>{address.title}</h2>
-              <p className='text-sm font-haasRegular uppercase text-primary'>{address.description}</p>
+              <p className='text-sm font-haasRegular uppercase text-primary whitespace-pre-line'>{address.description}</p>
             </div>
           ))}
         </div>
@@ -29,26 +58,26 @@ export const Footer = ({ data }) => {
             ))}
             <div className='max-w-[133px] mt-9 flex lg:hidden social-links w-full gap-3 justify-between'>
               {socialLinks.map((item, index) => (
-                <CustomLink to={item.link} target={item.target} key={index}>
-                  <PrimaryImage min_h={24} min_w={24} fit='fit' url={item.icon} defaultDimensions={{ height: "24px", width: "24px" }} alt="icon" />
+                <CustomLink to={item.link || item.url} target={item.target || '_blank'} key={index}>
+                  {renderSocialIcon(item)}
                 </CustomLink>
               ))}
             </div>
           </div>
         </div>
         <div className='order-4 md:order-2 lg:order-4 w-1/2 lg:w-1/6 flex flex-col max-w-[150px]'>
-          <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'> {footerData.copyrightText1} </h2>
-          <p className='text-sm font-haasRegular uppercase text-primary mb-5'>{footerData.copyrightText2}</p>
+          <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'> {brandHeading} </h2>
+          <p className='text-sm font-haasRegular uppercase text-primary mb-5 whitespace-pre-line'>{brandCopy}</p>
           <div className='hidden lg:flex social-links w-full gap-3 justify-between max-w-[133px]'>
             {socialLinks.map((item, index) => (
-              <CustomLink to={item.link} key={index} target={item.target}>
-                <PrimaryImage min_h={24} min_w={24} fit='fit' url={item.icon} defaultDimensions={{ height: "24px", width: "24px" }} alt="icon" />
+              <CustomLink to={item.link || item.url} key={index} target={item.target || '_blank'}>
+                {renderSocialIcon(item)}
               </CustomLink>
             ))}
           </div>
         </div>
       </div>
-      <PrimaryImage min_w={1920} min_h={300} timeout={0} url={footerData.logo} fit='fit' customClasses="mt-20 lg:mt-0 mx-auto w-full" src={logo} alt="logo" />
+      <PrimaryImage customClasses='mt-20 lg:mt-0 mx-auto w-full' url={logoUrl} alt='logo' />
     </footer>
   )
 }

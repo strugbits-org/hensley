@@ -1,21 +1,15 @@
 "use server";
 
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
+import { querySection, sectionToObject } from "@/services/payloadCollections";
 
 export const fetchPrivacyPolicyPageData = async () => {
   try {
-    const privacyData = await queryCollection({ dataCollectionId: "PrivacyPolicy" });
+    const section = await querySection('privacy-policy-content');
+    const privacyData = sectionToObject(section);
 
-    if (!Array.isArray(privacyData.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
-    }
-
-    return {
-      privacyData: privacyData.items[0],
-    };
-
+    return { privacyData };
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching privacy policy page data: ${error.message}`, error);
   }
 };

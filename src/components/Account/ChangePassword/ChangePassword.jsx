@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { lightboxActions } from '@/store/lightboxStore';
 import { logError } from '@/utils';
-// import { changePassword } from '@/services/auth/authentication'; // Add your API service
+import { changePassword } from '@/services/auth/authentication';
 
 // Validation schema
 const schema = yup.object({
@@ -112,15 +112,14 @@ function ChangePassword({ content }) {
     const onSubmit = async (formData) => {
         setIsSubmitting(true);
         try {
-            // Replace with your actual API call
-            // await changePassword({
-            //     oldPassword: formData.oldPassword,
-            //     newPassword: formData.newPassword
-            // });
+            const result = await changePassword({
+                oldPassword: formData.oldPassword,
+                newPassword: formData.newPassword
+            });
 
-
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            if (result?.error) {
+                throw new Error(result.message || "Password change failed");
+            }
 
             // Show success message
             setTimeout(() => {
@@ -139,7 +138,7 @@ function ChangePassword({ content }) {
             setTimeout(() => {
                 lightboxActions.setBasicLightBoxDetails({
                     title: pageContent.messages.error.title,
-                    description: pageContent.messages.error.description,
+                    description: error.message || pageContent.messages.error.description,
                     buttonText: pageContent.messages.error.buttonText,
                     open: true,
                 });

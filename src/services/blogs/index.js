@@ -1,23 +1,23 @@
 "use server";
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
+import {
+    queryBlogs,
+    queryBlogBySlug,
+    queryBlogCategories,
+    queryMarkets,
+    queryStudios,
+    querySection,
+    sectionToObject,
+    normalizePayloadBlog,
+    normalizePayloadBlogCategory,
+    normalizePayloadMarketRef,
+    normalizePayloadStudio,
+} from "../payloadCollections";
 
 export const fetchBlogs = async () => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', 'blogCategories'],
-            sortKey: "publishDate",
-            sortOrder: "desc",
-            limit: "infinite",
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ]
-        });
-        return response.items;
+        const payloadBlogs = await queryBlogs({ sort: "-publishedDate" });
+        return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {
         logError(`Error searching blogs: ${error.message}`, error);
         return [];
@@ -26,19 +26,19 @@ export const fetchBlogs = async () => {
 
 export const fetchCategoriesMarketsAndStudios = async () => {
     try {
-        const [categories, markets, studios] = await Promise.all([
-            queryCollection({ dataCollectionId: "Blog/Categories", limit: "infinite" }),
-            queryCollection({ dataCollectionId: "Markets", limit: "infinite" }),
-            queryCollection({ dataCollectionId: "Studios", limit: "infinite" })
+        const [payloadCategories, payloadMarkets, payloadStudios] = await Promise.all([
+            queryBlogCategories(),
+            queryMarkets(),
+            queryStudios(),
         ]);
-        return { categories: categories.items, markets: markets.items, studios: studios.items };
+        return {
+            categories: payloadCategories.map(normalizePayloadBlogCategory),
+            markets: payloadMarkets.map((m) => normalizePayloadMarketRef(m)),
+            studios: payloadStudios.map(normalizePayloadStudio),
+        };
     } catch (error) {
         logError(`Error fetching categories, markets, and studios: ${error.message}`, error);
-        return {
-            categories: [],
-            markets: [],
-            studios: []
-        };
+        return { categories: [], markets: [], studios: [] };
     }
 }
 
@@ -57,28 +57,9 @@ export const fetchBlogPageData = async () => {
 
 export const fetchSelectedBlog = async (slug) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
-            eq: [
-                {
-                    key: "slug",
-                    value: slug
-                }
-            ],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ]
-        });
-
-        if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Selected blog not found`);
-        }
-
-        return response.items[0];
+        const payloadBlog = await queryBlogBySlug(slug);
+        if (!payloadBlog) throw new Error(`Blog not found: ${slug}`);
+        return normalizePayloadBlog(payloadBlog);
     } catch (error) {
         logError(`Error fetching selected blog: ${error.message}`, error);
     }
@@ -86,32 +67,14 @@ export const fetchSelectedBlog = async (slug) => {
 
 export const fetchOtherBlogs = async (slug) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "ManageBlogs",
-            includeReferencedItems: ['blogRef', 'markets', 'studios', 'author', "storeProducts"],
-            ne: [
-                {
-                    key: "slug",
-                    value: slug
-                }
-            ],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ],
-            sortKey: "publishDate",
-            sortOrder: "desc",
+        const payloadBlogs = await queryBlogs({
+            where: { slug: { not_equals: slug } },
+            sort: "-publishedDate",
         });
-
-        if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Selected blog not found`);
-        }
-
-        return response.items;
+        return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {
         logError(`Error fetching other blogs: ${error.message}`, error);
+        return [];
     }
 }
 
@@ -130,31 +93,34 @@ export const fetchPostPageData = async (slug) => {
 
 export const fetchPostPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "PostPageTitle" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("post-page-title");
+    if (section) {
+      const details = sectionToObject(section);
+      return {
+        hensleyNewsTitle: details.hensleyNewsTitle || "",
+        featuredProductTitle: details.featuredProductTitle || "",
+      };
     }
-
-    return pageDetails.items[0]
-
+    return {};
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching post page details: ${error.message}`, error);
+    return {};
   }
 };
 
 
 export const fetchBlogPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "BlogPageTitle" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("blog-page-title");
+    if (section) {
+      const details = sectionToObject(section);
+      return {
+        hensleyNewsTitle: details.hensleyNewsTitle || "",
+      };
     }
-
-    return pageDetails.items[0]
-
+    return {};
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching blog page details: ${error.message}`, error);
+    return {};
   }
 };

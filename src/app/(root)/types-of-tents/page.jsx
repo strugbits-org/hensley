@@ -1,5 +1,5 @@
 import Tents from "@/components/Tents";
-import { fetchFeaturedBlogs, fetchFeaturedProjects, fetchMasterClassTenting, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData, fetchTentsWithProjectsAndBlogs } from "@/services"; // multiple services
+import { fetchFeaturedBlogs, fetchFeaturedProjects, fetchMasterClassTenting, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData } from "@/services";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 

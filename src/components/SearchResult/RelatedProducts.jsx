@@ -8,7 +8,7 @@ import Loading from '@/app/loading'
 import { searchProducts } from '@/services/search'
 import { logError } from '@/utils'
 
-const RelatedProducts = ({ data, term, pageSize, savedProducts, setSavedProducts, pageTitle }) => {
+const RelatedProducts = ({ data, term, pageSize, savedProducts, setSavedProducts, pageTitle, allCollections = [] }) => {
     const [loading, setLoading] = useState(false);
     const [searchCompleted, setSearchCompleted] = useState(false);
     const [products, setProducts] = useState([]);
@@ -48,6 +48,7 @@ const RelatedProducts = ({ data, term, pageSize, savedProducts, setSavedProducts
                         data={item}
                         savedProducts={savedProducts}
                         setSavedProducts={setSavedProducts}
+                        allCollections={allCollections}
                     />
                 ))}
             </div>

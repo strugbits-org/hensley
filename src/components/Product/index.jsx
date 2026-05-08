@@ -4,14 +4,14 @@ import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError, normalizeProductForDisplay } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
-import { checkProductInCart, fetchSavedProductData } from '@/services/products';
+import { checkProductInCart } from '@/services/products';
 import { BreadCrumbs } from '../common/BreadCrumbs';
-import { MatchItWithButton } from '../common/MatchItWithButton';
+import { ProductBadge, resolveProductRibbon } from '../common/ProductBadge';
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -52,7 +52,7 @@ export const QuantityControls = ({ quantity, onQuantityChange }) => (
   </div>
 );
 
-export const Product = ({ data, matchedProducts = [] }) => {
+export const Product = ({ data, matchedProducts = [], allCollections = [] }) => {
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
   const [productSetItems, setProductSetItems] = useState([]);
@@ -63,21 +63,22 @@ export const Product = ({ data, matchedProducts = [] }) => {
   const redirectWithLoader = useRedirectWithLoader();
 
   const { productData, productCollectionData } = data;
-  const { product } = productData;
+  const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
+  const ribbon = resolveProductRibbon(productData?.product, allCollections);
 
   const isProductCollection = productData?.isProductCollection || false;
 
-  useMemo(() => {
+  useEffect(() => {
     if (!isProductCollection || !productCollectionData) {
       setProductSetItems([]);
       return;
     }
 
     const items = productCollectionData.map(set => ({
-      id: set.product._id,
-      product: set.product.name,
+      id: set.product._id || set.product.id,
+      product: set.product.name || set.product.title,
       size: findProductSize(set.product.additionalInfoSections),
-      formattedPrice: set.product.formattedPrice,
+      formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
       price: set.product.price,
       quantity: set.quantity
     }));
@@ -91,6 +92,19 @@ export const Product = ({ data, matchedProducts = [] }) => {
     const productSize = findProductSize(product.additionalInfoSections);
     return [{ size: productSize, formattedPrice: product.formattedPrice }];
   }, [isProductCollection, product]);
+
+  const breadcrumbItems = useMemo(() => {
+    const items = [{ label: 'Home', to: '/' }];
+
+    product.collectionBreadcrumbs?.forEach((collection) => {
+      if (collection?.slug) {
+        items.push({ label: collection.name, to: `/subcategory/${collection.slug}` });
+      }
+    });
+
+    items.push({ label: product.name || product.title || 'Product' });
+    return items;
+  }, [product.collectionBreadcrumbs, product.name, product.title]);
 
   const totalPrice = useMemo(() => {
     if (isProductCollection) {
@@ -131,25 +145,54 @@ export const Product = ({ data, matchedProducts = [] }) => {
       let lineItems = [];
 
       if (isProductCollection) {
-        let setData;
+        let setItemsData;
 
         if (productInCart) {
-          // Update existing cart item
-          const descriptionLines = formatDescriptionLines(productInCart.descriptionLines);
-          const existingSet = descriptionLines.find(x => x.title === "Set")?.value;
+          // Update existing cart item - check for new setItems format first, then fall back to string format
+          const existingSetItems = productInCart.setItems || [];
+          
+          if (existingSetItems.length > 0) {
+            // New format - merge with existing setItems
+            setItemsData = productSetItems.map((item) => {
+              const existingItem = existingSetItems.find((si) => si.productName === item.product);
+              const oldQuantity = existingItem ? parseInt(existingItem.quantity, 10) : 0;
+              return {
+                product: item.productId || null,
+                productName: item.product,
+                size: item.size,
+                quantity: oldQuantity + parseInt(item.quantity, 10),
+                unitPrice: parseFloat(item.price) || 0,
+              };
+            });
+          } else {
+            // Old format - parse from string and convert
+            const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
+            const descriptionLines = formatDescriptionLines(rawDescriptionLines);
+            const existingSet = descriptionLines.find(x => x.title === "Set")?.value || "";
 
-          setData = productSetItems.map((item) => {
-            const existingItem = existingSet.split("; ").find((field) => field.includes(item.product));
-            const oldQuantity = existingItem ? parseInt(existingItem.split("~")[3]) : 0;
-            return `${item.product}~${item.size}~${item.price}~${oldQuantity + parseInt(item.quantity)}`;
-          }).join("; ");
+            setItemsData = productSetItems.map((item) => {
+              const existingItemStr = existingSet.split("; ").find((field) => field.includes(item.product));
+              const oldQuantity = existingItemStr ? parseInt(existingItemStr.split("~")[3], 10) : 0;
+              return {
+                product: item.productId || null,
+                productName: item.product,
+                size: item.size,
+                quantity: oldQuantity + parseInt(item.quantity, 10),
+                unitPrice: parseFloat(item.price) || 0,
+              };
+            });
+          }
 
           await removeProductFromCart([productInCart._id]);
         } else {
-          // Create new cart item
-          setData = productSetItems.map((item) =>
-            `${item.product}~${item.size}~${item.price}~${item.quantity}`
-          ).join("; ");
+          // Create new cart item with structured setItems
+          setItemsData = productSetItems.map((item) => ({
+            product: item.productId || null,
+            productName: item.product,
+            size: item.size,
+            quantity: parseInt(item.quantity, 10),
+            unitPrice: parseFloat(item.price) || 0,
+          }));
         }
 
         lineItems = [{
@@ -157,10 +200,12 @@ export const Product = ({ data, matchedProducts = [] }) => {
             appId,
             catalogItemId: productId,
             options: {
-              customTextFields: { "Set": setData }
+              customTextFields: {}
             },
           },
+          setItems: setItemsData,
           quantity: 1,
+          price: product.price || 0,
         }];
       } else {
         // Single product
@@ -175,6 +220,7 @@ export const Product = ({ data, matchedProducts = [] }) => {
             },
           },
           quantity: cartQuantity,
+          price: product.price || 0,
         }];
       }
 
@@ -237,7 +283,7 @@ export const Product = ({ data, matchedProducts = [] }) => {
 
   useEffect(() => {
     setInitialData();
-  }, []);
+  }, [product._id, isProductCollection]);
 
   return (
     <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]'>
@@ -250,17 +296,19 @@ export const Product = ({ data, matchedProducts = [] }) => {
       <div className='xl:w-1/2 flex flex-col items-center relative'>
         <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
           <div className='w-full flex items-center my-8'>
-            <BreadCrumbs items={[
-              { label: 'Home', to: '/' },
-              { label: `${product.name}` }
-            ]} />
+            <BreadCrumbs items={breadcrumbItems} />
           </div>
 
+          {ribbon && (
+            <div className='mb-3'>
+              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full'>
+                {ribbon}
+              </span>
+            </div>
+          )}
           <h1 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[15px] lg:mb-[28px] sm:mt-[9px] sm:mb-[9px]'>
             {product.name}
           </h1>
-
-          <MatchItWithButton product={{ ...product, matchedProducts }} />
 
           <div className='lg:mb-[48px] sm:mb-[10px] flex lg:justify-end gap-x-[28px]'>
             <span className='text-[35px] text-secondary-alt font-recklessRegular'>{totalPrice}</span>

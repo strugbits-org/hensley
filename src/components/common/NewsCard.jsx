@@ -23,7 +23,7 @@ function NewsCard({ data, classes }) {
                 </div>
                 <div className='w-1/3 flex justify-end'>
                     <PrimaryImage
-                        url={"https://static.wixstatic.com/media/0e0ac5_87d58241be704c008a2500d6691fb318~mv2.png"}
+                        url={"/icons/0e0ac5_87d58241be704c008a2500d6691fb318.png"}
                         alt="Arrow"
                         customClasses="h-[20px] group-hover:lg:h-[44px] object-contain transition-all duration-300 ease-in-out"
                     />

@@ -43,28 +43,45 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
         ) {
             return;
         }
-        const updatedSet = collection.productSetItems.map(item => {
-            const set = item.split("~");
-            if (set[0] === id) {
-                return `${set[0]}~${set[1]}~${set[2]}~${numValue}`;
+
+        // Check for new setItems format first
+        if (collection.setItems && Array.isArray(collection.setItems) && collection.setItems.length > 0) {
+            const updatedSetItems = collection.setItems.map(item => {
+                if (item.productName === id || item.product === id) {
+                    return { ...item, quantity: numValue };
+                }
+                return item;
+            });
+            collection.setItems = updatedSetItems;
+        } else if (collection.productSetItems) {
+            // Fall back to old string format
+            const updatedSet = collection.productSetItems.map(item => {
+                const set = item.split("~");
+                if (set[0] === id) {
+                    return `${set[0]}~${set[1]}~${set[2]}~${numValue}`;
+                }
+                return item;
+            }).join("; ");
+
+            if (collection.catalogReference?.options?.customTextFields) {
+                collection.catalogReference.options.customTextFields.Set = updatedSet;
             }
-            return item;
-        }).join("; ");
+            if (collection.descriptionLines) {
+                collection.descriptionLines = collection.descriptionLines.map(line => {
+                    if (line.name?.original === "Set") {
+                        const plainText = {
+                            translated: updatedSet,
+                            original: updatedSet
+                        };
 
-        collection.catalogReference.options.customTextFields.Set = updatedSet;
-        collection.descriptionLines = collection.descriptionLines.map(line => {
-            if (line.name.original === "Set") {
-                const plainText = {
-                    translated: updatedSet,
-                    original: updatedSet
-                };
-
-                return { ...line, plainText };
+                        return { ...line, plainText };
+                    }
+                    return line;
+                });
             }
-            return line;
-        });
 
-        delete collection.productSetItems;
+            delete collection.productSetItems;
+        }
 
         const updatedLineItems = cartItems.map(item =>
             item.product._id === collection._id ? { ...item, product: collection } : item
@@ -103,6 +120,13 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                         catalogReference: catalogReference,
                         quantity: productData.quantity,
                     };
+
+                    // Include setItems for product sets (new format)
+                    if (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0) {
+                        product.setItems = item.setItems;
+                    } else if (productData.setItems && Array.isArray(productData.setItems) && productData.setItems.length > 0) {
+                        product.setItems = productData.setItems;
+                    }
 
                     products.push(product);
                 } catch (error) {
@@ -196,13 +220,23 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                             <div className=''>
                                                 {cartItems.map((item, index) => {
                                                     const product = item.product;
-                                                    const descriptionLines = product.descriptionLines ? formatDescriptionLines(product.descriptionLines) : product.customTextFields;
-                                                    const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-                                                    const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
+                                                    // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
+                                                    const rawDescriptionLines = product.descriptionLines || product.customTextFieldValues || product.customTextFields || [];
+                                                    const descriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name 
+                                                        ? formatDescriptionLines(rawDescriptionLines) 
+                                                        : rawDescriptionLines;
+                                                    
+                                                    // Check for new itemType/setItems format first, then fall back to old string format
+                                                    const isProductSet = item.itemType === "set" || product.itemType === "set" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
+                                                    const productCollectionString = descriptionLines.find(x => x.title === "Set")?.value;
+                                                    const isProductCollection = isProductSet || Boolean(productCollectionString);
+                                                    
+                                                    const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || product.itemType === "tent" || product.itemType === "pool_cover" || descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
-                                                    if (productCollection) {
-                                                        const productSetItems = productCollection.split("; ");
-                                                        const lineItemData = { ...product, productSetItems };
+                                                    if (isProductCollection) {
+                                                        // Use new setItems if available, otherwise parse old string format
+                                                        const productSetItems = productCollectionString ? productCollectionString.split("; ") : [];
+                                                        const lineItemData = { ...product, productSetItems, setItems: item.setItems || product.setItems };
                                                         return (
                                                             <CartCollection key={index} data={lineItemData} enableQuantityControls={true} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} actions={{ handleQuantityChange: (value, id) => handleCollectionQuantityChange(lineItemData, value, id) }} />
                                                         )

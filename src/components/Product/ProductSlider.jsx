@@ -116,7 +116,7 @@ export default function ProductSlider({ product }) {
     [thumbnailPlugin(instanceRef)]
   );
 
-  const mediaItems = useMemo(() => product?.mediaItems || [], [product?.mediaItems]);
+  const mediaItems = useMemo(() => product?.mediaItems || [], [product]);
 
   if (!mediaItems.length) {
     return (

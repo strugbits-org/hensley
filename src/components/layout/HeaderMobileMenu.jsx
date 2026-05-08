@@ -3,23 +3,68 @@ import { SearchModal } from "../Modals/SearchModal";
 import { MarketTentModal } from "../Modals/MarketTentModal";
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
+import { lightboxActions } from "@/store/lightboxStore";
+
+const resolveSubCategoryHref = (data = {}) => {
+    const directPath = data.slug || data.href || data.url;
+
+    if (directPath) return directPath;
+
+    const relatedCollection = data?.category || data?.collection || data?.productCollection || {};
+    const categorySlug = relatedCollection?.slug ? String(relatedCollection.slug).replace(/^\//, "") : "";
+
+    if (!categorySlug) return "";
+
+    const hasParent = Boolean(relatedCollection?.parent);
+    const hasHierarchy = relatedCollection?.hierarchyLevel !== undefined || relatedCollection?.level !== undefined || hasParent;
+    const hierarchyLevel = Number(relatedCollection?.hierarchyLevel ?? relatedCollection?.level ?? (hasParent ? 2 : 0));
+    const basePath = hasHierarchy
+        ? (!hasParent && hierarchyLevel <= 1 ? "/collections" : "/subcategory")
+        : (data.redirection || "/subcategory");
+
+    return `${basePath}/${categorySlug}`;
+};
 
 const SubCategoryItem = ({ data, closeModal }) => {
-    const { title, category, redirection } = data;
-    const linkTo = `${redirection || "/subcategory"}/${category.slug}`;
-    return (
-        <CustomLink to={linkTo} className="w-1/2 flex flex-col items-center" key={title} onClick={closeModal}>
+    const relatedCollection = data?.category || data?.collection || data?.productCollection || {};
+    const collectionImage = relatedCollection.mainMedia || relatedCollection.media?.mainMedia || null;
+    const { title, type, lightbox, target } = data;
+    const linkTo = resolveSubCategoryHref(data);
+
+    const content = (
+        <>
             <div className="relative bg-primary rounded-full w-[115px] h-[115px] overflow-hidden">
-                {category.mainMedia && (
+                {collectionImage && (
                     <PrimaryImage
                         timeout={0}
-                        url={category.mainMedia}
+                        url={collectionImage}
                         alt={title}
                         customClasses="h-full w-full object-cover"
                     />
                 )}
             </div>
             <p className="mt-4 text-xs uppercase tracking-wider text-secondary-alt font-haasRegular">{title}</p>
+        </>
+    );
+
+    if (type === "lightbox" && lightbox) {
+        return (
+            <button
+                type="button"
+                className="w-1/2 flex flex-col items-center"
+                onClick={() => {
+                    lightboxActions.showLightBox(lightbox);
+                    closeModal?.();
+                }}
+            >
+                {content}
+            </button>
+        );
+    }
+
+    return (
+        <CustomLink to={linkTo} target={target} className="w-1/2 flex flex-col items-center" key={title} onClick={closeModal}>
+            {content}
         </CustomLink>
     );
 };
@@ -52,7 +97,7 @@ export const HeaderMobileMenu = ({
                                     {menuItems.map((item) => (
                                         <React.Fragment key={item.title}>
                                             <button
-                                                onClick={() => handleMainMenuClick(item)}
+                                                onClick={() => handleMainMenuClick(item, true)}
                                                 className="font-haasMedium text-center cursor-pointer text-[21px] tracking-widest"
                                             >
                                                 {item.title}

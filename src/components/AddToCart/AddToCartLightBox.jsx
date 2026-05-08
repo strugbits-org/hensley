@@ -4,7 +4,7 @@ import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/re
 import AddToCart from '../Modals/AddToCart/AddToCart';
 import AddToCartTent from '../Modals/AddToCart/AddToCartTent';
 
-export const AddToCartLightBox = ({ data, onClose }) => {
+export const AddToCartLightBox = ({ data, onClose, allCollections = [] }) => {
     const { open, type } = data;
 
     return (
@@ -34,7 +34,7 @@ export const AddToCartLightBox = ({ data, onClose }) => {
                             leaveTo="opacity-0 scale-95"
                         >
                             <DialogPanel className="transform sm:!px-[20px] overflow-hidden text-left align-middle transition-all relative flex justify-center items-center">
-                                {type === 'tent' ? <AddToCartTent data={data} onClose={onClose} /> : <AddToCart data={data} onClose={onClose} />}
+                                {type === 'tent' ? <AddToCartTent data={data} onClose={onClose} allCollections={allCollections} /> : <AddToCart data={data} onClose={onClose} allCollections={allCollections} />}
                             </DialogPanel>
                         </TransitionChild>
                     </div>

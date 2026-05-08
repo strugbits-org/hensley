@@ -5,6 +5,17 @@ import EventGallery from './EventGallery'
 import { FeaturedProducts } from '../Product/FeaturedProducts';
 import OurProjects from '../Collections/OurProjects';
 import SectionTitle from '../common/SectionTitle';
+import { generateImageURLAlternate } from '@/utils/generateImageURL';
+import Image from 'next/image';
+
+const formatEventDate = (dateString) => {
+    if (!dateString) return "";
+    try {
+        return new Date(dateString).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    } catch {
+        return "";
+    }
+};
 
 const PortfolioDetails = ({ data }) => {
     const { project, otherProjects, pageDetails } = data;

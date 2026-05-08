@@ -38,7 +38,7 @@ const ProjectCard = ({ data, handleFilterChange, selectedTags, isRTL }) => {
 
                         <CustomLink to={`/project/${slug}`} className='pt-[10px]'>
                             <PrimaryImage
-                                url="https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"
+                                url="/icons/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"
                                 alt="Arrow"
                                 customClasses="hidden lg:block arrow w-[25px] h-[25px] transition-all duration-300 ease-in-out group-hover:w-[70px] group-hover:h-[70px] lg:mb-[12px] group-hover:filter brightness-50"
                             />
@@ -47,7 +47,7 @@ const ProjectCard = ({ data, handleFilterChange, selectedTags, isRTL }) => {
 
                     <CustomLink to={`/project/${slug}`} >
                         <PrimaryImage
-                            url="https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"
+                            url="/icons/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"
                             alt="Arrow"
                             customClasses="lg:hidden arrow w-[25px] h-[25px]"
                         />
@@ -59,3 +59,4 @@ const ProjectCard = ({ data, handleFilterChange, selectedTags, isRTL }) => {
 }
 
 export default ProjectCard;
+

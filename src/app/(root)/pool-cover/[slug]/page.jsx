@@ -2,6 +2,7 @@ import ProductPoolCover from "@/components/PoolCover";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import { fetchPoolCoverPageData, fetchPoolCovers } from "@/services/poolcover";
+import { queryProductCollections } from "@/services/payloadCollections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -19,7 +20,10 @@ export const generateStaticParams = async () => {
 export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
-    const data = await fetchPoolCoverPageData(slug);
+    const [data, allCollections] = await Promise.all([
+      fetchPoolCoverPageData(slug),
+      queryProductCollections().catch(() => []),
+    ]);
     const { productData, matchedProducts, featuredProjectsData } = data;
 
     if (!data) {
@@ -28,8 +32,8 @@ export default async function Page({ params }) {
 
     return (
       <>
-        <ProductPoolCover productData={productData} matchedProducts={matchedProducts || []} />
-        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="auto" />
+        <ProductPoolCover productData={productData} matchedProducts={matchedProducts || []} allCollections={allCollections} />
+        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
         <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="auto" />
       </>
     );

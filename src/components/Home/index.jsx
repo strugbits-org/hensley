@@ -8,7 +8,7 @@ import { HeroSection } from "./HeroSection"
 import OurProjects from "./OurProjects";
 
 export const HomePage = ({ data }) => {
-    const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers, testimonials, marketsData, blogsData } = data;
+    const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers, testimonials, marketsData, blogsData, allCollections = [] } = data;
 
     return (
         <>
@@ -16,7 +16,7 @@ export const HomePage = ({ data }) => {
             <OurCategories data={categoriesData} pageDetails={homePageDetails} />
             <OurProjects data={portfolioData} pageDetails={homePageDetails} />
             <Banner data={bannerData} />
-            <BestSellers data={bestSellers} pageDetails={homePageDetails} />
+            <BestSellers data={bestSellers} pageDetails={homePageDetails} allCollections={allCollections} />
             <Testimonials cardClasses={'lg:hover:bg-primary'} data={testimonials} pageDetails={homePageDetails} />
             <MarketSection classes={"border !border-secondary"} data={marketsData} pageDetails={homePageDetails} />
             <HensleyNews data={blogsData} pageDetails={homePageDetails} />

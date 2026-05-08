@@ -1,23 +1,33 @@
 "use server";
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
 import { fetchMarketsData } from "..";
+import {
+    queryProjects,
+    queryProjectBySlug,
+    queryProjectCategories,
+    queryMarkets,
+    queryStudios,
+    normalizePayloadProject,
+    normalizePayloadProjectCategory,
+    normalizePayloadStudio,
+    querySection,
+    sectionToObject,
+} from "../payloadCollections";
+
+const normalizePayloadMarketForFilter = (m) => {
+    if (!m || typeof m !== "object") return m;
+    return {
+        ...m,
+        _id: m.id || m._id,
+        category: m.title || m.category || "",
+        slug: m.slug?.startsWith("/") ? m.slug : `/${m.slug || ""}`,
+    };
+};
 
 export const fetchProjects = async () => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ['portfolioRef', 'markets', 'studios', 'portfolioCategories'],
-            sortKey: "order",
-            limit: "infinite",
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ]
-        });
-        return response.items;
+        const payloadProjects = await queryProjects({ sort: "order" });
+        return payloadProjects.map(normalizePayloadProject);
     } catch (error) {
         logError(`Error searching projects: ${error.message}`, error);
         return [];
@@ -26,19 +36,19 @@ export const fetchProjects = async () => {
 
 export const fetchCategoriesMarketsAndStudios = async () => {
     try {
-        const [categories, markets, studios] = await Promise.all([
-            queryCollection({ dataCollectionId: "Portfolio/Collections", limit: "infinite" }),
-            queryCollection({ dataCollectionId: "Markets", limit: "infinite" }),
-            queryCollection({ dataCollectionId: "Studios", limit: "infinite" })
+        const [payloadCategories, payloadMarkets, payloadStudios] = await Promise.all([
+            queryProjectCategories(),
+            queryMarkets(),
+            queryStudios(),
         ]);
-        return { categories: categories.items, markets: markets.items, studios: studios.items };
+        return {
+            categories: payloadCategories.map(normalizePayloadProjectCategory),
+            markets: payloadMarkets.map(normalizePayloadMarketForFilter),
+            studios: payloadStudios.map(normalizePayloadStudio),
+        };
     } catch (error) {
         logError(`Error fetching categories, markets, and studios: ${error.message}`, error);
-        return {
-            categories: [],
-            markets: [],
-            studios: []
-        };
+        return { categories: [], markets: [], studios: [] };
     }
 }
 
@@ -55,30 +65,11 @@ export const fetchPortfolioPageData = async () => {
     }
 }
 
-export const fetchSelectedProject = async (slug) => {
+export const fetchSelectedProject = async (slug, { draft = false } = {}) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ['portfolioRef', 'markets', 'studios', "storeProducts"],
-            eq: [
-                {
-                    key: "slug",
-                    value: slug
-                }
-            ],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ]
-        });
-
-        if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Selected project not found`);
-        }
-
-        return response.items[0];
+        const payloadProject = await queryProjectBySlug(slug, { draft });
+        if (!payloadProject) throw new Error(`Selected project not found`);
+        return normalizePayloadProject(payloadProject);
     } catch (error) {
         logError(`Error fetching selected projects=: ${error.message}`, error);
     }
@@ -86,36 +77,21 @@ export const fetchSelectedProject = async (slug) => {
 
 export const fetchOtherProjects = async (slug) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ['portfolioRef', 'markets', 'studios', "storeProducts"],
-            ne: [
-                {
-                    key: "slug",
-                    value: slug
-                },
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ],
-            sortKey: "order",
+        const payloadProjects = await queryProjects({
+            where: { slug: { not_equals: slug } },
+            sort: "order",
         });
-
-        if (!Array.isArray(response.items) || response.items.length === 0) {
-            throw new Error(`Selected projects not found`);
-        }
-
-        return response.items;
+        return payloadProjects.map(normalizePayloadProject);
     } catch (error) {
         logError(`Error fetching other projects: ${error.message}`, error);
+        return [];
     }
 }
 
-export const fetchProjectPageData = async (slug) => {
+export const fetchProjectPageData = async (slug, { draft = false } = {}) => {
     try {
         const [project, otherProjects, pageDetails] = await Promise.all([
-            fetchSelectedProject(slug),
+            fetchSelectedProject(slug, { draft }),
             fetchOtherProjects(slug),
             fetchProjectPageDetails()
         ]);
@@ -127,15 +103,36 @@ export const fetchProjectPageData = async (slug) => {
 
 export const fetchProjectPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "ProjectPageTitle" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("project-page-title");
+    if (section) {
+      const details = sectionToObject(section);
+      return {
+        otherProjectsTitle: details.otherProjectsTitle || "",
+        featuredProductTitle: details.featuredProductTitle || "",
+      };
     }
-
-    return pageDetails.items[0]
-
+    return {};
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching project page details: ${error.message}`, error);
+    return {};
   }
+};
+
+export const fetchFeaturedProjects = async (limit = 3) => {
+    try {
+        const payloadProjects = await queryProjects({
+            where: { isFeatured: { equals: true } },
+            sort: "order",
+            limit,
+        });
+        if (payloadProjects.length) {
+            return payloadProjects.map(normalizePayloadProject);
+        }
+        // Fallback: return first N projects
+        const fallback = await queryProjects({ sort: "order", limit });
+        return fallback.map(normalizePayloadProject);
+    } catch (error) {
+        logError(`Error fetching featured projects: ${error.message}`, error);
+        return [];
+    }
 };

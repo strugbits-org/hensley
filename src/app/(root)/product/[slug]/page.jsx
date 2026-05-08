@@ -1,9 +1,11 @@
 import { Product } from "@/components/Product";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
+import OurCategories from "@/components/common/OurCategories";
 import { fetchPageMetaData } from "@/services";
 import { fetchProductData, fetchProductPageData, fetchProductPaths } from "@/services/products";
-import { logError } from "@/utils";
+import { queryProductsBySlug } from "@/services/payloadCollections";
+import { logError, normalizeProductForDisplay, richTextToPlainText } from "@/utils";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }) {
@@ -12,15 +14,19 @@ export async function generateMetadata({ params }) {
 
     const [
       metaData,
-      productData
+      product
     ] = await Promise.all([
       fetchPageMetaData("product"),
-      fetchProductData(slug)
+      queryProductsBySlug(slug)
     ]);
 
     const { title, noFollowTag } = metaData;
-    const fullTitle = productData.product.name + " " + title;
-    const metadata = { title: fullTitle };
+    const normalizedProduct = normalizeProductForDisplay(product || {});
+    const fullTitle = `${normalizedProduct.name} ${title}`;
+    const metadata = {
+      title: fullTitle,
+      description: richTextToPlainText(product?.description).slice(0, 160) || undefined,
+    };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
       metadata.robots = "noindex,nofollow";
     }
@@ -45,7 +51,7 @@ export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchProductPageData(slug);
-    const { matchedProducts, featuredProjectsData, pageDetails } = data;
+    const { matchedProducts, featuredProjectsData, pageDetails, ourCategoriesData, allCollections = [] } = data;
     const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     if (!data) {
@@ -54,8 +60,12 @@ export default async function Page({ params }) {
 
     return (
       <>
-        <Product data={data} matchedProducts={matchedProducts || []} />
-        <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" />
+        <Product data={data} matchedProducts={matchedProducts || []} allCollections={allCollections} />
+        <OurCategories
+          data={ourCategoriesData || []}
+          pageDetails={{ ourCategoriesTitle: pageDetails?.ourCategoriesTitle || "SHOP BY CATEGORY" }}
+        />
+        <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
         <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
       </>
     );

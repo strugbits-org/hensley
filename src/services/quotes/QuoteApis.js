@@ -1,14 +1,14 @@
 "use server";
-import queryCollection from "@/utils/fetchFunction";
-import { getAuthToken, getCartId, getMemberTokens } from "../auth";
+import { logError } from "@/utils";
+import { getAuthToken, getCartId } from "../auth";
 import { createPriceQuoteVisitor } from "./QuoteApisVisitor";
+import { querySection, sectionToObject } from "../payloadCollections";
 
 const baseUrl = process.env.BASE_URL;
 
 export const createPriceQuote = async ({ lineItems, quoteDetails }) => {
   try {
     const authToken = await getAuthToken();
-    const memberTokens = await getMemberTokens();
 
     if (!authToken) {
       const cartId = await getCartId();
@@ -16,7 +16,7 @@ export const createPriceQuote = async ({ lineItems, quoteDetails }) => {
       return response;
     }
 
-    const payload = { memberTokens, lineItems, quoteDetails };
+    const payload = { lineItems, quoteDetails };
 
     const response = await fetch(`${baseUrl}/api/quote/create`, {
       method: "POST",
@@ -81,16 +81,14 @@ export const fetchQuote = async (id) => {
 
 export const fetchQuoteHistoryPageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "QuoteHistoryPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("quote-history-page-details");
+    if (section) {
+      return sectionToObject(section);
     }
-
-    return pageDetails.items[0]
-
+    return {};
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching quote history page details: ${error.message}`, error);
+    return {};
   }
 };
 
@@ -98,15 +96,43 @@ export const fetchQuoteHistoryPageDetails = async () => {
 
 export const fetchQuotePageDetails = async () => {
   try {
-    const pageDetails = await queryCollection({ dataCollectionId: "QuoteRequestPageDetails" });
-
-    if (!Array.isArray(pageDetails.items)) {
-      throw new Error(`PrivacyPolicy response does not contain items array`);
+    const section = await querySection("quote-request-page-details");
+    if (section) {
+      const details = sectionToObject(section);
+      return {
+        title: details.title || "QUOTE REQUEST",
+        tagline: details.tagline || "",
+        description: details.description || "",
+        submitButtonLabel: details.submitButtonLabel || "SUBMIT",
+        sections: {
+          eventDetails: details.eventDetailsTitle || "EVENT DETAILS",
+          billingDetails: details.billingDetailsTitle || "BILLING DETAILS",
+          orderBy: details.orderByTitle || "ORDER BY",
+        },
+        labels: {
+          eventDate: details.eventDateLabel || "EVENT DATE*",
+          deliveryDate: details.deliveryDateLabel || "DELIVERY DATE*",
+          pickupDate: details.pickupDateLabel || "PICKUP DATE*",
+          eventLocation: details.eventLocationLabel || "EVENT LOCATION",
+          eventDescription: details.eventDescriptionLabel || "EVENT DESCRIPTION / PO#",
+          billTo: details.billToLabel || "BILL TO*",
+          streetAddress: details.streetAddressLabel || "STREET ADDRESS*",
+          addressLine2: details.addressLine2Label || "ADDRESS LINE 2",
+          city: details.cityLabel || "CITY*",
+          state: details.stateLabel || "STATE*",
+          zipCode: details.zipCodeLabel || "ZIP CODE*",
+          specialInstructions: details.specialInstructionsLabel || "SPECIAL INSTRUCTIONS OR ORDER COMMENTS",
+          city1: details.citySecondaryLabel || "CITY",
+          state1: details.stateSecondaryLabel || "STATE",
+          name: details.nameLabel || "NAME*",
+          email: details.emailLabel || "EMAIL*",
+          phone: details.phoneLabel || "PHONE*",
+        },
+      };
     }
-
-    return pageDetails.items[0]
-
+    return {};
   } catch (error) {
-    logError(`Error fetching contact page data: ${error.message}`, error);
+    logError(`Error fetching quote page details: ${error.message}`, error);
+    return {};
   }
 };

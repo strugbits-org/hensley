@@ -1,13 +1,14 @@
 import React from 'react';
+import Image from 'next/image';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { formatDate } from '@/utils';
 import { MarketsStudiosTags } from './MarketsStudiosTags';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import arrowDark from '@/assets/icons/arrow-dark.svg';
 
 function BlogCard({ data, handleFilterChange, selectedTags }) {
     const { slug, author, blogRef, markets, studios, blogCategories } = data;
 
-    const arrowImageUrl = "https://static.wixstatic.com/media/0e0ac5_87d58241be704c008a2500d6691fb318~mv2.png";
     const redirectWithLoader = useRedirectWithLoader();
 
     const handleRedirection = () => {
@@ -30,10 +31,10 @@ function BlogCard({ data, handleFilterChange, selectedTags }) {
                     </h2>
                 </div>
                 <div className='w-1/3 flex justify-end'>
-                    <PrimaryImage
-                        url={arrowImageUrl}
+                    <Image
+                        src={arrowDark}
                         alt="Arrow"
-                        customClasses="h-[20px] group-hover:lg:h-[44px] object-contain transition-all duration-300 ease-in-out"
+                        className="h-[20px] group-hover:lg:h-[44px] w-auto object-contain transition-all duration-300 ease-in-out"
                     />
                 </div>
             </div>

@@ -6,9 +6,11 @@ import BannerStructures from '../Product-Tent/BannerStructures';
 import ProductSlider from '../Product/ProductSlider';
 import ProductSlider_tab from '../Product/ProductSlider_tab';
 import { AddToQuoteForm } from './AddToQuoteForm';
+import { resolveProductRibbon } from '../common/ProductBadge';
 
-const ProductPoolCover = ({ productData, matchedProducts = [] }) => {
+const ProductPoolCover = ({ productData, matchedProducts = [], allCollections = [] }) => {
   const { covers, mediagallery } = productData;
+  const ribbon = resolveProductRibbon(covers, allCollections);
 
   return (
     <>
@@ -18,6 +20,13 @@ const ProductPoolCover = ({ productData, matchedProducts = [] }) => {
           <ProductSlider_tab product={covers} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
+          {ribbon && (
+            <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px]'>
+              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full'>
+                {ribbon}
+              </span>
+            </div>
+          )}
           <AddToQuoteForm title={productData?.title} productData={covers} matchedProducts={matchedProducts} />
           <SaveProductButton
             key={productData._id}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { PrimaryImage } from './PrimaryImage';
 import { toast } from 'sonner';
 import { saveProduct, unSaveProduct } from '@/services/products';
@@ -8,10 +8,18 @@ import { useSnapshot } from 'valtio';
 import { actions, states } from '@/store';
 
 export const SaveProductButton = ({ productData, type = "primary" }) => {
-    const { savedProducts: savedProductsData } = useSnapshot(states);
-    const [savedProducts, setSavedProducts] = useState(savedProductsData);
+    const { savedProducts } = useSnapshot(states);
     const [isUpdating, setIsUpdating] = useState(false);
-    const isProductSaved = savedProducts.some(savedProduct => savedProduct._id === productData._id);
+    
+    // Get the actual product ID for comparison - handle both nested and flat structures
+    const currentProductId = productData.product?._id || productData.product?.id || productData._id;
+    const isProductSaved = savedProducts.some(savedProduct => {
+        // Handle both object { product: { _id } } and string { product: "id" } formats
+        const savedProductId = typeof savedProduct.product === 'string'
+            ? savedProduct.product
+            : (savedProduct.product?._id || savedProduct.product?.id || savedProduct._id);
+        return savedProductId === currentProductId;
+    });
     const [cookies, _setCookie] = useCookies(["authToken"]);
 
     const handleSaveToggle = async () => {
@@ -24,24 +32,39 @@ export const SaveProductButton = ({ productData, type = "primary" }) => {
         setIsUpdating(true);
         const wasProductSaved = isProductSaved;
 
+        // Optimistic update
         if (wasProductSaved) {
-            setSavedProducts(prevSaved => prevSaved.filter(savedProduct => savedProduct._id !== productData._id));
+            actions.setSavedProducts(savedProducts.filter(savedProduct => {
+                const savedProductId = typeof savedProduct.product === 'string'
+                    ? savedProduct.product
+                    : (savedProduct.product?._id || savedProduct.product?.id || savedProduct._id);
+                return savedProductId !== currentProductId;
+            }));
         } else {
-            setSavedProducts(prevSaved => [...prevSaved, productData]);
+            actions.setSavedProducts([...savedProducts, productData]);
         }
 
         try {
-            const productId = productData.product._id;
+            const productId = productData.product?._id || productData.product?.id || productData._id;
+            if (!productId) {
+                throw new Error("Product ID not found");
+            }
             if (wasProductSaved) {
                 await unSaveProduct(productId);
             } else {
                 await saveProduct(productId);
             }
         } catch (error) {
+            // Revert on error
             if (wasProductSaved) {
-                setSavedProducts(prevSaved => [...prevSaved, productData]);
+                actions.setSavedProducts([...savedProducts, productData]);
             } else {
-                setSavedProducts(prevSaved => prevSaved.filter(savedProduct => savedProduct._id !== productData._id));
+                actions.setSavedProducts(savedProducts.filter(savedProduct => {
+                    const savedProductId = typeof savedProduct.product === 'string'
+                        ? savedProduct.product
+                        : (savedProduct.product?._id || savedProduct.product?.id || savedProduct._id);
+                    return savedProductId !== currentProductId;
+                }));
             }
             toast.error(error.message);
         } finally {
@@ -52,10 +75,6 @@ export const SaveProductButton = ({ productData, type = "primary" }) => {
     // Icon URLs
     const unSavedUrl = "https://static.wixstatic.com/shapes/0e0ac5_28d83eb7d9a4476e9700ce3a03f5a414.svg";
     const savedUrl = "https://static.wixstatic.com/shapes/0e0ac5_f78bb7f1de5841d1b00852f89dbac4e6.svg";
-
-    useEffect(() => {
-        actions.setSavedProducts(savedProducts);
-    }, [savedProducts]);
 
     return (
         <div

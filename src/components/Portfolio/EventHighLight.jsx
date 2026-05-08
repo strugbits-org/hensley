@@ -26,7 +26,7 @@ const EventHighLight = ({ data, handleFilterChange, selectedTags }) => {
                             className='order-2 lg:order-1 z-10 lg:w-[176px] lg:h-[176px] w-[34px] h-[34px] lg:group-hover:w-[342px] lg:group-hover:h-[342px] transition-all duration-300 ease-in-out'
                             height={176}
                             width={176}
-                            src={"https://static.wixstatic.com/shapes/0e0ac5_7f17be7b63744aaf83be995827c7ff34.svg"}
+                            src={"/icons/0e0ac5_7f17be7b63744aaf83be995827c7ff34.svg"}
                         />
                         <div className='order-1 lg:order-2 flex flex-col gap-y-[15px] max-w-md'>
                             <span className='font-haasRegular uppercase text-[12px] text-secondary-alt text-white block '>{formatDate(publishDate)}</span>

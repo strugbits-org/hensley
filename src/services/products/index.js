@@ -1,229 +1,242 @@
 "use server";
-import { logError, mapProductSetItems } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
+import { logError, mapProductSetItems, normalizeProductForDisplay } from "@/utils";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
+import { fetchOurCategoriesData } from "..";
+import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProject, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload } from "../payloadCollections";
+
 
 const baseUrl = process.env.BASE_URL;
 
 export const fetchProductsByCategory = async (id) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            includeReferencedItems: ["product"],
-            hasSome: [
-                {
-                    key: "categories",
-                    values: [id]
-                }
-            ],
-            sortKey: "order"
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
+        if (!id) return [];
+        const result = await queryProductsByCollectionIds([id]);
+        return Array.isArray(result?.docs) ? result.docs : [];
     } catch (error) {
         logError(`Error fetching products by category: ${error.message}`, error);
+        return [];
     }
 }
 
 export const fetchCategoriesData = async () => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "Stores/Collections",
-            limit: "infinite",
-            extendedLimit: 100,
-        });
-
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
+        const docs = await queryProductCollections();
+        return Array.isArray(docs) ? docs : [];
     } catch (error) {
         logError(`Error fetching category data: ${error.message}`, error);
+        return [];
     }
 }
 
 export const fetchProductsByIds = async (ids) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            hasSome: [
-                {
-                    key: "product",
-                    values: ids
-                }
-            ]
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
+        if (!ids || !ids.length) return [];
+        return await queryProductsByIds(ids);
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);
+        return [];
     }
 }
 
-export const fetchProductData = async (slug) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            includeReferencedItems: ["product"],
-            eq: [
-                {
-                    key: "slug",
-                    value: slug
-                }
-            ]
+// fetchProductData removed — wixProductId is no longer needed.
+// product.recommendedProducts and product.collections are resolved directly from bps-core.
+
+/**
+ * Map Payload bundle items to the expected productCollectionData format
+ */
+const mapBundleItemsToCollectionData = (bundleItems) => {
+    if (!Array.isArray(bundleItems) || bundleItems.length === 0) return null;
+
+    return bundleItems
+        .filter(item => item.product && typeof item.product === 'object')
+        .map(item => {
+            const product = item.product;
+            return {
+                product: {
+                    _id: product.id || product._id,
+                    id: product.id || product._id,
+                    name: product.title,
+                    title: product.title,
+                    price: product.price || 0,
+                    formattedPrice: product.price ? `$${product.price.toFixed(2)}` : '$0.00',
+                    additionalInfoSections: product.additionalInfoSections || [],
+                },
+                quantity: item.quantity || 1,
+                optional: item.optional || false,
+                variant: item.variant,
+            };
         });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
+};
+
+export const fetchProductCollectionData = async (id, productData = null) => {
+    try {
+        // First check if this is a Payload bundle product
+        // productData may be passed directly from the modal with bundle info
+        let product = productData;
+        
+        // If productData has bundleItems, use them directly
+        if (product?.type === 'bundle' && Array.isArray(product.bundleItems) && product.bundleItems.length > 0) {
+            const bundleItems = mapBundleItemsToCollectionData(product.bundleItems);
+            if (bundleItems && bundleItems.length > 0) {
+                return bundleItems;
+            }
+        }
+        
+        // Try to fetch from Payload if we have an ID
+        if (id) {
+            const payloadProduct = await queryProductById(id);
+            if (payloadProduct?.type === 'bundle' && 
+                Array.isArray(payloadProduct.bundleItems) && 
+                payloadProduct.bundleItems.length > 0) {
+                const bundleItems = mapBundleItemsToCollectionData(payloadProduct.bundleItems);
+                if (bundleItems && bundleItems.length > 0) {
+                    return bundleItems;
+                }
+            }
         }
 
-        return response.items[0];
-    } catch (error) {
-        logError(`Error fetching product data: ${error.message}`, error);
-    }
-}
-
-export const fetchProductCollectionData = async (id) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "MultipleProductsSet",
-            includeReferencedItems: ["products"],
-            eq: [
-                {
-                    key: "product",
-                    value: id
-                }
-            ]
-        });
-        const productSetItems = mapProductSetItems(response.items[0]);
-        if (productSetItems.length === 0) return false;
-        return productSetItems;
+        return false;
     } catch (error) {
         logError(`Error fetching product collection data: ${error.message}`, error);
+        return false;
     }
 }
 
 export const fetchFeaturedProjects = async (id) => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "PortfolioCollection",
-            includeReferencedItems: ["portfolioRef"],
-            ne: [
-                {
-                    key: "isHidden",
-                    value: true
-                }
-            ],
-            hasSome: [
-                {
-                    key: "storeProducts",
-                    values: [id]
-                }
-            ],
-            sortKey: "order"
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
+        if (!id || (typeof id !== "string" && typeof id !== "number")) {
+            return [];
         }
-
-        return response.items;
+        const payloadProjects = await queryProjects({
+            where: { storeProducts: { contains: id } },
+            sort: "order",
+        });
+        return payloadProjects.map(normalizePayloadProject);
     } catch (error) {
         logError(`Error fetching featured projects: ${error.message}`, error);
-    }
-}
-
-export const fetchMatchedProducts = async (id) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "MATCHITWITH",
-            includeReferencedItems: ["matchProducts", "productData"],
-            eq: [{ key: "product", value: id }],
-        });
-
-        // Early return if no items found
-        if (!response?.items?.length) {
-            return [];
-        }
-
-        // Filter out string items and early return if empty
-        const matchProducts = response.items[0].matchProducts?.filter(item =>
-            item && typeof item === "object" && item._id
-        );
-
-        if (!matchProducts?.length) {
-            return [];
-        }
-
-        // Extract IDs and fetch products
-        const productIds = matchProducts.map(item => item._id);
-        const products = await fetchProductsByIds(productIds);
-
-
-
-        // Create a Map for O(1) lookup instead of find() for each item
-        const matchProductsMap = new Map(
-            matchProducts.map(product => [product._id, product])
-        );
-        // Merge products with match data
-        return products.map(product => ({
-            ...product,
-            product: matchProductsMap.get(product.product)
-        }));
-
-    } catch (error) {
         return [];
     }
 }
 
+// fetchMatchedProducts removed — replaced by product.recommendedProducts from bps-core.
 
-export const fetchProductPageDetails = async () => {
+const getPayloadCollectionIds = (product = {}) => {
+    const collectionsSource = product?.collections || product?.productCollections || product?.productCollection || product?.collection;
+    const collections = Array.isArray(collectionsSource) ? collectionsSource : collectionsSource ? [collectionsSource] : [];
+
+    return collections
+        .map((collection) => {
+            if (typeof collection === "string") return collection;
+            if (collection && typeof collection === "object") {
+                return collection.id || collection._id || collection.value?.id || collection.value?._id;
+            }
+
+            return null;
+        })
+        .filter(Boolean);
+};
+
+const fetchMatchedProductsFromCollections = async (product = {}) => {
+    const productId = product?.id || product?._id;
+    const collectionIds = getPayloadCollectionIds(product);
+
+    if (!productId || collectionIds.length === 0) {
+        return [];
+    }
+
+    const response = await queryProductsByCollectionIds(collectionIds);
+    const relatedProducts = Array.isArray(response?.docs) ? response.docs : [];
+    const seenProductIds = new Set();
+
+    return relatedProducts
+        .filter((relatedProduct) => {
+            const relatedProductId = relatedProduct?.id || relatedProduct?._id;
+
+            if (!relatedProductId || relatedProductId === productId || seenProductIds.has(relatedProductId)) {
+                return false;
+            }
+
+            seenProductIds.add(relatedProductId);
+            return true;
+        })
+        .map((relatedProduct) => ({
+            product: normalizeProductForDisplay(relatedProduct),
+        }));
+};
+
+export const fetchMatchedProductsForProduct = async ({ payloadProduct = null } = {}) => {
     try {
-        const pageDetails = await queryCollection({ dataCollectionId: "dynamicProductPageDetails" });
-
-        if (!Array.isArray(pageDetails.items)) {
-            throw new Error(`PrivacyPolicy response does not contain items array`);
+        // Prefer recommendedProducts relationship from bps-core (populated at depth>=2)
+        const recommended = Array.isArray(payloadProduct?.recommendedProducts)
+            ? payloadProduct.recommendedProducts
+            : [];
+        if (recommended.length > 0) {
+            return recommended
+                .filter(p => p && typeof p === 'object')
+                .map(p => ({ product: normalizeProductForDisplay(p) }));
         }
-
-        return pageDetails.items[0]
-
+        // Fall back to products in the same collections
+        return await fetchMatchedProductsFromCollections(payloadProduct);
     } catch (error) {
-        logError(`Error fetching contact page data: ${error.message}`, error);
+        logError(`Error fetching matched products for product page: ${error.message}`, error);
+        return [];
     }
 };
 
 
+export const fetchProductPageDetails = async () => {
+    return {
+        matchItWithTitle: "MATCH IT WITH",
+        featuredProductTitle: "Products Featured in this Project Entry",
+    };
+};
+
 export const fetchProductPageData = async (slug) => {
     try {
-        const productData = await fetchProductData(slug);
-        if (!productData || !productData.product) {
+        // Fetch Payload product — source of truth for all display data
+        const coreProductData = await queryProductsBySlug(slug);
+
+        if (!coreProductData) {
             throw new Error("Product data not found");
         }
-        const productId = productData.product._id;
+
+        // Check if this is a Payload bundle product
+        const isPayloadBundle = coreProductData.type === 'bundle' && 
+            Array.isArray(coreProductData.bundleItems) && 
+            coreProductData.bundleItems.length > 0;
+
         const [
-            productCollectionData,
             featuredProjectsData,
             matchedProducts,
-            pageDetails
+            pageDetails,
+            ourCategoriesData,
+            allCollections,
         ] = await Promise.all([
-            fetchProductCollectionData(productId),
-            fetchFeaturedProjects(productId),
-            fetchMatchedProducts(productId),
-            fetchProductPageDetails()
+            fetchFeaturedProjects(coreProductData.id || coreProductData._id),
+            fetchMatchedProductsForProduct({ payloadProduct: coreProductData }),
+            fetchProductPageDetails(),
+            fetchOurCategoriesData(),
+            queryProductCollections(),
         ]);
 
+        // Use Payload bundle items for collection data
+        const productCollectionData = isPayloadBundle 
+            ? mapBundleItemsToCollectionData(coreProductData.bundleItems)
+            : false;
+
         return {
-            productData,
+            productData: {
+                product: coreProductData,
+                isProductCollection: Boolean(productCollectionData),
+                isBundle: isPayloadBundle,
+            },
             productCollectionData,
             featuredProjectsData,
             matchedProducts,
-            pageDetails
+            pageDetails,
+            ourCategoriesData,
+            allCollections: Array.isArray(allCollections) ? allCollections : [],
         };
     } catch (error) {
         logError(`Error fetching product data: ${error.message}`, error);
@@ -329,7 +342,15 @@ export const checkProductInCart = async (productId, isProductCollection = false)
     try {
         if (!isProductCollection) return false;
         const cart = await getProductsCart();
-        const existingItem = cart.lineItems.find((item) => item.catalogReference.catalogItemId === productId);
+        if (!cart?.lineItems) return false;
+        
+        // Support both Payload format (productId, product.id) and legacy Wix format (catalogReference.catalogItemId)
+        const existingItem = cart.lineItems.find((item) => {
+            const itemProductId = item.productId || 
+                (typeof item.product === 'object' ? item.product?.id || item.product?._id : item.product) ||
+                item.catalogReference?.catalogItemId;
+            return itemProductId === productId;
+        });
         return existingItem || false;
     } catch (error) {
         logError("Error fetching cart items:", error);
@@ -337,56 +358,15 @@ export const checkProductInCart = async (productId, isProductCollection = false)
 };
 
 export const fetchProductPaths = async () => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            limit: "infinite",
-            extendedLimit: 1000
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items.map(x => ({ slug: x.slug.trim().replace("/", "") }));
-    } catch (error) {
-        logError(`Error fetching products by category: ${error.message}`, error);
-    }
+    // Returns empty so Next.js generates product pages on-demand (ISR)
+    return [];
 }
 
 export const fetchAllProducts = async () => {
     try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            includeReferencedItems: ["product"],
-            limit: "infinite",
-            extendedLimit: 1000
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items.filter(x => typeof x.product !== "string" && x.product);
+        return await queryAllProducts({ depth: 1 });
     } catch (error) {
         logError(`Error fetching products: ${error.message}`, error);
-    }
-}
-
-export const queryProducts = async (query) => {
-    try {
-        const response = await queryCollection({
-            dataCollectionId: "FullProductData",
-            includeReferencedItems: ["product"],
-            contains: ["content", query],
-            limit: 100,
-            sortOrder: "asc",
-            sortKey: "title",
-        });
-        if (!Array.isArray(response.items)) {
-            throw new Error(`Response does not contain items array`);
-        }
-
-        return response.items;
-    } catch (error) {
-        logError(`Error fetching products by category: ${error.message}`, error);
+        return [];
     }
 }

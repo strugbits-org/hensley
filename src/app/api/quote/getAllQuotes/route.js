@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import handleAuthentication from "@/services/auth/handleAuthentication";
+import { getMemberQuotes } from "@/services/quotes/payloadQuotes";
 import { logError } from "@/utils";
-import queryCollection from "@/utils/fetchFunction";
 
 export const POST = async (req) => {
   try {
@@ -10,26 +10,20 @@ export const POST = async (req) => {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const data = await queryCollection({
-      dataCollectionId: "QuoteRequest",
-      eq: [
-        {
-          key: "memberId",
-          value: authenticatedUserData.memberId
-        }
-      ],
-      limit: "infinite",
-    });
+    const quotes = await getMemberQuotes(
+      authenticatedUserData.memberId,
+      authenticatedUserData.token
+    );
 
     return NextResponse.json(
       {
         message: "Quotes data Successfully fetched",
-        data,
+        data: { items: quotes },
       },
       { status: 200 }
     );
   } catch (error) {
-    logError("Error", error);
+    logError("Error fetching quotes:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 };

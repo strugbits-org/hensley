@@ -10,6 +10,7 @@ import * as cheerio from "cheerio";
 import { files } from "@wix/media";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
 
 export const logError = (...args) => {
     if (isDebugMode) console.error(...args);
@@ -78,6 +79,40 @@ export const createWixClientCart = async (memberTokens) => {
 };
 
 // -------------------------------------------------------------- WIX Clients END --------------------------------------------------------------
+
+/**
+ * Resolve a media value coming from Payload (object or string) to a fully-qualified URL.
+ * Handles the depth-1 populated upload object shape ({ url, sizes, ... }) and prefixes
+ * relative `/api/media/...` paths with CORE_API_BASE_URL.
+ */
+export const resolveCoreMediaUrl = (media) => {
+    if (!media) return "";
+    if (typeof media === "string") {
+        if (media.startsWith("/api/media/") && CORE_API_BASE_URL) {
+            return `${CORE_API_BASE_URL.replace(/\/$/, "")}${media}`;
+        }
+        return media;
+    }
+    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0]);
+    if (typeof media !== "object") return "";
+
+    const candidate = media.url
+        || media.src
+        || media.thumbnailURL
+        || media?.sizes?.card?.url
+        || media?.sizes?.thumbnail?.url
+        || media?.mainMedia?.url
+        || media?.media?.url
+        || "";
+
+    if (!candidate) return "";
+    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate);
+
+    if (candidate.startsWith("/api/media/") && CORE_API_BASE_URL) {
+        return `${CORE_API_BASE_URL.replace(/\/$/, "")}${candidate}`;
+    }
+    return candidate;
+};
 
 export const sortByOrderNumber = (array, options = {}) => {
     const {
@@ -220,8 +255,10 @@ export const calculateCartTotalPrice = (lineItems) => {
 export const formatDescriptionLines = (items) => {
     if (!items) return [];
     return items.reduce((acc, item) => {
-        const title = item.name?.translated || item.name?.original;
-        const value = item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
+        // Support both Wix format (name.translated/original, colorInfo, plainText) and
+        // Payload format (title, value)
+        const title = item.title || item.name?.translated || item.name?.original;
+        const value = item.value || item.colorInfo?.translated || item.colorInfo?.original || item.plainText?.translated || item.plainText?.original || item.colorInfo?.code;
         acc.push({ title, value });
         return acc;
     }, []);
@@ -232,17 +269,22 @@ export function formatLineItemsForQuote(lineItems) {
     let counter = 0;
 
     for (const item of lineItems || []) {
-        const { productName, price, quantity, descriptionLines } = item;
-        const formattedDescriptionLines = formatDescriptionLines(descriptionLines);
+        // Support both Wix format and Payload format
+        const productName = item.productName || { original: item.name || '' };
+        const price = item.price?.amount !== undefined ? item.price : { amount: item.price || 0 };
+        const quantity = item.quantity || 1;
+        // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
+        const rawDescriptionLines = item.descriptionLines || item.customTextFieldValues || item.customTextFields || [];
+        const formattedDescriptionLines = formatDescriptionLines(rawDescriptionLines);
         const productCollection = formattedDescriptionLines.find(x => x.title === "Set")?.value;
-        const isTentOrCover = formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
+        const isTentOrCover = item.itemType === "tent" || item.itemType === "pool_cover" || formattedDescriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
         if (!productCollection && !isTentOrCover) {
             formattedCartData.push({
                 id: `${counter++}`,
-                name: productName.original,
+                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
                 description: "—",
-                price: price.amount,
+                price: typeof price === 'number' ? price : (price.amount || 0),
                 quantity
             });
             continue;
@@ -252,7 +294,7 @@ export function formatLineItemsForQuote(lineItems) {
             const setItems = productCollection.split("; ");
             formattedCartData.push({
                 id: `${counter++}`,
-                name: productName.original,
+                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
                 description: "PRODUCT SET",
                 price: 0,
                 quantity: 1
@@ -260,7 +302,8 @@ export function formatLineItemsForQuote(lineItems) {
 
             for (const setItem of setItems) {
                 const [setName, size, setPrice, setQuantity] = setItem.split("~").map(v => v.trim());
-                const description = size && size !== "—" ? `${size} | SET OF ${productName.original}` : `SET OF ${productName.original}`;
+                const nameStr = typeof productName === 'string' ? productName : (productName.original || productName.translated || '');
+                const description = size && size !== "—" ? `${size} | SET OF ${nameStr}` : `SET OF ${nameStr}`;
                 const existing = formattedCartData.find(i => i.name === `${setName} - ` && i.description === description);
 
                 if (existing) {
@@ -280,9 +323,9 @@ export function formatLineItemsForQuote(lineItems) {
         if (isTentOrCover) {
             formattedCartData.push({
                 id: `${counter++}`,
-                name: productName.original,
+                name: typeof productName === 'string' ? productName : (productName.original || productName.translated || ''),
                 description: generateDescriptionForQuote(formattedDescriptionLines, isTentOrCover),
-                price: price.amount,
+                price: typeof price === 'number' ? price : (price.amount || 0),
                 quantity
             });
         }
@@ -341,7 +384,7 @@ export const formatDateForQuote = (d) => {
 }
 
 export const getAdditionalInfoSection = (sections, title) => {
-    const html = sections.find(item => item.title.toUpperCase() === title)?.description;
+    const html = richTextToHTML(sections.find(item => item.title.toUpperCase() === title)?.description);
     if (!html) return "";
 
     const $ = cheerio.load(html);
@@ -359,9 +402,227 @@ export const getAdditionalInfoSection = (sections, title) => {
     return parse(cleaned) || "";
 };
 
+const escapeHtml = (value = "") => String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const applyLexicalTextFormatting = (value = "", format = 0) => {
+    let formattedValue = value;
+
+    if (format & 1) formattedValue = `<strong>${formattedValue}</strong>`;
+    if (format & 2) formattedValue = `<em>${formattedValue}</em>`;
+    if (format & 4) formattedValue = `<s>${formattedValue}</s>`;
+    if (format & 8) formattedValue = `<u>${formattedValue}</u>`;
+    if (format & 16) formattedValue = `<code>${formattedValue}</code>`;
+
+    return formattedValue;
+};
+
+const renderLexicalNodeToHTML = (node) => {
+    if (!node || typeof node !== "object") return "";
+
+    const childrenHTML = Array.isArray(node.children)
+        ? node.children.map(renderLexicalNodeToHTML).join("")
+        : "";
+
+    switch (node.type) {
+        case "root":
+            return childrenHTML;
+        case "paragraph":
+            return childrenHTML ? `<p>${childrenHTML}</p>` : "";
+        case "text":
+            return applyLexicalTextFormatting(escapeHtml(node.text || ""), node.format || 0);
+        case "linebreak":
+            return "<br />";
+        case "list": {
+            const listTag = node.listType === "number" ? "ol" : "ul";
+            return `<${listTag}>${childrenHTML}</${listTag}>`;
+        }
+        case "listitem":
+            return `<li>${childrenHTML}</li>`;
+        case "quote":
+            return `<blockquote>${childrenHTML}</blockquote>`;
+        case "heading": {
+            const headingLevel = Math.min(Math.max(node.tag?.replace("h", "") || 2, 1), 6);
+            return `<h${headingLevel}>${childrenHTML}</h${headingLevel}>`;
+        }
+        default:
+            return childrenHTML;
+    }
+};
+
+const extractLexicalNodeText = (node) => {
+    if (!node || typeof node !== "object") return "";
+
+    if (node.type === "text") return node.text || "";
+    if (node.type === "linebreak") return "\n";
+
+    const childrenText = Array.isArray(node.children)
+        ? node.children.map(extractLexicalNodeText).join("")
+        : "";
+
+    if (["paragraph", "listitem", "quote", "heading"].includes(node.type)) {
+        return `${childrenText}\n`;
+    }
+
+    return childrenText;
+};
+
+export const richTextToHTML = (content) => {
+    if (!content) return "";
+    if (typeof content === "string") return content;
+
+    if (content?.root?.type === "root") {
+        return renderLexicalNodeToHTML(content.root);
+    }
+
+    return "";
+};
+
+export const richTextToPlainText = (content) => {
+    if (!content) return "";
+
+    if (typeof content === "string") {
+        return content
+            .replace(/<br\s*\/?>/gi, "\n")
+            .replace(/<[^>]*>/g, " ")
+            .replace(/&nbsp;/g, " ")
+            .replace(/\s+\n/g, "\n")
+            .replace(/\n\s+/g, "\n")
+            .replace(/\n{3,}/g, "\n\n")
+            .replace(/[ \t]{2,}/g, " ")
+            .trim();
+    }
+
+    if (content?.root?.type === "root") {
+        return extractLexicalNodeText(content.root)
+            .replace(/\n{3,}/g, "\n\n")
+            .trim();
+    }
+
+    return "";
+};
+
+export const resolveProductMediaUrl = (media) => {
+    const source = typeof media === "string"
+        ? media
+        : media?.src || media?.url || media?.media?.url || media?.mainMedia?.url || media?.mainMedia;
+
+    if (!source) return "";
+    if (/^(https?:)?\/\//.test(source) || source.startsWith("wix:")) return source;
+
+    return `${CORE_API_BASE_URL}${source}`;
+};
+
+const normalizeAdditionalInfoSections = (sections = []) => {
+    if (!Array.isArray(sections)) return [];
+
+    return sections.map((section) => ({
+        ...section,
+        html: richTextToHTML(section?.description),
+        text: richTextToPlainText(section?.description),
+    }));
+};
+
+const getCollectionKey = (collection = {}) => collection.id || collection._id || collection.slug || collection.name;
+
+const buildCollectionBreadcrumbs = (collections = []) => {
+    if (!Array.isArray(collections) || collections.length === 0) return [];
+
+    const collectionMap = new Map(collections.map((collection) => [getCollectionKey(collection), collection]));
+    const deepestCollection = [...collections]
+        .filter(Boolean)
+        .sort((left, right) => (right?.hierarchyLevel || 0) - (left?.hierarchyLevel || 0))[0];
+
+    const breadcrumbs = [];
+    const visited = new Set();
+    let currentCollection = deepestCollection;
+
+    while (currentCollection) {
+        const key = getCollectionKey(currentCollection);
+        if (!key || visited.has(key)) break;
+
+        visited.add(key);
+        breadcrumbs.unshift({
+            id: currentCollection.id || currentCollection._id,
+            name: currentCollection.name,
+            slug: currentCollection.slug,
+            hierarchyLevel: currentCollection.hierarchyLevel || 0,
+        });
+
+        if (!currentCollection.parent) break;
+
+        currentCollection = typeof currentCollection.parent === "object"
+            ? currentCollection.parent
+            : collectionMap.get(currentCollection.parent);
+    }
+
+    return breadcrumbs;
+};
+
+export const normalizeProductForDisplay = (product = {}) => {
+    const title = product?.name || product?.title || "";
+    const id = product?._id || product?.id || "";
+    const price = Number(product?.price?.amount ?? product?.price ?? 0) || 0;
+    const compareAtPrice = Number(product?.compareAtPrice?.amount ?? product?.compareAtPrice ?? 0) || 0;
+    const additionalInfoSections = normalizeAdditionalInfoSections(product?.additionalInfoSections || []);
+    const descriptionHtml = richTextToHTML(product?.description);
+    const descriptionText = richTextToPlainText(product?.description);
+    const rawMediaItems = Array.isArray(product?.mediaItems) ? product.mediaItems : [];
+
+    // Build gallery slides: new Payload shape is flat { id, alt, url, ... };
+    // legacy Wix shape was nested { media: { url, alt }, altText, isFeatured }.
+    const mediaItems = rawMediaItems
+        .map((item, index) => ({
+            id: item?.id || item?.media?.id || `${id || title}-media-${index}`,
+            src: resolveProductMediaUrl(item),
+            alt: item?.alt || item?.altText || item?.media?.alt || title || `Product image ${index + 1}`,
+        }))
+        .filter((item) => item.src);
+
+    // Prepend mainMedia as the first gallery slide when it is not already present
+    const mainMediaUrl = resolveProductMediaUrl(product?.mainMedia);
+    const mainMediaAlt = product?.mainMedia?.alt || title;
+
+    if (mainMediaUrl && !mediaItems.some((item) => item.src === mainMediaUrl)) {
+        mediaItems.unshift({
+            id: product?.mainMedia?.id || `${id || title}-main-media`,
+            src: mainMediaUrl,
+            alt: mainMediaAlt,
+        });
+    }
+
+    return {
+        ...product,
+        _id: id,
+        id,
+        name: title,
+        title,
+        price,
+        compareAtPrice: compareAtPrice || null,
+        formattedPrice: product?.formattedPrice || formatTotalPrice(price),
+        formattedCompareAtPrice: compareAtPrice ? formatTotalPrice(compareAtPrice) : "",
+        description: descriptionHtml,
+        descriptionHtml,
+        descriptionText,
+        additionalInfoSections,
+        size: additionalInfoSections.find((section) => section?.title === "Size")?.text || "—",
+        mainMedia: mainMediaUrl,
+        mainMediaUrl,
+        mediaItems,
+        collectionBreadcrumbs: buildCollectionBreadcrumbs(product?.collections || []),
+        stockLabel: product?.stock?.inStock ? "In stock" : "Out of stock",
+    };
+};
+
 export const findProductSize = (additionalInfoSections = []) => {
-    const size = additionalInfoSections?.find(x => x.title === "Size")?.description?.replace(/<[^>]*>/g, "").trim() || "—";
+    const sizeSection = additionalInfoSections?.find(x => x.title === "Size");
+    const size = richTextToPlainText(sizeSection?.description || sizeSection?.text || "") || "—";
     return size;
 }
 
 export const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+export const CORE_TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || 1;

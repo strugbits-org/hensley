@@ -12,6 +12,63 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { loaderActions } from '@/store/loaderStore';
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
+
+const toAbsoluteMediaUrl = (source) => {
+  if (!source) return "";
+  if (/^(https?:)?\/\//.test(source) || source.startsWith("wix:")) return source;
+
+  if (source.startsWith("/")) {
+    if (CORE_API_BASE_URL) {
+      return `${CORE_API_BASE_URL.replace(/\/$/, "")}${source}`;
+    }
+
+    if (typeof window !== "undefined") {
+      return `${window.location.origin}${source}`;
+    }
+  }
+
+  return source;
+};
+
+const resolveCartItemMediaSrc = (item) => {
+  const product = typeof item?.product === "object" ? item.product : null;
+  const firstMediaItem = Array.isArray(product?.mediaItems) ? product.mediaItems[0] : null;
+
+  return toAbsoluteMediaUrl(
+    item?.image ||
+    item?.mediaItem?.src ||
+    product?.mainMedia?.url ||
+    product?.mainMedia ||
+    product?.featuredImage?.url ||
+    product?.featuredImage?.sizes?.thumbnail?.url ||
+    firstMediaItem?.url ||
+    firstMediaItem?.src ||
+    firstMediaItem?.media?.url ||
+    product?.media?.url ||
+    ""
+  );
+};
+
+const normalizeCartLineItem = (item) => {
+  const product = typeof item?.product === "object" ? item.product : null;
+  const mediaSrc = resolveCartItemMediaSrc(item);
+
+  return {
+    ...item,
+    _id: item?._id || item?.id,
+    id: item?.id || item?._id,
+    productId: item?.productId || product?.id || item?.product,
+    name: item?.name || product?.name || product?.title,
+    price: item?.price || item?.priceAtAdd || product?.price || 0,
+    quantity: Number(item?.quantity || 1),
+    customTextFields:
+      item?.customTextFields ||
+      item?.customTextFieldValues ||
+      [],
+    mediaItem: item?.mediaItem || { src: mediaSrc },
+  };
+};
 
 const Cart = () => {
   const [_cookies, setCookie] = useCookies(["cartQuantity"]);
@@ -23,7 +80,9 @@ const Cart = () => {
   const fetchCartItems = async () => {
     try {
       const response = await getProductsCart();
-      const lineItems = response?.lineItems || [];
+      const lineItems = (response?.lineItems || []).map(normalizeCartLineItem);
+      // console.log("lineItems", lineItems);
+      
       setCartItems(lineItems);
 
       const total = calculateTotalCartQuantity(lineItems);
@@ -74,28 +133,64 @@ const Cart = () => {
     ) {
       return;
     }
-    const updatedSet = data.productSetItems.map(item => {
-      const set = item.split("~");
-      if (set[0] === id) {
-        return `${set[0]}~${set[1]}~${set[2]}~${numValue}`;
-      }
-      return item;
-    }).join("; ");
 
-    data.catalogReference.options.customTextFields.Set = updatedSet;
-    data.descriptionLines = data.descriptionLines.map(line => {
-      if (line.name.original === "Set") {
-        const plainText = {
-          translated: updatedSet,
-          original: updatedSet
+    // Check for new setItems format first
+    if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
+      data.setItems = data.setItems.map(item => {
+        if (item.productName === id || item.product === id) {
+          return { ...item, quantity: numValue };
+        }
+        return item;
+      });
+    } else if (data.productSetItems) {
+      // Fall back to old string format
+      const updatedSet = data.productSetItems.map(item => {
+        const set = item.split("~");
+        if (set[0] === id) {
+          return `${set[0]}~${set[1]}~${set[2]}~${numValue}`;
+        }
+        return item;
+      }).join("; ");
+
+      // Support both Wix format (catalogReference, descriptionLines) and Payload format (customTextFieldValues/customTextFields)
+      if (data.catalogReference) {
+        // Wix format
+        data.catalogReference.options.customTextFields.Set = updatedSet;
+        if (data.descriptionLines) {
+          data.descriptionLines = data.descriptionLines.map(line => {
+            if (line.name?.original === "Set") {
+              const plainText = {
+                translated: updatedSet,
+                original: updatedSet
+              };
+              return { ...line, plainText };
+            }
+            return line;
+          });
+        }
+      } else {
+        // Payload format - update customTextFieldValues or customTextFields
+        const updateField = (fields) => {
+          if (!Array.isArray(fields)) return fields;
+          return fields.map(field => {
+            if (field.title === "Set") {
+              return { ...field, value: updatedSet };
+            }
+            return field;
+          });
         };
-
-        return { ...line, plainText };
+        
+        if (data.customTextFieldValues) {
+          data.customTextFieldValues = updateField(data.customTextFieldValues);
+        }
+        if (data.customTextFields) {
+          data.customTextFields = updateField(data.customTextFields);
+        }
       }
-      return line;
-    });
 
-    delete data.productSetItems;
+      delete data.productSetItems;
+    }
+
     const updatedLineItems = cartItems.map(item =>
       item._id === data._id ? data : item
     );
@@ -110,14 +205,52 @@ const Cart = () => {
           handleCollectionQuantityChange(data, quantity, id);
           return;
         }
-        const cartData = {
-          lineItems: [
-            {
-              catalogReference: data.catalogReference,
-              quantity: 1,
-            }
-          ]
-        };
+        
+        // Build cartData for both formats
+        let lineItem;
+        
+        // Check for new setItems format
+        if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
+          const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+          lineItem = {
+            catalogReference: {
+              appId,
+              catalogItemId: data.productId || data.product?.id || data.product,
+              options: {
+                customTextFields: {},
+              },
+            },
+            setItems: data.setItems,
+            quantity: 1,
+          };
+        } else if (data.catalogReference) {
+          // Wix format
+          lineItem = {
+            catalogReference: data.catalogReference,
+            quantity: 1,
+          };
+        } else {
+          // Payload format - build catalogReference from customTextFields
+          const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+          const customTextFields = (data.customTextFieldValues || data.customTextFields || [])
+            .reduce((acc, { title, value }) => {
+              acc[title] = value;
+              return acc;
+            }, {});
+          
+          lineItem = {
+            catalogReference: {
+              appId,
+              catalogItemId: data.productId || data.product?.id || data.product,
+              options: {
+                customTextFields,
+              },
+            },
+            quantity: 1,
+          };
+        }
+        
+        const cartData = { lineItems: [lineItem] };
         await updateProductInCart(data._id, cartData);
       } catch (error) {
         logError("Error while updating products quantity in cart:", error);
@@ -177,12 +310,20 @@ const Cart = () => {
           <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
           <div className='flex flex-col border-t border-primary-border'>
             {cartItems.map((item) => {
-              const descriptionLines = item.descriptionLines ? formatDescriptionLines(item.descriptionLines) : item.customTextFields;
-              const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
-              const isTentItem = descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
+              const descriptionLines = item.descriptionLines
+                ? (formatDescriptionLines(item.descriptionLines) || [])
+                : (Array.isArray(item.customTextFields) ? item.customTextFields : []);
+              
+              // Check for new itemType/setItems format first, then fall back to old string format
+              const isProductSet = item.itemType === "set" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
+              const productCollectionString = descriptionLines.find(x => x?.title === "Set")?.value;
+              const isProductCollection = isProductSet || Boolean(productCollectionString);
+              
+              const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
 
-              if (productCollection) {
-                const productSetItems = productCollection.split("; ");
+              if (isProductCollection) {
+                // Use new setItems if available, otherwise parse old string format
+                const productSetItems = productCollectionString ? productCollectionString.split("; ") : [];
                 const data = { ...item, productSetItems };
                 return (
                   <CartCollection key={item._id} data={data} actions={{ handleQuantityChange: (value, id, disabled) => handleCollectionQuantityChange(data, value, id, disabled), removeProduct }} />

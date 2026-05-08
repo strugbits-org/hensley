@@ -4,12 +4,13 @@ import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteButton } from './AddtoQuoteButton'
 import ProductDescription from '@/components/common/helpers/ProductDescription'
 import { QuantityControls } from '@/components/Product'
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError } from '@/utils'
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError, normalizeProductForDisplay } from '@/utils'
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
 import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
 import Loading from '@/app/loading'
 import { checkProductInCart, fetchProductCollectionData } from '@/services/products'
+import { resolveProductRibbon } from '@/components/common/ProductBadge'
 
 const INFO_HEADERS = [
   { title: 'Product', setItem: true },
@@ -19,15 +20,27 @@ const INFO_HEADERS = [
 ];
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const AddToCart = ({ data, onClose }) => {
+const AddToCart = ({ data, onClose, allCollections = [] }) => {
   const { productData } = data;
-  const { product, isProductCollection = false } = productData;
+  const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
+  const ribbon = resolveProductRibbon(productData?.product, allCollections);
+  
+  // Initial detection for collection/bundle products
+  // - isProductCollection: legacy Wix collection flag
+  // - product.type === 'bundle': Payload bundle products
+  const isPayloadBundle = product?.type === 'bundle';
+  const initialIsCollection = productData?.isProductCollection || isPayloadBundle;
+  
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+  const [isLoadingCollections, setIsLoadingCollections] = useState(true); // Start true to check for bundles
+  const [showCollectionView, setShowCollectionView] = useState(initialIsCollection);
   const [productInCart, setProductInCart] = useState();
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
+
+  // Use showCollectionView for rendering (dynamically set after fetching data)
+  const isProductCollection = showCollectionView;
 
   const productInfoSection = useMemo(() => {
     if (isProductCollection) {
@@ -103,28 +116,59 @@ const AddToCart = ({ data, onClose }) => {
   const handleAddToCart = async () => {
     try {
       setIsLoading(true);
-      const productId = product._id;
+      const productId = product._id || product.id;
       const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
       let lineItems = [];
 
       if (isProductCollection) {
-        let setData;
+        let setItemsData;
 
         if (productInCart) {
-          const descriptionLines = formatDescriptionLines(productInCart.descriptionLines);
-          const existingSet = descriptionLines.find(x => x.title === "Set")?.value;
+          // Check for new setItems format first, then fall back to string format
+          const existingSetItems = productInCart.setItems || [];
+          
+          if (existingSetItems.length > 0) {
+            // New format - merge with existing setItems
+            setItemsData = productSetItems.map((item) => {
+              const existingItem = existingSetItems.find((si) => si.productName === item.product);
+              const oldQuantity = existingItem ? parseInt(existingItem.quantity, 10) : 0;
+              return {
+                product: item.productId || null,
+                productName: item.product,
+                size: item.size,
+                quantity: oldQuantity + parseInt(item.quantity, 10),
+                unitPrice: parseFloat(item.price) || 0,
+              };
+            });
+          } else {
+            // Old format - parse from string and convert
+            const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
+            const descriptionLines = formatDescriptionLines(rawDescriptionLines);
+            const existingSet = descriptionLines.find(x => x.title === "Set")?.value || "";
 
-          setData = productSetItems.map((item) => {
-            const existingItem = existingSet.split("; ").find((field) => field.includes(item.product));
-            const oldQuantity = existingItem ? parseInt(existingItem.split("~")[3]) : 0;
-            return `${item.product}~${item.size}~${item.price}~${oldQuantity + parseInt(item.quantity)}`;
-          }).join("; ");
+            setItemsData = productSetItems.map((item) => {
+              const existingItemStr = existingSet.split("; ").find((field) => field.includes(item.product));
+              const oldQuantity = existingItemStr ? parseInt(existingItemStr.split("~")[3], 10) : 0;
+              return {
+                product: item.productId || null,
+                productName: item.product,
+                size: item.size,
+                quantity: oldQuantity + parseInt(item.quantity, 10),
+                unitPrice: parseFloat(item.price) || 0,
+              };
+            });
+          }
 
           await removeProductFromCart([productInCart._id]);
         } else {
-          setData = productSetItems.map((item) =>
-            `${item.product}~${item.size}~${item.price}~${item.quantity}`
-          ).join("; ");
+          // Create new cart item with structured setItems
+          setItemsData = productSetItems.map((item) => ({
+            product: item.productId || null,
+            productName: item.product,
+            size: item.size,
+            quantity: parseInt(item.quantity, 10),
+            unitPrice: parseFloat(item.price) || 0,
+          }));
         }
 
         lineItems = [{
@@ -132,10 +176,12 @@ const AddToCart = ({ data, onClose }) => {
             appId,
             catalogItemId: productId,
             options: {
-              customTextFields: { "Set": setData }
+              customTextFields: {}
             },
           },
+          setItems: setItemsData,
           quantity: 1,
+          price: product.price || 0,
         }];
       } else {
         const size = findProductSize(product.additionalInfoSections);
@@ -149,6 +195,7 @@ const AddToCart = ({ data, onClose }) => {
             },
           },
           quantity: cartQuantity,
+          price: product.price || 0,
         }];
       }
 
@@ -178,28 +225,38 @@ const AddToCart = ({ data, onClose }) => {
 
   const setInitialData = async () => {
     try {
-      if (!isProductCollection) return;
-
       setIsLoadingCollections(true);
-      const productId = product._id;
+      const productId = product._id || product.id;
+      if (!productId) {
+        setShowCollectionView(false);
+        setIsLoadingCollections(false);
+        return;
+      }
 
-      const collectionData = await fetchProductCollectionData(productId);
+      // Pass product data to fetchProductCollectionData for Payload bundle detection
+      // This will check both Payload bundles and legacy Wix collections
+      const collectionData = await fetchProductCollectionData(productId, product);
 
-      if (!collectionData) return;
+      if (!collectionData) {
+        setShowCollectionView(false);
+        setIsLoadingCollections(false);
+        return;
+      }
 
       const items = collectionData.map(set => ({
-        id: set.product._id,
-        product: set.product.name,
+        id: set.product._id || set.product.id,
+        product: set.product.name || set.product.title,
         size: findProductSize(set.product.additionalInfoSections),
-        formattedPrice: set.product.formattedPrice,
+        formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
         price: set.product.price,
         quantity: set.quantity
       }));
 
       setProductSetItems(items);
+      setShowCollectionView(true); // Show collection view when data is found
       setIsLoadingCollections(false);
 
-      checkProductInCart(productId, isProductCollection)
+      checkProductInCart(productId, true) // Pass true since we have collection data
         .then(existInCart => {
           setProductInCart(existInCart);
         })
@@ -215,16 +272,23 @@ const AddToCart = ({ data, onClose }) => {
 
   useEffect(() => {
     setInitialData();
-  }, [isProductCollection]);
+  }, [product._id, product.id]);
 
   return (
-    <div className='sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
+    <div className='relative sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
       {isLoadingCollections && (
         <div className='absolute inset-x-4 inset-y-0 bg-secondary-alt opacity-30 z-[999] flex justify-center items-center'>
           <Loading custom={true} classes='absolute' />
         </div>
       )}
-      <AddToCartSlider data={productData} isOpen={data.open} />
+      <div className='relative sm:max-w-[45%] w-full sm:h-full flex-shrink-0'>
+        <AddToCartSlider data={{ ...productData, product }} isOpen={data.open} noWidthConstraint />
+        {ribbon && (
+          <span className='absolute top-3 left-3 z-20 bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full pointer-events-none'>
+            {ribbon}
+          </span>
+        )}
+      </div>
       <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative'>
         <div className='w-full flex flex-col  gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
           <div className='w-full flex justify-between relative '>
@@ -236,7 +300,7 @@ const AddToCart = ({ data, onClose }) => {
             uppercase
             w-full
             max-w-[350px]
-            '>{product.name}</span>
+            '>{product.name || product.title}</span>
             <button onClick={onClose} className='close-button absolute top-0 right-0'>
               <svg preserveAspectRatio="xMidYMid meet" width="24.707" height="24.707" data-bbox="25.975 25.975 148.05 148.05" xmlns="http://www.w3.org/2000/svg" viewBox="25.975 25.975 148.05 148.05" role="presentation" aria-hidden="true">
                 <g>

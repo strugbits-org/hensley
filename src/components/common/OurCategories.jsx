@@ -8,7 +8,12 @@ function OurCategories({ data, pageDetails, classes }) {
   const { ourCategoriesTitle } = pageDetails;
 
   const checkIsTent = (category) => {
-    const isTent = category._id === "d27f504d-05a2-ec30-c018-cc403e815bfa";
+    const normalizedSlug = (category?.slug || "").toLowerCase();
+    const normalizedName = (category?.name || "").toLowerCase();
+    const isTent =
+      category?._id === "d27f504d-05a2-ec30-c018-cc403e815bfa" ||
+      normalizedSlug.includes("tent") ||
+      normalizedName.includes("tent");
     return isTent;
   };
 
@@ -46,7 +51,7 @@ function OurCategories({ data, pageDetails, classes }) {
 
                     <div>
                       <PrimaryImage
-                        url={"https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
+                        url={"/icons/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
                         alt="Arrow"
                         customClasses="hidden lg:block arrow w-[25px] h-[25px] transition-all duration-300 ease-in-out group-hover:w-[133px] group-hover:h-[133px] lg:mb-[12px] group-hover:filter brightness-50"
                       />
@@ -57,7 +62,7 @@ function OurCategories({ data, pageDetails, classes }) {
                     </div>
                   </div>
                   <PrimaryImage
-                    url={"https://static.wixstatic.com/shapes/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
+                    url={"/icons/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"}
                     alt="Arrow"
                     customClasses="lg:hidden arrow w-[25px] h-[25px]"
                   />
@@ -72,3 +77,4 @@ function OurCategories({ data, pageDetails, classes }) {
 }
 
 export default OurCategories;
+

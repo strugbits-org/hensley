@@ -3,6 +3,7 @@ import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import { fetchPageMetaData, fetchTentsData } from "@/services";
 import { fetchTentData, fetchTentPageData } from "@/services/tents";
+import { queryProductCollections } from "@/services/payloadCollections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }) {
 
     const { title, noFollowTag } = metaData;
 
-    const fullTitle = tentData.title + title;
+    const fullTitle = (tentData?.title || slug) + title;
 
     const metadata = { title: fullTitle };
 
@@ -37,7 +38,13 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const tentsData = await fetchTentsData();
-    const paths = tentsData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
+    if (!Array.isArray(tentsData)) return [];
+
+    const paths = tentsData.map((data) => {
+      // Core API may return slug as "frame-tents" or "/frame-tents"
+      const rawSlug = data.slug || data.tent?.slug || "";
+      return { slug: rawSlug.replace(/^\//, "").trim() };
+    });
     return paths;
   } catch (error) {
     logError("Error generating static params(tent page):", error);
@@ -48,7 +55,10 @@ export const generateStaticParams = async () => {
 export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
-    const data = await fetchTentPageData(slug);
+    const [data, allCollections] = await Promise.all([
+      fetchTentPageData(slug),
+      queryProductCollections().catch(() => []),
+    ]);
     const { productData, matchedProducts, featuredProjectsData, pageDetails, masterClassTentingURL } = data;
 
     if (!data) {
@@ -59,8 +69,8 @@ export default async function Page({ params }) {
 
     return (
       <>
-        <ProductTent productData={productData} masterClassTentingURL={masterClassTentingURL} matchedProducts={matchedProducts || []} />
-        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" />
+        <ProductTent productData={productData} masterClassTentingURL={masterClassTentingURL} matchedProducts={matchedProducts || []} allCollections={allCollections} />
+        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
         <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
       </>
     );

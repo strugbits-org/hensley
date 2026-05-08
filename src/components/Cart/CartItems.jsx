@@ -5,6 +5,8 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
 
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
+
 const INFO_HEADERS = [
     'Product',
     'Size',
@@ -183,19 +185,38 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
 
     const productName = data?.productName?.original || data?.name;
 
-    const productInfoSection = data.productSetItems.map(item => {
-        const set = item.split("~");
-        const price = parseFloat(set[2]);
-        const quantity = parseInt(set[3]);
-
-        return {
-            product: set[0],
-            size: set[1],
-            price,
-            quantity,
-            formattedPrice: formatTotalPrice(price),
+    // Support both new structured setItems format and old string format
+    const productInfoSection = useMemo(() => {
+        // Check for new setItems format first
+        if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
+            return data.setItems.map(item => ({
+                product: item.productName || item.product || '',
+                size: item.size || '',
+                price: parseFloat(item.unitPrice) || 0,
+                quantity: parseInt(item.quantity, 10) || 1,
+                formattedPrice: formatTotalPrice(parseFloat(item.unitPrice) || 0),
+            }));
         }
-    });
+        
+        // Fall back to old string format (productSetItems)
+        if (data.productSetItems && Array.isArray(data.productSetItems)) {
+            return data.productSetItems.map(item => {
+                const set = item.split("~");
+                const price = parseFloat(set[2]);
+                const quantity = parseInt(set[3]);
+
+                return {
+                    product: set[0],
+                    size: set[1],
+                    price,
+                    quantity,
+                    formattedPrice: formatTotalPrice(price),
+                };
+            });
+        }
+        
+        return [];
+    }, [data.setItems, data.productSetItems]);
 
     const price = useMemo(() =>
         productInfoSection.reduce((acc, { price, quantity }) => acc + (price * quantity), 0),
@@ -265,7 +286,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data?.image || data?.mediaItem.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='w-full flex flex-col'>
@@ -326,9 +347,8 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
     const productName = data?.productName?.original || data?.name;
 
     const productSize = () => {
-        if (!data.descriptionLines) return data.size;
-        const formattedDescription = formatDescriptionLines(data.descriptionLines);
-        return formattedDescription.find(x => x.title === "size")?.value;
+        if (!data.customTextFields) return data.size;
+        return data.customTextFields.find(x => x.title === "size")?.value;
     }
     const price = (data?.price?.amount || data.price) * data.quantity;
     const formattedPrice = formatTotalPrice(price);
@@ -405,7 +425,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data?.image || data?.mediaItem.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>
