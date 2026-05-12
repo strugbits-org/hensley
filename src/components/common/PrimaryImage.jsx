@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react';
-import { debounce } from 'lodash';
 import Image from 'next/image';
 import { generateImageURL, generateImageURLAlternate, generateSVGURL } from "@/utils/generateImageURL";
 import fallbackImage from "@/assets/fallback-img.png";
@@ -17,8 +16,12 @@ export const PrimaryImage = ({
     alt = "",
     attributes,
     defaultDimensions,
-    timeout = 100,
-    useNextImage = false
+    timeout = 0,
+    useNextImage = false,
+    priority = false,
+    loading = "lazy",
+    sizes = "100vw",
+    unoptimized = true
 }) => {
 
     if (!url) return null;
@@ -28,64 +31,94 @@ export const PrimaryImage = ({
     const [height, setHeight] = useState();
     const [width, setWidth] = useState();
 
+    const resolveDimension = (measuredValue, fallbackValue, minimumValue) => {
+        const numericMeasuredValue = Number(measuredValue) || 0;
+        const numericFallbackValue = Number(fallbackValue) || 0;
+        const numericMinimumValue = Number(minimumValue) || 0;
+
+        return Math.max(numericMeasuredValue, numericFallbackValue, numericMinimumValue, 1);
+    };
+
     const generateSrc = () => {
         if (original) return generateImageURL({ wix_url: url, original });
 
         if (ref.current) {
-            const newWidth = ref.current.clientWidth;
-            const newHeight = ref.current.clientHeight;
-            let width = min_w && min_w > newWidth ? min_w : newWidth;
-            let height = min_h && min_h > newHeight ? min_h : newHeight;
+            const nextWidth = resolveDimension(ref.current.clientWidth, defaultDimensions?.width, min_w);
+            const nextHeight = resolveDimension(ref.current.clientHeight, defaultDimensions?.height, min_h);
 
-            if (!width && defaultDimensions) width = defaultDimensions.width;
-            if (!height && defaultDimensions) height = defaultDimensions.height;
-            setHeight(height);
-            setWidth(width);
+            setHeight(currentHeight => currentHeight === nextHeight ? currentHeight : nextHeight);
+            setWidth(currentWidth => currentWidth === nextWidth ? currentWidth : nextWidth);
+
             switch (type) {
                 case "default":
-                    return generateImageURL({ wix_url: url, w: width, h: height, original, fit, q });
+                    return generateImageURL({ wix_url: url, w: nextWidth, h: nextHeight, original, fit, q });
                 case "alternate":
-                    return generateImageURLAlternate({ wix_url: url, w: width, h: height, original, fit, q });
+                    return generateImageURLAlternate({ wix_url: url, w: nextWidth, h: nextHeight, original, fit, q });
                 case "svg":
                     return generateSVGURL(url);
                 case "product":
-                    return `${url}/v1/${fit}/w_${width},h_${height},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
+                    return `${url}/v1/${fit}/w_${nextWidth},h_${nextHeight},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
                 case "insta":
-                    return `https://static.wixstatic.com/media/${url}/v1/${fit}/w_${width},h_${height},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
+                    return `https://static.wixstatic.com/media/${url}/v1/${fit}/w_${nextWidth},h_${nextHeight},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
                 default:
                     return "";
             }
         }
+
+        return generateImageURL({ wix_url: url, original, fit, q });
     };
 
-    const handleResize = debounce(() => {
+    const handleResize = () => {
         const newSrc = generateSrc();
-        setSrc(newSrc);
-    }, 1000);
+        setSrc(currentSrc => currentSrc === newSrc ? currentSrc : newSrc);
+    };
 
     useEffect(() => {
-        setTimeout(() => {
-            const newSrc = generateSrc();
-            setSrc(newSrc);
-        }, timeout);
+        let timeoutId;
+        let observer;
 
-        window.addEventListener('resize', handleResize);
+        if (timeout > 0) {
+            timeoutId = window.setTimeout(handleResize, timeout);
+        } else {
+            handleResize();
+        }
+
+        if (typeof ResizeObserver !== 'undefined' && ref.current) {
+            observer = new ResizeObserver(() => {
+                handleResize();
+            });
+            observer.observe(ref.current);
+        } else {
+            window.addEventListener('resize', handleResize);
+        }
+
         return () => {
-            window.removeEventListener('resize', handleResize);
+            if (timeoutId) {
+                window.clearTimeout(timeoutId);
+            }
+
+            if (observer) {
+                observer.disconnect();
+            } else {
+                window.removeEventListener('resize', handleResize);
+            }
         };
 
-    }, [url]);
+    }, [url, defaultDimensions?.height, defaultDimensions?.width, fit, min_h, min_w, original, q, timeout, type]);
 
 
     return (
         <>
             {useNextImage && src && height && width ?
-                <Image ref={ref} src={src} quality={q} priority={true} loading={"eager"} height={height} width={width} className={customClasses} {...attributes} alt={alt} />
+                <Image ref={ref} src={src} quality={Number(q)} priority={priority} loading={priority ? "eager" : loading} sizes={sizes} unoptimized={unoptimized} height={height} width={width} className={customClasses} {...attributes} alt={alt} />
                 : <img
                     ref={ref}
                     src={src || fallbackImage.src}
                     className={customClasses}
                     alt={alt}
+                    loading={loading}
+                    decoding="async"
+                    fetchPriority={priority ? "high" : "auto"}
                     {...attributes}
                 />
             }
