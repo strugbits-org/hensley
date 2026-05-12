@@ -1,6 +1,7 @@
 import PortfolioDetails from "@/components/PortfolioDetails";
 import { fetchProjectPageData, fetchProjects, fetchSelectedProject } from "@/services/projects";
 import { logError } from "@/utils";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 
 
@@ -39,15 +40,14 @@ export const generateStaticParams = async () => {
   }
 }
 
-export default async function Page({ params, searchParams }) {
+export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     if (!slug) {
       throw new Error("Slug is required");
     }
 
-    // Draft preview support: bypass published filter when preview token is present
-    const isPreview = !!(await searchParams)?.['payload-preview'];
+    const { isEnabled: isPreview } = await draftMode();
     const data = isPreview
       ? await fetchProjectPageData(slug, { draft: true })
       : await fetchProjectPageData(slug);

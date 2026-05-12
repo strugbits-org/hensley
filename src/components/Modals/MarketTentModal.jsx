@@ -1,4 +1,4 @@
-import { convertToHTML } from "@/utils/renderRichText";
+import { getAdditionalInfoSection } from "@/utils";
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
 import { PrimaryButton } from "../common/PrimaryButton";
@@ -7,13 +7,14 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
 
     const { data = [], type } = selectedMenu;
     if (!data) return null;
+    
 
     return (
         <div onMouseLeave={closeModal} className="relative lg:p-6 lg:h-screen lg:overflow-auto lg:hide-scrollbar mt-4 lg:mt-0">
             <div className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px] h-full "></div>
             <div className={"w-full lg:h-[54vh] 2xl:h-[86vh] flex justify-center gap-y-3 lg:gap-y-16 lg:gap-6 lg:flex-row flex-col"}>
                 {data.map((category) => {
-                    const { title, description, tagline, slug, headerCoverImage, tent, buttonLabel, buttonLabelMenu, featuredImage, heroBackground } = category;
+                    const { title, tagline, slug, headerCoverImage, tent, buttonLabel, buttonLabelMenu, featuredImage, heroBackground } = category;
                     const coverImage = headerCoverImage || featuredImage || heroBackground || tent?.mainMedia || category?.mainMedia || null;
 
                     return (
@@ -31,9 +32,9 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
                                                 {tagline}
                                             </p>
                                         </div>
-                                    ) : description && (
-                                        <div>
-                                            {convertToHTML({ content: description, class_p: "text-[12px] lg:text-[16px] uppercase tracking-wider text-primary-alt font-haasLight" })}
+                                    ) : tent?.additionalInfoSections?.length > 0 && (
+                                        <div className="text-[12px] lg:text-[16px] uppercase tracking-wider text-primary-alt font-haasLight">
+                                            {getAdditionalInfoSection(tent.additionalInfoSections, "INFO")}
                                         </div>
                                     )}
                                     <CustomLink className={"hidden sm:block lg:hidden"} to={`/${type === "markets" ? "market" : "tent"}${slug}`}>

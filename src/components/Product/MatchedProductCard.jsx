@@ -38,14 +38,14 @@ function MatchedProductCard({ data, type = 'listing', allCollections = [] }) {
                             </div>
                         )}
                         {additionalInfoSections?.map((data, index) => {
-                            const { title, description } = data;
+                            const { title, html } = data;
                             if (title == "Size") {
                                 return (
                                     <div
                                         className="text-[12px] grow text-center text-secondary-alt"
                                         key={index}
                                         dangerouslySetInnerHTML={{
-                                            __html: description,
+                                            __html: html,
                                         }}
                                     ></div>
                                 );

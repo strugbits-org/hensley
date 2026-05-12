@@ -17,7 +17,7 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
   const sliderProduct = {
     ...tent,
     mainMedia: tent?.mainMedia,
-    mediaItems: tent?.mediaItems || gallery,
+    mediaItems: tent?.mainMedia ? [{ id: 'main-media', src: tent.mainMedia, alt: tent?.name || '' }] : [],
   };
 
   return (

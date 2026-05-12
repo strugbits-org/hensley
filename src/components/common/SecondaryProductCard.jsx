@@ -6,8 +6,7 @@ import { CustomLink } from './CustomLink';
 import { actions } from '@/store';
 import Image from 'next/image';
 import { ProductBadge, resolveProductRibbon } from './ProductBadge';
-
-const CORE_API_BASE_URL = process.env.NEXT_PUBLIC_CORE_API_BASE_URL || process.env.CORE_API_BASE_URL;
+import { resolveCoreMediaUrl } from '@/utils';
 
 // Helper to resolve product image URL from various formats
 const resolveImageUrl = (product) => {
@@ -17,26 +16,16 @@ const resolveImageUrl = (product) => {
     
     // Handle direct URL string
     if (typeof mainMedia === 'string') {
-        // If it's a wix URL, use PrimaryImage; otherwise check if it needs base URL
-        if (mainMedia.startsWith('wix:') || mainMedia.startsWith('http')) {
+        if (mainMedia.startsWith('wix:')) {
             return mainMedia;
         }
-        // Relative URL from Payload CMS
-        if (mainMedia.startsWith('/')) {
-            return CORE_API_BASE_URL ? `${CORE_API_BASE_URL}${mainMedia}` : mainMedia;
-        }
-        return mainMedia;
+        return resolveCoreMediaUrl(mainMedia);
     }
-    
-    // Handle object format { url: "..." }
+
     if (mainMedia && typeof mainMedia === 'object') {
-        const url = mainMedia.url || mainMedia.src || '';
-        if (url.startsWith('/') && CORE_API_BASE_URL) {
-            return `${CORE_API_BASE_URL}${url}`;
-        }
-        return url;
+        return resolveCoreMediaUrl(mainMedia);
     }
-    
+
     return null;
 };
 
@@ -58,7 +47,7 @@ function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
                     imageUrl.startsWith('wix:') ? (
                         <PrimaryImage timeout={50} alt={name} url={imageUrl} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
                     ) : (
-                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
+                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="lazy" unoptimized className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
                     )
                 ) : null}
             </CustomLink>

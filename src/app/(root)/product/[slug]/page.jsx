@@ -52,7 +52,8 @@ export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchProductPageData(slug);
-    const { matchedProducts, featuredProjectsData, pageDetails, ourCategoriesData, allCollections = [] } = data;
+    // const { matchedProducts, featuredProjectsData, pageDetails, ourCategoriesData, allCollections = [] } = data;
+    const { matchedProducts, featuredProjectsData, pageDetails, allCollections = [] } = data;
     const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     if (!data) {
@@ -62,10 +63,10 @@ export default async function Page({ params }) {
     return (
       <>
         <Product data={data} matchedProducts={matchedProducts || []} allCollections={allCollections} />
-        <OurCategories
+        {/* <OurCategories
           data={ourCategoriesData || []}
           pageDetails={{ ourCategoriesTitle: pageDetails?.ourCategoriesTitle || "SHOP BY CATEGORY" }}
-        />
+        /> */}
         <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
         <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
       </>

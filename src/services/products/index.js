@@ -177,7 +177,7 @@ export const fetchMatchedProductsForProduct = async ({ payloadProduct = null } =
                 .map(p => ({ product: normalizeProductForDisplay(p) }));
         }
         // Fall back to products in the same collections
-        return await fetchMatchedProductsFromCollections(payloadProduct);
+        // return await fetchMatchedProductsFromCollections(payloadProduct);
     } catch (error) {
         logError(`Error fetching matched products for product page: ${error.message}`, error);
         return [];
@@ -210,13 +210,13 @@ export const fetchProductPageData = async (slug) => {
             featuredProjectsData,
             matchedProducts,
             pageDetails,
-            ourCategoriesData,
+            // ourCategoriesData,
             allCollections,
         ] = await Promise.all([
             fetchFeaturedProjects(coreProductData.id || coreProductData._id),
             fetchMatchedProductsForProduct({ payloadProduct: coreProductData }),
             fetchProductPageDetails(),
-            fetchOurCategoriesData(),
+            // fetchOurCategoriesData(),
             queryProductCollections(),
         ]);
 
@@ -235,7 +235,7 @@ export const fetchProductPageData = async (slug) => {
             featuredProjectsData,
             matchedProducts,
             pageDetails,
-            ourCategoriesData,
+            // ourCategoriesData,
             allCollections: Array.isArray(allCollections) ? allCollections : [],
         };
     } catch (error) {
