@@ -1,11 +1,10 @@
 import React from 'react';
-import { formatDate } from '@/utils';
 import { Tag } from '../common/helpers/Tag';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { CustomLink } from '../common/CustomLink';
 
 function FeaturedBlogCard({ data, classes }) {
-    const { blogRef, markets, studios, publishDate, slug, author } = data;
+    const { blogRef, markets, studios, slug, author } = data;
     const title = blogRef?.title;
     const coverImage = blogRef?.coverImage;
 
@@ -27,7 +26,7 @@ function FeaturedBlogCard({ data, classes }) {
                 </div>
             </div>
             <div className='px-6'>
-                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>{formatDate(publishDate)} - {author?.nickname}</p>
+                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>{author?.nickname}</p>
 
                 <ul className="flex gap-2 flex-wrap">
                     {markets?.map((market, index) => (

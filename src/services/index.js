@@ -387,7 +387,7 @@ export const fetchPortfolioData = async () => {
 
 export const fetchBlogsData = async () => {
   try {
-    const payloadBlogs = await queryBlogs({ sort: "-publishedDate" });
+    const payloadBlogs = await queryBlogs({ sort: "-createdAt" });
     return payloadBlogs.map(normalizePayloadBlog);
   } catch (error) {
     logError(`Error fetching blogs data: ${error.message}`, error);
@@ -399,7 +399,7 @@ export const fetchFeaturedBlogs = async (productId) => {
   try {
     const payloadBlogs = await queryBlogs({
       where: { storeProducts: { contains: productId } },
-      sort: "-publishDate",
+      sort: "-createdAt",
     });
     return payloadBlogs.map(normalizePayloadBlog);
   } catch (error) {

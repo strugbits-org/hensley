@@ -815,24 +815,29 @@ const normalizePayloadProjectCategoryRef = (cat) => {
 export const normalizePayloadBlog = (blog) => {
     if (!blog || typeof blog !== "object") return blog;
     const coverImageUrl = resolveMediaUrl(blog.coverImage);
+    const author = blog.author && typeof blog.author === "object"
+        ? blog.author
+        : null;
+    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayDate = blog.createdAt || blog.updatedAt || "";
     return {
         ...blog,
         _id: blog.id || blog._id,
         slug: blog.slug || "",
-        publishDate: blog.publishedDate || blog.publishDate || "",
+        publishDate: displayDate,
         blogRef: {
             title: blog.title || "",
             coverImage: coverImageUrl,
-            publishedDate: blog.publishedDate || "",
+            publishedDate: displayDate,
             excerpt: blog.excerpt || "",
             richContent: blog.content || null,
         },
-        author: blog.author
+        author: author
             ? {
-                ...blog.author,
-                nickname: blog.author.nickname || blog.author.firstName || "",
-                firstName: blog.author.firstName || "",
-                lastName: blog.author.lastName || "",
+                ...author,
+                nickname: displayName || "",
+                firstName: author.firstName || "",
+                lastName: author.lastName || "",
             }
             : { nickname: "", firstName: "", lastName: "" },
         markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
@@ -932,7 +937,7 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 2 } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-createdAt", limit, depth = 2 } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",

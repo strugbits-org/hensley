@@ -1,6 +1,5 @@
 import React from 'react';
 import { PrimaryImage } from './PrimaryImage';
-import { formatDate } from '@/utils';
 import { CustomLink } from './CustomLink';
 import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
 
@@ -30,7 +29,7 @@ function NewsCard({ data, classes }) {
                 </div>
             </div>
             <div className='px-6'>
-                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3 uppercase'>{formatDate(blogRef.publishedDate)} - {author.nickname}</p>
+                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3 uppercase'>{author.nickname}</p>
                 <MarketsStudiosTags markets={markets} studios={studios} categories={blogCategories} />
             </div>
         </CustomLink>

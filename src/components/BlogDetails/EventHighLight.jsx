@@ -1,11 +1,8 @@
 import React from 'react'
-import { formatDate } from '@/utils';
 import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
 import { generateImageURL } from '@/utils/generateImageURL';
 
 const EventHighLight = ({ data }) => {
-    console.log("data", data);
-    
     const { author, blogRef, markets, studios } = data;
     const imageURL = generateImageURL({ wix_url: blogRef.coverImage }) || "";
     
@@ -31,12 +28,12 @@ const EventHighLight = ({ data }) => {
                         {blogRef.title}
                     </span>
 
-                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:hidden block '> {formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}</span>
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:hidden block '>{author?.nickname || author?.firstName || author?.lastName}</span>
                     <MarketsStudiosTags markets={markets} studios={studios} count={2} />
 
                 </div>
                 <div className='lg:w-1/2 text-right flex flex-col gap-y-[15px] '>
-                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:block hidden '>{formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}</span>
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:block hidden '>{author?.nickname || author?.firstName || author?.lastName}</span>
                     <span className='font-haasRegular uppercase text-[12px] text-secondary-alt text-left block max-lg:mt-[60px] '>{blogRef.excerpt}</span>
                 </div>
 

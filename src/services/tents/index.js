@@ -93,7 +93,7 @@ export const fetchFeaturedBlogs = async (productId) => {
         if (!productId) return [];
         const payloadBlogs = await queryBlogs({
             where: { storeProducts: { contains: productId } },
-            sort: "-publishedDate",
+            sort: "-createdAt",
         });
         return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {
