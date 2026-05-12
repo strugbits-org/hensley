@@ -504,7 +504,7 @@ export const fetchPageMetaData = async (slug) => {
   } catch (error) {
     console.error('Error fetching page meta data', error);
   }
-  return {};
+  return { title: '', description: '', keywords: '', noFollowTag: false };
 };
 
 

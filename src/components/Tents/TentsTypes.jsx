@@ -24,7 +24,7 @@ const TentsTypes = ({ data }) => {
                             className="max-w-[608px] h-[687px] px-[24px] py-[24px] border relative"
                         >
                             <div
-                                className='h-full w-full border xl:px-[54px] lg:px-[30px] py-[35px] flex flex-col justify-between items-center bg-contain bg-no-repeat bg-center'
+                                className='h-full w-full border xl:px-[54px] lg:px-[30px] py-[35px] flex flex-col justify-between items-center bg-cover bg-no-repeat bg-center'
                                 style={{ backgroundImage: `url(${imageURL})` }}
                             >
                                 <div className='border-b border-white pb-[17px] w-full'>

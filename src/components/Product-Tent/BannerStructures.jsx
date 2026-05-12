@@ -34,7 +34,7 @@ const BannerStructures = ({ title, data }) => {
                 <div className={`w-full py-[16px] flex lg:flex-row flex-col lg:border-b border-t border-t-primary-alt ${!info && !pros && !cons ? "lg:border-b-0" : ""}`}>
                     {[info, pros, cons].filter(Boolean).map((item, index) => (
                         <div key={index} className='lg:w-1/2 flex flex-col gap-y-[24px] lg:mb-0 mb-[16px] border-b border-b-primary-alt lg:border-0 pb-4'>
-                            <div className="text-[16px] leading-[25px] text-white font-haasRegular uppercase">
+                            <div className="text-[16px] leading-[25px] text-white font-haasRegular uppercase [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mb-1">
                                 {item}
                             </div>
                         </div>
