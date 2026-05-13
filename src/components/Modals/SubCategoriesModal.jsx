@@ -2,27 +2,6 @@ import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
 import { lightboxActions } from "@/store/lightboxStore";
 
-const resolveSubCategoryHref = (item = {}) => {
-    const directPath = item.slug || item.href || item.url;
-
-    if (directPath) return directPath;
-
-    const relatedCollection = item?.category || item?.collection || item?.productCollection || {};
-    const categorySlug = relatedCollection?.slug ? String(relatedCollection.slug).replace(/^\//, "") : "";
-
-    if (!categorySlug) return "";
-
-    const menuPath = relatedCollection?.menuPath;
-    const basePath =
-        menuPath === "collections" ? "/collections" :
-        menuPath === "subcategory" ? "/subcategory" :
-        relatedCollection?.featured
-            ? "/collections"
-            : (item.redirection || "/subcategory");
-
-    return `${basePath}/${categorySlug}`;
-};
-
 export const SubCategoriesModal = ({ selectedMenu, closeModal }) => {
     const { data } = selectedMenu;
     if (!data) return null;
@@ -35,8 +14,8 @@ export const SubCategoriesModal = ({ selectedMenu, closeModal }) => {
                 {data.map((item) => {
                     const relatedCollection = item?.category || item?.collection || item?.productCollection || {};
                     const collectionImage = relatedCollection.mainMedia || relatedCollection.media?.mainMedia || null;
-                    const { title, type, lightbox, target } = item;
-                    const href = resolveSubCategoryHref(item);
+                    const { title, type, lightbox, target, href } = item;
+                    
 
                     const content = (
                         <>

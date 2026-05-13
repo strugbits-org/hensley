@@ -125,42 +125,24 @@ const getCollectionPath = (collection, preferredBase = "") => {
 
     if (!resolved || typeof resolved !== "object") return "";
 
-    const normalizedPreferredBase = preferredBase === "/collections" || preferredBase === "/subcategory"
-        ? preferredBase
-        : "";
-    const rawRelationTo = getFirstString(collection?.relationTo, resolved?.relationTo).toLowerCase();
-    const breadcrumbUrl = Array.isArray(resolved?.breadcrumbs)
-        ? resolved.breadcrumbs[resolved.breadcrumbs.length - 1]?.url
-        : "";
-    const breadcrumbSuggestsCollection = breadcrumbUrl.includes("/collections/") || breadcrumbUrl.includes("/subcategory/");
-    const hasSubcategories = Array.isArray(resolved?.subcategories) && resolved.subcategories.length > 0;
-    const hasCollectionSignals = Boolean(
-        rawRelationTo === "product-collections" ||
-        hasSubcategories ||
-        breadcrumbSuggestsCollection ||
-        normalizedPreferredBase
-    );
-
-    if (!hasCollectionSignals) return "";
-
     const slug = getFirstString(resolved.slug, resolved.urlSlug).replace(/^\/+/, "");
     if (!slug) return "";
 
-    const directPath = normalizePath(
-        getFirstString(resolved.url, resolved.href, resolved.path, resolved.uri, breadcrumbUrl)
-    );
-
-    if (directPath && (directPath.includes("/collections/") || directPath.includes("/subcategory/"))) {
-        return directPath;
-    }
-
     const menuPath = getFirstString(resolved.menuPath).toLowerCase();
-    const basePath =
-        menuPath === "collections" ? "/collections" :
-        menuPath === "subcategory" ? "/subcategory" :
-        hasSubcategories || Boolean(resolved.featured)
-            ? "/collections"
-            : (normalizedPreferredBase || "/subcategory");
+    
+    // Simplified Hierarchy Rules:
+    // 1. Explicit menuPath overrides everything
+    // 2. Featured flag redirects to /collections/
+    // 3. Everything else defaults to /subcategory/
+    let basePath = "/subcategory";
+
+    if (menuPath === "collections") {
+         basePath = "/collections";
+    } else if (menuPath === "subcategory") {
+        basePath = "/subcategory";
+    } else if (Boolean(resolved.featured)) {
+        basePath = "/collections";
+    }
 
     return `${basePath}/${slug}`;
 };
@@ -301,7 +283,8 @@ const resolveMenuItemMeta = (item = {}, fallbackType = "slug") => {
         normalizePath(getFirstString(item.redirection, item.link?.redirection))
     );
 
-    const slug = normalizePath(directPath || relationPath || collectionPath);
+    // Prefer dynamically generated Collection / Relation paths over potentially stale direct text urls if the relationship exists
+    const slug = normalizePath(collectionPath || relationPath || directPath);
     const opensNewTab = Boolean(
         item.target === "_blank" ||
         item.openInNewTab ||
