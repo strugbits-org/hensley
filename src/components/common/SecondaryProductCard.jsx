@@ -6,7 +6,7 @@ import { CustomLink } from './CustomLink';
 import { actions } from '@/store';
 import Image from 'next/image';
 import { ProductBadge, resolveProductRibbon } from './ProductBadge';
-import { pickMediaUrl } from '@/utils';
+import { resolveCoreMediaUrl } from '@/utils';
 
 // Helper to resolve product image URL from various formats
 const resolveImageUrl = (product) => {
@@ -17,7 +17,7 @@ const resolveImageUrl = (product) => {
         return mainMedia;
     }
 
-    return pickMediaUrl(mainMedia, 'card') || null;
+    return resolveCoreMediaUrl(mainMedia) || null;
 };
 
 function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
