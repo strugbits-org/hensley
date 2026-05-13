@@ -108,13 +108,10 @@ const getCollectionPath = (collection, preferredBase = "") => {
         ? resolved.breadcrumbs[resolved.breadcrumbs.length - 1]?.url
         : "";
     const breadcrumbSuggestsCollection = breadcrumbUrl.includes("/collections/") || breadcrumbUrl.includes("/subcategory/");
+    const hasSubcategories = Array.isArray(resolved?.subcategories) && resolved.subcategories.length > 0;
     const hasCollectionSignals = Boolean(
         rawRelationTo === "product-collections" ||
-        resolved?.hierarchyLevel !== undefined ||
-        resolved?.level !== undefined ||
-        resolved?.depth !== undefined ||
-        resolved?.parent ||
-        resolved?.children ||
+        hasSubcategories ||
         breadcrumbSuggestsCollection ||
         normalizedPreferredBase
     );
@@ -132,12 +129,11 @@ const getCollectionPath = (collection, preferredBase = "") => {
         return directPath;
     }
 
-    const parentCollection = unwrapRelationshipValue(resolved.parent);
-    const rawLevel = Number(resolved.hierarchyLevel ?? resolved.level ?? resolved.depth);
-    const hierarchyLevel = Number.isFinite(rawLevel) ? rawLevel : (parentCollection ? 2 : 0);
-    const isTopLevel = !parentCollection && hierarchyLevel <= 1;
-    const basePath = (resolved?.hierarchyLevel !== undefined || resolved?.level !== undefined || resolved?.depth !== undefined || parentCollection)
-        ? (isTopLevel ? "/collections" : "/subcategory")
+    // After the parent→subcategories refactor, "is this a top-level entry page"
+    // is approximated by "does it have its own subcategories". Leaves go to
+    // /subcategory; anything with children acts as a /collections entry point.
+    const basePath = hasSubcategories
+        ? "/collections"
         : (normalizedPreferredBase || "/subcategory");
 
     return `${basePath}/${slug}`;

@@ -453,40 +453,20 @@ const normalizeAdditionalInfoSections = (sections = []) => {
     }));
 };
 
-const getCollectionKey = (collection = {}) => collection.id || collection._id || collection.slug || collection.name;
-
+// Breadcrumbs follow the simplified Home › Category › Product shape — we just
+// pick one representative collection (the first in the product's list) and
+// emit a single crumb. With multi-parent hierarchy, walking "up" is ambiguous.
 const buildCollectionBreadcrumbs = (collections = []) => {
     if (!Array.isArray(collections) || collections.length === 0) return [];
-
-    const collectionMap = new Map(collections.map((collection) => [getCollectionKey(collection), collection]));
-    const deepestCollection = [...collections]
-        .filter(Boolean)
-        .sort((left, right) => (right?.hierarchyLevel || 0) - (left?.hierarchyLevel || 0))[0];
-
-    const breadcrumbs = [];
-    const visited = new Set();
-    let currentCollection = deepestCollection;
-
-    while (currentCollection) {
-        const key = getCollectionKey(currentCollection);
-        if (!key || visited.has(key)) break;
-
-        visited.add(key);
-        breadcrumbs.unshift({
-            id: currentCollection.id || currentCollection._id,
-            name: currentCollection.name,
-            slug: currentCollection.slug,
-            hierarchyLevel: currentCollection.hierarchyLevel || 0,
-        });
-
-        if (!currentCollection.parent) break;
-
-        currentCollection = typeof currentCollection.parent === "object"
-            ? currentCollection.parent
-            : collectionMap.get(currentCollection.parent);
-    }
-
-    return breadcrumbs;
+    const primary = collections.find(Boolean);
+    if (!primary) return [];
+    return [
+        {
+            id: primary.id || primary._id,
+            name: primary.name,
+            slug: primary.slug,
+        },
+    ];
 };
 
 export const normalizeProductForDisplay = (product = {}) => {

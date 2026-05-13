@@ -24,20 +24,35 @@ export const fetchSelectedCollectionData = async (slug) => {
             throw new Error(`Category with slug "${slug}" not found`);
         }
 
-        const subCategories = selectedCategory?.children?.docs
-            || selectedCategory?.children
-            || [];
+        const subCategories = Array.isArray(selectedCategory?.subcategories)
+            ? selectedCategory.subcategories
+            : [];
 
-        // Recursively collect IDs from all descendant collections (grandchildren etc.)
+        const collectionsById = new Map(
+            (Array.isArray(allCollections) ? allCollections : []).map((c) => [c.id || c._id, c])
+        );
+
+        // DAG-aware descendant walker. The same collection can appear under
+        // multiple parents, so we guard against revisiting a node.
         const getAllDescendantIds = (collection) => {
-            const id = collection?.id || collection?._id;
-            const ids = id ? [id] : [];
-            const children = collection?.children?.docs || (Array.isArray(collection?.children) ? collection.children : []);
-            children.forEach(child => {
-                if (child && typeof child === 'object') ids.push(...getAllDescendantIds(child));
-                else if (typeof child === 'string') ids.push(child);
-            });
-            return ids;
+            const visited = new Set();
+            const stack = [collection];
+            while (stack.length) {
+                const current = stack.pop();
+                const id = current?.id || current?._id;
+                if (!id || visited.has(id)) continue;
+                visited.add(id);
+                const subs = Array.isArray(current?.subcategories) ? current.subcategories : [];
+                for (const sub of subs) {
+                    if (sub && typeof sub === 'object') stack.push(sub);
+                    else if (typeof sub === 'string') {
+                        const resolved = collectionsById.get(sub);
+                        if (resolved) stack.push(resolved);
+                        else if (!visited.has(sub)) visited.add(sub);
+                    }
+                }
+            }
+            return Array.from(visited);
         };
 
         const collectionIds = getAllDescendantIds(selectedCategory);
@@ -97,8 +112,18 @@ export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip
 export const fetchCollectionPagePaths = async () => {
     try {
         const allCollections = await queryProductCollections();
-        // Top-level collections (no parent) map to /collections/[slug]
-        const topLevel = allCollections.filter(c => !c.parent && c.slug);
+        // Top-level = collections that don't appear in anyone else's subcategories.
+        // With a many-to-many hierarchy a collection can have multiple parents, so
+        // we derive "is this a root" by reverse-indexing across all collections.
+        const childIds = new Set();
+        for (const c of allCollections) {
+            const subs = Array.isArray(c?.subcategories) ? c.subcategories : [];
+            for (const s of subs) {
+                if (typeof s === 'string') childIds.add(s);
+                else if (s && typeof s === 'object' && (s.id || s._id)) childIds.add(s.id || s._id);
+            }
+        }
+        const topLevel = allCollections.filter(c => c.slug && !childIds.has(c.id));
         const seen = new Set();
         return topLevel.reduce((acc, c) => {
             const slug = c.slug.trim().replace("/", "");

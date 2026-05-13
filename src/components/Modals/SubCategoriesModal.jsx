@@ -12,12 +12,12 @@ const resolveSubCategoryHref = (item = {}) => {
 
     if (!categorySlug) return "";
 
-    const hasParent = Boolean(relatedCollection?.parent);
-    const hasHierarchy = relatedCollection?.hierarchyLevel !== undefined || relatedCollection?.level !== undefined || hasParent;
-    const hierarchyLevel = Number(relatedCollection?.hierarchyLevel ?? relatedCollection?.level ?? (hasParent ? 2 : 0));
-    const basePath = hasHierarchy
-        ? (!hasParent && hierarchyLevel <= 1 ? "/collections" : "/subcategory")
-        : (item.redirection ? item.redirection : "/subcategory");
+    // Has its own subcategories → behaves as a top-level entry → /collections.
+    // Otherwise it's a leaf → /subcategory.
+    const hasSubcategories = Array.isArray(relatedCollection?.subcategories) && relatedCollection.subcategories.length > 0;
+    const basePath = hasSubcategories
+        ? "/collections"
+        : (item.redirection || "/subcategory");
 
     return `${basePath}/${categorySlug}`;
 };
