@@ -1,6 +1,6 @@
 import { PayloadSDK } from "@payloadcms/sdk";
 import { cache } from "react";
-import { logError, sortByOrderNumber } from "@/utils";
+import { logError, sortByOrderNumber, normalizeProductForDisplay } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
@@ -887,7 +887,7 @@ export const normalizePayloadBlog = (blog) => {
         markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
         blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
-        storeProducts: ensureArray(blog.storeProducts),
+        storeProducts: ensureArray(blog.storeProducts).map(normalizeProductForDisplay),
         isHidden: blog.isHidden || false,
     };
 };
@@ -939,7 +939,7 @@ export const normalizePayloadProject = (project) => {
         markets: ensureArray(project.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(project.studios).map(normalizePayloadStudioRef),
         portfolioCategories: ensureArray(project.portfolioCategories).map(normalizePayloadProjectCategoryRef),
-        storeProducts: ensureArray(project.storeProducts),
+        storeProducts: ensureArray(project.storeProducts).map(normalizeProductForDisplay),
         galleryImages,
         galleryImageObjects,
         isHidden: project.isHidden || false,

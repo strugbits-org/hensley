@@ -1,7 +1,6 @@
 import React from 'react'
 import { Button } from './Button'
-import { getAdditionalInfoSection, resolveProductMediaUrl } from '@/utils';
-import { generateImageURL } from '@/utils/generateImageURL';
+import { getAdditionalInfoSection, resolveCoreMediaUrl } from '@/utils';
 import { CustomLink } from '../common/CustomLink';
 
 const BannerStructures = ({ tent, data = {} }) => {
@@ -10,10 +9,7 @@ const BannerStructures = ({ tent, data = {} }) => {
     const pros = getAdditionalInfoSection(additionalInfoSections, "PROS");
     const cons = getAdditionalInfoSection(additionalInfoSections, "CONS");
 
-    // Support both Wix media URLs and core API media URLs
-    const bgUrl = typeof data.mainMedia === 'string'
-        ? generateImageURL({ wix_url: data.mainMedia })
-        : resolveProductMediaUrl(data.mainMedia);
+    const bgUrl = resolveCoreMediaUrl(data.mainMedia);
 
     // Derive the tent slug for linking, stripping any leading slash
     const tentSlug = (data.slug || tent?.tent?.slug || tent?.slug || "").replace(/^\//, "");

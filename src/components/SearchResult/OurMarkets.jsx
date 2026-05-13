@@ -1,11 +1,11 @@
 import React from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { CustomLink } from '../common/CustomLink'
-import { generateImageURL } from '@/utils/generateImageURL'
+import { resolveCoreMediaUrl } from '@/utils'
 
 
 const MarketCard = ({ data }) => {
-  const imageURL = generateImageURL({ wix_url: data.image1 });
+  const imageURL = resolveCoreMediaUrl(data.image1);
   return (
     <CustomLink to={`/market/${data.slug}`} className='sm:block hidden p-[24px] border border-primary-border'>
       <div className='w-full h-full flex lg:items-end lg:justify-start justify-center bg-no-repeat bg-center px-[24px] py-[24px]' style={{ backgroundImage: `url(${imageURL})`, backgroundSize: 'cover' }}>

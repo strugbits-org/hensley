@@ -1,10 +1,10 @@
 import React from 'react'
 import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
-import { generateImageURL } from '@/utils/generateImageURL';
+import { resolveCoreMediaUrl } from '@/utils';
 
 const EventHighLight = ({ data }) => {
     const { author, blogRef, markets, studios } = data;
-    const imageURL = generateImageURL({ wix_url: blogRef.coverImage }) || "";
+    const imageURL = resolveCoreMediaUrl(blogRef.coverImage) || "";
     
     const scrollToBottom = () => {
         window.scrollTo({

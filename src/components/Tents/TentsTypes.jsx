@@ -1,8 +1,7 @@
 import React from 'react';
 import SectionTitle from '../common/SectionTitle';
 import TentTypesSlider from './TentTypesSlider';
-import { generateImageURL } from '@/utils/generateImageURL';
-import { resolveProductMediaUrl } from '@/utils';
+import { resolveCoreMediaUrl } from '@/utils';
 
 const TentsTypes = ({ data }) => {
     return (
@@ -11,10 +10,7 @@ const TentsTypes = ({ data }) => {
             <div className='lg:grid hidden w-full grid-cols-3 gap-x-[24px] px-[24px] py-[31px]'>
                 {data.map((item, index) => {
                     const { tent } = item;
-                    // Support both Wix and core API media formats
-                    const imageURL = typeof tent?.mainMedia === 'string'
-                        ? generateImageURL({ wix_url: tent?.mainMedia, w: 608, h: 687 })
-                        : resolveProductMediaUrl(tent?.mainMedia);
+                    const imageURL = resolveCoreMediaUrl(tent?.mainMedia);
 
                     const tentSlug = (tent?.slug || "").replace(/^\//, "");
 

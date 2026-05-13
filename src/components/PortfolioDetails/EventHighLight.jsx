@@ -1,6 +1,6 @@
 import React from 'react'
 import { formatDate } from '@/utils';
-import { generateImageURLAlternate } from '@/utils/generateImageURL';
+import { resolveCoreMediaUrl } from '@/utils';
 
 const formatEventDate = (dateString) => {
     if (!dateString) return "";
@@ -14,7 +14,7 @@ const formatEventDate = (dateString) => {
 const EventHighLight = ({ data }) => {
     const { portfolioRef, markets, publishDate, eventDate, client, location } = data;
     // Prefer heroImage, fall back to coverImage
-    const bgImageUrl = generateImageURLAlternate({ wix_url: portfolioRef.heroImage || portfolioRef.coverImage.imageInfo });
+    const bgImageUrl = resolveCoreMediaUrl(portfolioRef.heroImage || portfolioRef.coverImage?.imageInfo);
     const displayDate = eventDate ? formatEventDate(eventDate) : formatDate(publishDate);
 
     return (
