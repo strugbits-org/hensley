@@ -71,21 +71,26 @@ export const pickMediaUrl = (media, preferredSize = "card") => {
     if (Array.isArray(media)) return pickMediaUrl(media[0], preferredSize);
     if (typeof media !== "object") return "";
 
+    const isValidUrl = (url) => url && typeof url === "string" && !url.endsWith("/null");
+
     const sizes = media.sizes || media?.mainMedia?.sizes || media?.media?.sizes;
     if (sizes && typeof sizes === "object") {
         const preferred = sizes?.[preferredSize]?.url;
-        if (preferred) return prefixCoreUrl(preferred);
+        if (isValidUrl(preferred)) return prefixCoreUrl(preferred);
 
         const startIdx = Math.max(SIZE_LADDER.indexOf(preferredSize), 0);
         for (let i = startIdx + 1; i < SIZE_LADDER.length; i++) {
             const url = sizes?.[SIZE_LADDER[i]]?.url;
-            if (url) return prefixCoreUrl(url);
+            if (isValidUrl(url)) return prefixCoreUrl(url);
         }
         for (let i = startIdx - 1; i >= 0; i--) {
             const url = sizes?.[SIZE_LADDER[i]]?.url;
-            if (url) return prefixCoreUrl(url);
+            if (isValidUrl(url)) return prefixCoreUrl(url);
         }
     }
+
+    const fallbackUrl = media.url || media?.mainMedia?.url || media?.media?.url || "";
+    if (isValidUrl(fallbackUrl)) return prefixCoreUrl(fallbackUrl);
 
     return resolveCoreMediaUrl(media);
 };

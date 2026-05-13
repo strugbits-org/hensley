@@ -24,6 +24,8 @@ export const actions = {
         const productId = normalizeId(product?._id || product?.id);
         if (productId && tentIds.has(productId)) return true;
 
+        if (product?.type === 'tent') return true;
+
         if (Array.isArray(product?.tentConfig?.quoteRequestFields) && product.tentConfig.quoteRequestFields.length > 0) {
             return true;
         }

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { PrimaryImage } from './PrimaryImage';
 import { CopyIcon } from './helpers/CopyIcon';
 import { copyToClipboard } from '@/utils';
 import { CustomLink } from './CustomLink';
@@ -13,13 +12,23 @@ import { pickMediaUrl } from '@/utils';
 
 function ProductCard({ data: product, type = 'listing', btnClass, allCollections = [] }) {
     const { title } = product;
+
+    console.log("product", product);
+    
     const ribbon = resolveProductRibbon(product, allCollections);
     const productImageSrc = pickMediaUrl(product.mainMedia, 'card');
-
     
+    // Determine product path based on its type
+    let productPath = `/product/${product.slug}`;
+    if (product?.type === 'tent') {
+        productPath = `/tent/${product.slug}`;
+    } else if (product?.type === 'pool_cover') {
+        productPath = `/pool-cover/${product.slug}`;
+    }
+
+    const isTent = product?.type === 'tent' || actions.isTentProduct(product);
 
     const handleAddToCart = () => {
-        const isTent = actions.isTentProduct(product);
         const modalProductData = product?.product ? product : { product };
         lightboxActions.setAddToCartModal({ open: true, type: isTent ? 'tent' : 'product', productData: modalProductData });
     };
@@ -27,7 +36,7 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
     return (
         <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between max-lg:h-full h-[620px] ${type !== 'listing' ? 'bg-primary-alt col-span-1.5 md:col-span-2' : ''}`}>
             <ProductBadge ribbon={ribbon} />
-            <CustomLink to={`/product/${product.slug}`} className={`h-[217px] lg:h-full overflow-hidden flex justify-center items-center p-2 lg:p-14 ${type === 'listing' ? 'bg-white' : 'min-h-[450px]'}`}>
+            <CustomLink to={productPath} className={`h-[217px] lg:h-full overflow-hidden flex justify-center items-center p-2 lg:p-14 ${type === 'listing' ? 'bg-white' : 'min-h-[450px]'}`}>
             {productImageSrc ? (
                 <Image src={productImageSrc} alt={title} width={500} height={500} sizes="(max-width: 1024px) 50vw, 33vw" loading="eager" quality={70} className={"aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
             ) : null}
