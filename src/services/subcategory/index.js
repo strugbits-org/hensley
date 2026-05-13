@@ -90,6 +90,7 @@ export const fetchSelectedCategoryData = async (slug) => {
         return data;
     } catch (error) {
         logError(`Error fetching selected collection data: ${error.message}`, error);
+        return null;
     }
 }
 

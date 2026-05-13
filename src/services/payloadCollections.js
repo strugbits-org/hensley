@@ -1,13 +1,38 @@
 import { PayloadSDK } from "@payloadcms/sdk";
+import { cache } from "react";
 import { logError, sortByOrderNumber } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
 export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID || "";
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const retryFetch = async (url, init) => {
+    const maxAttempts = 4;
+    const baseDelayMs = 500;
+    let lastError;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const response = await fetch(url, init);
+            if (response.status >= 500 && response.status < 600 && attempt < maxAttempts) {
+                await sleep(baseDelayMs * 2 ** (attempt - 1));
+                continue;
+            }
+            return response;
+        } catch (error) {
+            lastError = error;
+            if (attempt >= maxAttempts) break;
+            await sleep(baseDelayMs * 2 ** (attempt - 1));
+        }
+    }
+    throw lastError;
+};
+
 // Initialize Payload SDK with auth header
 export const sdk = new PayloadSDK({
     baseURL: CORE_API_BASE_URL + "/api",
+    fetch: retryFetch,
     baseInit: {
         headers: {
             'Authorization': `Bearer ${CORE_API_KEY}`,
@@ -129,12 +154,13 @@ const getCollectionPath = (collection, preferredBase = "") => {
         return directPath;
     }
 
-    // After the parent→subcategories refactor, "is this a top-level entry page"
-    // is approximated by "does it have its own subcategories". Leaves go to
-    // /subcategory; anything with children acts as a /collections entry point.
-    const basePath = hasSubcategories
-        ? "/collections"
-        : (normalizedPreferredBase || "/subcategory");
+    const menuPath = getFirstString(resolved.menuPath).toLowerCase();
+    const basePath =
+        menuPath === "collections" ? "/collections" :
+        menuPath === "subcategory" ? "/subcategory" :
+        hasSubcategories || Boolean(resolved.featured)
+            ? "/collections"
+            : (normalizedPreferredBase || "/subcategory");
 
     return `${basePath}/${slug}`;
 };
@@ -456,7 +482,7 @@ export const queryActiveHeaderMenu = async () => {
             pagination: false,
             draft: false,
             locale: "en",
-            depth: 6,
+            depth: 2,
             limit: 100,
         });
 
@@ -574,14 +600,18 @@ export const queryStorefrontFooter = async ({ channel = "her", key = "default" }
     }
 };
 
-export const queryProductCollections = async () => {
+// Slim query used everywhere subcategories/featured/slug are needed but images
+// are not (DAG walks, path generation, lookups). depth: 0 keeps relationship
+// fields as ID strings — perfect for traversal, ~200KB total, well under the
+// Next.js 10MB data cache ceiling that prior depth-1 queries kept exceeding.
+export const queryProductCollections = cache(async () => {
     try {
         const result = await sdk.find({
             collection: 'product-collections',
-            pagination: false, // Return all documents
+            pagination: false,
             draft: false,
             locale: "en",
-            depth: 1,
+            depth: 0,
         });
 
         return result.docs;
@@ -589,7 +619,42 @@ export const queryProductCollections = async () => {
         logError('Error querying productCollections:', error);
         throw error;
     }
-}
+})
+
+// Heavier query restricted to featured collections (small set) — populates
+// `media.mainMedia` at depth 1 so the Our Categories section can render images.
+export const queryFeaturedProductCollections = cache(async () => {
+    try {
+        const result = await sdk.find({
+            collection: 'product-collections',
+            where: { featured: { equals: true } },
+            pagination: false,
+            draft: false,
+            locale: "en",
+            depth: 1,
+        });
+        return result.docs;
+    } catch (error) {
+        logError('Error querying featured productCollections:', error);
+        return [];
+    }
+})
+
+export const queryProductSlugs = cache(async () => {
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            pagination: false,
+            draft: false,
+            locale: 'en',
+            depth: 0,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError('Error querying product slugs:', error);
+        return [];
+    }
+})
 
 export const queryProductCollectionBySlug = async (slug) => {
     try {
@@ -933,13 +998,13 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-createdAt", limit, depth = 2 } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-createdAt", limit, depth = 1 } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
             where: { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
             sort,
-            limit: limit || 100,
+            limit: limit || 20,
             pagination: !limit,
             draft: false,
             locale: "en",

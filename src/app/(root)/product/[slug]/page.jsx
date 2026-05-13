@@ -40,8 +40,7 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchProductPaths();
-    // const paths = [];
-    return paths.slice(0, 2);
+    return paths.slice(0, 100); // Limit to first 100 paths
   } catch (error) {
     logError("Error generating static params(product page):", error);
     return [];
@@ -52,13 +51,13 @@ export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const data = await fetchProductPageData(slug);
-    // const { matchedProducts, featuredProjectsData, pageDetails, ourCategoriesData, allCollections = [] } = data;
-    const { matchedProducts, featuredProjectsData, pageDetails, allCollections = [] } = data;
-    const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     if (!data) {
       throw new Error("Product data not found");
     }
+
+    const { matchedProducts, featuredProjectsData, pageDetails, allCollections = [] } = data;
+    const { matchItWithTitle, featuredProductTitle } = pageDetails;
 
     return (
       <>

@@ -9,12 +9,12 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { actions } from '@/store';
 import Image from 'next/image';
 import { ProductBadge, resolveProductRibbon } from './ProductBadge';
-import { resolveCoreMediaUrl } from '@/utils';
+import { pickMediaUrl } from '@/utils';
 
 function ProductCard({ data: product, type = 'listing', btnClass, allCollections = [] }) {
     const { title } = product;
     const ribbon = resolveProductRibbon(product, allCollections);
-    const productImageSrc = resolveCoreMediaUrl(product.mainMedia);
+    const productImageSrc = pickMediaUrl(product.mainMedia, 'card');
 
     
 
@@ -29,7 +29,7 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
             <ProductBadge ribbon={ribbon} />
             <CustomLink to={`/product/${product.slug}`} className={`h-[217px] lg:h-full overflow-hidden flex justify-center items-center p-2 lg:p-14 ${type === 'listing' ? 'bg-white' : 'min-h-[450px]'}`}>
             {productImageSrc ? (
-                <Image src={productImageSrc} alt={title} width={500} height={500} sizes="(max-width: 1024px) 50vw, 33vw" loading="lazy" unoptimized className={"aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
+                <Image src={productImageSrc} alt={title} width={500} height={500} sizes="(max-width: 1024px) 50vw, 33vw" loading="lazy" className={"aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
             ) : null}
             </CustomLink>
 

@@ -9,7 +9,6 @@ import { notFound } from "next/navigation";
 export const generateStaticParams = async () => {
   try {
     const poolCovers = await fetchPoolCovers();
-    // const poolCovers = [];
     const paths = poolCovers.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
     return paths;
   } catch (error) {
@@ -25,11 +24,11 @@ export default async function Page({ params }) {
       fetchPoolCoverPageData(slug),
       queryProductCollections().catch(() => []),
     ]);
-    const { productData, matchedProducts, featuredProjectsData } = data;
-
     if (!data) {
       throw new Error("Product data not found");
     }
+
+    const { productData, matchedProducts, featuredProjectsData } = data;
 
     return (
       <>

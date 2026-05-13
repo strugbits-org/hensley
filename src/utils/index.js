@@ -10,6 +10,26 @@ export const logError = (...args) => {
 };
 
 
+// Plain Mongo ObjectId (24 hex) or UUID v4 (36 chars with hyphens). These show
+// up when a Payload upload field is queried at depth 0 — the field collapses to
+// the related doc's ID. Treat them as "no URL" so we don't render the bare ID
+// as a relative path like http://localhost:3000/<id>.
+const looksLikeBareId = (value) =>
+    typeof value === "string" &&
+    !value.includes("/") &&
+    !value.includes(":") &&
+    !value.includes(".") &&
+    (/^[a-f0-9]{24}$/i.test(value) || /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value));
+
+const prefixCoreUrl = (path) => {
+    if (!path || typeof path !== "string") return path || "";
+    if (looksLikeBareId(path)) return "";
+    if (path.startsWith("/api/media/") && CORE_API_BASE_URL) {
+        return `${CORE_API_BASE_URL.replace(/\/$/, "")}${path}`;
+    }
+    return path;
+};
+
 /**
  * Resolve a media value coming from Payload (object or string) to a fully-qualified URL.
  * Handles the depth-1 populated upload object shape ({ url, sizes, ... }) and prefixes
@@ -17,12 +37,7 @@ export const logError = (...args) => {
  */
 export const resolveCoreMediaUrl = (media) => {
     if (!media) return "";
-    if (typeof media === "string") {
-        if (media.startsWith("/api/media/") && CORE_API_BASE_URL) {
-            return `${CORE_API_BASE_URL.replace(/\/$/, "")}${media}`;
-        }
-        return media;
-    }
+    if (typeof media === "string") return prefixCoreUrl(media);
     if (Array.isArray(media)) return resolveCoreMediaUrl(media[0]);
     if (typeof media !== "object") return "";
 
@@ -38,10 +53,41 @@ export const resolveCoreMediaUrl = (media) => {
     if (!candidate) return "";
     if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate);
 
-    if (candidate.startsWith("/api/media/") && CORE_API_BASE_URL) {
-        return `${CORE_API_BASE_URL.replace(/\/$/, "")}${candidate}`;
+    return prefixCoreUrl(candidate);
+};
+
+/**
+ * Pick the smallest pre-generated Payload size variant that meets a target width.
+ * Payload's Media collection exposes: thumbnail (320), mobile (480), small (640),
+ * card (768), tablet (1024), desktop (1440), wide (1920). Falls back through the
+ * size ladder if the preferred key isn't generated for a given file (e.g. the
+ * source image was smaller than the variant's target width).
+ */
+const SIZE_LADDER = ["thumbnail", "mobile", "small", "card", "tablet", "desktop", "wide"];
+
+export const pickMediaUrl = (media, preferredSize = "card") => {
+    if (!media) return "";
+    if (typeof media === "string") return prefixCoreUrl(media);
+    if (Array.isArray(media)) return pickMediaUrl(media[0], preferredSize);
+    if (typeof media !== "object") return "";
+
+    const sizes = media.sizes || media?.mainMedia?.sizes || media?.media?.sizes;
+    if (sizes && typeof sizes === "object") {
+        const preferred = sizes?.[preferredSize]?.url;
+        if (preferred) return prefixCoreUrl(preferred);
+
+        const startIdx = Math.max(SIZE_LADDER.indexOf(preferredSize), 0);
+        for (let i = startIdx + 1; i < SIZE_LADDER.length; i++) {
+            const url = sizes?.[SIZE_LADDER[i]]?.url;
+            if (url) return prefixCoreUrl(url);
+        }
+        for (let i = startIdx - 1; i >= 0; i--) {
+            const url = sizes?.[SIZE_LADDER[i]]?.url;
+            if (url) return prefixCoreUrl(url);
+        }
     }
-    return candidate;
+
+    return resolveCoreMediaUrl(media);
 };
 
 export const sortByOrderNumber = (array, options = {}) => {

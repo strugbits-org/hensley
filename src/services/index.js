@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { logError, sortByOrderNumber } from "@/utils";
 import {
   sdk,
@@ -10,6 +11,7 @@ import {
   queryProjects,
   queryBlogs,
   queryProductCollections,
+  queryFeaturedProductCollections,
   queryProductCollectionBySlug,
   queryProductsByCollectionIds,
   mapStorefrontFooterBranches,
@@ -196,7 +198,7 @@ export const fetchHeaderData = async () => {
   }
 };
 
-export const fetchMarketsData = async () => {
+export const fetchMarketsData = cache(async () => {
   try {
     const response = await fetch(
       `${CORE_API_BASE_URL}/api/products/market`,
@@ -219,7 +221,7 @@ export const fetchMarketsData = async () => {
     logError(`Error fetching markets data: ${error.message}`, error);
     return [];
   }
-};
+})
 
 export const fetchStudiosData = async () => {
   try {
@@ -321,21 +323,11 @@ export const fetchFooterData = async () => {
 
 export const fetchOurCategoriesData = async () => {
   try {
-    const payloadCollections = await queryProductCollections();
+    const payloadCollections = await queryFeaturedProductCollections();
 
-    const featuredCollections = (Array.isArray(payloadCollections) ? payloadCollections : [])
-      .filter((collection) =>
-        isTruthyFlag(
-          collection?.featured ??
-            collection?.isFeatured ??
-            collection?.showOnHome ??
-            collection?.homeFeatured
-        )
-      )
+    return (Array.isArray(payloadCollections) ? payloadCollections : [])
       .map(mapProductCollectionToCategoryCard)
       .sort((a, b) => (a.orderNumber ?? 0) - (b.orderNumber ?? 0));
-
-    return featuredCollections;
   } catch (error) {
     logError(`Error fetching our categories data: ${error.message}`, error);
     return [];
@@ -351,7 +343,7 @@ export const fetchInstagramFeed = async () => {
   return [];
 };
 
-export const fetchHomePageDetails = async () => {
+export const fetchHomePageDetails = cache(async () => {
   try {
     const section = await querySection('home-page-labels');
     if (section) {
@@ -373,7 +365,7 @@ export const fetchHomePageDetails = async () => {
     ourProjectsTitle: "OUR PROJECTS",
     testimonialsTitle: "WHAT PEOPLE SAY",
   };
-};
+})
 
 export const fetchPortfolioData = async () => {
   try {

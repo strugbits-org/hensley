@@ -9,7 +9,7 @@ export async function generateMetadata({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     const projectData = await fetchProjectPageData(slug);
-    const { project } = projectData;
+    const project = projectData?.project || {};
     const { portfolioRef, meta } = project;
 
     const title = meta?.title || portfolioRef?.title || "Project";
@@ -31,7 +31,6 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const projectData = await fetchProjects();
-    // const projectData = [];
     const paths = projectData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
     return paths;
   } catch (error) {

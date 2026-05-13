@@ -15,11 +15,13 @@ const resolveSubCategoryHref = (data = {}) => {
 
     if (!categorySlug) return "";
 
-    // Has its own subcategories → top-level entry → /collections; else leaf.
-    const hasSubcategories = Array.isArray(relatedCollection?.subcategories) && relatedCollection.subcategories.length > 0;
-    const basePath = hasSubcategories
-        ? "/collections"
-        : (data.redirection || "/subcategory");
+    const menuPath = relatedCollection?.menuPath;
+    const basePath =
+        menuPath === "collections" ? "/collections" :
+        menuPath === "subcategory" ? "/subcategory" :
+        relatedCollection?.featured
+            ? "/collections"
+            : (data.redirection || "/subcategory");
 
     return `${basePath}/${categorySlug}`;
 };

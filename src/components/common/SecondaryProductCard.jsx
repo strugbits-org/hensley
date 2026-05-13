@@ -6,27 +6,18 @@ import { CustomLink } from './CustomLink';
 import { actions } from '@/store';
 import Image from 'next/image';
 import { ProductBadge, resolveProductRibbon } from './ProductBadge';
-import { resolveCoreMediaUrl } from '@/utils';
+import { pickMediaUrl } from '@/utils';
 
 // Helper to resolve product image URL from various formats
 const resolveImageUrl = (product) => {
     if (!product) return null;
-    
+
     const mainMedia = product.mainMedia;
-    
-    // Handle direct URL string
-    if (typeof mainMedia === 'string') {
-        if (mainMedia.startsWith('wix:')) {
-            return mainMedia;
-        }
-        return resolveCoreMediaUrl(mainMedia);
+    if (typeof mainMedia === 'string' && mainMedia.startsWith('wix:')) {
+        return mainMedia;
     }
 
-    if (mainMedia && typeof mainMedia === 'object') {
-        return resolveCoreMediaUrl(mainMedia);
-    }
-
-    return null;
+    return pickMediaUrl(mainMedia, 'card') || null;
 };
 
 function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
@@ -47,7 +38,7 @@ function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
                     imageUrl.startsWith('wix:') ? (
                         <PrimaryImage timeout={50} alt={name} url={imageUrl} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
                     ) : (
-                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="lazy" unoptimized className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
+                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="lazy" className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
                     )
                 ) : null}
             </CustomLink>

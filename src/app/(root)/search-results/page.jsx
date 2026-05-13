@@ -25,7 +25,7 @@ export default async function Page() {
       fetchSearchPageDetails(),
       queryProductCollections().catch(() => []),
     ]);
-    const {searchPageDetails} = response;
+    const { searchPageDetails } = response || {};
 
     return (
       <>

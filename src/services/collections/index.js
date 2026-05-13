@@ -90,6 +90,7 @@ export const fetchSelectedCollectionData = async (slug) => {
         return data;
     } catch (error) {
         logError(`Error fetching selected collection data: ${error.message}`, error);
+        return null;
     }
 }
 
@@ -136,22 +137,13 @@ export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip
 
 export const fetchCollectionPagePaths = async () => {
     try {
+        // /collections/[slug] only hosts featured collections — non-featured
+        // (and featured-duplicates routed via subcategory) live at /subcategory/[slug].
         const allCollections = await queryProductCollections();
-        // Top-level = collections that don't appear in anyone else's subcategories.
-        // With a many-to-many hierarchy a collection can have multiple parents, so
-        // we derive "is this a root" by reverse-indexing across all collections.
-        const childIds = new Set();
-        for (const c of allCollections) {
-            const subs = Array.isArray(c?.subcategories) ? c.subcategories : [];
-            for (const s of subs) {
-                if (typeof s === 'string') childIds.add(s);
-                else if (s && typeof s === 'object' && (s.id || s._id)) childIds.add(s.id || s._id);
-            }
-        }
-        const topLevel = allCollections.filter(c => c.slug && !childIds.has(c.id));
+        const featured = (Array.isArray(allCollections) ? allCollections : []).filter(c => c?.featured);
         const seen = new Set();
-        return topLevel.reduce((acc, c) => {
-            const slug = c.slug.trim().replace("/", "");
+        return featured.reduce((acc, c) => {
+            const slug = (c?.slug || "").trim().replace(/^\//, "");
             if (slug && !seen.has(slug)) {
                 seen.add(slug);
                 acc.push({ slug });
