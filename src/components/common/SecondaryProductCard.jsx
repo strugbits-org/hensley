@@ -38,7 +38,7 @@ function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
                     imageUrl.startsWith('wix:') ? (
                         <PrimaryImage timeout={50} alt={name} url={imageUrl} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
                     ) : (
-                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="lazy" className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
+                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="eager" quality={70} className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
                     )
                 ) : null}
             </CustomLink>

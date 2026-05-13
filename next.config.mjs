@@ -14,7 +14,11 @@ const nextConfig = {
         CORE_API_BASE_URL: process.env.CORE_API_BASE_URL,
     },
     images: {
-        formats: ['image/avif', 'image/webp'],
+        // WebP only — AVIF cuts ~20% more bytes but encoding it with sharp is
+        // 3–5x slower per image on first request. Vercel/CDN cache after that,
+        // but a fresh page that triggers a few dozen first-time optimizations
+        // visibly stalls without this.
+        formats: ['image/webp'],
         minimumCacheTTL: 60 * 60 * 24 * 30,
         deviceSizes: [360, 480, 640, 768, 1024, 1280, 1536, 1920],
         imageSizes: [16, 32, 64, 96, 128, 256, 384, 512],
