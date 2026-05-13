@@ -28,7 +28,7 @@ const useDebounce = (callback, delay) => {
 };
 
 function Listing({ data }) {
-  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, allCollections = [] } = data;
+  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, allCollections = [], productOrder = [] } = data;
   let bannerIndex = -1;
   const pageSize = 16;
 
@@ -71,7 +71,9 @@ function Listing({ data }) {
         collectionIds: activeCollectionIds,
         limit: pageSize,
         skip: newSkip,
-        sortIndex: newSortIndex
+        sortIndex: newSortIndex,
+        // Use productOrder only when no sub-category filter is active
+        productOrder: newFilters.length === 0 ? productOrder : undefined,
       });
 
       if (isLoadMore) {

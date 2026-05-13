@@ -58,10 +58,19 @@ export const fetchSelectedCollectionData = async (slug) => {
         const collectionIds = getAllDescendantIds(selectedCategory);
         const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory.id);
 
-        const sortedProducts = await queryProductsByCollectionIdsPaginated({
-            collections: collectionIds,
+        // Extract ordered product IDs from the productOrder relationship field.
+        // The field is populated at depth 2 so items may be objects or plain IDs.
+        const productOrder = Array.isArray(selectedCategory.productOrder)
+            ? selectedCategory.productOrder
+                .map(p => (typeof p === 'string' ? p : p?.id ?? p?._id))
+                .filter(Boolean)
+            : [];
+
+        const sortedProducts = await fetchSortedProducts({
+            collectionIds,
             limit: 12,
             skip: 0,
+            productOrder,
         });
 
         const data = {
@@ -73,6 +82,7 @@ export const fetchSelectedCollectionData = async (slug) => {
             collectionIds,
             sortIndex,
             sortedProducts,
+            productOrder,
             pageDetails,
             allCollections: Array.isArray(allCollections) ? allCollections : [],
         }
@@ -100,8 +110,23 @@ export const fetchProductBannersData = async () => {
     }
 };
 
-export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip = 0, sortIndex }) => {
+export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip = 0, sortIndex, productOrder }) => {
     try {
+        // When a productOrder array is available (and no sub-category filter narrows
+        // the scope), paginate through the ordered IDs and re-sort results to match.
+        if (Array.isArray(productOrder) && productOrder.length > 0) {
+            const { queryProductsByIds } = await import('../payloadCollections');
+            const pageIds = productOrder.slice(skip, skip + limit);
+            const docs = await queryProductsByIds(pageIds);
+            // Re-sort to match the slice order (queryProductsByIds order is arbitrary)
+            const idIndex = new Map(pageIds.map((id, i) => [id, i]));
+            const sorted = [...docs].sort((a, b) => {
+                const ia = idIndex.get(a.id ?? a._id) ?? 9999;
+                const ib = idIndex.get(b.id ?? b._id) ?? 9999;
+                return ia - ib;
+            });
+            return { items: sorted, hasNext: skip + limit < productOrder.length };
+        }
         return queryProductsByCollectionIdsPaginated({ collections: collectionIds, limit, skip });
     } catch (error) {
         logError(`Error fetching sorted products data: ${error.message}`, error);

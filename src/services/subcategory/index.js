@@ -59,11 +59,18 @@ export const fetchSelectedCategoryData = async (slug) => {
         const collectionIds = getAllDescendantIds(selectedCategory);
         const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory.id);
 
+        // Extract ordered product IDs from the productOrder relationship field.
+        const productOrder = Array.isArray(selectedCategory.productOrder)
+            ? selectedCategory.productOrder
+                .map(p => (typeof p === 'string' ? p : p?.id ?? p?._id))
+                .filter(Boolean)
+            : [];
+
         const sortedProducts = await fetchSortedProducts({
             collectionIds,
             limit: 12,
             skip: 0,
-            sortIndex
+            productOrder,
         });
 
         const data = {
@@ -75,6 +82,7 @@ export const fetchSelectedCategoryData = async (slug) => {
             collectionIds,
             sortIndex,
             sortedProducts,
+            productOrder,
             pageDetails,
             allCollections: Array.isArray(allCollections) ? allCollections : [],
         }

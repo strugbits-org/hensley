@@ -26,7 +26,7 @@ const useDebounce = (callback, delay) => {
 };
 
 export const ProductListing = ({ data }) => {
-    const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData } = data;
+    const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, productOrder = [] } = data;
 
     let bannerIndex = -1;
     const pageSize = 12;
@@ -72,7 +72,9 @@ export const ProductListing = ({ data }) => {
                 collectionIds: activeCollectionIds,
                 limit: pageSize,
                 skip: newSkip,
-                sortIndex: newSortIndex
+                sortIndex: newSortIndex,
+                // Use productOrder only when no sub-category filter is active
+                productOrder: newFilters.length === 0 ? productOrder : undefined,
             });
 
             if (isLoadMore) {
