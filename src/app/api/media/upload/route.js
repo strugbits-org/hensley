@@ -3,7 +3,7 @@ import { logError } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
 const CORE_API_KEY = process.env.CORE_API_KEY || "";
-const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID || "";
+const CORE_TENANT_ID = process.env.CORE_TENANT_ID || "";
 
 const toAbsoluteCoreUrl = (urlOrPath) => {
   if (!urlOrPath) return "";

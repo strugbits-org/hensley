@@ -1,7 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { PrimaryImage } from '../common/PrimaryImage';
-import { formatDate } from '@/utils';
 import { MarketsStudiosTags } from './MarketsStudiosTags';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import arrowDark from '@/assets/icons/arrow-dark.svg';
@@ -20,6 +19,7 @@ function BlogCard({ data, handleFilterChange, selectedTags }) {
             <PrimaryImage
                 alt={blogRef.title}
                 url={blogRef.coverImage}
+                size="card"
                 customClasses="h-full w-full object-cover min-h-[528px] max-h-[528px]"
             />
 
@@ -41,7 +41,7 @@ function BlogCard({ data, handleFilterChange, selectedTags }) {
 
             <div className='px-6'>
                 <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>
-                    {formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}
+                    {author?.nickname || author?.firstName || author?.lastName}
                 </p>
 
                 <MarketsStudiosTags markets={markets} studios={studios} categories={blogCategories} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />

@@ -69,7 +69,7 @@ function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
           return (
             <div onClick={() => { handleSeeMore(index) }} key={index} className={`${cardCss} cursor-pointer keen-slider__slide border border-white flex flex-col p-[20px] sm:min-h-[680px] ${tab || 'lg:h-min'}`}>
               <div className="h-[425px] relative">
-                <PrimaryImage timeout={0} url={dt.image} customClasses={"h-full w-full object-cover "} />
+                <PrimaryImage timeout={0} url={dt.image} size="card" customClasses={"h-full w-full object-cover "} />
               </div>
               <div>
                 <h3 className="uppercase text-secondary-alt text-[25px] leading-[22px] lg:text-[50px] lg:leading-[40px] xl:text-[70px] xl:leading-[60px] lg:max-w-[139px] md:text-5xl font-recklessRegular mt-[20px] mb-[20px]">

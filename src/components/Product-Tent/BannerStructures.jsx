@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from './Button';
-import { generateImageURL } from '@/utils/generateImageURL';
-import { getAdditionalInfoSection, resolveProductMediaUrl } from '@/utils';
+import { getAdditionalInfoSection, resolveCoreMediaUrl } from '@/utils';
 import { CustomLink } from '../common/CustomLink';
 
 const BannerStructures = ({ title, data }) => {
@@ -10,10 +9,7 @@ const BannerStructures = ({ title, data }) => {
     const pros = getAdditionalInfoSection(additionalInfoSections, "PROS");
     const cons = getAdditionalInfoSection(additionalInfoSections, "CONS");
 
-    // Support both Wix media URLs and core API media objects
-    const bgUrl = typeof data.mainMedia === 'string'
-        ? generateImageURL({ wix_url: data.mainMedia })
-        : resolveProductMediaUrl(data.mainMedia);
+    const bgUrl = resolveCoreMediaUrl(data.mainMedia, "tablet");
 
     return (
         <div className='w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] sm:h-[950px] bg-cover bg-no-repeat bg-top ' style={{ backgroundImage: `url(${bgUrl})` }}>

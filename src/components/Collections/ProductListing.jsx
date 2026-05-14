@@ -28,7 +28,7 @@ const useDebounce = (callback, delay) => {
 };
 
 function Listing({ data }) {
-  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, allCollections = [] } = data;
+  const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, allCollections = [], productOrder = [] } = data;
   let bannerIndex = -1;
   const pageSize = 16;
 
@@ -41,16 +41,23 @@ function Listing({ data }) {
   const [isMobile, setIsMobile] = useState(false);
   const isLoadingMoreRef = useRef(false);
 
-  // Recursively collect IDs from a collection and all its populated children
+  // DAG-aware descendant walker. Multi-parent collections can be reached via
+  // more than one path; the visited set prevents infinite loops and dupes.
   const getCollectionIdsWithDescendants = useCallback((item) => {
-    const id = item?._id || item?.id;
-    const ids = id ? [id] : [];
-    const children = item?.children?.docs || (Array.isArray(item?.children) ? item.children : []);
-    children.forEach(child => {
-      if (child && typeof child === 'object') ids.push(...getCollectionIdsWithDescendants(child));
-      else if (typeof child === 'string') ids.push(child);
-    });
-    return ids;
+    const visited = new Set();
+    const stack = [item];
+    while (stack.length) {
+      const current = stack.pop();
+      const id = current?._id || current?.id;
+      if (!id || visited.has(id)) continue;
+      visited.add(id);
+      const subs = Array.isArray(current?.subcategories) ? current.subcategories : [];
+      for (const sub of subs) {
+        if (sub && typeof sub === 'object') stack.push(sub);
+        else if (typeof sub === 'string' && !visited.has(sub)) visited.add(sub);
+      }
+    }
+    return Array.from(visited);
   }, []);
 
   const fetchProducts = useCallback(async ({ newFilters = selectedFilters, isLoadMore = false, newSkip = 0 }) => {
@@ -64,7 +71,9 @@ function Listing({ data }) {
         collectionIds: activeCollectionIds,
         limit: pageSize,
         skip: newSkip,
-        sortIndex: newSortIndex
+        sortIndex: newSortIndex,
+        // Use productOrder only when no sub-category filter is active
+        productOrder: newFilters.length === 0 ? productOrder : undefined,
       });
 
       if (isLoadMore) {

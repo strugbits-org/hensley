@@ -32,6 +32,7 @@ export const ProductBanner = ({ data }) => {
     <div className="relative col-span-3 h-[400px] sm:h-[230px] lg:h-[425px] border my-[24px]">
       <PrimaryImage
         url={image}
+        size="tablet"
         alt={`Banner for ${title}`}
         fit='fit'
         min_w={1920}

@@ -1,13 +1,36 @@
 import { PayloadSDK } from "@payloadcms/sdk";
-import { logError, sortByOrderNumber } from "@/utils";
+import { cache } from "react";
+import { logError, sleep, sortByOrderNumber, normalizeProductForDisplay, resolveCoreMediaUrl } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
-export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID || "";
+export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || "";
+
+const retryFetch = async (url, init) => {
+    const maxAttempts = 4;
+    const baseDelayMs = 500;
+    let lastError;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const response = await fetch(url, init);
+            if (response.status >= 500 && response.status < 600 && attempt < maxAttempts) {
+                await sleep(baseDelayMs * 2 ** (attempt - 1));
+                continue;
+            }
+            return response;
+        } catch (error) {
+            lastError = error;
+            if (attempt >= maxAttempts) break;
+            await sleep(baseDelayMs * 2 ** (attempt - 1));
+        }
+    }
+    throw lastError;
+};
 
 // Initialize Payload SDK with auth header
 export const sdk = new PayloadSDK({
     baseURL: CORE_API_BASE_URL + "/api",
+    fetch: retryFetch,
     baseInit: {
         headers: {
             'Authorization': `Bearer ${CORE_API_KEY}`,
@@ -100,45 +123,24 @@ const getCollectionPath = (collection, preferredBase = "") => {
 
     if (!resolved || typeof resolved !== "object") return "";
 
-    const normalizedPreferredBase = preferredBase === "/collections" || preferredBase === "/subcategory"
-        ? preferredBase
-        : "";
-    const rawRelationTo = getFirstString(collection?.relationTo, resolved?.relationTo).toLowerCase();
-    const breadcrumbUrl = Array.isArray(resolved?.breadcrumbs)
-        ? resolved.breadcrumbs[resolved.breadcrumbs.length - 1]?.url
-        : "";
-    const breadcrumbSuggestsCollection = breadcrumbUrl.includes("/collections/") || breadcrumbUrl.includes("/subcategory/");
-    const hasCollectionSignals = Boolean(
-        rawRelationTo === "product-collections" ||
-        resolved?.hierarchyLevel !== undefined ||
-        resolved?.level !== undefined ||
-        resolved?.depth !== undefined ||
-        resolved?.parent ||
-        resolved?.children ||
-        breadcrumbSuggestsCollection ||
-        normalizedPreferredBase
-    );
-
-    if (!hasCollectionSignals) return "";
-
     const slug = getFirstString(resolved.slug, resolved.urlSlug).replace(/^\/+/, "");
     if (!slug) return "";
 
-    const directPath = normalizePath(
-        getFirstString(resolved.url, resolved.href, resolved.path, resolved.uri, breadcrumbUrl)
-    );
+    const menuPath = getFirstString(resolved.menuPath).toLowerCase();
+    
+    // Simplified Hierarchy Rules:
+    // 1. Explicit menuPath overrides everything
+    // 2. Featured flag redirects to /collections/
+    // 3. Everything else defaults to /subcategory/
+    let basePath = "/subcategory";
 
-    if (directPath && (directPath.includes("/collections/") || directPath.includes("/subcategory/"))) {
-        return directPath;
+    if (menuPath === "collections") {
+         basePath = "/collections";
+    } else if (menuPath === "subcategory") {
+        basePath = "/subcategory";
+    } else if (Boolean(resolved.featured)) {
+        basePath = "/collections";
     }
-
-    const parentCollection = unwrapRelationshipValue(resolved.parent);
-    const rawLevel = Number(resolved.hierarchyLevel ?? resolved.level ?? resolved.depth);
-    const hierarchyLevel = Number.isFinite(rawLevel) ? rawLevel : (parentCollection ? 2 : 0);
-    const isTopLevel = !parentCollection && hierarchyLevel <= 1;
-    const basePath = (resolved?.hierarchyLevel !== undefined || resolved?.level !== undefined || resolved?.depth !== undefined || parentCollection)
-        ? (isTopLevel ? "/collections" : "/subcategory")
-        : (normalizedPreferredBase || "/subcategory");
 
     return `${basePath}/${slug}`;
 };
@@ -279,7 +281,8 @@ const resolveMenuItemMeta = (item = {}, fallbackType = "slug") => {
         normalizePath(getFirstString(item.redirection, item.link?.redirection))
     );
 
-    const slug = normalizePath(directPath || relationPath || collectionPath);
+    // Prefer dynamically generated Collection / Relation paths over potentially stale direct text urls if the relationship exists
+    const slug = normalizePath(collectionPath || relationPath || directPath);
     const opensNewTab = Boolean(
         item.target === "_blank" ||
         item.openInNewTab ||
@@ -320,7 +323,18 @@ const normalizeMegaMenuItem = (item = {}, parentId, index) => {
         item.category || item.productCollection || item.productCollections || item.collection || item.collections
     );
     const category = typeof relatedCollection === "object" && relatedCollection ? relatedCollection : {};
-    const image = item.image?.url || item.image || item.mainMedia?.url || item.mainMedia || item.media?.mainMedia?.url || item.media?.mainMedia || category.mainMedia?.url || category.mainMedia || category.media?.mainMedia?.url || category.media?.mainMedia || category.image?.url || category.image || null;
+    const imageCandidates = [
+        item.image,
+        item.mainMedia,
+        item.media?.mainMedia,
+        category.mainMedia,
+        category.media?.mainMedia,
+        category.image,
+    ];
+    const image = imageCandidates.reduce(
+        (acc, candidate) => acc || resolveCoreMediaUrl(candidate, "thumbnail"),
+        ""
+    ) || null;
 
     return {
         _id: item.id || item._id || `${parentId}-nested-${index}`,
@@ -460,7 +474,7 @@ export const queryActiveHeaderMenu = async () => {
             pagination: false,
             draft: false,
             locale: "en",
-            depth: 6,
+            depth: 2,
             limit: 100,
         });
 
@@ -578,14 +592,18 @@ export const queryStorefrontFooter = async ({ channel = "her", key = "default" }
     }
 };
 
-export const queryProductCollections = async () => {
+// Slim query used everywhere subcategories/featured/slug are needed but images
+// are not (DAG walks, path generation, lookups). depth: 0 keeps relationship
+// fields as ID strings — perfect for traversal, ~200KB total, well under the
+// Next.js 10MB data cache ceiling that prior depth-1 queries kept exceeding.
+export const queryProductCollections = cache(async () => {
     try {
         const result = await sdk.find({
             collection: 'product-collections',
-            pagination: false, // Return all documents
+            pagination: false,
             draft: false,
             locale: "en",
-            depth: 1,
+            depth: 0,
         });
 
         return result.docs;
@@ -593,7 +611,43 @@ export const queryProductCollections = async () => {
         logError('Error querying productCollections:', error);
         throw error;
     }
-}
+})
+
+// Heavier query restricted to featured collections (small set) — populates
+// `media.mainMedia` at depth 1 so the Our Categories section can render images.
+export const queryFeaturedProductCollections = cache(async () => {
+    try {
+        const result = await sdk.find({
+            collection: 'product-collections',
+            where: { featured: { equals: true } },
+            pagination: false,
+            draft: false,
+            locale: "en",
+            depth: 1,
+        });
+
+        return result.docs;
+    } catch (error) {
+        logError('Error querying featured productCollections:', error);
+        return [];
+    }
+})
+
+export const queryProductSlugs = cache(async () => {
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            pagination: false,
+            draft: false,
+            locale: 'en',
+            depth: 0,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError('Error querying product slugs:', error);
+        return [];
+    }
+})
 
 export const queryProductCollectionBySlug = async (slug) => {
     try {
@@ -764,10 +818,41 @@ export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip =
 // Payload Media URL helper
 // ──────────────────────────────────────────────────────────────────────
 
-const resolveMediaUrl = (media) => {
+// Size preference chains — always try tablet first to avoid the crop issues
+// seen with smaller variants, then degrade to card/thumbnail only if tablet
+// wasn't generated for the asset.
+const MEDIA_SIZE_PREFERENCE = {
+    thumbnail: ["tablet", "card", "thumbnail"],
+    card:      ["tablet", "card", "thumbnail"],
+    tablet:    ["tablet", "card", "thumbnail"],
+};
+
+const isUsableVariant = (variant) =>
+    variant && typeof variant === "object" && typeof variant.filename === "string" && variant.filename.length > 0;
+const isUsableMediaUrl = (value) =>
+    typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
+
+const resolveMediaUrl = (media, size) => {
     if (!media) return "";
     if (typeof media === "string") return media;
-    return media?.url || media?.sizes?.card?.url || media?.sizes?.thumbnail?.url || media?.thumbnailURL || "";
+
+    if (size && media?.sizes) {
+        const prefs = MEDIA_SIZE_PREFERENCE[size] || [size];
+        for (const s of prefs) {
+            const variant = media.sizes?.[s];
+            if (!isUsableVariant(variant)) continue;
+            if (isUsableMediaUrl(variant.url)) return variant.url;
+            return `/api/media/file/${variant.filename}`;
+        }
+    }
+
+    const candidate = media?.url || media?.sizes?.card?.url || media?.sizes?.thumbnail?.url || media?.thumbnailURL || "";
+    if (!isUsableMediaUrl(candidate)) {
+        return isUsableMediaUrl(media?.thumbnailURL)
+            ? media.thumbnailURL
+            : (media?.filename ? `/api/media/file/${media.filename}` : "");
+    }
+    return candidate;
 };
 
 // ──────────────────────────────────────────────────────────────────────
@@ -814,47 +899,52 @@ const normalizePayloadProjectCategoryRef = (cat) => {
 
 export const normalizePayloadBlog = (blog) => {
     if (!blog || typeof blog !== "object") return blog;
-    const coverImageUrl = resolveMediaUrl(blog.coverImage);
+    const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
+    const author = blog.author && typeof blog.author === "object"
+        ? blog.author
+        : null;
+    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayDate = blog.createdAt || blog.updatedAt || "";
     return {
         ...blog,
         _id: blog.id || blog._id,
         slug: blog.slug || "",
-        publishDate: blog.publishedDate || blog.publishDate || "",
+        publishDate: displayDate,
         blogRef: {
             title: blog.title || "",
             coverImage: coverImageUrl,
-            publishedDate: blog.publishedDate || "",
+            publishedDate: displayDate,
             excerpt: blog.excerpt || "",
             richContent: blog.content || null,
         },
-        author: blog.author
+        author: author
             ? {
-                ...blog.author,
-                nickname: blog.author.nickname || blog.author.firstName || "",
-                firstName: blog.author.firstName || "",
-                lastName: blog.author.lastName || "",
+                ...author,
+                nickname: displayName || "",
+                firstName: author.firstName || "",
+                lastName: author.lastName || "",
             }
             : { nickname: "", firstName: "", lastName: "" },
         markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
         blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
-        storeProducts: ensureArray(blog.storeProducts),
+        storeProducts: ensureArray(blog.storeProducts).map(normalizeProductForDisplay),
         isHidden: blog.isHidden || false,
     };
 };
 
 export const normalizePayloadProject = (project) => {
     if (!project || typeof project !== "object") return project;
-    const coverImageUrl = resolveMediaUrl(project.coverImage);
-    const heroImageUrl = resolveMediaUrl(project.heroImage);
+    const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
+    const heroImageUrl = resolveMediaUrl(project.heroImage, "tablet");
     const galleryImages = ensureArray(project.galleryImages).map((item) => {
         if (typeof item === "string") return item;
-        const imgUrl = resolveMediaUrl(item?.image || item);
+        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
         return imgUrl;
     }).filter(Boolean);
     const galleryImageObjects = ensureArray(project.galleryImages).map((item) => {
         if (!item || typeof item === "string") return null;
-        const imgUrl = resolveMediaUrl(item?.image || item);
+        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
         return imgUrl ? { url: imgUrl, caption: item?.caption || "" } : null;
     }).filter(Boolean);
     const excerpt = project.excerpt || (project.description ? project.description.slice(0, 120) + (project.description.length > 120 ? "..." : "") : "");
@@ -885,12 +975,12 @@ export const normalizePayloadProject = (project) => {
         meta: {
             title: meta.title || "",
             description: meta.description || "",
-            image: resolveMediaUrl(meta.image) || "",
+            image: resolveMediaUrl(meta.image, "tablet") || "",
         },
         markets: ensureArray(project.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(project.studios).map(normalizePayloadStudioRef),
         portfolioCategories: ensureArray(project.portfolioCategories).map(normalizePayloadProjectCategoryRef),
-        storeProducts: ensureArray(project.storeProducts),
+        storeProducts: ensureArray(project.storeProducts).map(normalizeProductForDisplay),
         galleryImages,
         galleryImageObjects,
         isHidden: project.isHidden || false,
@@ -932,13 +1022,13 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 2 } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-createdAt", limit, depth = 1 } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
             where: { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
             sort,
-            limit: limit || 100,
+            limit: limit || 20,
             pagination: !limit,
             draft: false,
             locale: "en",
@@ -1181,14 +1271,32 @@ export const sectionToObject = (section) => {
 
 // ── New First-Class Collection Queries ───────────────────────────────────────
 
+const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1 }) => {
+    const baseWhere = {
+        and: [
+            { tenant: { equals: tenantId } },
+            { _status: { equals: "published" } },
+            ...(Object.keys(extraWhere).length ? [extraWhere] : []),
+        ],
+    };
+
+    const result = await sdk.find({
+        collection,
+        where: baseWhere,
+        sort,
+        limit,
+        depth,
+        draft: false,
+        locale: "en",
+        pagination: false,
+    });
+
+    return ensureArray(result?.docs);
+};
+
 export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/how-we-do-it?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=10`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "how-we-do-it", tenantId, limit: 10 });
     } catch (error) {
         logError(`Error querying how-we-do-it: ${error.message}`, error);
         return [];
@@ -1197,12 +1305,7 @@ export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
 
 export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/dream-team-members?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=100`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "dream-team-members", tenantId, limit: 100 });
     } catch (error) {
         logError(`Error querying dream-team-members: ${error.message}`, error);
         return [];
@@ -1211,12 +1314,7 @@ export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
 
 export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/partner-brands?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=10`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "partner-brands", tenantId, limit: 10 });
     } catch (error) {
         logError(`Error querying partner-brands: ${error.message}`, error);
         return [];
@@ -1225,12 +1323,12 @@ export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
 
 export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 'client') {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/testimonials?where[tenant][equals]=${tenantId}&where[type][equals]=${type}&where[_status][equals]=published&sort=order&limit=20`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({
+            collection: "testimonials",
+            tenantId,
+            extraWhere: { type: { equals: type } },
+            limit: 20,
+        });
     } catch (error) {
         logError(`Error querying testimonials (type=${type}): ${error.message}`, error);
         return [];
@@ -1239,12 +1337,7 @@ export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 
 
 export async function queryInstagramFeedItems(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/instagram-feed-items?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=12`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "instagram-feed-items", tenantId, limit: 12 });
     } catch (error) {
         logError(`Error querying instagram-feed-items: ${error.message}`, error);
         return [];
@@ -1260,12 +1353,13 @@ export async function queryInstagramFeedItems(tenantId = CORE_TENANT_ID) {
  */
 export async function queryHeroBanner(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/hero-banners?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=1&depth=1`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        const banner = data.docs?.[0];
+        const docs = await findPublishedByTenant({
+            collection: "hero-banners",
+            tenantId,
+            limit: 1,
+            depth: 1,
+        });
+        const banner = docs[0];
         if (!banner) return null;
         return {
             title: banner.title ?? null,
@@ -1288,12 +1382,14 @@ export async function queryHeroBanner(tenantId = CORE_TENANT_ID) {
  */
 export async function queryProductBanners(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/product-banners?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=orderDesktop&limit=50&depth=1`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return (data.docs || []).map((banner) => ({
+        const docs = await findPublishedByTenant({
+            collection: "product-banners",
+            tenantId,
+            sort: "orderDesktop",
+            limit: 50,
+            depth: 1,
+        });
+        return docs.map((banner) => ({
             _id: banner.id,
             title: banner.title,
             image: banner.image ?? null,

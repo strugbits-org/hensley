@@ -3,7 +3,6 @@ import React from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { PrimaryImage } from '../common/PrimaryImage'
 import { CustomLink } from '../common/CustomLink'
-import { formatDate } from '@/utils'
 import { MarketsStudiosTags } from './MarketsStudiosTags'
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader'
 
@@ -25,12 +24,12 @@ const EventHighLight = ({ data, handleFilterChange, selectedTags, pageTitle="" }
             />
             <div onClick={handleRedirection} className='w-full border border-primary-border p-[24px] gap-x-[24px] flex lg:flex-row flex-col cursor-pointer'>
                 <div className='lg:w-3/5 overflow-hidden'>
-                    <PrimaryImage url={blogRef.coverImage} alt={blogRef.title} customClasses="h-full w-full max-h-[600px] object-cover transition-transform duration-300 group-hover:scale-105" />
+                    <PrimaryImage url={blogRef.coverImage} size="tablet" alt={blogRef.title} customClasses="h-full w-full max-h-[600px] object-cover transition-transform duration-300 group-hover:scale-105" />
                 </div>
                 <div className='lg:w-2/5  flex flex-row lg:flex-col gap-x-[20px] lg:px-0 max-lg:py-[40px] lg:gap-y-[15px] relative '>
                     <div className=' max-lg:w-1/2  flex flex-col gap-y-[15px]'>
                         <div className='w-full flex gap-x-[10px] justify-end'>
-                            <span className='font-haasRegular uppercase text-[12px] text-secondary-altinline'>{formatDate(blogRef.publishedDate)} - {author?.nickname || author?.firstName || author?.lastName}</span>
+                            <span className='font-haasRegular uppercase text-[12px] text-secondary-altinline'>{author?.nickname || author?.firstName || author?.lastName}</span>
                         </div>
 
                         <span className='uppercase text-secondary-alt lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[32px] text-[25px] leading-[23px] font-recklessRegular block '>

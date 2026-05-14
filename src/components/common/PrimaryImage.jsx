@@ -2,10 +2,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { generateImageURL, generateImageURLAlternate, generateSVGURL } from "@/utils/generateImageURL";
+import { resolveCoreMediaUrl } from "@/utils";
 import fallbackImage from "@/assets/fallback-img.png";
 
 export const PrimaryImage = ({
     url,
+    size,
     type = "default",
     original,
     fit = "fill",
@@ -39,7 +41,11 @@ export const PrimaryImage = ({
         return Math.max(numericMeasuredValue, numericFallbackValue, numericMinimumValue, 1);
     };
 
+    const isWixUrl = (u) => typeof u === 'string' && (u.startsWith('wix:image://v1/') || u.startsWith('wix:vector://v1/'));
+
     const generateSrc = () => {
+        if (!isWixUrl(url)) return resolveCoreMediaUrl(url, size);
+
         if (original) return generateImageURL({ wix_url: url, original });
 
         if (ref.current) {

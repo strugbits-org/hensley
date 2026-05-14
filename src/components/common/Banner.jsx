@@ -9,8 +9,8 @@ export const Banner = ({ data }) => {
     return (
         <div className='relative banner lg:h-[125vh] h-[100vh] lg:p-6 border border-primary-border'>
             <div className='absolute lg:inset-6 inset-0 bg-[#babab2]'>
-                <PrimaryImage timeout={0} url={backgroundImage} alt={title} fit='fit' customClasses="hidden lg:block border border-primary-border h-full w-full object-cover" />
-                <PrimaryImage timeout={0} url={mobileImage} alt={title} fit='fit' customClasses="lg:hidden border border-primary-border h-full w-full object-contain object-[center_250px]" />
+                <PrimaryImage timeout={0} url={backgroundImage} size="tablet" alt={title} fit='fit' customClasses="hidden lg:block border border-primary-border h-full w-full object-cover" />
+                <PrimaryImage timeout={0} url={mobileImage} size="card" alt={title} fit='fit' customClasses="lg:hidden border border-primary-border h-full w-full object-contain object-[center_250px]" />
             </div>
             <div className="absolute inset-0 lg:px-44 py-24 lg:py-20 flex justify-center lg:block">
                 <div className='flex flex-col lg:justify-start justify-between max-w-xs lg:max-w-sm gap-4 lg:gap-6 items-center lg:items-start'>

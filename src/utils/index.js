@@ -10,38 +10,87 @@ export const logError = (...args) => {
 };
 
 
+// Plain Mongo ObjectId (24 hex) or UUID v4 (36 chars with hyphens). These show
+// up when a Payload upload field is queried at depth 0 — the field collapses to
+// the related doc's ID. Treat them as "no URL" so we don't render the bare ID
+// as a relative path like http://localhost:3000/<id>.
+const looksLikeBareId = (value) =>
+    typeof value === "string" &&
+    !value.includes("/") &&
+    !value.includes(":") &&
+    !value.includes(".") &&
+    (/^[a-f0-9]{24}$/i.test(value) || /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(value));
+
+const prefixCoreUrl = (path) => {
+    if (!path || typeof path !== "string") return path || "";
+    if (looksLikeBareId(path)) return "";
+    if (path.startsWith("/api/media/") && CORE_API_BASE_URL) {
+        return `${CORE_API_BASE_URL.replace(/\/$/, "")}${path}`;
+    }
+    return path;
+};
+
+// Payload size names in preference order for each requested size hint.
+// Walks the list left-to-right and returns the first size that has a url.
+// Tablet leads every chain — smaller variants were cropping product imagery
+// (e.g. chair legs cut off in card grids), so we upscale-prefer the largest
+// generated size and only degrade if tablet wasn't produced for that asset.
+const SIZE_PREFERENCE = {
+    thumbnail: ["tablet", "card", "thumbnail"],
+    card:      ["tablet", "card", "thumbnail"],
+    tablet:    ["tablet", "card", "thumbnail"],
+};
+
 /**
  * Resolve a media value coming from Payload (object or string) to a fully-qualified URL.
- * Handles the depth-1 populated upload object shape ({ url, sizes, ... }) and prefixes
- * relative `/api/media/...` paths with CORE_API_BASE_URL.
+ * Pass a `size` hint ("thumbnail" | "card" | "tablet") to pick the best Payload size variant
+ * instead of the full original. Falls back to the next preferred size, then to the original.
  */
-export const resolveCoreMediaUrl = (media) => {
+export const resolveCoreMediaUrl = (media, size) => {
     if (!media) return "";
-    if (typeof media === "string") {
-        if (media.startsWith("/api/media/") && CORE_API_BASE_URL) {
-            return `${CORE_API_BASE_URL.replace(/\/$/, "")}${media}`;
-        }
-        return media;
-    }
-    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0]);
+    if (typeof media === "string") return prefixCoreUrl(media);
+    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0], size);
     if (typeof media !== "object") return "";
 
-    const candidate = media.url
-        || media.src
-        || media.thumbnailURL
-        || media?.sizes?.card?.url
-        || media?.sizes?.thumbnail?.url
-        || media?.mainMedia?.url
-        || media?.media?.url
-        || "";
+    // Unwrap nested shapes first
+    if (media.mainMedia) return resolveCoreMediaUrl(media.mainMedia, size);
+    if (media.media)     return resolveCoreMediaUrl(media.media, size);
+
+    // A size variant is "real" only when it has a concrete filename — Payload
+    // sometimes inserts placeholder entries with url ".../null" and filename:null
+    // for sizes that weren't actually generated. Skip those.
+    const isUsableVariant = (variant) =>
+        variant && typeof variant === "object" && typeof variant.filename === "string" && variant.filename.length > 0;
+
+    const isUsableUrl = (value) =>
+        typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
+
+    // Try size variants in preference order when a hint is given.
+    if (size && media.sizes) {
+        const prefs = SIZE_PREFERENCE[size] || [size];
+        for (const s of prefs) {
+            const variant = media.sizes?.[s];
+            if (!isUsableVariant(variant)) continue;
+            if (isUsableUrl(variant.url)) return prefixCoreUrl(variant.url);
+            return prefixCoreUrl(`/api/media/file/${variant.filename}`);
+        }
+    }
+
+    // Fall back to the original url / legacy fields
+    let candidate = media.url || media.src || media.thumbnailURL || "";
+
+    // Guard against assets that stored a literal "null" in `url` — fall through
+    // to thumbnailURL or a constructed /api/media/file/<filename> path instead.
+    if (!isUsableUrl(candidate)) {
+        candidate = isUsableUrl(media.thumbnailURL)
+            ? media.thumbnailURL
+            : (media.filename ? `/api/media/file/${media.filename}` : "");
+    }
 
     if (!candidate) return "";
-    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate);
+    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate, size);
 
-    if (candidate.startsWith("/api/media/") && CORE_API_BASE_URL) {
-        return `${CORE_API_BASE_URL.replace(/\/$/, "")}${candidate}`;
-    }
-    return candidate;
+    return prefixCoreUrl(candidate);
 };
 
 export const sortByOrderNumber = (array, options = {}) => {
@@ -195,15 +244,8 @@ export const calculateCartTotalPrice = (lineItems) => {
 };
 
 
-export const formatDescriptionLines = (items) => {
-    if (!items) return [];
-    return items.reduce((acc, item) => {
-        const title = item.title;
-        const value = item.value;
-        acc.push({ title, value });
-        return acc;
-    }, []);
-}
+export const formatDescriptionLines = (items = []) =>
+    items.map(({ title, value }) => ({ title, value }));
 
 export function formatLineItemsForQuote(lineItems) {
     const formattedCartData = [];
@@ -279,18 +321,6 @@ function generateDescriptionForQuote(customTextFields, poolCover) {
 
     return descriptionLines.join("\n");
 }
-
-export function isValidPassword(password) {
-    const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()~<>?,./;:{}[\]|\\])[A-Za-z\d!@#$%^&*()~<>?,./;:{}[\]|\\]{6,}$/;
-    return passwordRegex.test(password);
-}
-
-export function isValidEmail(email) {
-    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    return emailRegex.test(email);
-}
-
 
 export const formatDateForQuote = (d) => {
     const date = new Date(d);
@@ -432,17 +462,6 @@ export const richTextToPlainText = (content) => {
     return "";
 };
 
-export const resolveProductMediaUrl = (media) => {
-    const source = typeof media === "string"
-        ? media
-        : media?.src || media?.url || media?.media?.url || media?.mainMedia?.url || media?.mainMedia;
-
-    if (!source) return "";
-    if (/^https?:\/\//.test(source)) return source;
-
-    return `${CORE_API_BASE_URL.replace(/\/$/, "")}${source}`;
-};
-
 const normalizeAdditionalInfoSections = (sections = []) => {
     if (!Array.isArray(sections)) return [];
 
@@ -453,40 +472,20 @@ const normalizeAdditionalInfoSections = (sections = []) => {
     }));
 };
 
-const getCollectionKey = (collection = {}) => collection.id || collection._id || collection.slug || collection.name;
-
+// Breadcrumbs follow the simplified Home › Category › Product shape — we just
+// pick one representative collection (the first in the product's list) and
+// emit a single crumb. With multi-parent hierarchy, walking "up" is ambiguous.
 const buildCollectionBreadcrumbs = (collections = []) => {
     if (!Array.isArray(collections) || collections.length === 0) return [];
-
-    const collectionMap = new Map(collections.map((collection) => [getCollectionKey(collection), collection]));
-    const deepestCollection = [...collections]
-        .filter(Boolean)
-        .sort((left, right) => (right?.hierarchyLevel || 0) - (left?.hierarchyLevel || 0))[0];
-
-    const breadcrumbs = [];
-    const visited = new Set();
-    let currentCollection = deepestCollection;
-
-    while (currentCollection) {
-        const key = getCollectionKey(currentCollection);
-        if (!key || visited.has(key)) break;
-
-        visited.add(key);
-        breadcrumbs.unshift({
-            id: currentCollection.id || currentCollection._id,
-            name: currentCollection.name,
-            slug: currentCollection.slug,
-            hierarchyLevel: currentCollection.hierarchyLevel || 0,
-        });
-
-        if (!currentCollection.parent) break;
-
-        currentCollection = typeof currentCollection.parent === "object"
-            ? currentCollection.parent
-            : collectionMap.get(currentCollection.parent);
-    }
-
-    return breadcrumbs;
+    const primary = collections.find(Boolean);
+    if (!primary) return [];
+    return [
+        {
+            id: primary.id || primary._id,
+            name: primary.name,
+            slug: primary.slug,
+        },
+    ];
 };
 
 export const normalizeProductForDisplay = (product = {}) => {
@@ -502,13 +501,13 @@ export const normalizeProductForDisplay = (product = {}) => {
     const mediaItems = rawMediaItems
         .map((item, index) => ({
             id: item?.id || `${id || title}-media-${index}`,
-            src: resolveProductMediaUrl(item),
+            src: resolveCoreMediaUrl(item, "tablet"),
             alt: item?.alt || title || `Product image ${index + 1}`,
         }))
         .filter((item) => item.src);
 
     // Prepend mainMedia as the first gallery slide when it is not already present
-    const mainMediaUrl = resolveProductMediaUrl(product?.mainMedia);
+    const mainMediaUrl = resolveCoreMediaUrl(product?.mainMedia, "tablet");
     const mainMediaAlt = product?.mainMedia?.alt || title;
 
     if (mainMediaUrl && !mediaItems.some((item) => item.src === mainMediaUrl)) {

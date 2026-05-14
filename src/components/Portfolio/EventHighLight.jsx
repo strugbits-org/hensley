@@ -2,7 +2,7 @@
 import React from 'react'
 import SectionTitle from '../common/SectionTitle'
 import Image from 'next/image'
-import { generateImageURLAlternate } from '@/utils/generateImageURL'
+import { resolveCoreMediaUrl } from '@/utils'
 import { formatDate } from '@/utils'
 import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags'
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader'
@@ -10,7 +10,7 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader'
 const EventHighLight = ({ data, handleFilterChange, selectedTags }) => {
     if (!data) return;
     const { slug, portfolioRef, markets, studios, portfolioCategories, publishDate } = data;
-    const coverImage = generateImageURLAlternate({ wix_url: portfolioRef.coverImage.imageInfo });
+    const coverImage = resolveCoreMediaUrl(portfolioRef.coverImage?.imageInfo, "tablet");
     const redirectWithLoader = useRedirectWithLoader();
 
     const handleRedirection = () => {

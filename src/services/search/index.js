@@ -62,7 +62,7 @@ export const searchBlogs = async (query) => {
                     { excerpt: { like: query } },
                 ],
             },
-            sort: "-publishDate",
+            sort: "-createdAt",
         });
         return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {

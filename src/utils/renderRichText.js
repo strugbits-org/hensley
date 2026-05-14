@@ -1,5 +1,16 @@
 import parse from 'html-react-parser';
-import { generateImageURL, generateImageURLById, generateVideoURL } from './generateImageURL';
+import { generateImageURL, generateVideoURL } from './generateImageURL';
+import { resolveCoreMediaUrl } from '.';
+
+// Resolve an image src from rich-text nodes — prefer Payload/Core URLs directly,
+// only fall through to Wix helpers for legacy wix:image:// protocol strings.
+const resolveRichTextImageSrc = (rawSrc) => {
+    if (!rawSrc) return '';
+    if (rawSrc.startsWith('wix:image://v1/') || rawSrc.startsWith('wix:vector://v1/')) {
+        return generateImageURL({ wix_url: rawSrc, fit: 'fit' });
+    }
+    return resolveCoreMediaUrl(rawSrc);
+};
 
 // --- Lexical (Payload CMS) → Wix Rich Text Adapter ---
 
@@ -663,9 +674,7 @@ export const convertToHTMLRichContent = ({
             const imageData = node.imageData;
             const image = imageData.image;
             const rawSrc = image.src?.url || image.src?.id || '';
-            const imageSrc = rawSrc.startsWith('/api/media/')
-                ? generateImageURL({ wix_url: rawSrc })
-                : generateImageURLById({ id: rawSrc });
+            const imageSrc = resolveRichTextImageSrc(rawSrc);
 
             // Build image attributes
             const width = image.width ? `width="${image.width}"` : '';
@@ -690,7 +699,7 @@ export const convertToHTMLRichContent = ({
             items.forEach(item => {
                 const image = item.image?.media;
                 if (image?.src?.url) {
-                    const imageSrc = generateImageURLById({ id: image.src.url });
+                    const imageSrc = resolveRichTextImageSrc(image.src.url);
                     const width = image.width ? `width="${image.width}"` : '';
                     const height = image.height ? `height="${image.height}"` : '';
                     const altText = item.altText ? `alt="${item.altText}"` : '';
@@ -712,9 +721,7 @@ export const convertToHTMLRichContent = ({
             html += `<div class="gallery-block-container w-full my-6">`;
             html += `<div class="grid ${colClass} gap-4">`;
             images.forEach(img => {
-                const src = img.url.startsWith('/api/media/')
-                    ? generateImageURL({ wix_url: img.url })
-                    : generateImageURLById({ id: img.url });
+                const src = resolveRichTextImageSrc(img.url);
                 const altAttr = img.alt ? `alt="${img.alt}"` : '';
                 html += `<div class="gallery-block-item">`;
                 html += `<img class="${class_image} w-full h-auto object-cover" src="${src}" ${altAttr} />`;
@@ -729,9 +736,7 @@ export const convertToHTMLRichContent = ({
             html += `<div class="slider-block-container w-full my-6 overflow-x-auto">`;
             html += `<div class="flex gap-4">`;
             slides.forEach(slide => {
-                const src = slide.url.startsWith('/api/media/')
-                    ? generateImageURL({ wix_url: slide.url })
-                    : generateImageURLById({ id: slide.url });
+                const src = resolveRichTextImageSrc(slide.url);
                 const altAttr = slide.alt ? `alt="${slide.alt}"` : '';
                 const wrapper = slide.link ? `<a href="${slide.link}" target="_blank" rel="noopener noreferrer">` : '';
                 const wrapperClose = slide.link ? `</a>` : '';

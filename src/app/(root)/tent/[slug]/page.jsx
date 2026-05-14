@@ -19,9 +19,9 @@ export async function generateMetadata({ params }) {
       fetchTentData(slug)
     ]);
 
-    const { title, noFollowTag } = metaData;
+    const { title, noFollowTag } = metaData || {};
 
-    const fullTitle = (tentData?.title || slug) + title;
+    const fullTitle = (tentData?.title || slug) + (title || "");
 
     const metadata = { title: fullTitle };
 
@@ -38,11 +38,8 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const tentsData = await fetchTentsData();
-    // const tentsData = [];
     if (!Array.isArray(tentsData)) return [];
-
     const paths = tentsData.map((data) => {
-      // Core API may return slug as "frame-tents" or "/frame-tents"
       const rawSlug = data.slug || data.tent?.slug || "";
       return { slug: rawSlug.replace(/^\//, "").trim() };
     });
@@ -60,13 +57,13 @@ export default async function Page({ params }) {
       fetchTentPageData(slug),
       queryProductCollections().catch(() => []),
     ]);
-    const { productData, matchedProducts, featuredProjectsData, pageDetails, masterClassTentingURL } = data;
 
     if (!data) {
       throw new Error("Product data not found");
     }
 
-    const { matchItWithTitle, featuredProductTitle } = pageDetails;
+    const { productData, matchedProducts, featuredProjectsData, pageDetails, masterClassTentingURL } = data;
+    const { matchItWithTitle, featuredProductTitle } = pageDetails || {};
 
     return (
       <>

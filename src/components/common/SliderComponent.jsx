@@ -72,6 +72,7 @@ export default function SliderComponent({ data = [], classes = "", pageDetails =
                   useNextImage={true}
                   q={60}
                   url={portfolioRef?.coverImage?.imageInfo || image}
+                  size="tablet"
                   type="alternate"
                   customClasses="size-full object-cover brightness-50"
                 />

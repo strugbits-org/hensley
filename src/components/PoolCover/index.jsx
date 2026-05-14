@@ -46,7 +46,7 @@ const ProductPoolCover = ({ productData, matchedProducts = [], allCollections = 
 
             return (
               <div key={index} className={`${colSpanClass}`}>
-                <PrimaryImage url={item.src} alt={`covers-${index}`} customClasses="w-full h-full object-cover" />
+                <PrimaryImage url={item.src} size="tablet" alt={`covers-${index}`} customClasses="w-full h-full object-cover" />
               </div>
             );
           })}

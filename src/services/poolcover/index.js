@@ -1,92 +1,57 @@
-import { logError } from "@/utils";
+import { logError, resolveCoreMediaUrl } from "@/utils";
 import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
+import {
+    queryProductsFromPayload,
+    queryProductCollectionBySlug,
+} from "../payloadCollections";
 
-const baseUrl = process.env.BASE_URL;
-const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
-
-const resolveMediaUrl = (media) => {
-    if (!media) return "";
-    if (typeof media === "string") return media;
-    return media.url || media.src || "";
+const sortByConfiguredOrder = (products, orderedIds) => {
+    if (!orderedIds?.length) return products;
+    const orderMap = new Map(orderedIds.map((id, i) => [String(id), i]));
+    return [...products].sort((a, b) => {
+        const ai = orderMap.get(String(a.id));
+        const bi = orderMap.get(String(b.id));
+        if (ai == null && bi == null) return (a.title || "").localeCompare(b.title || "");
+        if (ai == null) return 1;
+        if (bi == null) return -1;
+        return ai - bi;
+    });
 };
 
-const normalizePoolCoverItem = (item) => {
-    const poolCover = item.poolCover || item.covers || item.productData || item;
-    const productData = item.productData || poolCover;
-    const gallery = (item.gallery || poolCover.mediaItems || []).map((m, i) => ({
-        id: m.id || `gallery-${i}`,
-        src: resolveMediaUrl(m),
-        alt: m.alt || poolCover.title || `Pool cover image ${i + 1}`,
-    }));
+const resolveProductOrderIds = (collection) => {
+    const order = collection?.productOrder;
+    if (!Array.isArray(order)) return [];
+    return order
+        .map((item) => (typeof item === "string" ? item : item?.id || item?._id || null))
+        .filter(Boolean);
+};
 
-    const mainMediaUrl = resolveMediaUrl(poolCover.mainMedia);
-    if (mainMediaUrl && !gallery.some((g) => g.src === mainMediaUrl)) {
-        gallery.unshift({
-            id: poolCover.mainMedia?.id || "main-media",
-            src: mainMediaUrl,
-            alt: poolCover.mainMedia?.alt || poolCover.title || "Pool cover main image",
-        });
-    }
+const fetchPoolCoverProducts = async ({ slug } = {}) => {
+    const poolCoversCollection = await queryProductCollectionBySlug("pool-covers").catch(() => null);
+    const orderedIds = resolveProductOrderIds(poolCoversCollection);
 
-    // Normalize relevant images from poolCoverConfig
-    const poolCoverConfig = poolCover.poolCoverConfig || {};
-    const relevantImages = (poolCoverConfig.relevantImages || []).map((m, i) => ({
-        id: m.id || `relevant-image-${i}`,
-        src: resolveMediaUrl(m),
-        alt: m.alt || `Relevant reference image ${i + 1}`,
-    }));
-
-    return {
-        _id: item._id || item.id || poolCover._id || poolCover.id,
-        id: item.id || item._id || poolCover.id || poolCover._id,
-        title: item.title || poolCover.title || poolCover.name || "",
-        slug: item.slug || poolCover.slug || "",
-        orderNumber: item.orderNumber ?? 0,
-        price: poolCover.price ?? 0,
-        covers: {
-            ...poolCover,
-            _id: poolCover._id || poolCover.id,
-            id: poolCover.id || poolCover._id,
-            name: poolCover.name || poolCover.title || "",
-            slug: poolCover.slug || "",
-            mainMedia: resolveMediaUrl(poolCover.mainMedia),
-            mediaItems: (poolCover.mediaItems || []).map((m) => ({
-                ...m,
-                src: resolveMediaUrl(m),
-            })),
-            additionalInfoSections: poolCover.additionalInfoSections || [],
-            productOptions: poolCover.productOptions || [],
-            poolCoverConfig: {
-                ...poolCoverConfig,
-                relevantImages,
-                quoteIntroText: poolCoverConfig.quoteIntroText || "",
-                quoteSubmitLabel: poolCoverConfig.quoteSubmitLabel || "Request a Quote",
-                quoteRequestFields: poolCoverConfig.quoteRequestFields || [],
-            },
-            description: poolCover.description || "",
-        },
-        productData: {
-            ...productData,
-            _id: productData._id || productData.id,
-            id: productData.id || productData._id,
-        },
-        mediagallery: gallery,
-        collections: item.collections || productData.collections || [],
+    const where = {
+        and: [
+            { type: { equals: "pool_cover" } },
+            { visible: { equals: true } },
+            { status: { equals: "active" } },
+            ...(slug ? [{ slug: { equals: slug } }] : []),
+        ],
     };
+
+    const { docs } = await queryProductsFromPayload({
+        where,
+        depth: 2,
+        limit: slug ? 1 : 100,
+    });
+
+    return { products: sortByConfiguredOrder(docs, orderedIds), poolCoversCollection };
 };
 
 export const fetchPoolCovers = async () => {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/products/pool-cover`,
-            { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
-        );
-
-        if (!res.ok) throw new Error(`Core pool-cover API returned ${res.status}`);
-        const json = await res.json();
-        if (!Array.isArray(json.items)) throw new Error("Core API did not return items array");
-
-        return json.items.map(normalizePoolCoverItem);
+        const { products } = await fetchPoolCoverProducts();
+        return products.map((p, i) => normalizePoolCoverItem(p, i + 1));
     } catch (error) {
         logError(`Error fetching covers data: ${error.message}`, error);
         return [];
@@ -95,16 +60,10 @@ export const fetchPoolCovers = async () => {
 
 export const fetchPoolCoverData = async (slug) => {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/products/pool-cover?slug=${encodeURIComponent(slug)}`,
-            { next: { revalidate: Number(process.env.REVALIDATE_TIME) || 60 } }
-        );
-
-        if (!res.ok) throw new Error(`Core pool-cover API returned ${res.status}`);
-        const json = await res.json();
-        if (!json.item) throw new Error("Pool cover not found in core API");
-
-        return normalizePoolCoverItem(json.item);
+        const { products } = await fetchPoolCoverProducts({ slug });
+        const product = products[0];
+        if (!product) throw new Error(`Pool cover not found for slug: ${slug}`);
+        return normalizePoolCoverItem(product, 1);
     } catch (error) {
         logError(`Error fetching covers data: ${error.message}`, error);
     }
@@ -139,7 +98,8 @@ export const fetchPoolCoverPageData = async (slug) => {
         logError(`Error fetching product data: ${error.message}`, error);
         throw error;
     }
-}
+};
+
 export const uploadRelevantImage = async (file) => {
     try {
         const formData = new FormData();
@@ -166,4 +126,124 @@ export const uploadRelevantImage = async (file) => {
         logError(`Error uploading image: ${error.message}`, error);
         throw error;
     }
-}
+};
+
+// ---------------------------------------------------------------------------
+// Normalization – map a raw Payload product (type: 'pool_cover', depth >= 2)
+// to the shape Hensley components expect: { covers, productData, mediagallery, collections }.
+// ---------------------------------------------------------------------------
+
+const buildCollectionSummary = (collections) => {
+    if (!Array.isArray(collections)) return [];
+    return collections
+        .map((c) => {
+            if (!c || typeof c === "string") return null;
+            return {
+                id: c.id,
+                name: c.name,
+                slug: c.slug,
+                ribbon: c.ribbon ?? null,
+            };
+        })
+        .filter(Boolean);
+};
+
+const normalizeRecommendedProducts = (product) => {
+    if (!Array.isArray(product?.recommendedProducts)) return [];
+    return product.recommendedProducts
+        .map((rp) => {
+            if (!rp || typeof rp === "string") return null;
+            if (rp.id === product.id || rp.status !== "active" || rp.visible === false) return null;
+            return {
+                id: rp.id,
+                title: rp.title,
+                slug: rp.slug,
+                type: rp.type,
+                price: rp.price ?? null,
+                ribbon: rp.ribbon ?? null,
+                mainMedia: resolveCoreMediaUrl(rp.mainMedia, "card"),
+                collections: buildCollectionSummary(rp.collections),
+            };
+        })
+        .filter(Boolean);
+};
+
+const normalizePoolCoverItem = (product, orderNumber = 0) => {
+    const mediaItems = Array.isArray(product.mediaItems) ? product.mediaItems : [];
+    const gallery = mediaItems.map((m, i) => ({
+        id: m?.id || `gallery-${i}`,
+        src: resolveCoreMediaUrl(m, "tablet"),
+        alt: m?.alt || product.title || `Pool cover image ${i + 1}`,
+    }));
+
+    const mainMediaUrl = resolveCoreMediaUrl(product.mainMedia, "tablet");
+    if (mainMediaUrl && !gallery.some((g) => g.src === mainMediaUrl)) {
+        gallery.unshift({
+            id: product.mainMedia?.id || "main-media",
+            src: mainMediaUrl,
+            alt: product.mainMedia?.alt || product.title || "Pool cover main image",
+        });
+    }
+
+    const poolCoverConfig = product.poolCoverConfig || {};
+    const relevantImages = Array.isArray(poolCoverConfig.relevantImages)
+        ? poolCoverConfig.relevantImages.map((m, i) => ({
+              id: m?.id || `relevant-image-${i}`,
+              src: resolveCoreMediaUrl(m, "card"),
+              alt: m?.alt || `Relevant reference image ${i + 1}`,
+          }))
+        : [];
+
+    const collections = buildCollectionSummary(product.collections);
+    const recommendedProducts = normalizeRecommendedProducts(product);
+
+    const covers = {
+        _id: product.id,
+        id: product.id,
+        name: product.title,
+        title: product.title,
+        slug: product.slug,
+        price: product.price,
+        description: product.description ?? null,
+        mainMedia: mainMediaUrl,
+        mediaItems: mediaItems.map((m) => ({ ...m, src: resolveCoreMediaUrl(m, "tablet") })),
+        additionalInfoSections: product.additionalInfoSections ?? [],
+        productOptions: product.productOptions ?? [],
+        poolCoverConfig: {
+            quoteIntroText: poolCoverConfig.quoteIntroText ?? "",
+            quoteSubmitLabel: poolCoverConfig.quoteSubmitLabel ?? "Request a Quote",
+            relevantImages,
+            quoteRequestFields: Array.isArray(poolCoverConfig.quoteRequestFields)
+                ? poolCoverConfig.quoteRequestFields
+                : [],
+        },
+        collections,
+    };
+
+    return {
+        _id: product.id,
+        id: product.id,
+        title: product.title || "",
+        slug: `/${product.slug || ""}`,
+        orderNumber,
+        price: product.price ?? 0,
+        covers,
+        productData: {
+            _id: product.id,
+            id: product.id,
+            name: product.title,
+            title: product.title,
+            slug: product.slug,
+            price: product.price,
+            description: product.description ?? null,
+            additionalInfoSections: product.additionalInfoSections ?? [],
+            productOptions: product.productOptions ?? [],
+            poolCoverConfig: covers.poolCoverConfig,
+            collections,
+            recommendedProducts,
+        },
+        mediagallery: gallery,
+        collections,
+        recommendedProducts,
+    };
+};

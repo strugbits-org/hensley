@@ -15,12 +15,13 @@ const resolveSubCategoryHref = (data = {}) => {
 
     if (!categorySlug) return "";
 
-    const hasParent = Boolean(relatedCollection?.parent);
-    const hasHierarchy = relatedCollection?.hierarchyLevel !== undefined || relatedCollection?.level !== undefined || hasParent;
-    const hierarchyLevel = Number(relatedCollection?.hierarchyLevel ?? relatedCollection?.level ?? (hasParent ? 2 : 0));
-    const basePath = hasHierarchy
-        ? (!hasParent && hierarchyLevel <= 1 ? "/collections" : "/subcategory")
-        : (data.redirection || "/subcategory");
+    const menuPath = relatedCollection?.menuPath;
+    const basePath =
+        menuPath === "collections" ? "/collections" :
+        menuPath === "subcategory" ? "/subcategory" :
+        relatedCollection?.featured
+            ? "/collections"
+            : (data.redirection || "/subcategory");
 
     return `${basePath}/${categorySlug}`;
 };
@@ -38,6 +39,7 @@ const SubCategoryItem = ({ data, closeModal }) => {
                     <PrimaryImage
                         timeout={0}
                         url={collectionImage}
+                        size="thumbnail"
                         alt={title}
                         customClasses="h-full w-full object-cover"
                     />

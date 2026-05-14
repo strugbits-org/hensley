@@ -4,46 +4,22 @@
  * Handles saved products/wishlist operations with the Payload CMS backend (bps-core)
  */
 
-import { PayloadSDK } from "@payloadcms/sdk";
-import { logError } from "@/utils";
-
-const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
-const CORE_API_KEY = process.env.CORE_API_KEY;
-const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID;
-
-const ensureCoreTenantId = () => {
-  if (!CORE_TENANT_ID) {
-    throw new Error("Missing CORE_TENANT_ID environment variable");
-  }
-};
-
-const resolveAbsoluteMediaUrl = (source) => {
-  if (!source) return "";
-  if (/^(https?:)?\/\//.test(source) || source.startsWith("wix:")) return source;
-
-  if (source.startsWith("/")) {
-    return `${(CORE_API_BASE_URL || "").replace(/\/$/, "")}${source}`;
-  }
-
-  return source;
-};
+import { logError, resolveCoreMediaUrl } from "@/utils";
+import { getSDK as _getSDK, ensureCoreTenantId, CORE_API_BASE_URL, CORE_API_KEY, CORE_TENANT_ID } from "../payloadSDK";
 
 const resolveProductImage = (product) => {
   if (!product) return "";
   const firstMediaItem = Array.isArray(product?.mediaItems) ? product.mediaItems[0] : null;
-
-  return resolveAbsoluteMediaUrl(
-    product?.mainMedia?.url ||
+  return resolveCoreMediaUrl(
     product?.mainMedia ||
-    product?.featuredImage?.url ||
-    product?.featuredImage?.sizes?.thumbnail?.url ||
-    firstMediaItem?.url ||
-    firstMediaItem?.src ||
-    firstMediaItem?.media?.url ||
-    product?.media?.url ||
-    ""
+    product?.featuredImage ||
+    firstMediaItem ||
+    "",
+    "card",
   );
 };
+
+const getSDK = _getSDK;
 
 const buildMemberWishlistWhere = (memberId) => ({
   and: [
@@ -51,18 +27,6 @@ const buildMemberWishlistWhere = (memberId) => ({
     { tenant: { equals: CORE_TENANT_ID } },
   ],
 });
-
-// Initialize Payload SDK with API key auth for server-side operations
-const getSDK = (token = null) => {
-  const headers = token
-    ? { Authorization: `Bearer ${token}` }
-    : { Authorization: `Bearer ${CORE_API_KEY}` };
-
-  return new PayloadSDK({
-    baseURL: `${CORE_API_BASE_URL}/api`,
-    baseInit: { headers },
-  });
-};
 
 const getWishlistDocId = (wishlist) => wishlist?.id || wishlist?._id;
 

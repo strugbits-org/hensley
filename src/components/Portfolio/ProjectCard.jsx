@@ -18,7 +18,7 @@ const ProjectCard = ({ data, handleFilterChange, selectedTags, isRTL }) => {
             {/* Image Section */}
             <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] px-[12px] lg:h-auto h-[382px]">
                 <div className="overflow-hidden h-full w-full">
-                    <PrimaryImage url={portfolioRef.coverImage.imageInfo} useNextImage={true} alt={portfolioRef.title} type='alternate' q={"50"} customClasses="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                    <PrimaryImage url={portfolioRef.coverImage.imageInfo} size="card" useNextImage={true} alt={portfolioRef.title} type='alternate' q={"50"} customClasses="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 </div>
             </div>
 

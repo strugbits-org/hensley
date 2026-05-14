@@ -5,11 +5,11 @@ import React from 'react';
  *
  * Priority:
  *  1. product.ribbon (direct product field)
- *  2. Parent category ribbon (category with no parent that has a ribbon wins)
- *  3. Any category ribbon (first non-parent category with a ribbon)
+ *  2. Top-level category ribbon (a collection that's not a subcategory of any other)
+ *  3. Any matching collection's ribbon
  *
  * @param {object} product - raw product object from Payload
- * @param {Array}  allCollections - flat array of all product-collections (with ribbon + parent fields)
+ * @param {Array}  allCollections - flat array of all product-collections (with ribbon + subcategories fields)
  * @returns {string|null} ribbon text or null
  */
 export function resolveProductRibbon(product, allCollections = []) {
@@ -60,13 +60,27 @@ export function resolveProductRibbon(product, allCollections = []) {
 
     if (!matchingWithRibbon.length) return null;
 
-    // Prefer parent (top-level) categories — those with no parent field
-    const parentLevel = matchingWithRibbon.filter(
-        (col) => !col?.parent
+    // Prefer top-level categories (those that don't appear in any other
+    // collection's `subcategories`). Reverse-index across allCollections to
+    // figure out which IDs are children of someone.
+    const childIds = new Set();
+    for (const col of allCollections) {
+        const subs = Array.isArray(col?.subcategories) ? col.subcategories : [];
+        for (const sub of subs) {
+            if (typeof sub === 'string') childIds.add(sub);
+            else if (sub && typeof sub === 'object') {
+                const id = sub.id || sub._id;
+                if (id) childIds.add(id);
+            }
+        }
+    }
+
+    const topLevel = matchingWithRibbon.filter(
+        (col) => !childIds.has(col?.id || col?._id)
     );
 
-    if (parentLevel.length) {
-        return parentLevel[0].ribbon.trim();
+    if (topLevel.length) {
+        return topLevel[0].ribbon.trim();
     }
 
     return matchingWithRibbon[0].ribbon.trim();

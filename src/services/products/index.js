@@ -3,7 +3,7 @@ import { logError, mapProductSetItems, normalizeProductForDisplay } from "@/util
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
 import { fetchOurCategoriesData } from "..";
-import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProject, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload } from "../payloadCollections";
+import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProject, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload, queryProductSlugs } from "../payloadCollections";
 
 
 const baseUrl = process.env.BASE_URL;
@@ -358,8 +358,21 @@ export const checkProductInCart = async (productId, isProductCollection = false)
 };
 
 export const fetchProductPaths = async () => {
-    // Returns empty so Next.js generates product pages on-demand (ISR)
-    return [];
+    try {
+        const docs = await queryProductSlugs();
+        const seen = new Set();
+        return docs.reduce((acc, doc) => {
+            const slug = (doc?.slug || "").trim().replace(/^\//, "");
+            if (slug && !seen.has(slug)) {
+                seen.add(slug);
+                acc.push({ slug });
+            }
+            return acc;
+        }, []);
+    } catch (error) {
+        logError(`Error fetching product paths: ${error.message}`, error);
+        return [];
+    }
 }
 
 export const fetchAllProducts = async () => {

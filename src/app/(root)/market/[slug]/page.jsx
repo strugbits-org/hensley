@@ -17,8 +17,8 @@ export async function generateMetadata({ params }) {
       fetchSelectedMarketsData(slug)
     ]);
 
-    const { title, noFollowTag } = metaData;
-    const fullTitle = marketData.title + " " + title;
+    const { title, noFollowTag } = metaData || {};
+    const fullTitle = (marketData?.title || slug) + " " + (title || "");
     const metadata = { title: fullTitle };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
       metadata.robots = "noindex,nofollow";
@@ -35,7 +35,6 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const marketsData = await fetchMarketsData();
-    // const marketsData = [];
     const paths = marketsData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
     return paths;
   } catch (error) {

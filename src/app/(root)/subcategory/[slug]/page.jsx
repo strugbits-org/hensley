@@ -17,9 +17,9 @@ export async function generateMetadata({ params }) {
       fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug)
     ]);
 
-    const { title, noFollowTag } = metaData;
-    const { selectedCategory } = subCategoryData
-    const fullTitle = selectedCategory?.name + " " + title;
+    const { title, noFollowTag } = metaData || {};
+    const { selectedCategory } = subCategoryData || {};
+    const fullTitle = (selectedCategory?.name || slug) + " " + (title || "");
     const metadata = { title: fullTitle };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
       metadata.robots = "noindex,nofollow";
@@ -34,10 +34,9 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchSubCategoryPagePaths();
-    // const paths = [];
     return paths;
   } catch (error) {
-    logError("Error generating static params(tent page):", error);
+    logError("Error generating static params(subcategory page):", error);
     return [];
   }
 }
@@ -50,7 +49,12 @@ export default async function Page({ params }) {
     }
     const data = await fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug);
 
-    const { pageDetails } = data
+    if (!data) {
+      notFound();
+      return;
+    }
+
+    const { pageDetails } = data;
 
     return (
       <SubCategoryPage data={data} pageDetails={pageDetails} />

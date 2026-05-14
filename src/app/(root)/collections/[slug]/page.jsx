@@ -18,9 +18,9 @@ export async function generateMetadata({ params }) {
      fetchSelectedCollectionData(slug)
     ]);
 
-    const { title, noFollowTag } = metaData;
-    const {selectedCategory} = subCategoryData
-    const fullTitle = selectedCategory?.name + " " + title;
+    const { title, noFollowTag } = metaData || {};
+    const { selectedCategory } = subCategoryData || {};
+    const fullTitle = (selectedCategory?.name || slug) + " " + (title || "");
     const metadata = { title: fullTitle };
     if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
       metadata.robots = "noindex,nofollow";
@@ -38,10 +38,9 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const paths = await fetchCollectionPagePaths();
-    // const paths = [];
     return paths;
   } catch (error) {
-    logError("Error generating static params(tent page):", error);
+    logError("Error generating static params(collection page):", error);
     return [];
   }
 }
@@ -53,6 +52,11 @@ export default async function Page({ params }) {
       throw new Error("Slug is required");
     }
     const data = await fetchSelectedCollectionData(slug);
+
+    if (!data) {
+      notFound();
+      return;
+    }
 
     return (
       <CollectionPage data={data} />

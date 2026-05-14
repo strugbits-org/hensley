@@ -105,7 +105,7 @@ function InstagramFeed({ data, details }) {
                     className={`keen-slider__slide  flex flex-col md:p-[10px]`}
                   >
                     <div className="h-[325px] lg:h-[448px] relative">
-                      <PrimaryImage url={dt.image} customClasses={"h-full w-full object-cover"} />
+                      <PrimaryImage url={dt.image} size="card" customClasses={"h-full w-full object-cover"} />
                     </div>
                   </CustomLink>
                 );

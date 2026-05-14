@@ -4,8 +4,7 @@ import React, { useState } from 'react'
 import { useKeenSlider } from "keen-slider/react"
 import "keen-slider/keen-slider.min.css"
 import "./styles.css"
-import { generateImageURL } from '@/utils/generateImageURL'
-import { resolveProductMediaUrl } from '@/utils'
+import { resolveCoreMediaUrl } from '@/utils'
 
 const TentTypesSlider = ({ data }) => {
     const [currentSlide, setCurrentSlide] = useState(0)
@@ -37,9 +36,7 @@ const TentTypesSlider = ({ data }) => {
                     const isActive = currentSlide % data.length === idx
 
                     const { tent } = item;
-                    const imageURL = typeof tent?.mainMedia === 'string'
-                        ? generateImageURL({ wix_url: tent?.mainMedia })
-                        : resolveProductMediaUrl(tent?.mainMedia);
+                    const imageURL = resolveCoreMediaUrl(tent?.mainMedia, "card");
                     const tentName = tent?.name || tent?.title || "";
 
 

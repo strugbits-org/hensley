@@ -4,54 +4,12 @@
  * Handles quote operations with the Payload CMS backend (bps-core)
  */
 
-import { PayloadSDK } from "@payloadcms/sdk";
 import { logError } from "@/utils";
+import { getSDK as _getSDK, apiKeySDK as _apiKeySDK, ensureCoreTenantId, CORE_TENANT_ID } from "../payloadSDK";
+import { parseSetItemsString } from "../cart/payloadCart";
 
-const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
-const CORE_API_KEY = process.env.CORE_API_KEY;
-const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID;
-
-const ensureCoreTenantId = () => {
-  if (!CORE_TENANT_ID) {
-    throw new Error("Missing CORE_TENANT_ID environment variable");
-  }
-};
-
-// Initialize Payload SDK with auth
-const getSDK = (token = null) => {
-  const headers = token
-    ? { Authorization: `Bearer ${token}` }
-    : { Authorization: `Bearer ${CORE_API_KEY}` };
-
-  return new PayloadSDK({
-    baseURL: `${CORE_API_BASE_URL}/api`,
-    baseInit: { headers },
-  });
-};
-
-// API-key SDK (no member token)
-const apiKeySDK = () => getSDK(null);
-
-/**
- * Parse set items string to structured array
- * Converts "Product~Size~Price~Quantity; ..." to setItems array
- * @param {string} setString - The set string format
- * @returns {Array} Array of setItems objects
- */
-const parseSetItemsString = (setString) => {
-  if (!setString || typeof setString !== "string") return [];
-  
-  return setString.split("; ").filter(Boolean).map((itemStr) => {
-    const [productName, size, price, quantity] = itemStr.split("~");
-    return {
-      product: null, // Product ID not available from string format
-      productName: productName || "",
-      size: size || "",
-      quantity: parseInt(quantity, 10) || 1,
-      unitPrice: parseFloat(price) || 0,
-    };
-  });
-};
+const getSDK = _getSDK;
+const apiKeySDK = _apiKeySDK;
 
 const extractPoolCoverImageIdsFromCustomFields = (fields = []) => {
   const imageField = fields.find((field) => {

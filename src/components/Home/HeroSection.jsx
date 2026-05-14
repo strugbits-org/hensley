@@ -1,10 +1,11 @@
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryButton } from "../common/PrimaryButton"
+import { resolveCoreMediaUrl } from "../../utils";
 
 export const HeroSection = ({ data }) => {
-   
+
     const { title, subTitle, estd, backgroundVideo, buttonLabel, buttonAction } = data;
-    const videoSrc = backgroundVideo?.url ? (process.env.CORE_API_BASE_URL + backgroundVideo.url) : null;
+    const videoSrc = resolveCoreMediaUrl(backgroundVideo) || null;
 
     return (
         <div className="relative h-screen isolate pt-24 lg:pt-40 px-6 lg:px-8 flex items-center">

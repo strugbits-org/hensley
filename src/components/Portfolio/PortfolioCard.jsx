@@ -20,6 +20,7 @@ function PortfolioCard({ data }) {
             <PrimaryImage
                 alt={title}
                 url={coverImage}
+                size="card"
                 customClasses="h-full w-full object-cover min-h-[528px] max-h-[528px]"
             />
 

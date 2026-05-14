@@ -1,13 +1,13 @@
 import React from 'react';
 import { fetchFeaturedProjects } from '@/services/projects';
-import { generateImageURLAlternate } from '@/utils/generateImageURL';
+import { resolveCoreMediaUrl } from '@/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import SectionTitle from '@/components/common/SectionTitle';
 
 const FeaturedProjectCard = ({ project }) => {
     const { slug, portfolioRef, excerpt, eventDate } = project;
-    const imageUrl = generateImageURLAlternate({ wix_url: portfolioRef.heroImage || portfolioRef.coverImage.imageInfo });
+    const imageUrl = resolveCoreMediaUrl(portfolioRef.heroImage || portfolioRef.coverImage?.imageInfo, "card");
     const displayExcerpt = excerpt || portfolioRef.description?.slice(0, 120) || '';
     const formattedDate = eventDate
         ? new Date(eventDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
