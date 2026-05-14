@@ -199,6 +199,13 @@ export const ProductListing = ({ data }) => {
                     );
                 })}
             </ul>
+            {!isLoading && products.length === 0 && (
+                <div className='w-full flex flex-col justify-center items-center py-20 gap-y-3'>
+                    <h3 className='uppercase text-secondary-alt font-recklessRegular text-[28px] lg:text-[35px] tracking-wider text-center'>No products found</h3>
+                    <p className='text-secondary-alt font-haasRegular text-sm lg:text-base text-center max-w-md'>Try adjusting your filters or check back soon.</p>
+                </div>
+            )}
+
             {!isLoading && hasMore && (
                 <AutoClickWrapper onIntersect={handleLoadMore}>
                     <Loading custom={true} classes='w-full flex justify-center p-6' />
