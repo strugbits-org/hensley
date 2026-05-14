@@ -1,12 +1,10 @@
 import { PayloadSDK } from "@payloadcms/sdk";
 import { cache } from "react";
-import { logError, sortByOrderNumber, normalizeProductForDisplay } from "@/utils";
+import { logError, sleep, sortByOrderNumber, normalizeProductForDisplay } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
-export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID || "";
-
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || "";
 
 const retryFetch = async (url, init) => {
     const maxAttempts = 4;

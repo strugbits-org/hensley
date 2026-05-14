@@ -4,22 +4,10 @@
  * Handles all authentication operations with the Payload CMS backend
  */
 
-import { PayloadSDK } from "@payloadcms/sdk";
 import { logError } from "@/utils";
+import { apiKeySDK, CORE_API_BASE_URL, CORE_TENANT_ID } from "../payloadSDK";
 
-const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
-const CORE_API_KEY = process.env.CORE_API_KEY;
-const CORE_TENANT_ID = process.env.CORE_TENANT_ID || process.env.CORE_TENTANT_ID;
-
-// Initialize Payload SDK with API key auth
-const sdk = new PayloadSDK({
-  baseURL: `${CORE_API_BASE_URL}/api`,
-  baseInit: {
-    headers: {
-      'Authorization': `Bearer ${CORE_API_KEY}`,
-    }
-  }
-});
+const sdk = apiKeySDK();
 
 /**
  * Login to Payload CMS

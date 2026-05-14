@@ -1,7 +1,7 @@
 "use server";
 
 import { cache } from "react";
-import { logError, sortByOrderNumber } from "@/utils";
+import { logError, sortByOrderNumber, resolveCoreMediaUrl } from "@/utils";
 import {
   sdk,
   CORE_TENANT_ID,
@@ -27,34 +27,6 @@ import {
 
 const CORE_API_KEY = process.env.CORE_API_KEY || "";
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
-
-const resolveCoreMediaUrl = (media) => {
-  if (!media) return "";
-  if (typeof media === "string") return media;
-  if (media?.url && typeof media.url === "object") {
-    return resolveCoreMediaUrl(media.url);
-  }
-  if (media?.mainMedia) {
-    return resolveCoreMediaUrl(media.mainMedia);
-  }
-  if (media?.media?.mainMedia) {
-    return resolveCoreMediaUrl(media.media.mainMedia);
-  }
-  if (media?.value) {
-    return resolveCoreMediaUrl(media.value);
-  }
-  return media?.url || media?.thumbnailURL || media?.sizes?.thumbnail?.url || "";
-};
-
-const isTruthyFlag = (value) => {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value !== 0;
-  if (typeof value === "string") {
-    const normalized = value.trim().toLowerCase();
-    return ["true", "1", "yes", "featured", "on"].includes(normalized);
-  }
-  return false;
-};
 
 const resolveCollectionMedia = (collection = {}) => {
   return (

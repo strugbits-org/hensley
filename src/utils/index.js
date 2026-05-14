@@ -56,45 +56,6 @@ export const resolveCoreMediaUrl = (media) => {
     return prefixCoreUrl(candidate);
 };
 
-/**
- * Pick the smallest pre-generated Payload size variant that meets a target width.
- * Payload's Media collection exposes: thumbnail (320), mobile (480), small (640),
- * card (768), tablet (1024), desktop (1440), wide (1920). Falls back through the
- * size ladder if the preferred key isn't generated for a given file (e.g. the
- * source image was smaller than the variant's target width).
- */
-const SIZE_LADDER = ["thumbnail", "mobile", "small", "card", "tablet", "desktop", "wide"];
-
-export const pickMediaUrl = (media, preferredSize = "card") => {
-    if (!media) return "";
-    if (typeof media === "string") return prefixCoreUrl(media);
-    if (Array.isArray(media)) return pickMediaUrl(media[0], preferredSize);
-    if (typeof media !== "object") return "";
-
-    const isValidUrl = (url) => url && typeof url === "string" && !url.endsWith("/null");
-
-    const sizes = media.sizes || media?.mainMedia?.sizes || media?.media?.sizes;
-    if (sizes && typeof sizes === "object") {
-        const preferred = sizes?.[preferredSize]?.url;
-        if (isValidUrl(preferred)) return prefixCoreUrl(preferred);
-
-        const startIdx = Math.max(SIZE_LADDER.indexOf(preferredSize), 0);
-        for (let i = startIdx + 1; i < SIZE_LADDER.length; i++) {
-            const url = sizes?.[SIZE_LADDER[i]]?.url;
-            if (isValidUrl(url)) return prefixCoreUrl(url);
-        }
-        for (let i = startIdx - 1; i >= 0; i--) {
-            const url = sizes?.[SIZE_LADDER[i]]?.url;
-            if (isValidUrl(url)) return prefixCoreUrl(url);
-        }
-    }
-
-    const fallbackUrl = media.url || media?.mainMedia?.url || media?.media?.url || "";
-    if (isValidUrl(fallbackUrl)) return prefixCoreUrl(fallbackUrl);
-
-    return resolveCoreMediaUrl(media);
-};
-
 export const sortByOrderNumber = (array, options = {}) => {
     const {
         ascending = true,
@@ -246,15 +207,8 @@ export const calculateCartTotalPrice = (lineItems) => {
 };
 
 
-export const formatDescriptionLines = (items) => {
-    if (!items) return [];
-    return items.reduce((acc, item) => {
-        const title = item.title;
-        const value = item.value;
-        acc.push({ title, value });
-        return acc;
-    }, []);
-}
+export const formatDescriptionLines = (items = []) =>
+    items.map(({ title, value }) => ({ title, value }));
 
 export function formatLineItemsForQuote(lineItems) {
     const formattedCartData = [];
@@ -330,18 +284,6 @@ function generateDescriptionForQuote(customTextFields, poolCover) {
 
     return descriptionLines.join("\n");
 }
-
-export function isValidPassword(password) {
-    const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()~<>?,./;:{}[\]|\\])[A-Za-z\d!@#$%^&*()~<>?,./;:{}[\]|\\]{6,}$/;
-    return passwordRegex.test(password);
-}
-
-export function isValidEmail(email) {
-    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
-    return emailRegex.test(email);
-}
-
 
 export const formatDateForQuote = (d) => {
     const date = new Date(d);
@@ -483,17 +425,6 @@ export const richTextToPlainText = (content) => {
     return "";
 };
 
-export const resolveProductMediaUrl = (media) => {
-    const source = typeof media === "string"
-        ? media
-        : media?.src || media?.url || media?.media?.url || media?.mainMedia?.url || media?.mainMedia;
-
-    if (!source) return "";
-    if (/^https?:\/\//.test(source)) return source;
-
-    return `${CORE_API_BASE_URL.replace(/\/$/, "")}${source}`;
-};
-
 const normalizeAdditionalInfoSections = (sections = []) => {
     if (!Array.isArray(sections)) return [];
 
@@ -533,13 +464,13 @@ export const normalizeProductForDisplay = (product = {}) => {
     const mediaItems = rawMediaItems
         .map((item, index) => ({
             id: item?.id || `${id || title}-media-${index}`,
-            src: resolveProductMediaUrl(item),
+            src: resolveCoreMediaUrl(item),
             alt: item?.alt || title || `Product image ${index + 1}`,
         }))
         .filter((item) => item.src);
 
     // Prepend mainMedia as the first gallery slide when it is not already present
-    const mainMediaUrl = resolveProductMediaUrl(product?.mainMedia);
+    const mainMediaUrl = resolveCoreMediaUrl(product?.mainMedia);
     const mainMediaAlt = product?.mainMedia?.alt || title;
 
     if (mainMediaUrl && !mediaItems.some((item) => item.src === mainMediaUrl)) {
