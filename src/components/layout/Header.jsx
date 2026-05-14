@@ -36,7 +36,6 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     const [selectedMenu, setSelectedMenu] = useState(false);
     const [searchModal, setSearchModal] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [enableMarketModal, setEnableMarketModal] = useState(false);
     const [cartTotalQuantity, setCartTotalQuantity] = useState(typeof window !== 'undefined' && localStorage?.getItem('cartQuantity') || "0");
     const pathname = usePathname();
     const router = useRouter();
@@ -130,7 +129,6 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     }
 
     const handleMainMenuClick = (item, isMobile = false) => {
-        setSelectedMenu(false);
         setSearchModal(false);
 
         const nextSubNavigation = getSubItemsForMenu(item);
@@ -138,10 +136,27 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         const itemIsTents = isTentsMenu(item);
 
         if (!nextSubNavigation.length && !itemIsMarkets && !itemIsTents && item?.type !== "submenu") {
+            setSelectedMenu(false);
             if (runMenuAction(item, isMobile)) return;
         }
 
         setActiveMenu(item?.title || defaultActiveMenu);
+
+        if (itemIsMarkets || itemIsTents) {
+            const newMenu = {
+                title: item?.title || (itemIsMarkets ? 'MARKETS' : 'TENTS'),
+                type: itemIsMarkets ? 'markets' : 'tents',
+                data: sortByOrderNumber(itemIsMarkets ? marketsData : tentsData),
+            };
+            if (selectedMenu) {
+                setSelectedMenu(false);
+                setTimeout(() => setSelectedMenu(newMenu), 50);
+            } else {
+                setSelectedMenu(newMenu);
+            }
+        } else {
+            setSelectedMenu(false);
+        }
     }
 
     const handleSubMenuClick = (item, isMobile = false) => {
@@ -208,13 +223,6 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                 type: 'slug'
             }));
             setSubNavigation(sortByOrderNumber(marketsNavigation) || []);
-            if (enableMarketModal) {
-                setSelectedMenu({
-                    title: currentMenu.title || 'MARKETS',
-                    type: 'markets',
-                    data: sortByOrderNumber(marketsData)
-                });
-            }
         } else if (isTentsMenu(currentMenu)) {
             const tentsNavigation = tentsData.map(item => ({
                 ...item,
@@ -222,17 +230,10 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                 type: 'slug'
             }));
             setSubNavigation(sortByOrderNumber(tentsNavigation) || []);
-            if (enableMarketModal) {
-                setSelectedMenu({
-                    title: currentMenu.title || 'TENTS',
-                    type: 'tents',
-                    data: sortByOrderNumber(tentsData)
-                });
-            }
         } else {
             setSubNavigation(getSubItemsForMenu(currentMenu));
         }
-    }, [activeMenu, enableMarketModal, header, headerSubMenu, marketsData, tentsData]);
+    }, [activeMenu, header, headerSubMenu, marketsData, tentsData]);
 
     const closeAllModals = () => {
         setSearchModal(false);
@@ -301,9 +302,6 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         );
 
         setActiveMenu(matchedMenu ? matchedMenu : defaultActiveMenu);
-        setTimeout(() => {
-            setEnableMarketModal(true);
-        }, 100);
     }, [pathname, header, defaultActiveMenu]);
 
     useEffect(() => {

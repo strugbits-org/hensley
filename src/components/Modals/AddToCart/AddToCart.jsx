@@ -207,6 +207,15 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
       const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
       setCookie("cartQuantity", total, { path: "/" });
       setTimeout(() => {
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Added to Cart",
+          description: "Products added to cart successfully",
+          buttonText: "View Cart",
+          buttonLink: "/cart",
+          secondaryButtonText: "Continue Shopping",
+          onSecondaryClick: () => lightboxActions.resetAddToCartModal(),
+          open: true,
+        });
         setIsLoading(false);
       }, 500);
     } catch (error) {
