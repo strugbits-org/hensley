@@ -9,7 +9,7 @@ const BannerStructures = ({ title, data }) => {
     const pros = getAdditionalInfoSection(additionalInfoSections, "PROS");
     const cons = getAdditionalInfoSection(additionalInfoSections, "CONS");
 
-    const bgUrl = resolveCoreMediaUrl(data.mainMedia);
+    const bgUrl = resolveCoreMediaUrl(data.mainMedia, "tablet");
 
     return (
         <div className='w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] sm:h-[950px] bg-cover bg-no-repeat bg-top ' style={{ backgroundImage: `url(${bgUrl})` }}>

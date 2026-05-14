@@ -10,7 +10,7 @@ const TentsTypes = ({ data }) => {
             <div className='lg:grid hidden w-full grid-cols-3 gap-x-[24px] px-[24px] py-[31px]'>
                 {data.map((item, index) => {
                     const { tent } = item;
-                    const imageURL = resolveCoreMediaUrl(tent?.mainMedia);
+                    const imageURL = resolveCoreMediaUrl(tent?.mainMedia, "card");
 
                     const tentSlug = (tent?.slug || "").replace(/^\//, "");
 

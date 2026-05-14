@@ -9,7 +9,7 @@ const BannerStructures = ({ tent, data = {} }) => {
     const pros = getAdditionalInfoSection(additionalInfoSections, "PROS");
     const cons = getAdditionalInfoSection(additionalInfoSections, "CONS");
 
-    const bgUrl = resolveCoreMediaUrl(data.mainMedia);
+    const bgUrl = resolveCoreMediaUrl(data.mainMedia, "tablet");
 
     // Derive the tent slug for linking, stripping any leading slash
     const tentSlug = (data.slug || tent?.tent?.slug || tent?.slug || "").replace(/^\//, "");

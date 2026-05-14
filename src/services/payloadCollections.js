@@ -1,6 +1,6 @@
 import { PayloadSDK } from "@payloadcms/sdk";
 import { cache } from "react";
-import { logError, sleep, sortByOrderNumber, normalizeProductForDisplay } from "@/utils";
+import { logError, sleep, sortByOrderNumber, normalizeProductForDisplay, resolveCoreMediaUrl } from "@/utils";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
@@ -323,7 +323,18 @@ const normalizeMegaMenuItem = (item = {}, parentId, index) => {
         item.category || item.productCollection || item.productCollections || item.collection || item.collections
     );
     const category = typeof relatedCollection === "object" && relatedCollection ? relatedCollection : {};
-    const image = item.image?.url || item.image || item.mainMedia?.url || item.mainMedia || item.media?.mainMedia?.url || item.media?.mainMedia || category.mainMedia?.url || category.mainMedia || category.media?.mainMedia?.url || category.media?.mainMedia || category.image?.url || category.image || null;
+    const imageCandidates = [
+        item.image,
+        item.mainMedia,
+        item.media?.mainMedia,
+        category.mainMedia,
+        category.media?.mainMedia,
+        category.image,
+    ];
+    const image = imageCandidates.reduce(
+        (acc, candidate) => acc || resolveCoreMediaUrl(candidate, "thumbnail"),
+        ""
+    ) || null;
 
     return {
         _id: item.id || item._id || `${parentId}-nested-${index}`,
@@ -614,6 +625,7 @@ export const queryFeaturedProductCollections = cache(async () => {
             locale: "en",
             depth: 1,
         });
+
         return result.docs;
     } catch (error) {
         logError('Error querying featured productCollections:', error);
@@ -806,10 +818,41 @@ export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip =
 // Payload Media URL helper
 // ──────────────────────────────────────────────────────────────────────
 
-const resolveMediaUrl = (media) => {
+// Size preference chains — always try tablet first to avoid the crop issues
+// seen with smaller variants, then degrade to card/thumbnail only if tablet
+// wasn't generated for the asset.
+const MEDIA_SIZE_PREFERENCE = {
+    thumbnail: ["tablet", "card", "thumbnail"],
+    card:      ["tablet", "card", "thumbnail"],
+    tablet:    ["tablet", "card", "thumbnail"],
+};
+
+const isUsableVariant = (variant) =>
+    variant && typeof variant === "object" && typeof variant.filename === "string" && variant.filename.length > 0;
+const isUsableMediaUrl = (value) =>
+    typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
+
+const resolveMediaUrl = (media, size) => {
     if (!media) return "";
     if (typeof media === "string") return media;
-    return media?.url || media?.sizes?.card?.url || media?.sizes?.thumbnail?.url || media?.thumbnailURL || "";
+
+    if (size && media?.sizes) {
+        const prefs = MEDIA_SIZE_PREFERENCE[size] || [size];
+        for (const s of prefs) {
+            const variant = media.sizes?.[s];
+            if (!isUsableVariant(variant)) continue;
+            if (isUsableMediaUrl(variant.url)) return variant.url;
+            return `/api/media/file/${variant.filename}`;
+        }
+    }
+
+    const candidate = media?.url || media?.sizes?.card?.url || media?.sizes?.thumbnail?.url || media?.thumbnailURL || "";
+    if (!isUsableMediaUrl(candidate)) {
+        return isUsableMediaUrl(media?.thumbnailURL)
+            ? media.thumbnailURL
+            : (media?.filename ? `/api/media/file/${media.filename}` : "");
+    }
+    return candidate;
 };
 
 // ──────────────────────────────────────────────────────────────────────
@@ -856,7 +899,7 @@ const normalizePayloadProjectCategoryRef = (cat) => {
 
 export const normalizePayloadBlog = (blog) => {
     if (!blog || typeof blog !== "object") return blog;
-    const coverImageUrl = resolveMediaUrl(blog.coverImage);
+    const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
     const author = blog.author && typeof blog.author === "object"
         ? blog.author
         : null;
@@ -892,16 +935,16 @@ export const normalizePayloadBlog = (blog) => {
 
 export const normalizePayloadProject = (project) => {
     if (!project || typeof project !== "object") return project;
-    const coverImageUrl = resolveMediaUrl(project.coverImage);
-    const heroImageUrl = resolveMediaUrl(project.heroImage);
+    const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
+    const heroImageUrl = resolveMediaUrl(project.heroImage, "tablet");
     const galleryImages = ensureArray(project.galleryImages).map((item) => {
         if (typeof item === "string") return item;
-        const imgUrl = resolveMediaUrl(item?.image || item);
+        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
         return imgUrl;
     }).filter(Boolean);
     const galleryImageObjects = ensureArray(project.galleryImages).map((item) => {
         if (!item || typeof item === "string") return null;
-        const imgUrl = resolveMediaUrl(item?.image || item);
+        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
         return imgUrl ? { url: imgUrl, caption: item?.caption || "" } : null;
     }).filter(Boolean);
     const excerpt = project.excerpt || (project.description ? project.description.slice(0, 120) + (project.description.length > 120 ? "..." : "") : "");
@@ -932,7 +975,7 @@ export const normalizePayloadProject = (project) => {
         meta: {
             title: meta.title || "",
             description: meta.description || "",
-            image: resolveMediaUrl(meta.image) || "",
+            image: resolveMediaUrl(meta.image, "tablet") || "",
         },
         markets: ensureArray(project.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(project.studios).map(normalizePayloadStudioRef),
@@ -1228,14 +1271,32 @@ export const sectionToObject = (section) => {
 
 // ── New First-Class Collection Queries ───────────────────────────────────────
 
+const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1 }) => {
+    const baseWhere = {
+        and: [
+            { tenant: { equals: tenantId } },
+            { _status: { equals: "published" } },
+            ...(Object.keys(extraWhere).length ? [extraWhere] : []),
+        ],
+    };
+
+    const result = await sdk.find({
+        collection,
+        where: baseWhere,
+        sort,
+        limit,
+        depth,
+        draft: false,
+        locale: "en",
+        pagination: false,
+    });
+
+    return ensureArray(result?.docs);
+};
+
 export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/how-we-do-it?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=10`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "how-we-do-it", tenantId, limit: 10 });
     } catch (error) {
         logError(`Error querying how-we-do-it: ${error.message}`, error);
         return [];
@@ -1244,12 +1305,7 @@ export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
 
 export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/dream-team-members?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=100`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "dream-team-members", tenantId, limit: 100 });
     } catch (error) {
         logError(`Error querying dream-team-members: ${error.message}`, error);
         return [];
@@ -1258,12 +1314,7 @@ export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
 
 export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/partner-brands?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=10`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "partner-brands", tenantId, limit: 10 });
     } catch (error) {
         logError(`Error querying partner-brands: ${error.message}`, error);
         return [];
@@ -1272,12 +1323,12 @@ export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
 
 export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 'client') {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/testimonials?where[tenant][equals]=${tenantId}&where[type][equals]=${type}&where[_status][equals]=published&sort=order&limit=20`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({
+            collection: "testimonials",
+            tenantId,
+            extraWhere: { type: { equals: type } },
+            limit: 20,
+        });
     } catch (error) {
         logError(`Error querying testimonials (type=${type}): ${error.message}`, error);
         return [];
@@ -1286,12 +1337,7 @@ export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 
 
 export async function queryInstagramFeedItems(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/instagram-feed-items?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=12`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return data.docs || [];
+        return await findPublishedByTenant({ collection: "instagram-feed-items", tenantId, limit: 12 });
     } catch (error) {
         logError(`Error querying instagram-feed-items: ${error.message}`, error);
         return [];
@@ -1307,12 +1353,13 @@ export async function queryInstagramFeedItems(tenantId = CORE_TENANT_ID) {
  */
 export async function queryHeroBanner(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/hero-banners?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=order&limit=1&depth=1`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        const banner = data.docs?.[0];
+        const docs = await findPublishedByTenant({
+            collection: "hero-banners",
+            tenantId,
+            limit: 1,
+            depth: 1,
+        });
+        const banner = docs[0];
         if (!banner) return null;
         return {
             title: banner.title ?? null,
@@ -1335,12 +1382,14 @@ export async function queryHeroBanner(tenantId = CORE_TENANT_ID) {
  */
 export async function queryProductBanners(tenantId = CORE_TENANT_ID) {
     try {
-        const res = await fetch(
-            `${CORE_API_BASE_URL}/api/product-banners?where[tenant][equals]=${tenantId}&where[_status][equals]=published&sort=orderDesktop&limit=50&depth=1`,
-            { headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {}, next: { revalidate: 3600 } }
-        );
-        const data = await res.json();
-        return (data.docs || []).map((banner) => ({
+        const docs = await findPublishedByTenant({
+            collection: "product-banners",
+            tenantId,
+            sort: "orderDesktop",
+            limit: 50,
+            depth: 1,
+        });
+        return docs.map((banner) => ({
             _id: banner.id,
             title: banner.title,
             image: banner.image ?? null,

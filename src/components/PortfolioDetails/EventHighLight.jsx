@@ -14,7 +14,7 @@ const formatEventDate = (dateString) => {
 const EventHighLight = ({ data }) => {
     const { portfolioRef, markets, publishDate, eventDate, client, location } = data;
     // Prefer heroImage, fall back to coverImage
-    const bgImageUrl = resolveCoreMediaUrl(portfolioRef.heroImage || portfolioRef.coverImage?.imageInfo);
+    const bgImageUrl = resolveCoreMediaUrl(portfolioRef.heroImage || portfolioRef.coverImage?.imageInfo, "tablet");
     const displayDate = eventDate ? formatEventDate(eventDate) : formatDate(publishDate);
 
     return (

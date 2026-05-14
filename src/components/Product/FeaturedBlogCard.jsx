@@ -10,7 +10,7 @@ function FeaturedBlogCard({ data, classes }) {
 
     return (
         <CustomLink to={`/posts/${slug}`} className={`${classes} relative group border border-primary-border pb-2`}>
-            <PrimaryImage alt={title} url={coverImage} customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
+            <PrimaryImage alt={title} url={coverImage} size="card" customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
             <div className='w-full flex gap-1 p-6 pb-0'>
                 <div className='grow'>
                     <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular mb-3">

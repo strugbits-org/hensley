@@ -17,7 +17,7 @@ const resolveImageUrl = (product) => {
         return mainMedia;
     }
 
-    return resolveCoreMediaUrl(mainMedia) || null;
+    return resolveCoreMediaUrl(mainMedia, "card") || null;
 };
 
 function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {

@@ -112,7 +112,7 @@ const Login = ({ classes, close, isLightbox = true, data = {} }) => {
     } = data || {};
 
     const { email, password } = labels || {};
-    const logoUrl = resolveCoreMediaUrl(logo);
+    const logoUrl = resolveCoreMediaUrl(logo, "thumbnail");
     const logoAlt = (logo && typeof logo === "object" && logo.alt) || "Hensley Logo";
 
     const [showPassword, setShowPassword] = useState(false);

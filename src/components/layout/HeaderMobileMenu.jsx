@@ -39,6 +39,7 @@ const SubCategoryItem = ({ data, closeModal }) => {
                     <PrimaryImage
                         timeout={0}
                         url={collectionImage}
+                        size="thumbnail"
                         alt={title}
                         customClasses="h-full w-full object-cover"
                     />

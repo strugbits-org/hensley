@@ -54,7 +54,7 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
 
             return (
               <div key={item.id || index} className={`${colSpanClass}`}>
-                <PrimaryImage url={item.src} alt={item.alt || `tent-${index}`} customClasses="w-full h-full object-cover" />
+                <PrimaryImage url={item.src} size="tablet" alt={item.alt || `tent-${index}`} customClasses="w-full h-full object-cover" />
               </div>
             );
           })}

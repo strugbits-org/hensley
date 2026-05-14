@@ -36,7 +36,7 @@ const TentTypesSlider = ({ data }) => {
                     const isActive = currentSlide % data.length === idx
 
                     const { tent } = item;
-                    const imageURL = resolveCoreMediaUrl(tent?.mainMedia);
+                    const imageURL = resolveCoreMediaUrl(tent?.mainMedia, "card");
                     const tentName = tent?.name || tent?.title || "";
 
 

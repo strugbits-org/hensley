@@ -18,6 +18,7 @@ const resolveLineItemImage = (item) => {
       product?.featuredImage ||
       firstMediaItem ||
       "",
+    "thumbnail",
   );
 };
 

@@ -39,7 +39,7 @@ function HeroSection({ data = {} }) {
           </div>
         </div>
         <div className="w-full h-full lg:px-[24px] min-h-[500px]">
-          <PrimaryImage url={heroImage} alt="Hensley Events" customClasses=" w-full h-full object-cover" />
+          <PrimaryImage url={heroImage} size="tablet" alt="Hensley Events" customClasses=" w-full h-full object-cover" />
         </div>
       </div>
 

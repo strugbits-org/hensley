@@ -30,28 +30,65 @@ const prefixCoreUrl = (path) => {
     return path;
 };
 
+// Payload size names in preference order for each requested size hint.
+// Walks the list left-to-right and returns the first size that has a url.
+// Tablet leads every chain — smaller variants were cropping product imagery
+// (e.g. chair legs cut off in card grids), so we upscale-prefer the largest
+// generated size and only degrade if tablet wasn't produced for that asset.
+const SIZE_PREFERENCE = {
+    thumbnail: ["tablet", "card", "thumbnail"],
+    card:      ["tablet", "card", "thumbnail"],
+    tablet:    ["tablet", "card", "thumbnail"],
+};
+
 /**
  * Resolve a media value coming from Payload (object or string) to a fully-qualified URL.
- * Handles the depth-1 populated upload object shape ({ url, sizes, ... }) and prefixes
- * relative `/api/media/...` paths with CORE_API_BASE_URL.
+ * Pass a `size` hint ("thumbnail" | "card" | "tablet") to pick the best Payload size variant
+ * instead of the full original. Falls back to the next preferred size, then to the original.
  */
-export const resolveCoreMediaUrl = (media) => {
+export const resolveCoreMediaUrl = (media, size) => {
     if (!media) return "";
     if (typeof media === "string") return prefixCoreUrl(media);
-    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0]);
+    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0], size);
     if (typeof media !== "object") return "";
 
-    const candidate = media.url
-        || media.src
-        || media.thumbnailURL
-        || media?.sizes?.card?.url
-        || media?.sizes?.thumbnail?.url
-        || media?.mainMedia?.url
-        || media?.media?.url
-        || "";
+    // Unwrap nested shapes first
+    if (media.mainMedia) return resolveCoreMediaUrl(media.mainMedia, size);
+    if (media.media)     return resolveCoreMediaUrl(media.media, size);
+
+    // A size variant is "real" only when it has a concrete filename — Payload
+    // sometimes inserts placeholder entries with url ".../null" and filename:null
+    // for sizes that weren't actually generated. Skip those.
+    const isUsableVariant = (variant) =>
+        variant && typeof variant === "object" && typeof variant.filename === "string" && variant.filename.length > 0;
+
+    const isUsableUrl = (value) =>
+        typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
+
+    // Try size variants in preference order when a hint is given.
+    if (size && media.sizes) {
+        const prefs = SIZE_PREFERENCE[size] || [size];
+        for (const s of prefs) {
+            const variant = media.sizes?.[s];
+            if (!isUsableVariant(variant)) continue;
+            if (isUsableUrl(variant.url)) return prefixCoreUrl(variant.url);
+            return prefixCoreUrl(`/api/media/file/${variant.filename}`);
+        }
+    }
+
+    // Fall back to the original url / legacy fields
+    let candidate = media.url || media.src || media.thumbnailURL || "";
+
+    // Guard against assets that stored a literal "null" in `url` — fall through
+    // to thumbnailURL or a constructed /api/media/file/<filename> path instead.
+    if (!isUsableUrl(candidate)) {
+        candidate = isUsableUrl(media.thumbnailURL)
+            ? media.thumbnailURL
+            : (media.filename ? `/api/media/file/${media.filename}` : "");
+    }
 
     if (!candidate) return "";
-    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate);
+    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate, size);
 
     return prefixCoreUrl(candidate);
 };
@@ -464,13 +501,13 @@ export const normalizeProductForDisplay = (product = {}) => {
     const mediaItems = rawMediaItems
         .map((item, index) => ({
             id: item?.id || `${id || title}-media-${index}`,
-            src: resolveCoreMediaUrl(item),
+            src: resolveCoreMediaUrl(item, "tablet"),
             alt: item?.alt || title || `Product image ${index + 1}`,
         }))
         .filter((item) => item.src);
 
     // Prepend mainMedia as the first gallery slide when it is not already present
-    const mainMediaUrl = resolveCoreMediaUrl(product?.mainMedia);
+    const mainMediaUrl = resolveCoreMediaUrl(product?.mainMedia, "tablet");
     const mainMediaAlt = product?.mainMedia?.alt || title;
 
     if (mainMediaUrl && !mediaItems.some((item) => item.src === mainMediaUrl)) {

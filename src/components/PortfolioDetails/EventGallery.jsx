@@ -10,15 +10,15 @@ const EventGallery = ({ data }) => {
                     if (positionInGroup === 0) {
                         return (
                             <div key={index} className="w-full">
-                                <PrimaryImage url={url} fit={'fit'} customClasses="h-full w-full object-cover" />
+                                <PrimaryImage url={url} size="tablet" fit={'fit'} customClasses="h-full w-full object-cover" />
                             </div>
                         );
                     } else if (positionInGroup === 1) {
                         return (
                             <div key={index} className="grid grid-cols-2 gap-[24px]">
-                                <PrimaryImage url={url} fit={'fit'} customClasses="h-full w-full object-cover" />
+                                <PrimaryImage url={url} size="tablet" fit={'fit'} customClasses="h-full w-full object-cover" />
                                 {data[index + 1] && (
-                                    <PrimaryImage url={data[index + 1]} fit={'fit'} customClasses="h-full w-full object-cover" />
+                                    <PrimaryImage url={data[index + 1]} size="tablet" fit={'fit'} customClasses="h-full w-full object-cover" />
                                 )}
                             </div>
                         );

@@ -4,7 +4,7 @@ import { resolveCoreMediaUrl } from '@/utils';
 
 const EventHighLight = ({ data }) => {
     const { author, blogRef, markets, studios } = data;
-    const imageURL = resolveCoreMediaUrl(blogRef.coverImage) || "";
+    const imageURL = resolveCoreMediaUrl(blogRef.coverImage, "tablet") || "";
     
     const scrollToBottom = () => {
         window.scrollTo({

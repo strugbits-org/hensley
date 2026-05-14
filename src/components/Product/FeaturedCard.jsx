@@ -12,7 +12,7 @@ function FeaturedCard({ data, classes }) {
 
     return (
         <CustomLink to={`/${data?.blogRef ? "posts" : "project"}/${slug}`} className={`${classes} relative group border border-primary-border pb-2`}>
-            <PrimaryImage alt={title} url={coverImage?.imageInfo || data?.blogRef?.coverImage} type={"alternate"} customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
+            <PrimaryImage alt={title} url={coverImage?.imageInfo || data?.blogRef?.coverImage} size="card" type={"alternate"} customClasses={"h-full w-full object-cover min-h-[528px] max-h-[528px]"} />
             {/* <img src={generateImageURLAlternate({wix_url:coverImage.imageInfo})} className="h-full w-full object-cover min-h-[528px] max-h-[528px]" /> */}
             <div className='w-full flex gap-1 p-6 pb-0'>
                 <div className='grow'>

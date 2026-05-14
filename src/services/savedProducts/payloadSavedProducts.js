@@ -14,7 +14,8 @@ const resolveProductImage = (product) => {
     product?.mainMedia ||
     product?.featuredImage ||
     firstMediaItem ||
-    ""
+    "",
+    "card",
   );
 };
 

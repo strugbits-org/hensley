@@ -36,7 +36,7 @@ function OurCategories({ data, pageDetails, classes }) {
               {/* Image */}
               <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] px-[12px] lg:h-auto h-[382px] ">
                 <div className="overflow-hidden h-full w-full ">
-                  <PrimaryImage timeout={0} url={category.mainMedia} customClasses={"h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"} alt={category.name} />
+                  <PrimaryImage timeout={0} url={category.mainMedia} size="tablet" customClasses={"h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"} alt={category.name} />
                 </div>
               </div>
 

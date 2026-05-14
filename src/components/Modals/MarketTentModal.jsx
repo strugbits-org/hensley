@@ -20,7 +20,7 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
                     return (
                         <CustomLink key={title} to={`/${type === "markets" ? "market" : "tent"}${slug}`} className={"group relative min-h-[34rem] lg:h-full w-full lg:w-1/3 flex justify-center lg:border border-primary-border"} onClick={closeModal}>
                             <div className="absolute font-semibold inset-0 lg:inset-6 group-hover:inset-0 transition-[inset] duration-300 ease-in-out">
-                                {coverImage && <PrimaryImage timeout={0} url={coverImage} alt={title} customClasses="w-full h-full object-cover brightness-[90%]" />}
+                                {coverImage && <PrimaryImage timeout={0} url={coverImage} size="card" alt={title} customClasses="w-full h-full object-cover brightness-[90%]" />}
                             </div>
                             <div className="z-10 py-[41px] lg:py-[47px] px-[25px] lg:px-[78px] flex flex-col">
                                 <h2 className="lg:mt-[26px] text-[45px] leading-[45px] lg:text-[36px] lg:leading-[32px] 2xl:text-[70px] 2xl:leading-[65px] uppercase tracking-wider text-primary-alt font-recklessRegular mb-2">{title}</h2>

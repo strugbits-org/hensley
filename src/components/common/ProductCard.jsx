@@ -14,7 +14,7 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
     const { title } = product;
     
     const ribbon = resolveProductRibbon(product, allCollections);
-    const productImageSrc = resolveCoreMediaUrl(product.mainMedia);
+    const productImageSrc = resolveCoreMediaUrl(product.mainMedia, "card");
     
     // Determine product path based on its type
     let productPath = `/product/${product.slug}`;

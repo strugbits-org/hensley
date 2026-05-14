@@ -19,6 +19,7 @@ function BlogCard({ data, handleFilterChange, selectedTags }) {
             <PrimaryImage
                 alt={blogRef.title}
                 url={blogRef.coverImage}
+                size="card"
                 customClasses="h-full w-full object-cover min-h-[528px] max-h-[528px]"
             />
 

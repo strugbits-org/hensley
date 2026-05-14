@@ -10,7 +10,7 @@ import useRedirectWithLoader from '@/hooks/useRedirectWithLoader'
 const EventHighLight = ({ data, handleFilterChange, selectedTags }) => {
     if (!data) return;
     const { slug, portfolioRef, markets, studios, portfolioCategories, publishDate } = data;
-    const coverImage = resolveCoreMediaUrl(portfolioRef.coverImage?.imageInfo);
+    const coverImage = resolveCoreMediaUrl(portfolioRef.coverImage?.imageInfo, "tablet");
     const redirectWithLoader = useRedirectWithLoader();
 
     const handleRedirection = () => {

@@ -20,7 +20,8 @@ function DreamTeam({ dreamTeamData = [], pageTitle }) {
                 <div className='flex flex-col gap-2 px-3'>
                   <PrimaryImage
                     timeout={0}
-                    url={dt.photo?.url || dt.image}
+                    url={dt.photo || dt.image}
+                    size="card"
                     customClasses="h-full w-full object-cover"
                   />
                   <div>

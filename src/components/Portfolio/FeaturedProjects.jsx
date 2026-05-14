@@ -7,7 +7,7 @@ import SectionTitle from '@/components/common/SectionTitle';
 
 const FeaturedProjectCard = ({ project }) => {
     const { slug, portfolioRef, excerpt, eventDate } = project;
-    const imageUrl = resolveCoreMediaUrl(portfolioRef.heroImage || portfolioRef.coverImage?.imageInfo);
+    const imageUrl = resolveCoreMediaUrl(portfolioRef.heroImage || portfolioRef.coverImage?.imageInfo, "card");
     const displayExcerpt = excerpt || portfolioRef.description?.slice(0, 120) || '';
     const formattedDate = eventDate
         ? new Date(eventDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })

@@ -51,6 +51,7 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
                         <PrimaryImage
                             key={item.id || index}
                             url={item.src}
+                            size="card"
                             alt={item.alt || 'slide image'}
                             fit='fit'
                             customClasses={"h-full w-full object-contain"} />

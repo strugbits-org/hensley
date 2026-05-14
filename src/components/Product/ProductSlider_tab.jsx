@@ -52,6 +52,7 @@ const ProductSlider_tab = ({ product }) => {
             min_w={200}
             fit='fit'
             url={slide.src}
+            size="tablet"
             alt={`Product image ${idx + 1}`}
             customClasses="h-full w-full object-contain p-4"
           />
