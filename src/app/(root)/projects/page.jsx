@@ -9,9 +9,11 @@ import { Suspense } from "react";
 export async function generateMetadata() {
   try {
     const metaData = await fetchPageMetaData("projects");
-    const { title, noFollowTag } = metaData;
-    const metadata = { title };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) metadata.robots = "noindex,nofollow";
+    const metadata = {};
+    if (metaData?.title) metadata.title = metaData.title;
+    if (process.env.ENVIRONMENT === "PRODUCTION" && metaData?.noFollowTag) {
+      metadata.robots = "noindex,nofollow";
+    }
     return metadata;
   } catch (error) {
     logError("Error in metadata(projecting page):", error);

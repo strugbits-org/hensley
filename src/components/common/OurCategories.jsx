@@ -27,8 +27,9 @@ function OurCategories({ data, pageDetails, classes }) {
           const { categories: category, title } = item;
           const isTent = checkIsTent(category);
 
+          // <CustomLink to={isTent ? `/types-of-tents` : `/collections/${category.slug}`}
           return (
-            <CustomLink to={isTent ? `/types-of-tents` : `/collections/${category.slug}`}
+            <CustomLink to={`/collections/${category.slug}`}
               key={category._id}
               className={`cursor-pointer group border border-primary-border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out ${item.rtl && 'lg:flex-row-reverse'
                 } lg:h-[474px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
