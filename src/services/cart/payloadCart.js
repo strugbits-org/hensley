@@ -565,6 +565,9 @@ const normalizeItemToIds = (item) => {
     addedAt: item.addedAt ?? null,
   };
 
+  // Preserve existing sub-document id — without it Payload reassigns new ObjectIds on every write, breaking all subsequent ID-based lookups.
+  if (item.id) base.id = item.id;
+
   if (item.itemType === "pool_cover") {
     base.poolCoverOptions = Array.isArray(item.poolCoverOptions) ? item.poolCoverOptions : [];
     base.poolCoverRelevantImages = poolCoverRelevantImages;

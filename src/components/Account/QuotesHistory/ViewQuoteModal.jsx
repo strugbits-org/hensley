@@ -28,9 +28,12 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
             return;
         }
 
-        const updatedLineItems = cartItems.map(item =>
-            item.product._id === id ? { ...item, product: { ...item.product, quantity: numValue } } : item
-        );
+        const updatedLineItems = cartItems.map(item => {
+            const productId = typeof item.product === 'object'
+                ? (item.product?._id || item.product?.id)
+                : item.product;
+            return productId === id ? { ...item, quantity: numValue } : item;
+        });
         setCartItems(updatedLineItems);
     };
     const handleCollectionQuantityChange = (collection, value, id) => {
@@ -164,7 +167,7 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
     };
 
     useEffect(() => {        
-        const totalPrice = calculateCartTotalPrice(cartItems.map(x => x.product));
+        const totalPrice = calculateCartTotalPrice(cartItems.map(x => ({ ...x, price: x.unitPrice ?? 0 })));
         setFormattedTotalPrice(formatTotalPrice(totalPrice));
     }, [cartItems]);
 
@@ -208,7 +211,7 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                         <div className='bg-white w-full flex flex-col lg:gap-y-[20px] gap-y-[50px] py-[30px] px-[24px] h-[800px] overflow-y-scroll hide-scrollbar'>
                                             <div className='heading w-full  flex justify-center items-center flex-col max-lg:pt-[78px] max-lg:pb-0 max-lg:border-b-0 max-md:pt-[50px]'>
                                                 <p className='font-haasLight text-base uppercase'>{date}</p>
-                                                <h2 className='uppercase text-[140px] text-secondary-alt font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.eventDescriptionPo}</h2>
+                                                <h2 className='uppercase text-[140px] text-secondary-alt font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.eventDescription || data.eventDescriptionPo || data.quoteNumber}</h2>
                                             </div>
                                             <div className='w-full '>
                                                 <div className='w-full bg-[#F4F1EC] pt-[18px] pb-[17px]'>
@@ -219,34 +222,45 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                             </div>
                                             <div className=''>
                                                 {cartItems.map((item, index) => {
-                                                    const product = item.product;
+                                                    const product = typeof item.product === 'object' ? item.product : {};
+                                                    // Merge lineItem price/quantity/title into product — Payload stores these on the lineItem, not the product
+                                                    const itemData = {
+                                                        ...product,
+                                                        _id: product?._id || product?.id || item.product,
+                                                        name: item.productTitle || product?.name || product?.title,
+                                                        price: item.unitPrice ?? product?.price ?? 0,
+                                                        quantity: item.quantity ?? 1,
+                                                        customTextFields: item.customTextFieldValues || product?.customTextFields,
+                                                        mediaItem: product?.mediaItem || (product?.mainMedia?.url ? { src: product.mainMedia.url } : product?.mainMedia ? { src: product.mainMedia } : null),
+                                                    };
+
                                                     // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
-                                                    const rawDescriptionLines = product.descriptionLines || product.customTextFieldValues || product.customTextFields || [];
-                                                    const descriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name 
-                                                        ? formatDescriptionLines(rawDescriptionLines) 
+                                                    const rawDescriptionLines = item.customTextFieldValues || product.descriptionLines || product.customTextFields || [];
+                                                    const descriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name
+                                                        ? formatDescriptionLines(rawDescriptionLines)
                                                         : rawDescriptionLines;
-                                                    
+
                                                     // Check for new itemType/setItems format first, then fall back to old string format
                                                     const isProductSet = item.itemType === "set" || product.itemType === "set" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
                                                     const productCollectionString = descriptionLines.find(x => x.title === "Set")?.value;
                                                     const isProductCollection = isProductSet || Boolean(productCollectionString);
-                                                    
+
                                                     const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || product.itemType === "tent" || product.itemType === "pool_cover" || descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
                                                     if (isProductCollection) {
                                                         // Use new setItems if available, otherwise parse old string format
                                                         const productSetItems = productCollectionString ? productCollectionString.split("; ") : [];
-                                                        const lineItemData = { ...product, productSetItems, setItems: item.setItems || product.setItems };
+                                                        const lineItemData = { ...itemData, productSetItems, setItems: item.setItems || product.setItems };
                                                         return (
                                                             <CartCollection key={index} data={lineItemData} enableQuantityControls={true} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} actions={{ handleQuantityChange: (value, id) => handleCollectionQuantityChange(lineItemData, value, id) }} />
                                                         )
                                                     } else if (isTentItem) {
                                                         return (
-                                                            <CartTent key={index} data={product} descriptionLines={descriptionLines} readOnly={true} addToCartButtonLabel={addToCartButtonLabel} showAddToCart={true} />
+                                                            <CartTent key={index} data={itemData} descriptionLines={descriptionLines} readOnly={true} addToCartButtonLabel={addToCartButtonLabel} showAddToCart={true} />
                                                         )
                                                     } else {
                                                         return (
-                                                            <CartNormal key={index} data={product} enableQuantityControls={true} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} actions={{ handleQuantityChange }} />
+                                                            <CartNormal key={index} data={itemData} enableQuantityControls={true} readOnly={true} showAddToCart={true} addToCartButtonLabel={addToCartButtonLabel} actions={{ handleQuantityChange }} />
                                                         )
                                                     };
                                                 })}

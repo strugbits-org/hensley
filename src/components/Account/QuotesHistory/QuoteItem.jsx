@@ -10,11 +10,12 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
     const { viewButtonLabel, orderAgainButtonLabel } = data;
 
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
-    const totalPrice = useMemo(() => calculateCartTotalPrice(quote.lineItems.map(item => item.product)));
+    const totalPrice = useMemo(() => calculateCartTotalPrice(quote.lineItems));
     const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
     const [loading, setLoading] = useState(false);
 
     const date = useMemo(() => formatDateForQuote(quote.eventDate), [quote.eventDate]);
+    const quoteLabel = quote.eventDescription || quoteLabel || quote.quoteNumber || '';
 
     const handleOrderAgainClick = async () => {
         try {
@@ -87,7 +88,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
             <div className='hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-y-4 gap-x-4 xl:gap-x-[100px] items-center py-[35px] max-lg:py-5'>
                 <div className='quote-location'>
                     <h3 className='font-recklessRegular text-xl text-wrap m-0'>
-                        {quote.eventDescriptionPo}
+                        {quoteLabel}
                     </h3>
                     <time
                         className="font-haasLight text-xs uppercase lg:hidden"
@@ -117,7 +118,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                         <button
                             className="bg-[#F0DEA2] font-haasLight text-xs w-[134px] h-[27px] max-lg:w-[114px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[5px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary uppercase"
                             onClick={handleViewClick}
-                            aria-label={`View quote for ${quote.eventDescriptionPo}`}
+                            aria-label={`View quote for ${quoteLabel}`}
                         >
                             {viewButtonLabel || 'VIEW'}
                             <span className="absolute right-3" aria-hidden="true">
@@ -127,7 +128,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                         <button
                             className="break-keep bg-transparent border border-secondary-alt font-haasLight text-xs w-[144px] h-[27px] max-lg:w-[14px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[1px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary uppercase"
                             onClick={handleOrderAgainClick}
-                            aria-label={`Order again for ${quote.eventDescriptionPo}`}
+                            aria-label={`Order again for ${quoteLabel}`}
                         >
                             {loading ? "PLEASE WAIT..." : (orderAgainButtonLabel || "ORDER AGAIN")}
                             <span className="absolute right-3" aria-hidden="true">
@@ -143,7 +144,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                 <div className='flex justify-between'>
                     <div className='quote-header-mobile'>
                         <h3 className="font-recklessRegular text-xl m-0 mb-1">
-                            {quote.eventDescriptionPo}
+                            {quoteLabel}
                         </h3>
                         <time
                             className="font-haasLight text-xs uppercase block"
@@ -165,7 +166,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                         <button
                             className="flex-1 bg-[#F0DEA2] font-haasLight text-xs h-[27px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[5px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary"
                             onClick={handleViewClick}
-                            aria-label={`View quote for ${quote.eventDescriptionPo}`}
+                            aria-label={`View quote for ${quoteLabel}`}
                         >
                             {viewButtonLabel || 'VIEW'}
                             <span className="absolute right-3" aria-hidden="true">
@@ -175,7 +176,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                         <button
                             className="flex-1 break-keep bg-transparent border border-secondary-alt font-haasLight text-xs h-[27px] max-lg:h-[35px] flex items-center justify-center max-lg:justify-start max-lg:pl-3 relative group hover:tracking-[1px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary"
                             onClick={handleOrderAgainClick}
-                            aria-label={`Order again for ${quote.eventDescriptionPo}`}
+                            aria-label={`Order again for ${quoteLabel}`}
                         >
                             {loading ? "PLEASE WAIT..." : (orderAgainButtonLabel || "ORDER AGAIN")}
                             <span className="absolute right-3" aria-hidden="true">

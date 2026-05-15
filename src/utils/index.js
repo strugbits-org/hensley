@@ -170,7 +170,7 @@ export const findSortIndexByCategory = (data, categoryId) => {
 };
 
 export const formatTotalPrice = (price) => {
-    return '$' + price?.toFixed(2) || '$0.00';
+    return '$' + (parseFloat(price) || 0).toFixed(2);
 }
 
 
@@ -230,7 +230,7 @@ export const calculateCartTotalPrice = (lineItems) => {
         const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
 
         if (!productCollection) {
-            return total + (currentItem.price * currentItem.quantity);
+            return total + ((currentItem.price || currentItem.unitPrice || 0) * currentItem.quantity);
         }
 
         const collectionTotalPrice = productCollection.split('; ').reduce((acc, item) => {
