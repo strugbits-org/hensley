@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { CartCollection, CartNormal, CartTent } from './CartItems'
 import PriceDisplay from './PriceDisplay'
 import { AddToQuote } from './AddtoQuoteButton'
@@ -76,6 +76,7 @@ const Cart = () => {
   const [trashList, setTrashList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [totalPrice, setTotalPrice] = useState(0);
+  const pendingQuantityUpdatesRef = useRef({});
 
   const fetchCartItems = async () => {
     try {
@@ -101,7 +102,21 @@ const Cart = () => {
     fetchCartItems();
   }, []);
 
-  const handleQuantityChange = useCallback((value, id, disabled) => {
+  const flushQuantityUpdates = useCallback(
+    debounce(async () => {
+      const updates = Object.values(pendingQuantityUpdatesRef.current);
+      pendingQuantityUpdatesRef.current = {};
+      if (!updates.length) return;
+      try {
+        await updateProductsQuantityCart(updates);
+      } catch (error) {
+        logError("Error while updating products quantity in cart:", error);
+      }
+    }, 1500),
+    []
+  );
+
+  const handleQuantityChange = useCallback((value, id) => {
     const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
 
     if (
@@ -112,16 +127,13 @@ const Cart = () => {
       return;
     }
 
-    const updatedLineItems = cartItems.map(item =>
+    setCartItems(prev => prev.map(item =>
       item._id === id ? { ...item, quantity: numValue } : item
-    );
+    ));
 
-    setCartItems(updatedLineItems);
-
-    const total = calculateTotalCartQuantity(updatedLineItems || cartItems);
-    setCookie("cartQuantity", total, { path: "/" });
-    updateProductsQuantity([{ _id: id, quantity: numValue }]);
-  }, [cartItems]);
+    pendingQuantityUpdatesRef.current[id] = { _id: id, quantity: numValue };
+    flushQuantityUpdates();
+  }, [flushQuantityUpdates]);
 
   const handleCollectionQuantityChange = useCallback((data, value, id, disabled) => {
     const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
@@ -205,74 +217,49 @@ const Cart = () => {
   }, [cartItems]);
 
   const updateCollectionProducts = useCallback(
-    debounce(async (data, id, quantity) => {
+    debounce(async (data) => {
       try {
-        if (id) {
-          handleCollectionQuantityChange(data, quantity, id);
-          return;
-        }
-        
-        // Build cartData for both formats
         let lineItem;
-        
-        // Check for new setItems format
+
         if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
           const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
           lineItem = {
             catalogReference: {
               appId,
               catalogItemId: data.productId || data.product?.id || data.product,
-              options: {
-                customTextFields: {},
-              },
+              options: { customTextFields: {} },
             },
             setItems: data.setItems,
             quantity: 1,
           };
         } else if (data.catalogReference) {
-          // Wix format
           lineItem = {
             catalogReference: data.catalogReference,
             quantity: 1,
           };
         } else {
-          // Payload format - build catalogReference from customTextFields
           const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
           const customTextFields = (data.customTextFieldValues || data.customTextFields || [])
             .reduce((acc, { title, value }) => {
               acc[title] = value;
               return acc;
             }, {});
-          
           lineItem = {
             catalogReference: {
               appId,
               catalogItemId: data.productId || data.product?.id || data.product,
-              options: {
-                customTextFields,
-              },
+              options: { customTextFields },
             },
             quantity: 1,
           };
         }
-        
+
         const cartData = { lineItems: [lineItem] };
         await updateProductInCart(data._id, cartData);
       } catch (error) {
-        logError("Error while updating products quantity in cart:", error);
+        logError("Error while updating bundle in cart:", error);
       }
     }, 1500), []);
-
-  const updateProductsQuantity = useCallback(
-    debounce(async (lineItems) => {
-      try {
-        await updateProductsQuantityCart(lineItems);
-      } catch (error) {
-        logError("Error while updating products quantity in cart:", error);
-      }
-    }, 1500),
-    []
-  );
 
   useEffect(() => {
     const totalQuantity = calculateTotalCartQuantity(cartItems);
@@ -282,13 +269,13 @@ const Cart = () => {
     setTotalPrice(formatTotalPrice(total));
   }, [cartItems]);
 
-  const removeProduct = async (ids) => {
-    const newCartItems = cartItems.filter((item) => !ids.includes(item._id));
-    const total = calculateTotalCartQuantity(newCartItems);
-    setCookie("cartQuantity", total, { path: "/" });
-    setCartItems(newCartItems);
-    setTrashList((prevTrashList) => prevTrashList.concat(ids.filter(id => !prevTrashList.includes(id))));
-  };
+  const removeProduct = useCallback((ids) => {
+    setCartItems(prev => prev.filter(item => !ids.includes(item._id)));
+    setTrashList(prev => {
+      const newIds = ids.filter(id => !prev.includes(id));
+      return newIds.length ? [...prev, ...newIds] : prev;
+    });
+  }, []);
 
   useEffect(() => {
     if (!trashList.length) return;

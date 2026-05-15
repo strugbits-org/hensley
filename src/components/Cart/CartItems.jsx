@@ -82,7 +82,7 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, r
 const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, showAddToCart = false }) => {
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const { removeProduct } = actions;
-    const productName = data?.productName?.original || data?.name;
+    const productName = data?.productName?.original || data?.productTitle || data?.name || data?.title;
     const systemFields = ["POOLCOVER", "RELEVENT IMAGES"];
     const [isLoading, setIsLoading] = useState(false);
 
@@ -183,14 +183,18 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const productName = data?.productName?.original || data?.name;
+    const productName = data?.productName?.original || data?.productTitle || data?.name || data?.title;
 
     // Support both new structured setItems format and old string format
     const productInfoSection = useMemo(() => {
         // Check for new setItems format first
         if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
             return data.setItems.map(item => ({
-                product: item.productName || item.product || '',
+                product: item.productName ||
+                    (typeof item.product === 'object'
+                        ? (item.product?.title || item.product?.name)
+                        : item.product) ||
+                    '',
                 size: item.size || '',
                 price: parseFloat(item.unitPrice) || 0,
                 quantity: parseInt(item.quantity, 10) || 1,
@@ -344,7 +348,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
     const { removeProduct, handleQuantityChange } = actions;
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [isLoading, setIsLoading] = useState(false);
-    const productName = data?.productName?.original || data?.name;
+    const productName = data?.productName?.original || data?.productTitle || data?.name || data?.title;
 
     const productSize = () => {
         if (!data.customTextFields) return data.size;
@@ -359,7 +363,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
             price: data?.price?.amount || data?.price,
             size: productSize(),
             formattedPrice: data?.fullPrice?.formattedAmount || formatTotalPrice(data.price),
-            _id: data._id
+            _id: data._id || data.id
         }
     ]
 
@@ -441,7 +445,7 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
                 lg:mt-[21px]
                 lg:mb-[27px]
                 mr-[100px]
-                '>{data.price.amount || data.price}</span>
+                '>{data.price?.amount || data.price}</span>
                 </div>
                 <table className="max-lg:border-b max-lg:mb-4 border-primary-border lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left lg:border-separate lg:border-spacing-y-[15px] border-spacing-y-[12px] xl:pr-[30px] lg:pr-[50px] ">
                     <thead>

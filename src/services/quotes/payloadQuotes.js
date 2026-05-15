@@ -11,6 +11,86 @@ import { parseSetItemsString } from "../cart/payloadCart";
 const getSDK = _getSDK;
 const apiKeySDK = _apiKeySDK;
 
+// Resolve product IDs from line items + nested setItems and refetch in a
+// single query so legacy quotes (saved before normalizeLineItem persisted
+// `productTitle`, or with product IDs Payload's depth-2 populate can't
+// resolve) still render a product name in the View Quote modal.
+const hydrateQuoteLineItems = async (quote) => {
+  if (!quote || !Array.isArray(quote.lineItems) || quote.lineItems.length === 0) {
+    return quote;
+  }
+
+  const idOf = (ref) => {
+    if (!ref) return null;
+    if (typeof ref === "string") return ref;
+    if (typeof ref === "object") return ref?.id || ref?._id || null;
+    return null;
+  };
+
+  const productIds = new Set();
+  for (const item of quote.lineItems) {
+    const itemId = idOf(item?.product);
+    if (itemId) productIds.add(itemId);
+    if (Array.isArray(item?.setItems)) {
+      for (const si of item.setItems) {
+        const setId = idOf(si?.product);
+        if (setId) productIds.add(setId);
+      }
+    }
+  }
+
+  let productMap = new Map();
+  if (productIds.size > 0) {
+    try {
+      const sdk = apiKeySDK();
+      const result = await sdk.find({
+        collection: "products",
+        where: { id: { in: [...productIds] } },
+        pagination: false,
+        depth: 1,
+      });
+      productMap = new Map(
+        (result?.docs || []).map((p) => [p?.id || p?._id, p]),
+      );
+    } catch (error) {
+      logError("Error enriching quote product data:", error);
+    }
+  }
+
+  return {
+    ...quote,
+    lineItems: quote.lineItems.map((item) => {
+      const productId = idOf(item?.product);
+      const populatedObj = typeof item?.product === "object" && item.product?.name
+        ? item.product
+        : null;
+      const enriched = populatedObj || productMap.get(productId) || null;
+
+      const hydratedSetItems = Array.isArray(item?.setItems)
+        ? item.setItems.map((si) => {
+            const sid = idOf(si?.product);
+            const siPopulated = typeof si?.product === "object" && si.product?.name
+              ? si.product
+              : null;
+            const siEnriched = siPopulated || productMap.get(sid) || null;
+            return {
+              ...si,
+              product: siEnriched || si.product,
+              productName: si?.productName || siEnriched?.name || siEnriched?.title || "",
+            };
+          })
+        : item?.setItems;
+
+      return {
+        ...item,
+        product: enriched || item.product,
+        productTitle: item?.productTitle || enriched?.name || enriched?.title || null,
+        ...(hydratedSetItems !== undefined ? { setItems: hydratedSetItems } : {}),
+      };
+    }),
+  };
+};
+
 const extractPoolCoverImageIdsFromCustomFields = (fields = []) => {
   const imageField = fields.find((field) => {
     const title = String(field?.title || "").toUpperCase();
@@ -90,6 +170,7 @@ const normalizeLineItem = (item) => {
 
   const base = {
     product: productObj?.id || productObj?._id || item.product || item.productId || item.catalogReference?.catalogItemId,
+    productTitle: item.name || item.productName || productObj?.title || productObj?.name || null,
     variant: typeof item.variant === "object" ? item.variant?.id : item.variant || item.catalogReference?.options?.variantId || null,
     quantity: Number(item.quantity) || 1,
     unitPrice: unitPrice,
@@ -294,7 +375,8 @@ export const getMemberQuotes = async (memberId, token) => {
       pagination: false,
     });
 
-    return result.docs || [];
+    const docs = result.docs || [];
+    return Promise.all(docs.map(hydrateQuoteLineItems));
   } catch (error) {
     logError("Error fetching member quotes:", error);
     throw new Error(error.message || "Failed to fetch quotes");
@@ -324,7 +406,7 @@ export const getQuoteById = async (quoteId, token = null) => {
       depth: 2,
     });
 
-    return result.docs?.[0] || null;
+    return await hydrateQuoteLineItems(result.docs?.[0] || null);
   } catch (error) {
     logError("Error fetching quote by ID:", error);
     throw new Error(error.message || "Failed to fetch quote");
@@ -354,7 +436,7 @@ export const getQuoteByNumber = async (quoteNumber, token = null) => {
       depth: 2,
     });
 
-    return result.docs?.[0] || null;
+    return await hydrateQuoteLineItems(result.docs?.[0] || null);
   } catch (error) {
     logError("Error fetching quote by number:", error);
     throw new Error(error.message || "Failed to fetch quote");

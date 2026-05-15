@@ -1,5 +1,5 @@
 "use server";
-import { AddProductToCartVisitor, getProductsCartVisitor, removeProductFromCartVisitor, updateProductsQuantityCartVisitor } from "./CartApisVisitor";
+import { AddProductToCartVisitor, getProductsCartVisitor, removeProductFromCartVisitor, updateProductsQuantityCartVisitor, updateProductInCartVisitor } from "./CartApisVisitor";
 import { getAuthToken, getCartId } from "../auth";
 import { logError } from "@/utils";
 
@@ -150,7 +150,7 @@ export const updateProductInCart = async (id, productData) => {
 
     if (!authToken) {
       const cartId = await getCartId();
-      const response = AddProductToCartVisitor(cartId, id, productData);
+      const response = updateProductInCartVisitor(cartId, id, productData);
       return response;
     }
 
