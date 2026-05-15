@@ -20,43 +20,62 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
     const handleOrderAgainClick = async () => {
         try {
             setLoading(true);
+            const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
             const products = [];
-            for (const item of quote?.lineItems || []) {
-                const productData = item.product;
 
+            for (const item of quote?.lineItems || []) {
                 try {
-                    let catalogReference = productData?.catalogReference;
-                    if (!catalogReference) {
-                        const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
-                        const { customTextFields = [], productId } = productData;
-                        const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
-                            acc[title] = value;
-                            return acc;
-                        }, {});
-                        customTextFieldsData.size = item.size;
-                        catalogReference = {
-                            appId,
-                            catalogItemId: productId,
-                            options: {
-                                customTextFields: customTextFieldsData,
-                            },
-                        };
+                    const productObj = typeof item?.product === "object" ? item.product : null;
+                    const productId =
+                        productObj?.id ||
+                        productObj?._id ||
+                        (typeof item?.product === "string" ? item.product : null) ||
+                        item?.productId ||
+                        item?.catalogReference?.catalogItemId;
+
+                    if (!productId) {
+                        logError("Skipping line item in Order Again — no product id", item);
+                        continue;
                     }
 
-                    const product = {
-                        catalogReference: catalogReference,
-                        quantity: productData.quantity,
+                    const customTextFieldsArray = item?.customTextFieldValues || item?.customTextFields || [];
+                    const customTextFieldsData = customTextFieldsArray.reduce((acc, { title, value }) => {
+                        if (title) acc[title] = value;
+                        return acc;
+                    }, {});
+
+                    const catalogReference = item?.catalogReference || {
+                        appId,
+                        catalogItemId: productId,
+                        options: {
+                            variantId: item?.variant?.id || item?.variant || null,
+                            options: item?.selectedOptions || null,
+                            customTextFields: customTextFieldsData,
+                        },
                     };
 
-                    products.push(product);
+                    products.push({
+                        catalogReference,
+                        quantity: Number(item?.quantity) || 1,
+                        priceAtAdd: Number(item?.unitPrice ?? item?.priceAtAdd ?? 0) || 0,
+                        setItems: Array.isArray(item?.setItems) ? item.setItems : undefined,
+                    });
                 } catch (error) {
                     logError(error);
                 }
             }
 
-            const cartData = {
-                lineItems: products,
-            };
+            if (products.length === 0) {
+                lightboxActions.setBasicLightBoxDetails({
+                    title: "Unable to reorder",
+                    description: "This quote has no products that can be added to the cart.",
+                    buttonText: "OK",
+                    open: true,
+                });
+                return;
+            }
+
+            const cartData = { lineItems: products };
 
             await AddProductToCart(cartData);
             const newItems = calculateTotalCartQuantity(cartData.lineItems);

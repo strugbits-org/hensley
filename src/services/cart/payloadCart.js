@@ -394,7 +394,7 @@ export const addToCart = async (memberId, token, lineItems) => {
     }
 
     // Normalize all items to use IDs and strip unsupported nested fields
-    const normalizedItems = mergedItems.map(normalizeItemToIds);
+    const normalizedItems = mergedItems.map(normalizeItemToIds).filter((item) => item.product);
 
     // Update cart with merged items
     await sdk.update({
@@ -451,7 +451,7 @@ export const updateCartQuantity = async (memberId, token, updates) => {
       where: buildMemberCartWhere(memberId),
       limit: 1,
       data: {
-        lineItems: updatedItems,
+        lineItems: updatedItems.filter((item) => item.product),
       },
     });
 
@@ -482,7 +482,8 @@ export const removeFromCart = async (memberId, token, lineItemIds) => {
     // Filter out removed items
     const remainingItems = existingItems
       .filter((item) => !lineItemIds.includes(item.id))
-      .map(normalizeItemToIds);
+      .map(normalizeItemToIds)
+      .filter((item) => item.product);
 
     await sdk.update({
       collection: "cart",
@@ -719,7 +720,7 @@ export const addToVisitorCart = async (visitorId, lineItems) => {
       collection: "cart",
       where: buildVisitorCartWhere(visitorId),
       limit: 1,
-      data: { lineItems: mergedItems.map(normalizeItemToIds) },
+      data: { lineItems: mergedItems.map(normalizeItemToIds).filter((item) => item.product) },
     });
 
     return await getVisitorCart(visitorId);
@@ -747,7 +748,7 @@ export const updateVisitorCartQuantity = async (visitorId, updates) => {
       collection: "cart",
       where: buildVisitorCartWhere(visitorId),
       limit: 1,
-      data: { lineItems: updatedItems },
+      data: { lineItems: updatedItems.filter((item) => item.product) },
     });
 
     return await getVisitorCart(visitorId);
@@ -768,7 +769,8 @@ export const removeFromVisitorCart = async (visitorId, lineItemIds) => {
     const sdk = apiKeySDK();
     const remainingItems = (cart.lineItems || [])
       .filter((item) => !lineItemIds.includes(item.id))
-      .map(normalizeItemToIds);
+      .map(normalizeItemToIds)
+      .filter((item) => item.product);
 
     await sdk.update({
       collection: "cart",
@@ -846,7 +848,7 @@ export const mergeVisitorCartToMember = async (visitorId, memberId, memberToken)
 
     // Write merged items into member cart by explicit document ID.
     await patchCartByDocId(memberCartId, {
-      lineItems: mergedItems.map(normalizeItemToIds),
+      lineItems: mergedItems.map(normalizeItemToIds).filter((item) => item.product),
     });
 
     // Remove visitor cart by explicit document ID.
