@@ -193,54 +193,63 @@ export const fetchProductPageDetails = async () => {
 };
 
 export const fetchProductPageData = async (slug) => {
+    // Fetch the core product first. Only a genuine "no such slug" should 404;
+    // transient SDK/network errors are re-thrown so Next renders an error page
+    // (and won't be cached as a 404).
+    let coreProductData;
     try {
-        // Fetch Payload product — source of truth for all display data
-        const coreProductData = await queryProductsBySlug(slug);
-
-        if (!coreProductData) {
-            throw new Error("Product data not found");
-        }
-
-        // Check if this is a Payload bundle product
-        const isPayloadBundle = coreProductData.type === 'bundle' && 
-            Array.isArray(coreProductData.bundleItems) && 
-            coreProductData.bundleItems.length > 0;
-
-        const [
-            featuredProjectsData,
-            matchedProducts,
-            pageDetails,
-            // ourCategoriesData,
-            allCollections,
-        ] = await Promise.all([
-            fetchFeaturedProjects(coreProductData.id || coreProductData._id),
-            fetchMatchedProductsForProduct({ payloadProduct: coreProductData }),
-            fetchProductPageDetails(),
-            // fetchOurCategoriesData(),
-            queryProductCollections(),
-        ]);
-
-        // Use Payload bundle items for collection data
-        const productCollectionData = isPayloadBundle 
-            ? mapBundleItemsToCollectionData(coreProductData.bundleItems)
-            : false;
-
-        return {
-            productData: {
-                product: coreProductData,
-                isProductCollection: Boolean(productCollectionData),
-                isBundle: isPayloadBundle,
-            },
-            productCollectionData,
-            featuredProjectsData,
-            matchedProducts,
-            pageDetails,
-            // ourCategoriesData,
-            allCollections: Array.isArray(allCollections) ? allCollections : [],
-        };
+        coreProductData = await queryProductsBySlug(slug);
     } catch (error) {
-        logError(`Error fetching product data: ${error.message}`, error);
+        logError(`Error fetching core product for slug "${slug}": ${error.message}`, error);
+        throw error;
     }
+
+    if (!coreProductData) {
+        return null;
+    }
+
+    const isPayloadBundle = coreProductData.type === 'bundle' &&
+        Array.isArray(coreProductData.bundleItems) &&
+        coreProductData.bundleItems.length > 0;
+
+    // Auxiliary data — a transient failure here must NOT 404 the page.
+    const [
+        featuredProjectsResult,
+        matchedProductsResult,
+        pageDetailsResult,
+        allCollectionsResult,
+    ] = await Promise.allSettled([
+        fetchFeaturedProjects(coreProductData.id || coreProductData._id),
+        fetchMatchedProductsForProduct({ payloadProduct: coreProductData }),
+        fetchProductPageDetails(),
+        queryProductCollections(),
+    ]);
+
+    const settledValue = (result, fallback) => {
+        if (result.status === "fulfilled") return result.value;
+        logError(`Auxiliary product-page fetch failed: ${result.reason?.message}`, result.reason);
+        return fallback;
+    };
+
+    const productCollectionData = isPayloadBundle
+        ? mapBundleItemsToCollectionData(coreProductData.bundleItems)
+        : false;
+
+    return {
+        productData: {
+            product: coreProductData,
+            isProductCollection: Boolean(productCollectionData),
+            isBundle: isPayloadBundle,
+        },
+        productCollectionData,
+        featuredProjectsData: settledValue(featuredProjectsResult, []),
+        matchedProducts: settledValue(matchedProductsResult, []),
+        pageDetails: settledValue(pageDetailsResult, { matchItWithTitle: "MATCH IT WITH", featuredProductTitle: "Products Featured in this Project Entry" }),
+        allCollections: (() => {
+            const v = settledValue(allCollectionsResult, []);
+            return Array.isArray(v) ? v : [];
+        })(),
+    };
 }
 
 export const fetchSavedProductData = async (includeProducts = false, retries = 3, delay = 1000) => {

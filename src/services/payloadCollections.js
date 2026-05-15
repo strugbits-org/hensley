@@ -1039,14 +1039,14 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-createdAt", limit, depth = 1 } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1 } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
             where: { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
             sort,
-            limit: limit || 20,
-            pagination: !limit,
+            ...(limit ? { limit } : {}),
+            pagination: false,
             draft: false,
             locale: "en",
             depth,
@@ -1102,8 +1102,8 @@ export const queryProjects = async ({ where = {}, sort = "order", limit, depth =
             collection: "projects",
             where: { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
             sort,
-            limit: limit || 100,
-            pagination: !limit,
+            ...(limit ? { limit } : {}),
+            pagination: false,
             draft: false,
             locale: "en",
             depth,

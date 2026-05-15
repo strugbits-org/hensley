@@ -16,7 +16,7 @@ import {
 
 export const fetchBlogs = async () => {
     try {
-        const payloadBlogs = await queryBlogs({ sort: "-createdAt" });
+        const payloadBlogs = await queryBlogs();
         return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {
         logError(`Error searching blogs: ${error.message}`, error);
@@ -69,7 +69,6 @@ export const fetchOtherBlogs = async (slug) => {
     try {
         const payloadBlogs = await queryBlogs({
             where: { slug: { not_equals: slug } },
-            sort: "-createdAt",
         });
         return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {

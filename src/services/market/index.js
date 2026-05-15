@@ -147,7 +147,6 @@ export const fetchBlogsForMarket = async (ids) => {
     try {
         const payloadBlogs = await queryBlogs({
             where: { markets: { in: ids } },
-            sort: "order",
         });
         return payloadBlogs.map(normalizePayloadBlog);
     } catch (error) {

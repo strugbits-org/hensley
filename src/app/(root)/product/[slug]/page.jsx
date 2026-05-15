@@ -48,30 +48,24 @@ export const generateStaticParams = async () => {
 }
 
 export default async function Page({ params }) {
-  try {
-    const slug = decodeURIComponent(params.slug);
-    const data = await fetchProductPageData(slug);
+  const slug = decodeURIComponent(params.slug);
+  const data = await fetchProductPageData(slug);
 
-    if (!data) {
-      throw new Error("Product data not found");
-    }
-
-    const { matchedProducts, featuredProjectsData, pageDetails, allCollections = [] } = data;
-    const { matchItWithTitle, featuredProductTitle } = pageDetails;
-
-    return (
-      <>
-        <Product data={data} matchedProducts={matchedProducts || []} allCollections={allCollections} />
-        {/* <OurCategories
-          data={ourCategoriesData || []}
-          pageDetails={{ ourCategoriesTitle: pageDetails?.ourCategoriesTitle || "SHOP BY CATEGORY" }}
-        /> */}
-        <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
-        <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
-      </>
-    );
-  } catch (error) {
-    logError("Error fetching product page data:", error);
+  // Only call notFound() when the product genuinely does not exist.
+  // Transient upstream errors re-throw from fetchProductPageData and surface as
+  // an error page (which is retried on reload) — never a cached 404.
+  if (data === null) {
     notFound();
   }
+
+  const { matchedProducts, featuredProjectsData, pageDetails, allCollections = [] } = data;
+  const { matchItWithTitle, featuredProductTitle } = pageDetails;
+
+  return (
+    <>
+      <Product data={data} matchedProducts={matchedProducts || []} allCollections={allCollections} />
+      <MatchProducts classes={"bg-transparent z-10"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
+      <FeaturedProjects classes={'z-10'} data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
+    </>
+  );
 }
