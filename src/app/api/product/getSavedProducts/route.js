@@ -10,7 +10,7 @@ export const POST = async (req) => {
     if (!authenticatedUserData) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    
+
     const body = await req.json();
     const includeProducts = body.includeProducts || false;
 
@@ -23,6 +23,7 @@ export const POST = async (req) => {
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     logError(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const status = typeof error?.message === "string" && error.message.toLowerCase().includes("unauthorized") ? 401 : 500;
+    return NextResponse.json({ error: error.message }, { status });
   }
 };
