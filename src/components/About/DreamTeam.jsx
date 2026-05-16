@@ -18,12 +18,14 @@ function DreamTeam({ dreamTeamData = [], pageTitle }) {
             {dreamTeamData.slice(0, pageLimit).map((dt, index) => (
               <div key={index} className="w-1/2 lg:w-1/4 mt-8">
                 <div className='flex flex-col gap-2 px-3'>
-                  <PrimaryImage
-                    timeout={0}
-                    url={dt.photo || dt.image}
-                    size="card"
-                    customClasses="h-full w-full object-cover"
-                  />
+                  <div className="w-full aspect-[3/4] overflow-hidden">
+                    <PrimaryImage
+                      timeout={0}
+                      url={dt.photo || dt.image}
+                      size="card"
+                      customClasses="h-full w-full object-cover"
+                    />
+                  </div>
                   <div>
                     <h3 className="uppercase font-recklessLight text-secondary-alt text-[20px] md:text-[25px] lg:text-[32px] lg:leading-[35px] leading-[20px] mt-[12px]">
                       {dt.name}

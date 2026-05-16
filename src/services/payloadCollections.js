@@ -834,43 +834,14 @@ export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip =
 // ──────────────────────────────────────────────────────────────────────
 // Payload Media URL helper
 // ──────────────────────────────────────────────────────────────────────
-
-// Size preference chains — always try tablet first to avoid the crop issues
-// seen with smaller variants, then degrade to card/thumbnail only if tablet
-// wasn't generated for the asset.
-const MEDIA_SIZE_PREFERENCE = {
-    thumbnail: ["tablet", "card", "thumbnail"],
-    card:      ["tablet", "card", "thumbnail"],
-    tablet:    ["tablet", "card", "thumbnail"],
-};
-
-const isUsableVariant = (variant) =>
-    variant && typeof variant === "object" && typeof variant.filename === "string" && variant.filename.length > 0;
-const isUsableMediaUrl = (value) =>
-    typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
-
-const resolveMediaUrl = (media, size) => {
-    if (!media) return "";
-    if (typeof media === "string") return media;
-
-    if (size && media?.sizes) {
-        const prefs = MEDIA_SIZE_PREFERENCE[size] || [size];
-        for (const s of prefs) {
-            const variant = media.sizes?.[s];
-            if (!isUsableVariant(variant)) continue;
-            if (isUsableMediaUrl(variant.url)) return variant.url;
-            return `/api/media/file/${variant.filename}`;
-        }
-    }
-
-    const candidate = media?.url || media?.sizes?.card?.url || media?.sizes?.thumbnail?.url || media?.thumbnailURL || "";
-    if (!isUsableMediaUrl(candidate)) {
-        return isUsableMediaUrl(media?.thumbnailURL)
-            ? media.thumbnailURL
-            : (media?.filename ? `/api/media/file/${media.filename}` : "");
-    }
-    return candidate;
-};
+//
+// The local resolveMediaUrl that used to live here walked media.sizes.* with
+// a preference chain. That field no longer exists on the backend (sizes are
+// generated on-demand by the CDN transform endpoint), so we now route every
+// call through the canonical resolveCoreMediaUrl which handles base-URL
+// prefixing, transform-path injection, and size-hint → bucket-width mapping
+// in one place.
+const resolveMediaUrl = (media, size) => resolveCoreMediaUrl(media, size);
 
 // ──────────────────────────────────────────────────────────────────────
 // Normalizers — convert Payload shapes → Wix shapes expected by components
