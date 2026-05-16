@@ -1,14 +1,15 @@
+import { cache } from "react";
 import { logError } from "@/utils";
-import { fetchBannerData, fetchBestSellers, fetchBlogsData, fetchMarketsData, fetchTestimonials } from "..";
-import { fetchProductsByCategory } from "../products";
+import { fetchBannerData, fetchMarketsData, fetchTestimonials } from "..";
 import {
     queryProjects,
     queryBlogs,
     queryMarkets,
     querySection,
     sectionToObject,
-    normalizePayloadProject,
-    normalizePayloadBlog,
+    normalizePayloadProjectForHome,
+    normalizePayloadBlogForHome,
+    queryProductsByCollectionIdsForHome,
 } from "../payloadCollections";
 
 const fallbackMarketPageDetails = {
@@ -20,7 +21,7 @@ const fallbackMarketPageDetails = {
     buttonLabelPortfolioSlider: "OUR PROJECTS",
 };
 
-export const fetchMarketPageDetails = async () => {
+export const fetchMarketPageDetails = cache(async () => {
     try {
         const section = await querySection("market-page-details");
         if (section) {
@@ -31,7 +32,7 @@ export const fetchMarketPageDetails = async () => {
         logError(`Error fetching market page details: ${error.message}`, error);
     }
     return fallbackMarketPageDetails;
-};
+});
 
 const resolveHowWeDoItImage = (item = {}) => {
     if (!item) return "";
@@ -73,6 +74,7 @@ const fetchPayloadHowWeDoItDataForMarket = async (slug) => {
             where: { slug: { equals: slug } },
             limit: 1,
             depth: 1,
+            select: { howWeDoIt: true },
         });
 
         if (!docs.length) return [];
@@ -84,13 +86,16 @@ const fetchPayloadHowWeDoItDataForMarket = async (slug) => {
     }
 };
 
+// SliderComponent reads portfolioRef.{title, slug, coverImage.imageInfo} only.
 export const fetchPortfolioDataForMarkets = async (id) => {
     try {
         const payloadProjects = await queryProjects({
             where: { markets: { in: id } },
             sort: "order",
+            limit: 20,
+            depth: 1,
         });
-        return payloadProjects.map(normalizePayloadProject);
+        return payloadProjects.map(normalizePayloadProjectForHome);
     } catch (error) {
         logError(`Error fetching portfolio data: ${error.message}`, error);
         return [];
@@ -99,7 +104,52 @@ export const fetchPortfolioDataForMarkets = async (id) => {
 
 export const fetchHowWeDoItDataForMarket = async () => [];
 
-export const fetchSelectedMarketData = async (slug) => {
+// HensleyNews/NewsCard reads only the slim blog shape (cover, title, date,
+// author display name, market/studio/category refs). Drop content/excerpt/
+// storeProducts hydration.
+const fetchBlogsForMarketSlim = async (ids) => {
+    try {
+        const payloadBlogs = await queryBlogs({
+            where: { markets: { in: ids } },
+            depth: 1,
+            select: {
+                title: true,
+                slug: true,
+                coverImage: true,
+                author: true,
+                markets: true,
+                studios: true,
+                blogCategories: true,
+                publishedDate: true,
+                createdAt: true,
+                updatedAt: true,
+                order: true,
+                isHidden: true,
+            },
+        });
+        return payloadBlogs.map(normalizePayloadBlogForHome);
+    } catch (error) {
+        logError(`Error fetching blogs for market: ${error.message}`, error);
+        return [];
+    }
+};
+
+// Slim best sellers fetch. Mirrors the homepage best-sellers variant — drops
+// variants/productOptions/recommendedProducts/seo. ProductCard reads only
+// title/sku/type/slug/mainMedia/ribbon; AddToCart refetches by id if it
+// needs more.
+const fetchBestSellersForMarket = async (collectionId) => {
+    try {
+        if (!collectionId) return [];
+        const result = await queryProductsByCollectionIdsForHome([collectionId]);
+        return Array.isArray(result?.docs) ? result.docs : [];
+    } catch (error) {
+        logError(`Error fetching market best sellers: ${error.message}`, error);
+        return [];
+    }
+};
+
+export const fetchSelectedMarketData = cache(async (slug) => {
     try {
         const marketsData = await fetchMarketsData();
 
@@ -119,8 +169,8 @@ export const fetchSelectedMarketData = async (slug) => {
             marketHowWeDoItData.length ? Promise.resolve([]) : fetchPayloadHowWeDoItDataForMarket(slug),
             fetchBannerData(),
             fetchTestimonials(),
-            fetchBlogsForMarket(ids),
-            fetchProductsByCategory(bestSellerCollection),
+            fetchBlogsForMarketSlim(ids),
+            fetchBestSellersForMarket(bestSellerCollection),
             fetchMarketPageDetails(),
         ]);
 
@@ -141,16 +191,5 @@ export const fetchSelectedMarketData = async (slug) => {
     } catch (error) {
         logError(`Error fetching selected market data: ${error.message}`, error);
     }
-}
+});
 
-export const fetchBlogsForMarket = async (ids) => {
-    try {
-        const payloadBlogs = await queryBlogs({
-            where: { markets: { in: ids } },
-        });
-        return payloadBlogs.map(normalizePayloadBlog);
-    } catch (error) {
-        logError(`Error fetching blogs for market: ${error.message}`, error);
-        return [];
-    }
-}

@@ -674,9 +674,8 @@ export const queryProductSlugs = cache(async () => {
 // name/slug + their own subcategory IDs for DAG traversal), and productOrder
 // reduced to ID strings (the ordered IDs feed the paginated products query).
 // At depth 2 with no projection this response ballooned to ~23MB — over the
-// 10MB Next.js data cache limit AND the Vercel response body cap, causing
-// FALLBACK_BODY_TOO_LARGE. Selecting fields + populating products as IDs only
-// keeps the payload tiny; `cache: 'no-store'` skips the data-cache attempt.
+// 10MB Next.js data cache limit. Selecting fields + populating products as
+// IDs only keeps the payload tiny so it fits the data cache.
 export const queryProductCollectionBySlug = async (slug) => {
     try {
         const result = await sdk.find({
@@ -698,7 +697,7 @@ export const queryProductCollectionBySlug = async (slug) => {
                 'product-collections': { name: true, slug: true, subcategories: true },
                 products: {},
             },
-        }, { cache: 'no-store' });
+        });
 
         return result.docs?.[0] || null;
     } catch (error) {
@@ -1120,7 +1119,7 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1 } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
@@ -1131,6 +1130,7 @@ export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, d
             draft: false,
             locale: "en",
             depth,
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1177,7 +1177,7 @@ export const queryBlogCategories = async () => {
 // Payload SDK queries — Projects
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryProjects = async ({ where = {}, sort = "order", limit, depth = 2 } = {}) => {
+export const queryProjects = async ({ where = {}, sort = "order", limit, depth = 2, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "projects",
@@ -1188,6 +1188,7 @@ export const queryProjects = async ({ where = {}, sort = "order", limit, depth =
             draft: false,
             locale: "en",
             depth,
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1268,6 +1269,7 @@ export const queryMarkets = async (options = {}) => {
             sort = "order",
             draft = false,
             locale = "en",
+            select,
         } = options;
 
         const result = await sdk.find({
@@ -1279,6 +1281,7 @@ export const queryMarkets = async (options = {}) => {
             depth,
             ...(where ? { where } : {}),
             ...(typeof limit === "number" ? { limit } : {}),
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1369,7 +1372,7 @@ export const sectionToObject = (section) => {
 
 // ── New First-Class Collection Queries ───────────────────────────────────────
 
-const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1 }) => {
+const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1, select }) => {
     const baseWhere = {
         and: [
             { tenant: { equals: tenantId } },
@@ -1387,6 +1390,7 @@ const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, so
         draft: false,
         locale: "en",
         pagination: false,
+        ...(select ? { select } : {}),
     });
 
     return ensureArray(result?.docs);
@@ -1394,7 +1398,17 @@ const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, so
 
 export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "how-we-do-it", tenantId, limit: 10 });
+        return await findPublishedByTenant({
+            collection: "how-we-do-it",
+            tenantId,
+            limit: 10,
+            select: {
+                title: true,
+                content: true,
+                image: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying how-we-do-it: ${error.message}`, error);
         return [];
@@ -1403,7 +1417,19 @@ export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
 
 export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "dream-team-members", tenantId, limit: 100 });
+        return await findPublishedByTenant({
+            collection: "dream-team-members",
+            tenantId,
+            limit: 100,
+            select: {
+                name: true,
+                jobTitle: true,
+                title: true,
+                photo: true,
+                image: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying dream-team-members: ${error.message}`, error);
         return [];
@@ -1412,7 +1438,19 @@ export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
 
 export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "partner-brands", tenantId, limit: 10 });
+        return await findPublishedByTenant({
+            collection: "partner-brands",
+            tenantId,
+            limit: 10,
+            select: {
+                title: true,
+                description: true,
+                logo: true,
+                buttonLabel: true,
+                buttonLink: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying partner-brands: ${error.message}`, error);
         return [];
@@ -1426,6 +1464,19 @@ export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 
             tenantId,
             extraWhere: { type: { equals: type } },
             limit: 20,
+            select: {
+                name: true,
+                authorName: true,
+                title: true,
+                authorTitle: true,
+                feedback: true,
+                description: true,
+                image: true,
+                avatar: true,
+                sectionTitle: true,
+                type: true,
+                order: true,
+            },
         });
     } catch (error) {
         logError(`Error querying testimonials (type=${type}): ${error.message}`, error);
