@@ -13,10 +13,13 @@ import {
   queryFeaturedProductCollections,
   queryProductCollectionBySlug,
   queryProductsByCollectionIds,
+  queryProductsByCollectionIdsForHome,
   mapStorefrontFooterBranches,
   normalizePayloadStudio,
   normalizePayloadProject,
+  normalizePayloadProjectForHome,
   normalizePayloadBlog,
+  normalizePayloadBlogForHome,
   querySection,
   sectionToObject,
   queryTestimonialsByType,
@@ -384,6 +387,120 @@ export const fetchBestSellers = async () => {
     return products;
   } catch (error) {
     logError(`Error fetching best sellers data: ${error.message}`, error);
+    return [];
+  }
+};
+
+// Homepage-only variants. Each pairs a tighter Payload query (select/depth)
+// with a slim normalizer so we don't change the shape consumers already read.
+// Shared service functions above stay untouched for layout/sitemap/PDP/etc.
+
+export const fetchBestSellersForHome = async () => {
+  try {
+    const bestSellerCollection = await queryProductCollectionBySlug("best-sellers");
+    if (!bestSellerCollection) return [];
+
+    const collectionIds = getCollectionWithChildrenIds(bestSellerCollection);
+    if (!collectionIds.length) return [];
+
+    const productsResponse = await queryProductsByCollectionIdsForHome(collectionIds);
+    const products = Array.isArray(productsResponse?.docs) ? productsResponse.docs : [];
+
+    // Honor the admin-curated order from the best-sellers collection's
+    // productOrder field. SDK returns docs in arbitrary order otherwise.
+    const orderedIds = Array.isArray(bestSellerCollection.productOrder)
+      ? bestSellerCollection.productOrder
+          .map((p) => (typeof p === "string" ? p : p?.id ?? p?._id))
+          .filter(Boolean)
+      : [];
+
+    if (!orderedIds.length) return products;
+
+    const indexById = new Map(orderedIds.map((id, i) => [id, i]));
+    const productId = (p) => p?.id ?? p?._id;
+    const FALLBACK = Number.MAX_SAFE_INTEGER;
+    return [...products].sort((a, b) => {
+      const ai = indexById.has(productId(a)) ? indexById.get(productId(a)) : FALLBACK;
+      const bi = indexById.has(productId(b)) ? indexById.get(productId(b)) : FALLBACK;
+      return ai - bi;
+    });
+  } catch (error) {
+    logError(`Error fetching best sellers (home): ${error.message}`, error);
+    return [];
+  }
+};
+
+export const fetchPortfolioDataForHome = async () => {
+  try {
+    const payloadProjects = await queryProjects({
+      sort: "order",
+      depth: 1,
+      select: {
+        title: true,
+        slug: true,
+        coverImage: true,
+        order: true,
+        isHidden: true,
+      },
+    });
+    return payloadProjects.map(normalizePayloadProjectForHome);
+  } catch (error) {
+    logError(`Error fetching portfolio data (home): ${error.message}`, error);
+    return [];
+  }
+};
+
+export const fetchBlogsDataForHome = async () => {
+  try {
+    const payloadBlogs = await queryBlogs({
+      depth: 1,
+      select: {
+        title: true,
+        slug: true,
+        coverImage: true,
+        author: true,
+        markets: true,
+        studios: true,
+        blogCategories: true,
+        publishedDate: true,
+        createdAt: true,
+        updatedAt: true,
+        order: true,
+        isHidden: true,
+      },
+    });
+    return payloadBlogs.map(normalizePayloadBlogForHome);
+  } catch (error) {
+    logError(`Error fetching blogs data (home): ${error.message}`, error);
+    return [];
+  }
+};
+
+export const fetchMarketsForHome = async () => {
+  try {
+    // depth: 1 is required so featuredImage/heroBackground upload relationships
+    // are populated into objects (with url/sizes) instead of bare ID strings.
+    // The `select` still trims description/video/howWeDoIt/bestSellerCollection.
+    const docs = await queryMarkets({
+      where: { isHidden: { not_equals: true } },
+      depth: 1,
+      limit: 100,
+      select: {
+        title: true,
+        slug: true,
+        featuredImage: true,
+        heroBackground: true,
+        orderNumber: true,
+        order: true,
+        isHidden: true,
+        buttonLabel: true,
+        buttonLabelHeader: true,
+        buttonLink: true,
+      },
+    });
+    return sortByOrderNumber(docs.map(normalizeCoreMarketItem));
+  } catch (error) {
+    logError(`Error fetching markets data (home): ${error.message}`, error);
     return [];
   }
 };

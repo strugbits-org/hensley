@@ -615,6 +615,7 @@ export const queryProductCollections = cache(async () => {
 
 // Heavier query restricted to featured collections (small set) — populates
 // `media.mainMedia` at depth 1 so the Our Categories section can render images.
+// Projection limited to the fields mapProductCollectionToCategoryCard reads.
 export const queryFeaturedProductCollections = cache(async () => {
     try {
         const result = await sdk.find({
@@ -624,6 +625,26 @@ export const queryFeaturedProductCollections = cache(async () => {
             draft: false,
             locale: "en",
             depth: 1,
+            select: {
+                name: true,
+                slug: true,
+                featured: true,
+                featuredSettings: true,
+                featuredOrderNumber: true,
+                orderNumber: true,
+                order: true,
+                mainMedia: true,
+                media: true,
+                featuredImage: true,
+                heroImage: true,
+                image: true,
+                cardSubtitle: true,
+                subtitle: true,
+                shortDescription: true,
+                description: true,
+                excerpt: true,
+                rtl: true,
+            },
         });
 
         return result.docs;
@@ -701,6 +722,49 @@ export const queryProductsByCollectionIds = async (collections) => {
         return result;
     } catch (error) {
         logError('Error querying products by collection IDs:', error);
+        throw error;
+    }
+}
+
+// Homepage best-sellers variant. Drops the heaviest fields (variants[],
+// productOptions[], recommendedProducts[], seo) that the homepage card and
+// the AddToCart modal's *initial open* don't read. Bundle items + media +
+// pricing + additionalInfoSections stay because AddToCart consumes them when
+// the user opens the modal from a homepage card. If the modal needs anything
+// beyond this set it refetches the full product by ID via queryProductById.
+export const queryProductsByCollectionIdsForHome = async (collections) => {
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            where: {
+                collections: { in: collections }
+            },
+            draft: false,
+            locale: "en",
+            depth: 1,
+            select: {
+                title: true,
+                name: true,
+                slug: true,
+                sku: true,
+                type: true,
+                ribbon: true,
+                collections: true,
+                mainMedia: true,
+                mediaItems: true,
+                price: true,
+                compareAtPrice: true,
+                formattedPrice: true,
+                description: true,
+                additionalInfoSections: true,
+                bundleItems: true,
+                tentConfig: true,
+            },
+        });
+
+        return result;
+    } catch (error) {
+        logError('Error querying products by collection IDs (home):', error);
         throw error;
     }
 }
@@ -972,6 +1036,51 @@ export const normalizePayloadProject = (project) => {
         galleryImages,
         galleryImageObjects,
         isHidden: project.isHidden || false,
+    };
+};
+
+// Homepage-only blog normalizer. Drops content (rich text body), excerpt
+// processing, and storeProducts hydration — none of which HensleyNews/NewsCard
+// renders. Keeps the blogRef wrapper + author/markets/studios/blogCategories
+// because MarketsStudiosTags and the card itself read them.
+export const normalizePayloadBlogForHome = (blog) => {
+    if (!blog || typeof blog !== "object") return blog;
+    const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
+    const author = blog.author && typeof blog.author === "object" ? blog.author : null;
+    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayDate = blog.publishedDate || blog.createdAt || blog.updatedAt || "";
+    return {
+        _id: blog.id || blog._id,
+        id: blog.id || blog._id,
+        slug: blog.slug || "",
+        blogRef: {
+            title: blog.title || "",
+            coverImage: coverImageUrl,
+            publishedDate: displayDate,
+        },
+        author: { nickname: displayName || "" },
+        markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
+        blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
+    };
+};
+
+// Homepage-only project normalizer. OurProjects only reads
+// portfolioRef.{title, slug, coverImage.imageInfo} — everything else (hero,
+// gallery, description, testimonial, storeProducts) is detail-page only.
+export const normalizePayloadProjectForHome = (project) => {
+    if (!project || typeof project !== "object") return project;
+    const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
+    return {
+        _id: project.id || project._id,
+        id: project.id || project._id,
+        slug: project.slug || "",
+        order: project.order ?? 0,
+        portfolioRef: {
+            title: project.title || "",
+            slug: project.slug || "",
+            coverImage: { imageInfo: coverImageUrl },
+        },
     };
 };
 
