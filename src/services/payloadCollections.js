@@ -1119,7 +1119,7 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1 } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
@@ -1130,6 +1130,7 @@ export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, d
             draft: false,
             locale: "en",
             depth,
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1176,7 +1177,7 @@ export const queryBlogCategories = async () => {
 // Payload SDK queries — Projects
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryProjects = async ({ where = {}, sort = "order", limit, depth = 2 } = {}) => {
+export const queryProjects = async ({ where = {}, sort = "order", limit, depth = 2, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "projects",
@@ -1187,6 +1188,7 @@ export const queryProjects = async ({ where = {}, sort = "order", limit, depth =
             draft: false,
             locale: "en",
             depth,
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1267,6 +1269,7 @@ export const queryMarkets = async (options = {}) => {
             sort = "order",
             draft = false,
             locale = "en",
+            select,
         } = options;
 
         const result = await sdk.find({
@@ -1278,6 +1281,7 @@ export const queryMarkets = async (options = {}) => {
             depth,
             ...(where ? { where } : {}),
             ...(typeof limit === "number" ? { limit } : {}),
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
