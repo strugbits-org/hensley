@@ -77,7 +77,7 @@ export const Footer = ({ data }) => {
           </div>
         </div>
       </div>
-      <PrimaryImage customClasses='mt-20 lg:mt-0 mx-auto w-full' url={logoUrl} alt='logo' />
+      <PrimaryImage customClasses='mt-20 lg:mt-0 mx-auto w-full min-h-[293px]' url={logoUrl} alt='logo' />
     </footer>
   )
 }

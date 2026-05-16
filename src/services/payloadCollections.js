@@ -871,7 +871,7 @@ export const queryAllProducts = async ({ depth = 1 } = {}) => {
     }
 };
 
-export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip = 0, depth = 1, sort } = {}) => {
+export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip = 0, depth = 1, sort, select } = {}) => {
     try {
         const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
         const result = await sdk.find({
@@ -883,6 +883,7 @@ export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip =
             locale: 'en',
             depth,
             ...(sort ? { sort } : {}),
+            ...(select ? { select } : {}),
         });
         return {
             docs: ensureArray(result?.docs),

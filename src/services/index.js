@@ -147,7 +147,7 @@ export const joinWaitList = async (payload) => {
   }
 };
 
-export const fetchHeaderData = async () => {
+export const fetchHeaderData = cache(async () => {
   try {
     const response = await queryActiveHeaderMenu();
 
@@ -155,8 +155,6 @@ export const fetchHeaderData = async () => {
       header: sortByOrderNumber(response?.header || []),
       headerSubMenu: sortByOrderNumber(response?.headerSubMenu || []),
       headerMegaMenu: sortByOrderNumber(response?.headerMegaMenu || []),
-      menuSource: response?.menuSource || "payload",
-      menuDocumentId: response?.menuDocumentId || null,
     };
   } catch (error) {
     logError(`Error fetching header menu data: ${error.message}`, error);
@@ -164,11 +162,9 @@ export const fetchHeaderData = async () => {
       header: [],
       headerSubMenu: [],
       headerMegaMenu: [],
-      menuSource: "payload",
-      menuDocumentId: null,
     };
   }
-};
+});
 
 export const fetchMarketsData = cache(async () => {
   try {
@@ -180,6 +176,36 @@ export const fetchMarketsData = cache(async () => {
     return sortByOrderNumber(docs.map(normalizeCoreMarketItem));
   } catch (error) {
     logError(`Error fetching markets data: ${error.message}`, error);
+    return [];
+  }
+})
+
+// Layout/Header variant. MarketTentModal reads title/tagline/slug/buttonLabel
+// and one of headerCoverImage|featuredImage|heroBackground for the card image.
+// Drops description/video/howWeDoIt/bestSellerCollection/marketsOld/content.
+export const fetchMarketsForHeader = cache(async () => {
+  try {
+    const docs = await queryMarkets({
+      where: { isHidden: { not_equals: true } },
+      depth: 1,
+      limit: 100,
+      select: {
+        title: true,
+        slug: true,
+        tagline: true,
+        featuredImage: true,
+        heroBackground: true,
+        orderNumber: true,
+        order: true,
+        isHidden: true,
+        buttonLabel: true,
+        buttonLabelHeader: true,
+        buttonLink: true,
+      },
+    });
+    return sortByOrderNumber(docs.map(normalizeCoreMarketItem));
+  } catch (error) {
+    logError(`Error fetching markets data (header): ${error.message}`, error);
     return [];
   }
 })
@@ -213,10 +239,20 @@ export const fetchTentListingPageDetails = async () => {
   };
 };
 
-export const fetchTentsData = async () => {
+export const fetchTentsData = cache(async () => {
   const { fetchAllTents } = await import("./tents");
   return fetchAllTents();
-};
+});
+
+// Layout-only variant. The Header dropdown only reads title/slug/tagline/
+// images/additionalInfoSections and a few IDs for the tents-id store. Skips
+// the full depth-2 product graph and the heavy normalizer fields (variants,
+// productOptions, recommendedProducts, mediaItems gallery) that only the PDP
+// and types-of-tents page consume.
+export const fetchTentsDataForHeader = cache(async () => {
+  const { fetchAllTentsForHeader } = await import("./tents");
+  return fetchAllTentsForHeader();
+});
 
 export const fetchMasterClassTenting = async () => {
   return process.env.MASTER_CLASS_TENTING_URL || "";
@@ -264,10 +300,10 @@ const mapStorefrontFooterToLayoutData = (footer) => {
   };
 };
 
-export const fetchFooterData = async () => {
+export const fetchFooterData = cache(async () => {
   try {
     const storefrontFooter = await queryStorefrontFooter({ channel: "her", key: "default" });
-    
+
     if (!storefrontFooter) throw new Error("Footer not found in bps-core");
     return mapStorefrontFooterToLayoutData(storefrontFooter);
   } catch (error) {
@@ -280,7 +316,7 @@ export const fetchFooterData = async () => {
       branches: [],
     };
   }
-};
+});
 
 export const fetchOurCategoriesData = async () => {
   try {
@@ -295,14 +331,14 @@ export const fetchOurCategoriesData = async () => {
   }
 }
 
-export const fetchInstagramFeed = async () => {
+export const fetchInstagramFeed = cache(async () => {
   try {
     return await queryInstagramFeedItems();
   } catch (error) {
     logError('Error fetching instagram feed items:', error);
   }
   return [];
-};
+});
 
 export const fetchHomePageDetails = cache(async () => {
   try {
