@@ -2,7 +2,7 @@ import { Header } from "@/components/layout/Header";
 import "./globals.css";
 import { Footer } from "@/components/layout/Footer";
 import localFont from 'next/font/local';
-import { fetchFooterData, fetchHeaderData, fetchHomePageDetails, fetchInstagramFeed, fetchMarketsData, fetchTentsData, fetchContactPageData } from "@/services";
+import { fetchFooterData, fetchHeaderData, fetchHomePageDetails, fetchInstagramFeed, fetchMarketsForHeader, fetchTentsDataForHeader, fetchContactPageData } from "@/services";
 import { queryProductCollections } from "@/services/payloadCollections";
 import InstagramFeed from "@/components/common/InstagramFeed";
 import Loader from "@/components/common/Loader";
@@ -74,8 +74,8 @@ export default async function RootLayout({ children }) {
     allCollections,
   ] = await Promise.all([
     fetchHeaderData(),
-    fetchMarketsData(),
-    fetchTentsData(),
+    fetchMarketsForHeader(),
+    fetchTentsDataForHeader(),
     fetchFooterData(),
     fetchInstagramFeed(),
     fetchHomePageDetails(),

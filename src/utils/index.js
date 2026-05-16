@@ -1,5 +1,5 @@
 import parse from 'html-react-parser';
-import { generateImageURL, generateImageURLAlternate } from "./generateImageURL";
+import { generateImageURL, generateImageURLAlternate, generateCoreImageURL } from "./generateImageURL";
 import * as cheerio from "cheerio";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
@@ -30,67 +30,84 @@ const prefixCoreUrl = (path) => {
     return path;
 };
 
-// Payload size names in preference order for each requested size hint.
-// Walks the list left-to-right and returns the first size that has a url.
-// Tablet leads every chain — smaller variants were cropping product imagery
-// (e.g. chair legs cut off in card grids), so we upscale-prefer the largest
-// generated size and only degrade if tablet wasn't produced for that asset.
-const SIZE_PREFERENCE = {
-    thumbnail: ["tablet", "card", "thumbnail"],
-    card:      ["tablet", "card", "thumbnail"],
-    tablet:    ["tablet", "card", "thumbnail"],
+// Legacy size-hint strings (used at ~30 call sites today). Map them to bucket
+// widths so existing callers keep producing reasonable URLs without changes.
+// Hints bias upward intentionally — the previous implementation always
+// preferred the largest available size variant ("tablet" first) to avoid
+// cropping artifacts in product imagery, so we preserve that bias.
+const LEGACY_HINT_TO_OPTS = {
+    thumbnail: { w: 512 },
+    card:      { w: 1024 },
+    tablet:    { w: 1920 },
 };
 
+const normalizeCoreImageOpts = (input) => {
+    if (!input) return {};
+    if (typeof input === "string") return LEGACY_HINT_TO_OPTS[input] || {};
+    if (typeof input === "object") return input;
+    return {};
+};
+
+const isUsableMediaUrl = (value) =>
+    typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
+
 /**
- * Resolve a media value coming from Payload (object or string) to a fully-qualified URL.
- * Pass a `size` hint ("thumbnail" | "card" | "tablet") to pick the best Payload size variant
- * instead of the full original. Falls back to the next preferred size, then to the original.
+ * Resolve a media value coming from Payload (object or string) to a CDN URL.
+ *
+ * The second argument controls how the URL is sized for the render slot:
+ * - A string hint ("thumbnail" | "card" | "tablet") — kept for backwards
+ *   compatibility with existing call sites. Maps to a bucket width.
+ * - An options object ({ w, h, q, f, fit, al, original }) — preferred for new
+ *   code. Forwarded to generateCoreImageURL so the CDN serves the exact size.
+ * - Omitted — returns the original URL with no query params.
+ *
+ * Non-image media (videos, PDFs, Wix legacy URLs, /api/media/file/* paths)
+ * pass through unchanged regardless of the second argument.
  */
-export const resolveCoreMediaUrl = (media, size) => {
+export const resolveCoreMediaUrl = (media, sizeOrOpts) => {
     if (!media) return "";
-    if (typeof media === "string") return prefixCoreUrl(media);
-    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0], size);
+    if (typeof media === "string") {
+        const base = prefixCoreUrl(media);
+        return generateCoreImageURL({ url: base, ...normalizeCoreImageOpts(sizeOrOpts) });
+    }
+    if (Array.isArray(media)) return resolveCoreMediaUrl(media[0], sizeOrOpts);
     if (typeof media !== "object") return "";
 
     // Unwrap nested shapes first
-    if (media.mainMedia) return resolveCoreMediaUrl(media.mainMedia, size);
-    if (media.media)     return resolveCoreMediaUrl(media.media, size);
-
-    // A size variant is "real" only when it has a concrete filename — Payload
-    // sometimes inserts placeholder entries with url ".../null" and filename:null
-    // for sizes that weren't actually generated. Skip those.
-    const isUsableVariant = (variant) =>
-        variant && typeof variant === "object" && typeof variant.filename === "string" && variant.filename.length > 0;
-
-    const isUsableUrl = (value) =>
-        typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
-
-    // Try size variants in preference order when a hint is given.
-    if (size && media.sizes) {
-        const prefs = SIZE_PREFERENCE[size] || [size];
-        for (const s of prefs) {
-            const variant = media.sizes?.[s];
-            if (!isUsableVariant(variant)) continue;
-            if (isUsableUrl(variant.url)) return prefixCoreUrl(variant.url);
-            return prefixCoreUrl(`/api/media/file/${variant.filename}`);
-        }
-    }
+    if (media.mainMedia) return resolveCoreMediaUrl(media.mainMedia, sizeOrOpts);
+    if (media.media)     return resolveCoreMediaUrl(media.media, sizeOrOpts);
 
     // Fall back to the original url / legacy fields
     let candidate = media.url || media.src || media.thumbnailURL || "";
 
     // Guard against assets that stored a literal "null" in `url` — fall through
     // to thumbnailURL or a constructed /api/media/file/<filename> path instead.
-    if (!isUsableUrl(candidate)) {
-        candidate = isUsableUrl(media.thumbnailURL)
+    if (!isUsableMediaUrl(candidate)) {
+        candidate = isUsableMediaUrl(media.thumbnailURL)
             ? media.thumbnailURL
             : (media.filename ? `/api/media/file/${media.filename}` : "");
     }
 
     if (!candidate) return "";
-    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate, size);
+    if (typeof candidate !== "string") return resolveCoreMediaUrl(candidate, sizeOrOpts);
 
-    return prefixCoreUrl(candidate);
+    const base = prefixCoreUrl(candidate);
+
+    // Skip transform params for non-rasterable media (videos, documents, SVGs).
+    // The Media collection sets mediaType on the backend ('image' | 'video' |
+    // 'document'); when present, trust it. Otherwise sniff the filename.
+    const mediaType = media.mediaType;
+    const mimeType = media.mimeType;
+    const isNonImage =
+        mediaType === "video" ||
+        mediaType === "document" ||
+        (typeof mimeType === "string" && (mimeType.startsWith("video/") || mimeType === "image/svg+xml" || mimeType === "application/pdf")) ||
+        /\.svg($|\?)/i.test(base) ||
+        /\.(mp4|webm|mov|m4v|ogv|pdf)($|\?)/i.test(base);
+
+    if (isNonImage) return base;
+
+    return generateCoreImageURL({ url: base, ...normalizeCoreImageOpts(sizeOrOpts) });
 };
 
 export const sortByOrderNumber = (array, options = {}) => {

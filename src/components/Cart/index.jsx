@@ -41,7 +41,6 @@ const resolveCartItemMediaSrc = (item) => {
     product?.mainMedia?.url ||
     product?.mainMedia ||
     product?.featuredImage?.url ||
-    product?.featuredImage?.sizes?.thumbnail?.url ||
     firstMediaItem?.url ||
     firstMediaItem?.src ||
     firstMediaItem?.media?.url ||

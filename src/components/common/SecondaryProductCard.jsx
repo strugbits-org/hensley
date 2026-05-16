@@ -7,6 +7,7 @@ import { actions } from '@/store';
 import Image from 'next/image';
 import { ProductBadge, resolveProductRibbon } from './ProductBadge';
 import { resolveCoreMediaUrl } from '@/utils';
+import coreImageLoader from '@/utils/coreImageLoader';
 
 // Helper to resolve product image URL from various formats
 const resolveImageUrl = (product) => {
@@ -38,7 +39,7 @@ function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
                     imageUrl.startsWith('wix:') ? (
                         <PrimaryImage timeout={50} alt={name} url={imageUrl} fit='fit' customClasses={"w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105"} />
                     ) : (
-                        <Image src={imageUrl} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="eager" quality={70} className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
+                        <Image src={imageUrl} loader={coreImageLoader} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="eager" quality={70} className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
                     )
                 ) : null}
             </CustomLink>

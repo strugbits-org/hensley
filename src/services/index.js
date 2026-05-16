@@ -13,10 +13,13 @@ import {
   queryFeaturedProductCollections,
   queryProductCollectionBySlug,
   queryProductsByCollectionIds,
+  queryProductsByCollectionIdsForHome,
   mapStorefrontFooterBranches,
   normalizePayloadStudio,
   normalizePayloadProject,
+  normalizePayloadProjectForHome,
   normalizePayloadBlog,
+  normalizePayloadBlogForHome,
   querySection,
   sectionToObject,
   queryTestimonialsByType,
@@ -144,7 +147,7 @@ export const joinWaitList = async (payload) => {
   }
 };
 
-export const fetchHeaderData = async () => {
+export const fetchHeaderData = cache(async () => {
   try {
     const response = await queryActiveHeaderMenu();
 
@@ -152,8 +155,6 @@ export const fetchHeaderData = async () => {
       header: sortByOrderNumber(response?.header || []),
       headerSubMenu: sortByOrderNumber(response?.headerSubMenu || []),
       headerMegaMenu: sortByOrderNumber(response?.headerMegaMenu || []),
-      menuSource: response?.menuSource || "payload",
-      menuDocumentId: response?.menuDocumentId || null,
     };
   } catch (error) {
     logError(`Error fetching header menu data: ${error.message}`, error);
@@ -161,11 +162,9 @@ export const fetchHeaderData = async () => {
       header: [],
       headerSubMenu: [],
       headerMegaMenu: [],
-      menuSource: "payload",
-      menuDocumentId: null,
     };
   }
-};
+});
 
 export const fetchMarketsData = cache(async () => {
   try {
@@ -177,6 +176,36 @@ export const fetchMarketsData = cache(async () => {
     return sortByOrderNumber(docs.map(normalizeCoreMarketItem));
   } catch (error) {
     logError(`Error fetching markets data: ${error.message}`, error);
+    return [];
+  }
+})
+
+// Layout/Header variant. MarketTentModal reads title/tagline/slug/buttonLabel
+// and one of headerCoverImage|featuredImage|heroBackground for the card image.
+// Drops description/video/howWeDoIt/bestSellerCollection/marketsOld/content.
+export const fetchMarketsForHeader = cache(async () => {
+  try {
+    const docs = await queryMarkets({
+      where: { isHidden: { not_equals: true } },
+      depth: 1,
+      limit: 100,
+      select: {
+        title: true,
+        slug: true,
+        tagline: true,
+        featuredImage: true,
+        heroBackground: true,
+        orderNumber: true,
+        order: true,
+        isHidden: true,
+        buttonLabel: true,
+        buttonLabelHeader: true,
+        buttonLink: true,
+      },
+    });
+    return sortByOrderNumber(docs.map(normalizeCoreMarketItem));
+  } catch (error) {
+    logError(`Error fetching markets data (header): ${error.message}`, error);
     return [];
   }
 })
@@ -210,10 +239,20 @@ export const fetchTentListingPageDetails = async () => {
   };
 };
 
-export const fetchTentsData = async () => {
+export const fetchTentsData = cache(async () => {
   const { fetchAllTents } = await import("./tents");
   return fetchAllTents();
-};
+});
+
+// Layout-only variant. The Header dropdown only reads title/slug/tagline/
+// images/additionalInfoSections and a few IDs for the tents-id store. Skips
+// the full depth-2 product graph and the heavy normalizer fields (variants,
+// productOptions, recommendedProducts, mediaItems gallery) that only the PDP
+// and types-of-tents page consume.
+export const fetchTentsDataForHeader = cache(async () => {
+  const { fetchAllTentsForHeader } = await import("./tents");
+  return fetchAllTentsForHeader();
+});
 
 export const fetchMasterClassTenting = async () => {
   return process.env.MASTER_CLASS_TENTING_URL || "";
@@ -261,10 +300,10 @@ const mapStorefrontFooterToLayoutData = (footer) => {
   };
 };
 
-export const fetchFooterData = async () => {
+export const fetchFooterData = cache(async () => {
   try {
     const storefrontFooter = await queryStorefrontFooter({ channel: "her", key: "default" });
-    
+
     if (!storefrontFooter) throw new Error("Footer not found in bps-core");
     return mapStorefrontFooterToLayoutData(storefrontFooter);
   } catch (error) {
@@ -277,7 +316,7 @@ export const fetchFooterData = async () => {
       branches: [],
     };
   }
-};
+});
 
 export const fetchOurCategoriesData = async () => {
   try {
@@ -292,14 +331,14 @@ export const fetchOurCategoriesData = async () => {
   }
 }
 
-export const fetchInstagramFeed = async () => {
+export const fetchInstagramFeed = cache(async () => {
   try {
     return await queryInstagramFeedItems();
   } catch (error) {
     logError('Error fetching instagram feed items:', error);
   }
   return [];
-};
+});
 
 export const fetchHomePageDetails = cache(async () => {
   try {
@@ -384,6 +423,120 @@ export const fetchBestSellers = async () => {
     return products;
   } catch (error) {
     logError(`Error fetching best sellers data: ${error.message}`, error);
+    return [];
+  }
+};
+
+// Homepage-only variants. Each pairs a tighter Payload query (select/depth)
+// with a slim normalizer so we don't change the shape consumers already read.
+// Shared service functions above stay untouched for layout/sitemap/PDP/etc.
+
+export const fetchBestSellersForHome = async () => {
+  try {
+    const bestSellerCollection = await queryProductCollectionBySlug("best-sellers");
+    if (!bestSellerCollection) return [];
+
+    const collectionIds = getCollectionWithChildrenIds(bestSellerCollection);
+    if (!collectionIds.length) return [];
+
+    const productsResponse = await queryProductsByCollectionIdsForHome(collectionIds);
+    const products = Array.isArray(productsResponse?.docs) ? productsResponse.docs : [];
+
+    // Honor the admin-curated order from the best-sellers collection's
+    // productOrder field. SDK returns docs in arbitrary order otherwise.
+    const orderedIds = Array.isArray(bestSellerCollection.productOrder)
+      ? bestSellerCollection.productOrder
+          .map((p) => (typeof p === "string" ? p : p?.id ?? p?._id))
+          .filter(Boolean)
+      : [];
+
+    if (!orderedIds.length) return products;
+
+    const indexById = new Map(orderedIds.map((id, i) => [id, i]));
+    const productId = (p) => p?.id ?? p?._id;
+    const FALLBACK = Number.MAX_SAFE_INTEGER;
+    return [...products].sort((a, b) => {
+      const ai = indexById.has(productId(a)) ? indexById.get(productId(a)) : FALLBACK;
+      const bi = indexById.has(productId(b)) ? indexById.get(productId(b)) : FALLBACK;
+      return ai - bi;
+    });
+  } catch (error) {
+    logError(`Error fetching best sellers (home): ${error.message}`, error);
+    return [];
+  }
+};
+
+export const fetchPortfolioDataForHome = async () => {
+  try {
+    const payloadProjects = await queryProjects({
+      sort: "order",
+      depth: 1,
+      select: {
+        title: true,
+        slug: true,
+        coverImage: true,
+        order: true,
+        isHidden: true,
+      },
+    });
+    return payloadProjects.map(normalizePayloadProjectForHome);
+  } catch (error) {
+    logError(`Error fetching portfolio data (home): ${error.message}`, error);
+    return [];
+  }
+};
+
+export const fetchBlogsDataForHome = async () => {
+  try {
+    const payloadBlogs = await queryBlogs({
+      depth: 1,
+      select: {
+        title: true,
+        slug: true,
+        coverImage: true,
+        author: true,
+        markets: true,
+        studios: true,
+        blogCategories: true,
+        publishedDate: true,
+        createdAt: true,
+        updatedAt: true,
+        order: true,
+        isHidden: true,
+      },
+    });
+    return payloadBlogs.map(normalizePayloadBlogForHome);
+  } catch (error) {
+    logError(`Error fetching blogs data (home): ${error.message}`, error);
+    return [];
+  }
+};
+
+export const fetchMarketsForHome = async () => {
+  try {
+    // depth: 1 is required so featuredImage/heroBackground upload relationships
+    // are populated into objects (with url/sizes) instead of bare ID strings.
+    // The `select` still trims description/video/howWeDoIt/bestSellerCollection.
+    const docs = await queryMarkets({
+      where: { isHidden: { not_equals: true } },
+      depth: 1,
+      limit: 100,
+      select: {
+        title: true,
+        slug: true,
+        featuredImage: true,
+        heroBackground: true,
+        orderNumber: true,
+        order: true,
+        isHidden: true,
+        buttonLabel: true,
+        buttonLabelHeader: true,
+        buttonLink: true,
+      },
+    });
+    return sortByOrderNumber(docs.map(normalizeCoreMarketItem));
+  } catch (error) {
+    logError(`Error fetching markets data (home): ${error.message}`, error);
     return [];
   }
 };

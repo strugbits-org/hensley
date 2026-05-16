@@ -20,7 +20,7 @@ export const SubCategoriesModal = ({ selectedMenu, closeModal }) => {
                     const content = (
                         <>
                             <div className="relative bg-primary-alt rounded-full w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-[169px] lg:h-[169px] overflow-hidden">
-                                {collectionImage && <PrimaryImage timeout={0} url={collectionImage} size="thumbnail" alt={title} customClasses="h-full w-full object-cover" />}
+                                {collectionImage && <PrimaryImage timeout={0} defaultDimensions={{ width: 250, height: 250 }} url={collectionImage} size="thumbnail" alt={title} customClasses="h-full w-full object-cover" />}
                             </div>
                             <p className="mt-3 sm:mt-4 md:mt-5 lg:mt-[26px] text-xs uppercase tracking-wider text-secondary-alt font-haasRegular text-center">
                                 {title}

@@ -1,10 +1,8 @@
 "use server";
-import { logError, mapProductSetItems, normalizeProductForDisplay } from "@/utils";
+import { logError, normalizeProductForDisplay } from "@/utils";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
-import { fetchOurCategoriesData } from "..";
 import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProject, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload, queryProductSlugs } from "../payloadCollections";
-
 
 const baseUrl = process.env.BASE_URL;
 
@@ -276,6 +274,12 @@ export const fetchSavedProductData = async (includeProducts = false, retries = 3
                 cache: "no-store",
             });
 
+            if (response.status === 401) {
+                const { handleUnauthorizedServer } = await import("@/services/auth/authedFetch");
+                await handleUnauthorizedServer();
+                return [];
+            }
+
             const data = await response.json();
 
             if (data && data.items) {
@@ -284,6 +288,8 @@ export const fetchSavedProductData = async (includeProducts = false, retries = 3
                 throw new Error("Response does not contain _items", response);
             }
         } catch (error) {
+            if (error?.digest?.startsWith?.("NEXT_REDIRECT")) throw error;
+
             logError(`Error fetching saved products: Attempt ${attempt + 1} failed: ${error}`);
 
             if (attempt < retries) {

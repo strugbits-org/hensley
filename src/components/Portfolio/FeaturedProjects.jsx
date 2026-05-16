@@ -4,6 +4,7 @@ import { resolveCoreMediaUrl } from '@/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import SectionTitle from '@/components/common/SectionTitle';
+import coreImageLoader from '@/utils/coreImageLoader';
 
 const FeaturedProjectCard = ({ project }) => {
     const { slug, portfolioRef, excerpt, eventDate } = project;
@@ -19,9 +20,11 @@ const FeaturedProjectCard = ({ project }) => {
                 {imageUrl ? (
                     <Image
                         src={imageUrl}
+                        loader={coreImageLoader}
                         alt={portfolioRef.title}
                         width={800}
                         height={600}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className='w-full h-full object-cover transition-transform duration-300 group-hover:scale-105'
                     />
                 ) : (

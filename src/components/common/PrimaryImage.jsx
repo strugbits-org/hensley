@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import { generateImageURL, generateImageURLAlternate, generateSVGURL } from "@/utils/generateImageURL";
+import { generateImageURL, generateImageURLAlternate, generateSVGURL, generateCoreImageURL } from "@/utils/generateImageURL";
 import { resolveCoreMediaUrl } from "@/utils";
 import fallbackImage from "@/assets/fallback-img.png";
 
@@ -44,7 +44,40 @@ export const PrimaryImage = ({
     const isWixUrl = (u) => typeof u === 'string' && (u.startsWith('wix:image://v1/') || u.startsWith('wix:vector://v1/'));
 
     const generateSrc = () => {
-        if (!isWixUrl(url)) return resolveCoreMediaUrl(url, size);
+        if (!isWixUrl(url)) {
+            // Core media path. Resolve to an absolute URL with no transform params
+            // first; we'll add params from the live container measurement below.
+            // (resolveCoreMediaUrl with no second arg still routes through the
+            // transform-path guard so /transform/ is injected when the backend
+            // hasn't deployed yet.)
+            const baseUrl = resolveCoreMediaUrl(url);
+            if (!baseUrl) return "";
+
+            // Non-rasterable media (videos, SVGs, PDFs) — resolveCoreMediaUrl
+            // already returned the raw URL without /transform/. Pass through.
+            if (!baseUrl.includes("/transform/")) return baseUrl;
+
+            if (ref.current) {
+                const nextWidth = resolveDimension(ref.current.clientWidth, defaultDimensions?.width, min_w);
+                const nextHeight = resolveDimension(ref.current.clientHeight, defaultDimensions?.height, min_h);
+                setHeight(currentHeight => currentHeight === nextHeight ? currentHeight : nextHeight);
+                setWidth(currentWidth => currentWidth === nextWidth ? currentWidth : nextWidth);
+                return generateCoreImageURL({
+                    url: baseUrl,
+                    w: nextWidth,
+                    h: nextHeight,
+                    q: Number(q) || 75,
+                    // PrimaryImage defaults `fit` to "fill"; that maps to the CDN
+                    // default so we omit it from the query.
+                    fit: fit === "fill" ? undefined : fit,
+                    original,
+                });
+            }
+
+            // Pre-mount: render with the legacy size hint so the first paint
+            // isn't unbounded. ResizeObserver will refine this on mount.
+            return resolveCoreMediaUrl(url, size);
+        }
 
         if (original) return generateImageURL({ wix_url: url, original });
 

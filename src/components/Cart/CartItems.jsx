@@ -7,6 +7,51 @@ import { useCookies } from 'react-cookie';
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 
+const CART_APP_ID = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
+
+// Build a cart line item from a row's `data` object. Handles both the legacy
+// shape (where `data` already carries a `catalogReference` + `productId`) and
+// the Payload-shaped rows surfaced by the View Quote modal, which expose the
+// product id on `_id` and custom fields on `customTextFields`.
+const buildLineItemFromRowData = (data) => {
+    if (!data) return null;
+
+    if (data.catalogReference?.catalogItemId) {
+        const item = {
+            catalogReference: data.catalogReference,
+            quantity: Number(data.quantity) || 1,
+        };
+        if (Array.isArray(data.setItems) && data.setItems.length > 0) item.setItems = data.setItems;
+        return item;
+    }
+
+    const productId = data.productId || data._id || data.id;
+    if (!productId) return null;
+
+    const customTextFieldsArray = Array.isArray(data.customTextFields) ? data.customTextFields : [];
+    const customTextFieldsData = customTextFieldsArray.reduce((acc, { title, value }) => {
+        if (title) acc[title] = value;
+        return acc;
+    }, {});
+    if (data.size && !customTextFieldsData.size) customTextFieldsData.size = data.size;
+
+    const item = {
+        catalogReference: {
+            appId: CART_APP_ID,
+            catalogItemId: productId,
+            options: {
+                variantId: data.variantId || data.variant?.id || null,
+                options: data.selectedOptions || null,
+                customTextFields: customTextFieldsData,
+            },
+        },
+        quantity: Number(data.quantity) || 1,
+        priceAtAdd: Number(data.unitPrice ?? data.priceAtAdd ?? data.price ?? 0) || 0,
+    };
+    if (Array.isArray(data.setItems) && data.setItems.length > 0) item.setItems = data.setItems;
+    return item;
+};
+
 const INFO_HEADERS = [
     'Product',
     'Size',
@@ -89,32 +134,19 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     const handleAddToCart = async () => {
         try {
             setIsLoading(true);
-            let catalogReference = data?.catalogReference;
-            if (!catalogReference) {
-                const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
-                const { customTextFields = [], productId } = data;
-                const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
-                    acc[title] = value;
-                    return acc;
-                }, {});
-                customTextFieldsData.size = data.size;
-                catalogReference = {
-                    appId,
-                    catalogItemId: productId,
-                    options: {
-                        customTextFields: customTextFieldsData,
-                    },
-                };
+            const product = buildLineItemFromRowData(data);
+            if (!product) {
+                logError("Cannot add item to cart — missing product id", data);
+                lightboxActions.setBasicLightBoxDetails({
+                    title: "Unable to add item",
+                    description: "This product is no longer available.",
+                    buttonText: "OK",
+                    open: true,
+                });
+                return;
             }
 
-            const product = {
-                catalogReference: catalogReference,
-                quantity: data.quantity,
-            };
-
-            const cartData = {
-                lineItems: [product],
-            };
+            const cartData = { lineItems: [product] };
 
             await AddProductToCart(cartData);
             const newItems = calculateTotalCartQuantity(cartData.lineItems);
@@ -136,7 +168,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     return (
         <div className='border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
             <div className='h-[104px] w-[104px] bg-white'>
-                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} defaultDimensions={{ width: 350, height: 350 }} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full flex lg:flex-row flex-col lg:items-center'>
                 <div>
@@ -231,32 +263,19 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
     const handleAddToCart = async () => {
         try {
             setIsLoading(true);
-            let catalogReference = data?.catalogReference;
-            if (!catalogReference) {
-                const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
-                const { customTextFields = [], productId } = data;
-                const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
-                    acc[title] = value;
-                    return acc;
-                }, {});
-                customTextFieldsData.size = data.size;
-                catalogReference = {
-                    appId,
-                    catalogItemId: productId,
-                    options: {
-                        customTextFields: customTextFieldsData,
-                    },
-                };
+            const product = buildLineItemFromRowData(data);
+            if (!product) {
+                logError("Cannot add item to cart — missing product id", data);
+                lightboxActions.setBasicLightBoxDetails({
+                    title: "Unable to add item",
+                    description: "This product is no longer available.",
+                    buttonText: "OK",
+                    open: true,
+                });
+                return;
             }
 
-            const product = {
-                catalogReference: catalogReference,
-                quantity: data.quantity,
-            };
-
-            const cartData = {
-                lineItems: [product],
-            };
+            const cartData = { lineItems: [product] };
 
             await AddProductToCart(cartData);
             const newItems = calculateTotalCartQuantity(cartData.lineItems);
@@ -290,7 +309,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} defaultDimensions={{ width: 350, height: 350 }} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='w-full flex flex-col'>
@@ -370,32 +389,19 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
     const handleAddToCart = async () => {
         try {
             setIsLoading(true);
-            let catalogReference = data?.catalogReference;
-            if (!catalogReference) {
-                const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
-                const { customTextFields = [], productId } = data;
-                const customTextFieldsData = customTextFields.reduce((acc, { title, value }) => {
-                    acc[title] = value;
-                    return acc;
-                }, {});
-                customTextFieldsData.size = data.size;
-                catalogReference = {
-                    appId,
-                    catalogItemId: productId,
-                    options: {
-                        customTextFields: customTextFieldsData,
-                    },
-                };
+            const product = buildLineItemFromRowData(data);
+            if (!product) {
+                logError("Cannot add item to cart — missing product id", data);
+                lightboxActions.setBasicLightBoxDetails({
+                    title: "Unable to add item",
+                    description: "This product is no longer available.",
+                    buttonText: "OK",
+                    open: true,
+                });
+                return;
             }
 
-            const product = {
-                catalogReference: catalogReference,
-                quantity: data.quantity,
-            };
-
-            const cartData = {
-                lineItems: [product],
-            };
+            const cartData = { lineItems: [product] };
 
             await AddProductToCart(cartData);
             const newItems = calculateTotalCartQuantity(cartData.lineItems);

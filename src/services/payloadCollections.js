@@ -615,6 +615,7 @@ export const queryProductCollections = cache(async () => {
 
 // Heavier query restricted to featured collections (small set) — populates
 // `media.mainMedia` at depth 1 so the Our Categories section can render images.
+// Projection limited to the fields mapProductCollectionToCategoryCard reads.
 export const queryFeaturedProductCollections = cache(async () => {
     try {
         const result = await sdk.find({
@@ -624,6 +625,26 @@ export const queryFeaturedProductCollections = cache(async () => {
             draft: false,
             locale: "en",
             depth: 1,
+            select: {
+                name: true,
+                slug: true,
+                featured: true,
+                featuredSettings: true,
+                featuredOrderNumber: true,
+                orderNumber: true,
+                order: true,
+                mainMedia: true,
+                media: true,
+                featuredImage: true,
+                heroImage: true,
+                image: true,
+                cardSubtitle: true,
+                subtitle: true,
+                shortDescription: true,
+                description: true,
+                excerpt: true,
+                rtl: true,
+            },
         });
 
         return result.docs;
@@ -701,6 +722,49 @@ export const queryProductsByCollectionIds = async (collections) => {
         return result;
     } catch (error) {
         logError('Error querying products by collection IDs:', error);
+        throw error;
+    }
+}
+
+// Homepage best-sellers variant. Drops the heaviest fields (variants[],
+// productOptions[], recommendedProducts[], seo) that the homepage card and
+// the AddToCart modal's *initial open* don't read. Bundle items + media +
+// pricing + additionalInfoSections stay because AddToCart consumes them when
+// the user opens the modal from a homepage card. If the modal needs anything
+// beyond this set it refetches the full product by ID via queryProductById.
+export const queryProductsByCollectionIdsForHome = async (collections) => {
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            where: {
+                collections: { in: collections }
+            },
+            draft: false,
+            locale: "en",
+            depth: 1,
+            select: {
+                title: true,
+                name: true,
+                slug: true,
+                sku: true,
+                type: true,
+                ribbon: true,
+                collections: true,
+                mainMedia: true,
+                mediaItems: true,
+                price: true,
+                compareAtPrice: true,
+                formattedPrice: true,
+                description: true,
+                additionalInfoSections: true,
+                bundleItems: true,
+                tentConfig: true,
+            },
+        });
+
+        return result;
+    } catch (error) {
+        logError('Error querying products by collection IDs (home):', error);
         throw error;
     }
 }
@@ -807,7 +871,7 @@ export const queryAllProducts = async ({ depth = 1 } = {}) => {
     }
 };
 
-export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip = 0, depth = 1, sort } = {}) => {
+export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip = 0, depth = 1, sort, select } = {}) => {
     try {
         const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
         const result = await sdk.find({
@@ -819,6 +883,7 @@ export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip =
             locale: 'en',
             depth,
             ...(sort ? { sort } : {}),
+            ...(select ? { select } : {}),
         });
         return {
             docs: ensureArray(result?.docs),
@@ -834,43 +899,14 @@ export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip =
 // ──────────────────────────────────────────────────────────────────────
 // Payload Media URL helper
 // ──────────────────────────────────────────────────────────────────────
-
-// Size preference chains — always try tablet first to avoid the crop issues
-// seen with smaller variants, then degrade to card/thumbnail only if tablet
-// wasn't generated for the asset.
-const MEDIA_SIZE_PREFERENCE = {
-    thumbnail: ["tablet", "card", "thumbnail"],
-    card:      ["tablet", "card", "thumbnail"],
-    tablet:    ["tablet", "card", "thumbnail"],
-};
-
-const isUsableVariant = (variant) =>
-    variant && typeof variant === "object" && typeof variant.filename === "string" && variant.filename.length > 0;
-const isUsableMediaUrl = (value) =>
-    typeof value === "string" && value.length > 0 && value !== "null" && !value.endsWith("/null");
-
-const resolveMediaUrl = (media, size) => {
-    if (!media) return "";
-    if (typeof media === "string") return media;
-
-    if (size && media?.sizes) {
-        const prefs = MEDIA_SIZE_PREFERENCE[size] || [size];
-        for (const s of prefs) {
-            const variant = media.sizes?.[s];
-            if (!isUsableVariant(variant)) continue;
-            if (isUsableMediaUrl(variant.url)) return variant.url;
-            return `/api/media/file/${variant.filename}`;
-        }
-    }
-
-    const candidate = media?.url || media?.sizes?.card?.url || media?.sizes?.thumbnail?.url || media?.thumbnailURL || "";
-    if (!isUsableMediaUrl(candidate)) {
-        return isUsableMediaUrl(media?.thumbnailURL)
-            ? media.thumbnailURL
-            : (media?.filename ? `/api/media/file/${media.filename}` : "");
-    }
-    return candidate;
-};
+//
+// The local resolveMediaUrl that used to live here walked media.sizes.* with
+// a preference chain. That field no longer exists on the backend (sizes are
+// generated on-demand by the CDN transform endpoint), so we now route every
+// call through the canonical resolveCoreMediaUrl which handles base-URL
+// prefixing, transform-path injection, and size-hint → bucket-width mapping
+// in one place.
+const resolveMediaUrl = (media, size) => resolveCoreMediaUrl(media, size);
 
 // ──────────────────────────────────────────────────────────────────────
 // Normalizers — convert Payload shapes → Wix shapes expected by components
@@ -1001,6 +1037,51 @@ export const normalizePayloadProject = (project) => {
         galleryImages,
         galleryImageObjects,
         isHidden: project.isHidden || false,
+    };
+};
+
+// Homepage-only blog normalizer. Drops content (rich text body), excerpt
+// processing, and storeProducts hydration — none of which HensleyNews/NewsCard
+// renders. Keeps the blogRef wrapper + author/markets/studios/blogCategories
+// because MarketsStudiosTags and the card itself read them.
+export const normalizePayloadBlogForHome = (blog) => {
+    if (!blog || typeof blog !== "object") return blog;
+    const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
+    const author = blog.author && typeof blog.author === "object" ? blog.author : null;
+    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayDate = blog.publishedDate || blog.createdAt || blog.updatedAt || "";
+    return {
+        _id: blog.id || blog._id,
+        id: blog.id || blog._id,
+        slug: blog.slug || "",
+        blogRef: {
+            title: blog.title || "",
+            coverImage: coverImageUrl,
+            publishedDate: displayDate,
+        },
+        author: { nickname: displayName || "" },
+        markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
+        blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
+    };
+};
+
+// Homepage-only project normalizer. OurProjects only reads
+// portfolioRef.{title, slug, coverImage.imageInfo} — everything else (hero,
+// gallery, description, testimonial, storeProducts) is detail-page only.
+export const normalizePayloadProjectForHome = (project) => {
+    if (!project || typeof project !== "object") return project;
+    const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
+    return {
+        _id: project.id || project._id,
+        id: project.id || project._id,
+        slug: project.slug || "",
+        order: project.order ?? 0,
+        portfolioRef: {
+            title: project.title || "",
+            slug: project.slug || "",
+            coverImage: { imageInfo: coverImageUrl },
+        },
     };
 };
 
