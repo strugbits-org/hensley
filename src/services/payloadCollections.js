@@ -1368,7 +1368,7 @@ export const sectionToObject = (section) => {
 
 // ── New First-Class Collection Queries ───────────────────────────────────────
 
-const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1 }) => {
+const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1, select }) => {
     const baseWhere = {
         and: [
             { tenant: { equals: tenantId } },
@@ -1386,6 +1386,7 @@ const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, so
         draft: false,
         locale: "en",
         pagination: false,
+        ...(select ? { select } : {}),
     });
 
     return ensureArray(result?.docs);
@@ -1393,7 +1394,17 @@ const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, so
 
 export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "how-we-do-it", tenantId, limit: 10 });
+        return await findPublishedByTenant({
+            collection: "how-we-do-it",
+            tenantId,
+            limit: 10,
+            select: {
+                title: true,
+                content: true,
+                image: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying how-we-do-it: ${error.message}`, error);
         return [];
@@ -1402,7 +1413,19 @@ export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
 
 export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "dream-team-members", tenantId, limit: 100 });
+        return await findPublishedByTenant({
+            collection: "dream-team-members",
+            tenantId,
+            limit: 100,
+            select: {
+                name: true,
+                jobTitle: true,
+                title: true,
+                photo: true,
+                image: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying dream-team-members: ${error.message}`, error);
         return [];
@@ -1411,7 +1434,19 @@ export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
 
 export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "partner-brands", tenantId, limit: 10 });
+        return await findPublishedByTenant({
+            collection: "partner-brands",
+            tenantId,
+            limit: 10,
+            select: {
+                title: true,
+                description: true,
+                logo: true,
+                buttonLabel: true,
+                buttonLink: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying partner-brands: ${error.message}`, error);
         return [];
@@ -1425,6 +1460,19 @@ export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 
             tenantId,
             extraWhere: { type: { equals: type } },
             limit: 20,
+            select: {
+                name: true,
+                authorName: true,
+                title: true,
+                authorTitle: true,
+                feedback: true,
+                description: true,
+                image: true,
+                avatar: true,
+                sectionTitle: true,
+                type: true,
+                order: true,
+            },
         });
     } catch (error) {
         logError(`Error querying testimonials (type=${type}): ${error.message}`, error);

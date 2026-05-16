@@ -1,9 +1,10 @@
 "use server";
 
+import { cache } from "react";
 import { logError } from "@/utils";
 import { querySection, sectionToObject, queryHowWeDoIt, queryTestimonialsByType } from "@/services/payloadCollections";
 
-export const fetchCareersPageData = async () => {
+export const fetchCareersPageData = cache(async () => {
     try {
         const [
             careersHeroSection,
@@ -30,4 +31,4 @@ export const fetchCareersPageData = async () => {
     } catch (error) {
         logError(`Error fetching careers page data: ${error.message}`, error);
     }
-};
+});
