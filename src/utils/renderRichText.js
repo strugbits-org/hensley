@@ -138,7 +138,7 @@ const convertLexicalNode = (node) => {
             return { type: 'DIVIDER', id };
 
         case 'upload': {
-            const mediaUrl = node.value?.url || node.value?.sizes?.card?.url || '';
+            const mediaUrl = resolveCoreMediaUrl(node.value, { w: 1280 });
             return {
                 type: 'IMAGE',
                 id,
@@ -159,7 +159,7 @@ const convertLexicalNode = (node) => {
 
             if (blockType === 'mediaBlock' && fields.media) {
                 const media = fields.media;
-                const mediaUrl = media.url || media.sizes?.tablet?.url || media.sizes?.card?.url || '';
+                const mediaUrl = resolveCoreMediaUrl(media, { w: 1280 });
                 return {
                     type: 'IMAGE',
                     id,
@@ -184,7 +184,7 @@ const convertLexicalNode = (node) => {
                         images: fields.images.map((item) => {
                             const img = item.image || {};
                             return {
-                                url: img.url || img.sizes?.tablet?.url || img.sizes?.card?.url || '',
+                                url: resolveCoreMediaUrl(img, { w: 768 }),
                                 width: img.width,
                                 height: img.height,
                                 alt: img.alt || '',
@@ -205,7 +205,7 @@ const convertLexicalNode = (node) => {
                         slides: fields.slides.map((slide) => {
                             const img = slide.image || {};
                             return {
-                                url: img.url || img.sizes?.tablet?.url || img.sizes?.card?.url || '',
+                                url: resolveCoreMediaUrl(img, { w: 1280 }),
                                 width: img.width,
                                 height: img.height,
                                 alt: img.alt || '',
