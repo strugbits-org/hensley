@@ -1,4 +1,5 @@
 "use server";
+import { cache } from "react";
 import { logError } from "@/utils";
 import {
     queryBlogs,
@@ -9,10 +10,29 @@ import {
     querySection,
     sectionToObject,
     normalizePayloadBlog,
+    normalizePayloadBlogForListing,
     normalizePayloadBlogCategory,
     normalizePayloadMarketRef,
     normalizePayloadStudio,
 } from "../payloadCollections";
+
+// Field set the listing + "other blogs" cards actually read. Excludes
+// content body, storeProducts, meta, hero/gallery images.
+const BLOG_LISTING_SELECT = {
+    title: true,
+    slug: true,
+    excerpt: true,
+    coverImage: true,
+    author: true,
+    markets: true,
+    studios: true,
+    blogCategories: true,
+    publishedDate: true,
+    createdAt: true,
+    updatedAt: true,
+    order: true,
+    isHidden: true,
+};
 
 export const fetchBlogs = async () => {
     try {
@@ -24,7 +44,23 @@ export const fetchBlogs = async () => {
     }
 }
 
-export const fetchCategoriesMarketsAndStudios = async () => {
+// Slim listing variant. Used by /blog and by "other blogs" on /posts/[slug].
+const fetchBlogsForListing = async ({ excludeSlug } = {}) => {
+    try {
+        const where = excludeSlug ? { slug: { not_equals: excludeSlug } } : {};
+        const payloadBlogs = await queryBlogs({
+            where,
+            depth: 1,
+            select: BLOG_LISTING_SELECT,
+        });
+        return payloadBlogs.map(normalizePayloadBlogForListing);
+    } catch (error) {
+        logError(`Error fetching blogs for listing: ${error.message}`, error);
+        return [];
+    }
+};
+
+export const fetchCategoriesMarketsAndStudios = cache(async () => {
     try {
         const [payloadCategories, payloadMarkets, payloadStudios] = await Promise.all([
             queryBlogCategories(),
@@ -40,20 +76,20 @@ export const fetchCategoriesMarketsAndStudios = async () => {
         logError(`Error fetching categories, markets, and studios: ${error.message}`, error);
         return { categories: [], markets: [], studios: [] };
     }
-}
+});
 
-export const fetchBlogPageData = async () => {
+export const fetchBlogPageData = cache(async () => {
     try {
         const [categoriesMarketStudios, blogs, pageDetails] = await Promise.all([
             fetchCategoriesMarketsAndStudios(),
-            fetchBlogs(),
+            fetchBlogsForListing(),
             fetchBlogPageDetails()
         ]);
         return { categoriesMarketStudios, blogs, pageDetails };
     } catch (error) {
         logError(`Error fetching blog page data: ${error.message}`, error);
     }
-}
+});
 
 export const fetchSelectedBlog = async (slug) => {
     try {
@@ -66,15 +102,7 @@ export const fetchSelectedBlog = async (slug) => {
 }
 
 export const fetchOtherBlogs = async (slug) => {
-    try {
-        const payloadBlogs = await queryBlogs({
-            where: { slug: { not_equals: slug } },
-        });
-        return payloadBlogs.map(normalizePayloadBlog);
-    } catch (error) {
-        logError(`Error fetching other blogs: ${error.message}`, error);
-        return [];
-    }
+    return fetchBlogsForListing({ excludeSlug: slug });
 }
 
 export const fetchPostPageData = async (slug) => {

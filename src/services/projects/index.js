@@ -1,4 +1,5 @@
 "use server";
+import { cache } from "react";
 import { logError } from "@/utils";
 import { fetchMarketsData } from "..";
 import {
@@ -8,20 +9,28 @@ import {
     queryMarkets,
     queryStudios,
     normalizePayloadProject,
+    normalizePayloadProjectForListing,
     normalizePayloadProjectCategory,
+    normalizePayloadMarketRef,
     normalizePayloadStudio,
     querySection,
     sectionToObject,
 } from "../payloadCollections";
 
-const normalizePayloadMarketForFilter = (m) => {
-    if (!m || typeof m !== "object") return m;
-    return {
-        ...m,
-        _id: m.id || m._id,
-        category: m.title || m.category || "",
-        slug: m.slug?.startsWith("/") ? m.slug : `/${m.slug || ""}`,
-    };
+// Field set the projects listing + "other projects" cards actually read.
+// Excludes hero, gallery, testimonial, storeProducts, meta.
+const PROJECT_LISTING_SELECT = {
+    title: true,
+    slug: true,
+    description: true,
+    coverImage: true,
+    publishDate: true,
+    publishedDate: true,
+    order: true,
+    isHidden: true,
+    markets: true,
+    studios: true,
+    portfolioCategories: true,
 };
 
 export const fetchProjects = async () => {
@@ -34,7 +43,24 @@ export const fetchProjects = async () => {
     }
 }
 
-export const fetchCategoriesMarketsAndStudios = async () => {
+// Slim listing variant. Used by /projects and by "other projects" on /project/[slug].
+const fetchProjectsForListing = async ({ excludeSlug } = {}) => {
+    try {
+        const where = excludeSlug ? { slug: { not_equals: excludeSlug } } : {};
+        const payloadProjects = await queryProjects({
+            where,
+            sort: "order",
+            depth: 1,
+            select: PROJECT_LISTING_SELECT,
+        });
+        return payloadProjects.map(normalizePayloadProjectForListing);
+    } catch (error) {
+        logError(`Error fetching projects for listing: ${error.message}`, error);
+        return [];
+    }
+};
+
+export const fetchCategoriesMarketsAndStudios = cache(async () => {
     try {
         const [payloadCategories, payloadMarkets, payloadStudios] = await Promise.all([
             queryProjectCategories(),
@@ -43,27 +69,27 @@ export const fetchCategoriesMarketsAndStudios = async () => {
         ]);
         return {
             categories: payloadCategories.map(normalizePayloadProjectCategory),
-            markets: payloadMarkets.map(normalizePayloadMarketForFilter),
+            markets: payloadMarkets.map(normalizePayloadMarketRef),
             studios: payloadStudios.map(normalizePayloadStudio),
         };
     } catch (error) {
         logError(`Error fetching categories, markets, and studios: ${error.message}`, error);
         return { categories: [], markets: [], studios: [] };
     }
-}
+});
 
-export const fetchPortfolioPageData = async () => {
+export const fetchPortfolioPageData = cache(async () => {
     try {
         const [categoriesMarketStudios, projects, markets] = await Promise.all([
             fetchCategoriesMarketsAndStudios(),
-            fetchProjects(),
+            fetchProjectsForListing(),
             fetchMarketsData()
         ]);
         return { categoriesMarketStudios, projects, markets };
     } catch (error) {
         logError(`Error fetching projects page data: ${error.message}`, error);
     }
-}
+});
 
 export const fetchSelectedProject = async (slug, { draft = false } = {}) => {
     try {
@@ -76,16 +102,7 @@ export const fetchSelectedProject = async (slug, { draft = false } = {}) => {
 }
 
 export const fetchOtherProjects = async (slug) => {
-    try {
-        const payloadProjects = await queryProjects({
-            where: { slug: { not_equals: slug } },
-            sort: "order",
-        });
-        return payloadProjects.map(normalizePayloadProject);
-    } catch (error) {
-        logError(`Error fetching other projects: ${error.message}`, error);
-        return [];
-    }
+    return fetchProjectsForListing({ excludeSlug: slug });
 }
 
 export const fetchProjectPageData = async (slug, { draft = false } = {}) => {

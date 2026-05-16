@@ -1084,6 +1084,57 @@ export const normalizePayloadProjectForHome = (project) => {
     };
 };
 
+// Listing-page blog normalizer. Same as the homepage variant but also
+// includes blogRef.excerpt because the featured EventHighLight card on
+// /blog reads it. Drops content/storeProducts/meta still.
+export const normalizePayloadBlogForListing = (blog) => {
+    if (!blog || typeof blog !== "object") return blog;
+    const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
+    const author = blog.author && typeof blog.author === "object" ? blog.author : null;
+    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayDate = blog.publishedDate || blog.createdAt || blog.updatedAt || "";
+    return {
+        _id: blog.id || blog._id,
+        id: blog.id || blog._id,
+        slug: blog.slug || "",
+        blogRef: {
+            title: blog.title || "",
+            coverImage: coverImageUrl,
+            publishedDate: displayDate,
+            excerpt: blog.excerpt || "",
+        },
+        author: { nickname: displayName || "" },
+        markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
+        blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
+    };
+};
+
+// Listing-page project normalizer. ProjectCard + EventHighLight read
+// portfolioRef.{title, coverImage.imageInfo, description}, publishDate,
+// markets, studios, portfolioCategories. Drops hero/gallery/testimonial/
+// storeProducts/meta hydration.
+export const normalizePayloadProjectForListing = (project) => {
+    if (!project || typeof project !== "object") return project;
+    const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
+    return {
+        _id: project.id || project._id,
+        id: project.id || project._id,
+        slug: project.slug || "",
+        order: project.order ?? 0,
+        publishDate: project.publishDate || project.publishedDate || "",
+        portfolioRef: {
+            title: project.title || "",
+            slug: project.slug || "",
+            coverImage: { imageInfo: coverImageUrl },
+            description: project.description || "",
+        },
+        markets: ensureArray(project.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(project.studios).map(normalizePayloadStudioRef),
+        portfolioCategories: ensureArray(project.portfolioCategories).map(normalizePayloadProjectCategoryRef),
+    };
+};
+
 export const normalizePayloadBlogCategory = (cat) => {
     if (!cat || typeof cat !== "object") return cat;
     return {
