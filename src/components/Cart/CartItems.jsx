@@ -168,7 +168,7 @@ const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, show
     return (
         <div className='border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
             <div className='h-[104px] w-[104px] bg-white'>
-                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} defaultDimensions={{ width: 350, height: 350 }} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full flex lg:flex-row flex-col lg:items-center'>
                 <div>
@@ -309,7 +309,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
             min-w-[50px]
            bg-white
             '>
-                <PrimaryImage url={data?.image || data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
+                <PrimaryImage url={data?.image || data?.mediaItem?.src} defaultDimensions={{ width: 350, height: 350 }} alt={productName} customClasses='h-full w-full object-contain' />
             </div>
             <div className='w-full lg:flex justify-between items-center'>
                 <div className='w-full flex flex-col'>

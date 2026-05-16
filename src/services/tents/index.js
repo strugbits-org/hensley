@@ -72,6 +72,75 @@ export const fetchAllTents = async () => {
     }
 };
 
+// Layout/Header variant. Skips depth: 2 expansion and the heavy normalizer.
+// MarketTentModal dropdown reads {title, tagline, slug, headerCoverImage,
+// featuredImage, heroBackground, buttonLabel, buttonLabelMenu, tent.mainMedia,
+// tent.additionalInfoSections, mainMedia}. The Header tents-ids effect reads
+// {_id, id, tent._id, tent.id, productData._id, productData.id} — all map to
+// the same product id, so we populate the nested shape from the slim product.
+const fetchTentProductsForHeader = async () => {
+    const tentsCollection = await queryProductCollectionBySlug("tents").catch(() => null);
+    const orderedIds = resolveProductOrderIds(tentsCollection);
+
+    const where = {
+        and: [
+            { type: { equals: "tent" } },
+            { visible: { equals: true } },
+            { status: { equals: "active" } },
+        ],
+    };
+
+    const { docs } = await queryProductsFromPayload({
+        where,
+        depth: 1,
+        limit: 100,
+        select: {
+            title: true,
+            slug: true,
+            type: true,
+            mainMedia: true,
+            additionalInfoSections: true,
+        },
+    });
+
+    return sortByConfiguredOrder(docs, orderedIds);
+};
+
+const normalizeTentItemForHeader = (product, orderNumber = 0) => {
+    const mainMediaUrl = resolveCoreMediaUrl(product.mainMedia, "tablet");
+    const additionalInfoSections = product.additionalInfoSections ?? [];
+    return {
+        _id: product.id,
+        id: product.id,
+        title: product.title || "",
+        slug: `/${product.slug || ""}`,
+        orderNumber,
+        mainMedia: mainMediaUrl,
+        tent: {
+            _id: product.id,
+            id: product.id,
+            title: product.title || "",
+            slug: product.slug,
+            mainMedia: mainMediaUrl,
+            additionalInfoSections,
+        },
+        productData: {
+            _id: product.id,
+            id: product.id,
+        },
+    };
+};
+
+export const fetchAllTentsForHeader = async () => {
+    try {
+        const products = await fetchTentProductsForHeader();
+        return products.map((p, i) => normalizeTentItemForHeader(p, i + 1));
+    } catch (error) {
+        logError(`Error fetching all tents (header): ${error.message}`, error);
+        return [];
+    }
+};
+
 export const fetchTentPageDetails = async () => {
     return {
         matchItWithTitle: "MATCH IT WITH",

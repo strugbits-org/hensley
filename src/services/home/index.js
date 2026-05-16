@@ -2,7 +2,16 @@
 
 import { logError } from "@/utils";
 import { querySection, queryProductCollections, sectionToObject } from "@/services/payloadCollections";
-import { fetchBannerData, fetchBestSellers, fetchBlogsData, fetchHomePageDetails, fetchMarketsData, fetchOurCategoriesData, fetchPortfolioData, fetchTestimonials } from "..";
+import {
+  fetchBannerData,
+  fetchBestSellersForHome,
+  fetchBlogsDataForHome,
+  fetchHomePageDetails,
+  fetchMarketsForHome,
+  fetchOurCategoriesData,
+  fetchPortfolioDataForHome,
+  fetchTestimonials,
+} from "..";
 
 export const fetchHomePageData = async () => {
   try {
@@ -22,11 +31,11 @@ export const fetchHomePageData = async () => {
       querySection('home-hero'),
       fetchHomePageDetails(),
       fetchOurCategoriesData(),
-      fetchPortfolioData(),
-      fetchBestSellers(),
+      fetchPortfolioDataForHome(),
+      fetchBestSellersForHome(),
       fetchTestimonials(),
-      fetchMarketsData(),
-      fetchBlogsData(),
+      fetchMarketsForHome(),
+      fetchBlogsDataForHome(),
       queryProductCollections(),
     ]);
 

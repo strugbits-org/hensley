@@ -6,7 +6,7 @@ export const states = proxy({
 });
 
 export const actions = {
-    setSavedProducts: (savedProducts) => (states.savedProducts = savedProducts),
+    setSavedProducts: (savedProducts) => (states.savedProducts = Array.isArray(savedProducts) ? savedProducts : []),
     clearSavedProducts: () => (states.savedProducts = []),
     setTentsIds: (tentsIds) => (states.tentsIds = tentsIds),
     clearTentsIds: () => (states.tentsIds = []),

@@ -10,10 +10,12 @@ import { actions, states } from '@/store';
 export const SaveProductButton = ({ productData, type = "primary" }) => {
     const { savedProducts } = useSnapshot(states);
     const [isUpdating, setIsUpdating] = useState(false);
-    
+
+    const savedProductsList = Array.isArray(savedProducts) ? savedProducts : [];
+
     // Get the actual product ID for comparison - handle both nested and flat structures
     const currentProductId = productData.product?._id || productData.product?.id || productData._id;
-    const isProductSaved = savedProducts.some(savedProduct => {
+    const isProductSaved = savedProductsList.some(savedProduct => {
         // Handle both object { product: { _id } } and string { product: "id" } formats
         const savedProductId = typeof savedProduct.product === 'string'
             ? savedProduct.product
@@ -34,14 +36,14 @@ export const SaveProductButton = ({ productData, type = "primary" }) => {
 
         // Optimistic update
         if (wasProductSaved) {
-            actions.setSavedProducts(savedProducts.filter(savedProduct => {
+            actions.setSavedProducts(savedProductsList.filter(savedProduct => {
                 const savedProductId = typeof savedProduct.product === 'string'
                     ? savedProduct.product
                     : (savedProduct.product?._id || savedProduct.product?.id || savedProduct._id);
                 return savedProductId !== currentProductId;
             }));
         } else {
-            actions.setSavedProducts([...savedProducts, productData]);
+            actions.setSavedProducts([...savedProductsList, productData]);
         }
 
         try {
@@ -57,9 +59,9 @@ export const SaveProductButton = ({ productData, type = "primary" }) => {
         } catch (error) {
             // Revert on error
             if (wasProductSaved) {
-                actions.setSavedProducts([...savedProducts, productData]);
+                actions.setSavedProducts([...savedProductsList, productData]);
             } else {
-                actions.setSavedProducts(savedProducts.filter(savedProduct => {
+                actions.setSavedProducts(savedProductsList.filter(savedProduct => {
                     const savedProductId = typeof savedProduct.product === 'string'
                         ? savedProduct.product
                         : (savedProduct.product?._id || savedProduct.product?.id || savedProduct._id);
