@@ -674,9 +674,8 @@ export const queryProductSlugs = cache(async () => {
 // name/slug + their own subcategory IDs for DAG traversal), and productOrder
 // reduced to ID strings (the ordered IDs feed the paginated products query).
 // At depth 2 with no projection this response ballooned to ~23MB — over the
-// 10MB Next.js data cache limit AND the Vercel response body cap, causing
-// FALLBACK_BODY_TOO_LARGE. Selecting fields + populating products as IDs only
-// keeps the payload tiny; `cache: 'no-store'` skips the data-cache attempt.
+// 10MB Next.js data cache limit. Selecting fields + populating products as
+// IDs only keeps the payload tiny so it fits the data cache.
 export const queryProductCollectionBySlug = async (slug) => {
     try {
         const result = await sdk.find({
@@ -698,7 +697,7 @@ export const queryProductCollectionBySlug = async (slug) => {
                 'product-collections': { name: true, slug: true, subcategories: true },
                 products: {},
             },
-        }, { cache: 'no-store' });
+        });
 
         return result.docs?.[0] || null;
     } catch (error) {

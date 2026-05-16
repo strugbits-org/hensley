@@ -8,7 +8,6 @@ import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, fo
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
 import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
-import Loading from '@/app/loading'
 import { checkProductInCart, fetchProductCollectionData } from '@/services/products'
 import { resolveProductRibbon } from '@/components/common/ProductBadge'
 
@@ -25,22 +24,18 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
   const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
   const ribbon = resolveProductRibbon(productData?.product, allCollections);
   
-  // Initial detection for collection/bundle products
-  // - isProductCollection: legacy Wix collection flag
-  // - product.type === 'bundle': Payload bundle products
+  // bps-core sets `type` on every product, so we can decide locally without
+  // a fetch. Bundle products always ship their bundleItems with the product
+  // payload — no network round-trip needed before rendering.
   const isPayloadBundle = product?.type === 'bundle';
-  const initialIsCollection = productData?.isProductCollection || isPayloadBundle;
-  
+
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingCollections, setIsLoadingCollections] = useState(true); // Start true to check for bundles
-  const [showCollectionView, setShowCollectionView] = useState(initialIsCollection);
   const [productInCart, setProductInCart] = useState();
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
-  // Use showCollectionView for rendering (dynamically set after fetching data)
-  const isProductCollection = showCollectionView;
+  const isProductCollection = isPayloadBundle;
 
   const productInfoSection = useMemo(() => {
     if (isProductCollection) {
@@ -232,64 +227,46 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
     }
   };
 
-  const setInitialData = async () => {
-    try {
-      setIsLoadingCollections(true);
-      const productId = product._id || product.id;
-      if (!productId) {
-        setShowCollectionView(false);
-        setIsLoadingCollections(false);
-        return;
-      }
-
-      // Pass product data to fetchProductCollectionData for Payload bundle detection
-      // This will check both Payload bundles and legacy Wix collections
-      const collectionData = await fetchProductCollectionData(productId, product);
-
-      if (!collectionData) {
-        setShowCollectionView(false);
-        setIsLoadingCollections(false);
-        return;
-      }
-
-      const items = collectionData.map(set => ({
-        id: set.product._id || set.product.id,
-        product: set.product.name || set.product.title,
-        size: findProductSize(set.product.additionalInfoSections),
-        formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
-        price: set.product.price,
-        quantity: set.quantity
-      }));
-
-      setProductSetItems(items);
-      setShowCollectionView(true); // Show collection view when data is found
-      setIsLoadingCollections(false);
-
-      checkProductInCart(productId, true) // Pass true since we have collection data
-        .then(existInCart => {
-          setProductInCart(existInCart);
-        })
-        .catch(error => {
-          logError("Error while checking product in cart", error);
-        });
-
-    } catch (error) {
-      logError("Error while fetching product data", error);
-      setIsLoadingCollections(false);
-    }
-  };
-
   useEffect(() => {
-    setInitialData();
-  }, [product._id, product.id]);
+    const productId = product._id || product.id;
+    if (!productId) return;
+
+    let isCancelled = false;
+
+    const loadBundleItems = async () => {
+      if (!isPayloadBundle) return;
+      try {
+        const collectionData = await fetchProductCollectionData(productId, product);
+        if (isCancelled || !collectionData) return;
+        const items = collectionData.map(set => ({
+          id: set.product._id || set.product.id,
+          product: set.product.name || set.product.title,
+          size: findProductSize(set.product.additionalInfoSections),
+          formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
+          price: set.product.price,
+          quantity: set.quantity
+        }));
+        setProductSetItems(items);
+      } catch (error) {
+        logError("Error while resolving bundle items", error);
+      }
+    };
+
+    loadBundleItems();
+
+    checkProductInCart(productId, isPayloadBundle)
+      .then(existInCart => {
+        if (!isCancelled) setProductInCart(existInCart);
+      })
+      .catch(error => {
+        logError("Error while checking product in cart", error);
+      });
+
+    return () => { isCancelled = true; };
+  }, [product._id, product.id, isPayloadBundle]);
 
   return (
     <div className='relative sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
-      {isLoadingCollections && (
-        <div className='absolute inset-x-4 inset-y-0 bg-secondary-alt opacity-30 z-[999] flex justify-center items-center'>
-          <Loading custom={true} classes='absolute' />
-        </div>
-      )}
       <div className='relative sm:max-w-[45%] w-full sm:h-full flex-shrink-0'>
         <AddToCartSlider data={{ ...productData, product }} isOpen={data.open} noWidthConstraint />
         {ribbon && (
