@@ -10,7 +10,7 @@ export const HeroSection = ({ data }) => {
     return (
         <div className="relative h-screen isolate pt-24 lg:pt-40 px-6 lg:px-8 flex items-center">
             {videoSrc && (
-                <video src={videoSrc} className="absolute inset-0 -z-10 h-full w-full object-cover bg-blend-overlay" autoPlay loop muted />
+                <video src={videoSrc} className="absolute inset-0 -z-10 h-full w-full object-cover bg-blend-overlay" autoPlay loop muted playsInline />
             )}
             <div className="mx-auto lg:max-w-[90rem] text-center font-haasRegular flex flex-col items-center gap-y-40 lg:gap-y-16 xl:gap-y-20">
                 <span className="text-primary-alt text-[16px] font-haasRegular max-w-[250px] mx-auto">

@@ -5,13 +5,18 @@ import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { PrimaryButton } from "./PrimaryButton";
 import { PrimaryImage } from "./PrimaryImage";
-import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
+import { BsChevronRight, BsChevronLeft } from "react-icons/bs";
 import { CustomLink } from "./CustomLink";
 import Loading from "@/app/loading";
 
-export default function SliderComponent({ data = [], classes = "", pageDetails = {}, loop = false }) {
+export default function SliderComponent({
+  data = [],
+  classes = "",
+  pageDetails = {},
+  loop = false,
+}) {
   const sliderData = Array.isArray(data) ? data : [];
-  const { ourProjectsTitle } = pageDetails ?? {};  
+  const { ourProjectsTitle } = pageDetails ?? {};
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isSliderReady, setIsSliderReady] = useState(false);
@@ -22,10 +27,18 @@ export default function SliderComponent({ data = [], classes = "", pageDetails =
     loop,
     breakpoints: {
       "(max-width: 1024px)": {
-        slides: { perView: sliderData.length > 1 ? 1.3 : 1, spacing: 10, origin: "center" },
+        slides: {
+          perView: sliderData.length > 1 ? 1.3 : 1,
+          spacing: 10,
+          origin: "center",
+        },
       },
       "(max-width: 768px)": {
-        slides: { perView: sliderData.length > 1 ? 1.3 : 1, spacing: 8, origin: "center" },
+        slides: {
+          perView: sliderData.length > 1 ? 1.3 : 1,
+          spacing: 8,
+          origin: "center",
+        },
       },
     },
     created(s) {
@@ -44,7 +57,7 @@ export default function SliderComponent({ data = [], classes = "", pageDetails =
     <>
       {!isSliderReady && (
         <div className="w-full h-[300px] flex justify-center items-center">
-          <Loading custom type='secondary' />
+          <Loading custom type="secondary" />
         </div>
       )}
       <div className={`w-full relative ${classes}`}>
@@ -52,15 +65,15 @@ export default function SliderComponent({ data = [], classes = "", pageDetails =
           ref={sliderRef}
           className={`relative keen-slider h-screen py-20 lg:py-[0px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
         >
-
           {sliderData.map((slide, index) => {
             const { portfolioRef, titleAndDescription, image } = slide;
 
             // Compute fallback title from titleAndDescription
             const rawTitle = titleAndDescription?.split("~")[0] || "";
             const maxLength = 85;
-            const displayedTitle = rawTitle.length > maxLength
-              ? rawTitle.slice(0, maxLength).trim() + "..."
+            const displayedTitle =
+              rawTitle.length > maxLength ?
+                rawTitle.slice(0, maxLength).trim() + "..."
               : rawTitle;
 
             return (
@@ -81,7 +94,9 @@ export default function SliderComponent({ data = [], classes = "", pageDetails =
                   <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] max-w-[340px] lg:max-w-[600px] lg:text-left text-center text-white font-recklessLight mb-8">
                     {portfolioRef?.title || displayedTitle}
                   </h2>
-                  <CustomLink to={`/project/${portfolioRef?.slug || slide?.slug}`}>
+                  <CustomLink
+                    to={`/project/${portfolioRef?.slug || slide?.slug}`}
+                  >
                     <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
                       {ourProjectsTitle}
                     </PrimaryButton>
@@ -89,21 +104,25 @@ export default function SliderComponent({ data = [], classes = "", pageDetails =
                 </div>
 
                 {/* Arrows */}
-                {(sliderData.length >= 4) && (
+                {sliderData.length >= 4 && (
                   <>
-                    {(loop || currentSlide?.rel > 0) && <button
-                      onClick={() => sliderInstance.current?.prev()}
-                      className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-                    >
-                      <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
-                    </button>}
+                    {(loop || currentSlide?.rel > 0) && (
+                      <button
+                        onClick={() => sliderInstance.current?.prev()}
+                        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                      >
+                        <BsChevronLeft className="w-[20px] h-[20px]" />
+                      </button>
+                    )}
 
-                    {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
-                      onClick={() => sliderInstance.current?.next()}
-                      className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-                    >
-                      <MdOutlineChevronRight className="w-[20px] h-[20px]" />
-                    </button>}
+                    {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && (
+                      <button
+                        onClick={() => sliderInstance.current?.next()}
+                        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                      >
+                        <BsChevronRight className="w-[20px] h-[20px]" />
+                      </button>
+                    )}
                   </>
                 )}
 

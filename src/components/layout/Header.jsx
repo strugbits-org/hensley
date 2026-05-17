@@ -323,7 +323,7 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     return (
         <>
             <header>
-                <div className='hidden lg:block fixed inset-x-0 top-0 z-50 desktop-menu'>
+                <div className='hidden lg:block fixed inset-x-0 top-0 z-[110] desktop-menu'>
                     <div className="h-[45px] relative">
                         <div className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px]"></div>
                         <nav className="h-full flex items-center justify-between" aria-label="Main Navigation">
@@ -431,8 +431,8 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                     </Suspense>
                 </div>
 
-                <div className="relative z-50">
-                    <div className='mobile-menu lg:hidden fixed inset-x-3 top-3 z-50 px-6 py-2'>
+                <div className="relative z-[110]">
+                    <div className='mobile-menu lg:hidden fixed inset-x-3 top-3 z-[110] px-6 py-2'>
                         <div className={`absolute inset-0 -z-10 backdrop-blur-[20px] brightness-[50px] ${isMobileMenuOpen ? "bg-glass-white" : "bg-secondary-glass"}`}></div>
                         <div className="flex p-2 lg:px-6 justify-between">
                             <CustomLink to="/" onClick={closeAllModals}>
