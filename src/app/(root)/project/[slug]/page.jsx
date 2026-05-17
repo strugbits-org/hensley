@@ -1,5 +1,5 @@
 import PortfolioDetails from "@/components/PortfolioDetails";
-import { fetchProjectPageData, fetchProjects, fetchSelectedProject } from "@/services/projects";
+import { fetchProjectMetadataBySlug, fetchProjectPageData, fetchProjects, fetchSelectedProject } from "@/services/projects";
 import { logError } from "@/utils";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
@@ -8,8 +8,13 @@ import { notFound } from "next/navigation";
 export async function generateMetadata({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
-    const projectData = await fetchProjectPageData(slug);
-    const project = projectData?.project || {};
+    // Slim metadata-only fetch: previously called fetchProjectPageData (full
+    // project + otherProjects listing + pageDetails) which Next 14 cannot
+    // dedupe with the page-body fetch — meaning every render paid the heavy
+    // query twice. This variant pulls only the title/excerpt/cover/hero/meta/
+    // noFollowTag fields needed below.
+    const project = await fetchProjectMetadataBySlug(slug);
+    if (!project) return {};
     const { portfolioRef, meta } = project;
 
     const title = meta?.title || portfolioRef?.title || "Project";
