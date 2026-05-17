@@ -69,6 +69,27 @@ export const Footer = ({ data }) => {
     );
   };
 
+  const formatAddressTitle = (title) => {
+    if (title.includes(" / ")) {
+      const parts = title.split(" / ");
+      return (
+        <>
+          <span className="hidden lg:inline">{title}</span>
+          <span className="lg:hidden">
+            {parts[0]} /<br />
+            {parts[1]}
+          </span>
+        </>
+      );
+    }
+    return <span className="lg:whitespace-nowrap">{title}</span>;
+  };
+
+  const formatAddressDescription = (desc) => {
+    if (!desc) return "";
+    return desc.replace(/(.+)\n(CA \d{5})/g, "$1, $2");
+  };
+
   return (
     <footer className="relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]">
       <div className="footer-content flex justify-between flex-wrap lg:flex-nowrap lg:gap-x-10 gap-y-20 md:gap-y-14 lg:gap-y-6 grow md:grow-0 items-stretch md:items-start">
@@ -77,9 +98,13 @@ export const Footer = ({ data }) => {
         </div>
         <div className="order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-80 md:mt-0">
           {branches.map((address, index) => (
-            <div className='w-2/5 lg:w-1/3' key={index}>
-              <h2 className='text-sm font-haasMedium uppercase text-primary mb-1 break-words'>{address?.title?.trim() === "Event Resources EST. 1980" ? "Event Resources <br /> EST.1980" : address?.title}</h2>
-              <p className='text-sm font-haasRegular uppercase text-primary whitespace-pre-line'>{address?.description}</p>
+            <div className="w-2/5 lg:w-1/2 pr-2" key={index}>
+              <h2 className="text-sm font-haasMedium uppercase text-primary mb-1">
+                {formatAddressTitle(address.title)}
+              </h2>
+              <p className="text-sm font-haasRegular uppercase text-primary whitespace-pre-line">
+                {formatAddressDescription(address.description)}
+              </p>
             </div>
           ))}
         </div>
