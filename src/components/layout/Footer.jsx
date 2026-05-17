@@ -44,8 +44,8 @@ export const Footer = ({ data }) => {
         <div className='order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-80 md:mt-0'>
           {branches.map((address, index) => (
             <div className='w-2/5 lg:w-1/3' key={index}>
-              <h2 className='text-sm font-haasMedium uppercase text-primary mb-1 break-words'>{address.title}</h2>
-              <p className='text-sm font-haasRegular uppercase text-primary whitespace-pre-line'>{address.description}</p>
+              <h2 className='text-sm font-haasMedium uppercase text-primary mb-1 break-words'>{address?.title?.trim() === "Event Resources EST. 1980" ? "Event Resources <br /> EST.1980" : address?.title}</h2>
+              <p className='text-sm font-haasRegular uppercase text-primary whitespace-pre-line'>{address?.description}</p>
             </div>
           ))}
         </div>

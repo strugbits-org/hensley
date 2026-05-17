@@ -13,9 +13,9 @@ const BannerStructures = ({ title, data }) => {
 
     return (
         <div className='w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] sm:h-[950px] bg-cover bg-no-repeat bg-top ' style={{ backgroundImage: `url(${bgUrl})` }}>
-            <div className='lg:px-[10px] lg:max-w-[1557px] sm:max-w-[490px] lg:mt-[197px] w-full flex flex-col justify-center items-center'>
+            <div className='lg:px-[10px] lg:max-w-[1557px] sm:max-w-[490px] lg:mt-[197px] w-full flex flex-col justify-center items-center border-t border-t-primary-alt'>
 
-                <div className='w-full flex items-center justify-between mb-14'>
+                <div className='w-full flex items-center justify-between mb-14 mt-14'>
                     <h3 className='lg:text-[120px] lg:leading-[55px]
                     sm:text-[58px]
                     sm:leading-[70px]
