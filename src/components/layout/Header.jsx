@@ -65,6 +65,7 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         );
     };
 
+
     const getNestedItemsForSubMenu = (item) => {
         if (!item) return [];
 
@@ -252,28 +253,28 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         }
     }
 
-    const fetchCartItems = async () => {
-        try {
-            const response = await getProductsCart();
-            if (response === "Token has expired") {
-                removeCookie("authToken", { path: "/" });
-                removeCookie("userData", { path: "/" });
-                removeCookie("cartQuantity", { path: "/" });
-                removeCookie("userTokens", { path: "/" });
-                setTimeout(() => {
-                    router.push("/");
-                }, 500);
-                return;
-            }
-            const lineItems = response?.lineItems || [];
-            const total = calculateTotalCartQuantity(lineItems);
-            if (total !== cookies.cartQuantity) {
-                setCookie("cartQuantity", total, { path: "/" });
-            }
-        } catch (error) {
-            console.error("Error fetching cart items:", error);
-        }
-    };
+    // const fetchCartItems = async () => {
+    //     try {
+    //         const response = await getProductsCart();
+    //         if (response === "Token has expired") {
+    //             removeCookie("authToken", { path: "/" });
+    //             removeCookie("userData", { path: "/" });
+    //             removeCookie("cartQuantity", { path: "/" });
+    //             removeCookie("userTokens", { path: "/" });
+    //             setTimeout(() => {
+    //                 router.push("/");
+    //             }, 500);
+    //             return;
+    //         }
+    //         const lineItems = response?.lineItems || [];
+    //         const total = calculateTotalCartQuantity(lineItems);
+    //         if (total !== cookies.cartQuantity) {
+    //             setCookie("cartQuantity", total, { path: "/" });
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching cart items:", error);
+    //     }
+    // };
 
     // useEffect(() => {
     //     fetchCartItems();
