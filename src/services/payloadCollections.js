@@ -692,9 +692,10 @@ export const queryProductCollectionBySlug = async (slug) => {
                 slug: true,
                 subcategories: true,
                 productOrder: true,
+                parent: true
             },
             populate: {
-                'product-collections': { name: true, slug: true, subcategories: true },
+                'product-collections': { name: true, slug: true, subcategories: true, parent: true },
                 products: {},
             },
         });
