@@ -107,13 +107,11 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
     // Prefer sessionStorage (set by the listing pages on click-through — works
     // for Next.js client-side nav where document.referrer is empty).
     let candidateSlug = null;
-    let candidateName = null;
     try {
       const raw = sessionStorage.getItem('lastCategoryCrumb');
       if (raw) {
         const parsed = JSON.parse(raw);
         candidateSlug = parsed?.slug || null;
-        candidateName = parsed?.name || null;
       }
     } catch {
       // sessionStorage unavailable — fall through to referrer
@@ -141,11 +139,10 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
 
     if (hit?.slug && hit?.name) {
       setReferringCollection({ name: hit.name, slug: hit.slug });
-    } else if (candidateName && candidateSlug) {
-      // sessionStorage gave us a fully-formed crumb that just isn't in this
-      // product's collections list — still honor it, since the user did
-      // navigate from that page.
-      setReferringCollection({ name: candidateName, slug: candidateSlug });
+    } else {
+      // Stored crumb doesn't belong to this product — drop it and evict it
+      // from sessionStorage so it can't leak into the next product view.
+      try { sessionStorage.removeItem('lastCategoryCrumb'); } catch {}
     }
   }, [productData?.product?.collections]);
 
