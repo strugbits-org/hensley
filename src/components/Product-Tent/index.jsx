@@ -50,10 +50,10 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
             const colSpanClass =
               position === 0 ? 'col-span-1' :
                 position === 1 ? 'col-span-1' :
-                  'col-span-2';
+                  'col-span-1 lg:col-span-2';
 
             return (
-              <div key={item.id || index} className={`${colSpanClass}`}>
+              <div key={item.id || index} className={`${colSpanClass} min-h-[600px] lg:min-h-0`}>
                 <PrimaryImage url={item.src} size="tablet" alt={item.alt || `tent-${index}`} customClasses="w-full h-full object-cover" />
               </div>
             );

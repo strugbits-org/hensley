@@ -9,10 +9,10 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
     if (!data) return null;
 
     return (
-        <div className="relative lg:p-6 lg:h-[calc(100dvh-90px)] flex items-center justify-center lg:overflow-hidden mt-4 lg:mt-0">
+        <div className="relative lg:p-6 lg:h-[calc(100dvh-90px)] flex items-start lg:items-center justify-center lg:overflow-hidden mt-4 lg:mt-0">
             <div onClick={closeModal} className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px] h-full cursor-pointer"></div>
-            
-            <div className={"w-full h-full lg:h-[75vh] 2xl:h-[82vh] max-h-[calc(100dvh-110px)] flex justify-center gap-y-4 lg:gap-4 xl:gap-6 lg:flex-row flex-col"}>
+
+            <div className={"w-full h-auto lg:h-[75vh] 2xl:h-[82vh] lg:max-h-[calc(100dvh-110px)] flex justify-center gap-y-4 lg:gap-4 xl:gap-6 lg:flex-row flex-col"}>
                 {data.map((category) => {
                     const { title, tagline, slug, headerCoverImage, tent, buttonLabel, buttonLabelMenu, featuredImage, heroBackground } = category;
                     const coverImage = headerCoverImage || featuredImage || heroBackground || tent?.mainMedia || category?.mainMedia || null;

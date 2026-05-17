@@ -3,7 +3,7 @@ import { PrimaryImage } from '../common/PrimaryImage'
 
 const EventGallery = ({ data }) => {
     return (
-        <div className='w-full px-[24px]'>
+        <div className='w-full px-[24px] mb-20'>
             <div className='w-full space-y-[24px]'>
                 {data.map((url, index) => {
                     const positionInGroup = index % 3;

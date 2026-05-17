@@ -348,13 +348,6 @@ const normalizeTentItem = (product, orderNumber = 0) => {
     const gallery = mediaItems.map((m, i) => normalizeGalleryItem(m, i, product.title));
 
     const mainMediaUrl = resolveCoreMediaUrl(product.mainMedia, "tablet");
-    if (mainMediaUrl && !gallery.some((g) => g.src === mainMediaUrl)) {
-        gallery.unshift({
-            id: product.mainMedia?.id || "main-media",
-            src: mainMediaUrl,
-            alt: product.mainMedia?.alt || product.title || "Tent main image",
-        });
-    }
 
     const collections = buildCollectionSummary(product.collections);
     const recommendedProducts = normalizeRecommendedProducts(product);
