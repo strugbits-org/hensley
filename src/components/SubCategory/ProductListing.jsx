@@ -144,6 +144,21 @@ export const ProductListing = ({ data }) => {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Remember which category the user was browsing so the product page can
+    // render a breadcrumb that reflects the path they took (Home > China >
+    // Product) instead of always defaulting to product.collections[0].
+    useEffect(() => {
+        if (typeof window === 'undefined' || !selectedCategory?.slug) return;
+        try {
+            sessionStorage.setItem(
+                'lastCategoryCrumb',
+                JSON.stringify({ slug: selectedCategory.slug, name: selectedCategory.name })
+            );
+        } catch {
+            // sessionStorage unavailable (private mode, etc.) — ignore
+        }
+    }, [selectedCategory?.slug, selectedCategory?.name]);
+
     return (
         <div className='flex flex-col items-center lg:px-[24px] px-[12px]'>
             {/* Title Section */}
