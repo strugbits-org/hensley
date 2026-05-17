@@ -6,7 +6,21 @@ import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
 function NewsCard({ data, classes }) {
 
     const { blogRef, author, slug, markets, studios, blogCategories } = data;
-    const { title, coverImage } = blogRef;
+    const { title, publishedDate, coverImage } = blogRef;
+
+    let formattedDate = "";
+        
+    if (publishedDate) {
+        const dateObj = new Date(publishedDate);
+        formattedDate = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    }
+   
+    const metaInfoArray = [
+        formattedDate,
+        author?.nickname || ""
+    ].filter(Boolean);
+
+    const metaInfoString = metaInfoArray.join('-');
 
     return (
         <CustomLink to={`/posts/${slug}`} className={`relative group border cursor-pointer border-primary-border hover:border-secondary-alt pb-6 ${classes}`}>
@@ -29,7 +43,8 @@ function NewsCard({ data, classes }) {
                 </div>
             </div>
             <div className='px-6'>
-                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3 uppercase'>{author.nickname}</p>
+                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3 uppercase'>{metaInfoString}</p>
+
                 <MarketsStudiosTags markets={markets} studios={studios} categories={blogCategories} />
             </div>
         </CustomLink>

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CopyIcon } from './helpers/CopyIcon';
-import { copyToClipboard } from '@/utils';
+import { copyToClipboard, richTextToHTML } from '@/utils';
 import { CustomLink } from './CustomLink';
 import { SaveProductButton } from './SaveProductButton';
 import { lightboxActions } from '@/store/lightboxStore';
@@ -54,7 +54,7 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
                                 <CopyIcon />
                             </div>
                         )}
-                        {/* {product.additionalInfoSections?.map((data, index) => {
+                        {product.additionalInfoSections?.map((data, index) => {
                             const { title, description } = data;
                             if (title == "Size") {
                                 return (
@@ -62,12 +62,12 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
                                         className="text-[12px] grow text-center text-secondary-alt"
                                         key={index}
                                         dangerouslySetInnerHTML={{
-                                            __html: description,
+                                            __html: richTextToHTML(description),
                                         }}
                                     ></div>
                                 );
                             }
-                        })} */}
+                        })}
                     </div>
 
                     <button

@@ -26,7 +26,7 @@ const useDebounce = (callback, delay) => {
 };
 
 export const ProductListing = ({ data }) => {
-    const { selectedCategory, sortedProducts, subCategories, collectionIds, sortIndex, categoriesSortData, productBannersData, productOrder = [] } = data;
+    const { selectedCategory, sortedProducts, subCategories, collectionIds, productBannersData, productOrder = [] } = data;
 
     let bannerIndex = -1;
     const pageSize = 12;
@@ -87,7 +87,7 @@ export const ProductListing = ({ data }) => {
             logError(`Error fetching ${isLoadMore ? 'more' : 'sorted'} products:`, error);
             return null;
         }
-    }, [collectionIds, selectedFilters, sortIndex, categoriesSortData, getEntityId, getCollectionIdsWithDescendants]);
+    }, [collectionIds, selectedFilters, productOrder, getCollectionIdsWithDescendants]);
 
     const debouncedFetchForFilters = useDebounce((newFilters) => {
         fetchProducts({ newFilters, isLoadMore: false, newSkip: 0 })
