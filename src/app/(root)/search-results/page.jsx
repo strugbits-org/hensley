@@ -9,9 +9,9 @@ import { Suspense } from "react";
 export async function generateMetadata() {
   try {
     const metaData = await fetchPageMetaData("search-results");
-    const { title, noFollowTag } = metaData;
+    const { title, robotsTag } = metaData;
     const metadata = { title };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) metadata.robots = "noindex,nofollow";
+    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) metadata.robots = robotsTag;
     return metadata;
   } catch (error) {
     logError("Error in metadata(home page):", error);

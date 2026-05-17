@@ -643,29 +643,49 @@ export const fetchAllPagesMetaData = async () => {
   return [];
 };
 
+export const buildRobotsTag = (noIndex, noFollow) => {
+  if (noIndex && noFollow) return "noindex,nofollow";
+  if (noIndex) return "noindex";
+  if (noFollow) return "nofollow";
+  return null;
+};
+
 export const fetchPageMetaData = async (slug) => {
   try {
     const result = await sdk.find({
-      collection: 'page-seo',
+      collection: 'pages',
       where: {
         slug: { equals: slug },
-        tenant: { equals: CORE_TENANT_ID }
+        tenant: { equals: CORE_TENANT_ID },
+        _status: { equals: 'published' }
       },
       limit: 1,
-      draft: false
+      depth: 0,
+      draft: false,
+      select: {
+        meta: true
+      }
     });
     const doc = result.docs[0];
     if (doc) {
+      const meta = doc.meta || {};
+      const keywords = Array.isArray(meta.metaKeywords) ? meta.metaKeywords.join(', ') : '';
+      const noIndex = meta.noIndex === true;
+      const noFollow = meta.noFollow === true;
       return {
-        title: doc.pageTitle || '',
-        description: doc.description || '',
-        keywords: doc.keywords || ''
+        title: meta.title || '',
+        description: meta.description || '',
+        keywords,
+        noIndex,
+        noFollow,
+        noFollowTag: noIndex || noFollow,
+        robotsTag: buildRobotsTag(noIndex, noFollow)
       };
     }
   } catch (error) {
     console.error('Error fetching page meta data', error);
   }
-  return { title: '', description: '', keywords: '', noFollowTag: false };
+  return { title: '', description: '', keywords: '', noIndex: false, noFollow: false, noFollowTag: false, robotsTag: null };
 };
 
 

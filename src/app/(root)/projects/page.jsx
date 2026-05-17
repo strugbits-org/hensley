@@ -11,8 +11,8 @@ export async function generateMetadata() {
     const metaData = await fetchPageMetaData("projects");
     const metadata = {};
     if (metaData?.title) metadata.title = metaData.title;
-    if (process.env.ENVIRONMENT === "PRODUCTION" && metaData?.noFollowTag) {
-      metadata.robots = "noindex,nofollow";
+    if (process.env.ENVIRONMENT === "PRODUCTION" && metaData?.robotsTag) {
+      metadata.robots = metaData.robotsTag;
     }
     return metadata;
   } catch (error) {

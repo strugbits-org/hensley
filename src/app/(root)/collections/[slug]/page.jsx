@@ -23,12 +23,12 @@ export async function generateMetadata({ params }) {
      fetchSelectedCollectionData(slug)
     ]);
 
-    const { title, noFollowTag } = metaData || {};
+    const { title, robotsTag } = metaData || {};
     const { selectedCategory } = subCategoryData || {};
     const fullTitle = (selectedCategory?.name || slug) + " " + (title || "");
     const metadata = { title: fullTitle };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
-      metadata.robots = "noindex,nofollow";
+    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
+      metadata.robots = robotsTag;
     }
 
     return metadata;
