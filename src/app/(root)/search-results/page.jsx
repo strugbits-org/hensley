@@ -21,11 +21,10 @@ export async function generateMetadata() {
 
 export default async function Page() {
   try {
-    const [response, allCollections] = await Promise.all([
+    const [searchPageDetails, allCollections] = await Promise.all([
       fetchSearchPageDetails(),
       queryProductCollections().catch(() => []),
     ]);
-    const { searchPageDetails } = response || {};
 
     return (
       <>

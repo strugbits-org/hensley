@@ -3,22 +3,24 @@ import { logError } from "@/utils";
 import {
     queryBlogs,
     queryProjects,
-    queryMarkets,
     normalizePayloadBlog,
     normalizePayloadProject,
     queryProductsFromPayload,
+    querySection,
+    sectionToObject,
 } from "../payloadCollections";
+import { fetchMarketsData } from "..";
+import { cache } from "react";
+
 export const searchMarkets = async (query) => {
     try {
-        const payloadMarkets = await queryMarkets();
+        const markets = await fetchMarketsData();
         const q = query.toLowerCase();
-        return payloadMarkets
+        return markets
             .filter((m) => (m.title || "").toLowerCase().includes(q))
             .map((m) => ({
                 ...m,
-                _id: m.id || m._id,
                 category: m.title || m.category || "",
-                slug: m.slug?.startsWith("/") ? m.slug : `/${m.slug || ""}`,
             }));
     } catch (error) {
         logError(`Error searching markets: ${error.message}`, error);
@@ -124,21 +126,23 @@ export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipPro
     }
 };
 
-
-export const fetchSearchPageDetails = async () => {
+export const fetchSearchPageDetails = cache(async () => {
+  try {
+    const section = await querySection('search-page-details');
+    if (section) {
+      return sectionToObject(section);
+    }
+  } catch (error) {
+    logError('Error fetching home page details:', error);
+  }
   return {
-    searchPageDetails: {
-      relatedPostTitle: "Related Posts",
-      tentsTypeTitle: "Types of Tents",
-      ourMarketsTitle: "Our Markets",
-      relatedProductTitle: "Related Products",
-      relatedProjectTitle: "Related Projects",
-    },
+      relatedPostTitle: "RELATED POSTS",
+      tentsTypeTitle: "TYPES OF TENTS",
+      ourMarketsTitle: "OUR MARKETS",
+      relatedProductTitle: "PRODUCTS RELATED TO YOUR SEARCH",
+      relatedProjectTitle: "RELATED PROJECTS",
   };
-};
-
-
-
+});
 
 export const searchOtherData = async (query) => {
     const [tents, projects, blogs, searchPageDetails] = await Promise.all([

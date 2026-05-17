@@ -14,7 +14,7 @@ const ProjectCards = ({ data, isRTL }) => {
       {/* Image Section */}
       <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] px-[12px] lg:h-auto h-[382px]">
         <div className="overflow-hidden h-full w-full">
-          <PrimaryImage useNextImage={true} url={data.image} size="card" alt={portfolioRef.title} type='alternate' q={"50"} customClasses="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          <PrimaryImage useNextImage={true} url={portfolioRef?.coverImage?.imageInfo} size="card" alt={portfolioRef.title} type='alternate' q={"50"} customClasses="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
         </div>
       </div>
 
