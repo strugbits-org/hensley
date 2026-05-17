@@ -7,8 +7,8 @@ export const SubCategoriesModal = ({ selectedMenu, closeModal }) => {
     if (!data) return null;
 
     return (
-        <div onMouseLeave={closeModal} className="relative px-4 sm:px-8 md:px-12 lg:px-24 xl:px-60 pt-8 sm:pt-12 md:pt-16 lg:pt-[120px] pb-6 sm:pb-8 md:pb-12 lg:pb-[105px]">
-            <div className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px] h-full"></div>
+        <div className="relative px-4 sm:px-8 md:px-12 lg:px-24 xl:px-60 pt-8 sm:pt-12 md:pt-16 lg:pt-[120px] pb-6 sm:pb-8 md:pb-12 lg:pb-[105px]">
+            <div onClick={closeModal} className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px] h-full cursor-pointer"></div>
 
             <div className="flex flex-wrap justify-center gap-0 lg:gap-y-[62px] max-h-[75vh] overflow-auto hide-scrollbar">
                 {data.map((item) => {

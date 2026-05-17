@@ -149,8 +149,12 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                 data: sortByOrderNumber(itemIsMarkets ? marketsData : tentsData),
             };
             if (selectedMenu) {
-                setSelectedMenu(false);
-                setTimeout(() => setSelectedMenu(newMenu), 50);
+                if (selectedMenu.title === newMenu.title) {
+                    setSelectedMenu(false);
+                } else {
+                    setSelectedMenu(false);
+                    setTimeout(() => setSelectedMenu(newMenu), 50);
+                }
             } else {
                 setSelectedMenu(newMenu);
             }
@@ -181,10 +185,14 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
             };
 
             if (selectedMenu) {
-                setSelectedMenu(false);
-                setTimeout(() => {
-                    setSelectedMenu(newMenu);
-                }, 50);
+                if (selectedMenu.title === newMenu.title) {
+                    setSelectedMenu(false);
+                } else {
+                    setSelectedMenu(false);
+                    setTimeout(() => {
+                        setSelectedMenu(newMenu);
+                    }, 50);
+                }
             } else {
                 setSelectedMenu(newMenu);
             }
@@ -319,6 +327,20 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         ));
         actions.setTentsIds(ids);
     }, [tentsData]);
+
+    useEffect(() => {
+            const handleClickOutside = (event) => {
+            if (window.innerWidth >= 1024 && selectedMenu) {
+                const desktopMenu = document.querySelector('.desktop-menu');
+                if (desktopMenu && !desktopMenu.contains(event.target)) {
+                    setSelectedMenu(false);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [selectedMenu]);
 
     return (
         <>
