@@ -327,7 +327,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
     return (
         <>
-            <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
+            <div className='w-full lg:max-w-[640px] sm:max-w-[400px] h-full overflow-y-scroll hide-scrollbar'>
                 <div className='w-full flex items-center my-8'>
                     <BreadCrumbs items={[
                         { label: 'Home', to: '/' },
