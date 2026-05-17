@@ -321,7 +321,7 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
               {renderTableRows()}
             </tbody>
           </table>
-          {product.description && (
+          {product.descriptionText && (
             <div className='py-[10px]'>
               <ProductDescription maxChars={130} text={product.description} />
             </div>

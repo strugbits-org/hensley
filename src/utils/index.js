@@ -440,23 +440,13 @@ export const richTextToHTML = (content) => {
 export const richTextToPlainText = (content) => {
     if (!content) return "";
 
-    if (typeof content === "string") {
-        return content
-            .replace(/<br\s*\/?>/gi, "\n")
-            .replace(/<[^>]*>/g, " ")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\s+\n/g, "\n")
-            .replace(/\n\s+/g, "\n")
-            .replace(/\n{3,}/g, "\n\n")
-            .replace(/[ \t]{2,}/g, " ")
-            .trim();
-    }
-
     if (content?.root?.type === "root") {
         return extractLexicalNodeText(content.root)
             .replace(/\n{3,}/g, "\n\n")
             .trim();
     }
+
+    if (typeof content === "string") return content.trim();
 
     return "";
 };
@@ -527,7 +517,6 @@ export const normalizeProductForDisplay = (product = {}) => {
         compareAtPrice: compareAtPrice || null,
         formattedPrice: product?.formattedPrice || formatTotalPrice(price),
         formattedCompareAtPrice: compareAtPrice ? formatTotalPrice(compareAtPrice) : "",
-        description: descriptionHtml,
         descriptionHtml,
         descriptionText,
         additionalInfoSections,
