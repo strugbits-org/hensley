@@ -127,8 +127,9 @@ export const Footer = ({ data }) => {
         </div>
       </div>
       <PrimaryImage
-        customClasses="mt-20 lg:mt-0 mx-auto w-full min-h-[293px]"
+        customClasses="mt-20 lg:mt-0 mx-auto w-full h-[60px] md:min-h-[293px] object-contain"
         url={logoUrl}
+        fit="fit"
         alt="logo"
       />
     </footer>
