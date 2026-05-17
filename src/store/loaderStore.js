@@ -1,7 +1,7 @@
 import { proxy } from 'valtio';
 
 export const loaderState = proxy({
-    isLoading: true
+    isLoading: false
 });
 
 export const loaderActions = {

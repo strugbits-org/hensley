@@ -168,24 +168,6 @@ export const formatDateNumeric = (d) => {
     return `${month}/${day}/${year}`;
 };
 
-
-export const findSortIndexByCategory = (data, categoryId) => {
-    const sortMapping = {
-        'Highlights': 'highlightSubCategoryIndex',
-        'Premium': 'premiumSubCategoryIndex',
-        'Main': 'categorySortIndex',
-        'L1': 'l1SubCategoryIndex',
-        'L2': 'l2SubCategoryIndex'
-    }
-
-    const category = data.find(item => 
-        item.collections === categoryId || 
-        item.collections?._id === categoryId
-    );
-    const sortIndex = category?.sortTitle?.[0];
-    return sortIndex ? sortMapping[sortIndex] : null;
-};
-
 export const formatTotalPrice = (price) => {
     return '$' + (parseFloat(price) || 0).toFixed(2);
 }

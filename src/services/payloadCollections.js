@@ -768,6 +768,83 @@ export const queryProductsByCollectionIdsForHome = async (collections) => {
     }
 }
 
+// Field set the PLP grid + AddToCart-from-grid actually need. Same shape
+// as the homepage best-sellers variant. ProductCard reads title/sku/type/
+// slug/mainMedia/ribbon/collections; AddToCart re-fetches by id when the
+// modal opens and needs more.
+const PLP_LISTING_PRODUCT_SELECT = {
+    title: true,
+    name: true,
+    slug: true,
+    sku: true,
+    type: true,
+    ribbon: true,
+    collections: true,
+    mainMedia: true,
+    mediaItems: true,
+    price: true,
+    compareAtPrice: true,
+    formattedPrice: true,
+    description: true,
+    additionalInfoSections: true,
+    bundleItems: true,
+    tentConfig: true,
+};
+
+// Slim paginated variant for /subcategory and /collections PLPs. Trims off
+// variants/productOptions/recommendedProducts/seo and other heavy graph
+// edges. Same return shape as queryProductsByCollectionIdsPaginated.
+export const queryProductsByCollectionIdsPaginatedSlim = async ({ collections = [], limit = 12, skip = 0 } = {}) => {
+    try {
+        const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
+        const query = {
+            collection: 'products',
+            limit,
+            page,
+            draft: false,
+            locale: "en",
+            depth: 1,
+            select: PLP_LISTING_PRODUCT_SELECT,
+        };
+
+        if (collections.length > 0) {
+            query.where = { collections: { in: collections } };
+        }
+
+        const result = await sdk.find(query);
+
+        return {
+            items: result.docs || [],
+            hasNext: result.hasNextPage ?? false,
+        };
+    } catch (error) {
+        logError('Error querying products by collection IDs (paginated slim):', error);
+        return { items: [], hasNext: false };
+    }
+};
+
+// Slim by-IDs variant. Used by /subcategory and /collections when the
+// collection has an explicit productOrder, so we fetch the configured page
+// slice in the configured order.
+export const queryProductsByIdsSlim = async (ids = []) => {
+    if (!ids || !ids.length) return [];
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            where: { id: { in: ids } },
+            pagination: false,
+            draft: false,
+            locale: 'en',
+            depth: 1,
+            select: PLP_LISTING_PRODUCT_SELECT,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError('Error querying products by IDs (slim):', error);
+        return [];
+    }
+};
+
 export const queryProductsByCollectionIdsPaginated = async ({ collections = [], limit = 12, skip = 0 } = {}) => {
     try {
         const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;

@@ -4,6 +4,11 @@ import { fetchCollectionPagePaths, fetchSelectedCollectionData } from "@/service
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
+// Pre-render every featured collection slug at build time and serve them as
+// static HTML. Unknown slugs fall through to on-demand rendering (then cached).
+export const dynamicParams = true;
+export const revalidate = +process.env.REVALIDATE_TIME || 86400;
+
 
 
 export async function generateMetadata({ params }) {

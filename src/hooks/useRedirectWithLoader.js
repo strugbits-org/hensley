@@ -5,21 +5,15 @@ const useRedirectWithLoader = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const redirectWithLoader = (slug, ignoreSamePath) => {
-    // Clear any scroll locks from modals before navigation
+  const redirectWithLoader = (slug) => {
     if (typeof window !== 'undefined') {
       document.body.classList.remove('overflow-hidden');
     }
-    
-    if (pathname === slug) {
-      if (ignoreSamePath) {
-        loaderActions.show();
-        setTimeout(() => loaderActions.hide(), 900);
-      }
-    } else {
-      loaderActions.show();
-      router.push(slug);
-    }
+
+    if (!slug || pathname === slug) return;
+
+    loaderActions.show();
+    router.push(slug);
   };
 
   return redirectWithLoader;

@@ -4,6 +4,11 @@ import { SubCategoryPage } from "@/components/SubCategory";
 import { fetchSelectedCategoryData, fetchSubCategoryPagePaths } from "@/services/subcategory";
 import { fetchPageMetaData } from "@/services";
 
+// Pre-render every known subcategory slug at build time and serve them as
+// static HTML. Unknown slugs fall through to on-demand rendering (then cached).
+export const dynamicParams = true;
+export const revalidate = +process.env.REVALIDATE_TIME || 86400;
+
 
 export async function generateMetadata({ params }) {
   try {
@@ -14,7 +19,7 @@ export async function generateMetadata({ params }) {
       subCategoryData
     ] = await Promise.all([
       fetchPageMetaData("market"),
-      fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug)
+      fetchSelectedCategoryData(slug)
     ]);
 
     const { title, noFollowTag } = metaData || {};
@@ -43,11 +48,11 @@ export const generateStaticParams = async () => {
 
 export default async function Page({ params }) {
   try {
-    const slug = decodeURIComponent(params.slug?.toLowerCase());
+    const slug = decodeURIComponent(params.slug);
     if (!slug) {
       throw new Error("Slug is required");
     }
-    const data = await fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug);
+    const data = await fetchSelectedCategoryData(slug);
 
     if (!data) {
       notFound();

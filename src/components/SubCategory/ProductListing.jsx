@@ -7,8 +7,8 @@ import { ProductsFilterPopup } from '../common/ProductsFilterPopup';
 import { ProductBanner } from '../common/ProductBanner';
 import Loading from '@/app/loading';
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper';
-import { findSortIndexByCategory, logError } from '@/utils';
-import { fetchSortedProducts } from '@/services/collections';
+import { logError } from '@/utils';
+import { fetchSortedProductsForListing } from '@/services/collections';
 
 // Debounce utility function
 const useDebounce = (callback, delay) => {
@@ -67,12 +67,10 @@ export const ProductListing = ({ data }) => {
             : collectionIds;
 
         try {
-            const newSortIndex = newFilters.length === 1 ? findSortIndexByCategory(categoriesSortData, getEntityId(newFilters[0])) : sortIndex;
-            const newSortedProducts = await fetchSortedProducts({
+            const newSortedProducts = await fetchSortedProductsForListing({
                 collectionIds: activeCollectionIds,
                 limit: pageSize,
                 skip: newSkip,
-                sortIndex: newSortIndex,
                 // Use productOrder only when no sub-category filter is active
                 productOrder: newFilters.length === 0 ? productOrder : undefined,
             });

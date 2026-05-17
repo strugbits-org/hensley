@@ -29,6 +29,7 @@ export const PrimaryImage = ({
     if (!url) return null;
 
     const ref = useRef();
+    const lastDimsRef = useRef({ w: 0, h: 0 });
     const [src, setSrc] = useState();
     const [height, setHeight] = useState();
     const [width, setWidth] = useState();
@@ -39,6 +40,21 @@ export const PrimaryImage = ({
         const numericMinimumValue = Number(minimumValue) || 0;
 
         return Math.max(numericMeasuredValue, numericFallbackValue, numericMinimumValue, 1);
+    };
+
+    // Suppress re-fetches during layout settle. If the container measured 600
+    // and now reports 612 (a 2% delta from grid/flex finalising), the
+    // already-loaded image is fine — swapping to a fresh URL produces a
+    // visible flash. Only re-fetch if the new size meaningfully exceeds the
+    // old one (>15% wider/taller), which means the user actually resized the
+    // viewport or rotated the device.
+    const SIZE_HYSTERESIS = 0.15;
+    const dimsChangedMeaningfully = (nextW, nextH) => {
+        const { w: prevW, h: prevH } = lastDimsRef.current;
+        if (!prevW || !prevH) return true;
+        const dw = Math.abs(nextW - prevW) / prevW;
+        const dh = Math.abs(nextH - prevH) / prevH;
+        return dw > SIZE_HYSTERESIS || dh > SIZE_HYSTERESIS;
     };
 
     const isWixUrl = (u) => typeof u === 'string' && (u.startsWith('wix:image://v1/') || u.startsWith('wix:vector://v1/'));
@@ -60,6 +76,15 @@ export const PrimaryImage = ({
             if (ref.current) {
                 const nextWidth = resolveDimension(ref.current.clientWidth, defaultDimensions?.width, min_w);
                 const nextHeight = resolveDimension(ref.current.clientHeight, defaultDimensions?.height, min_h);
+
+                // Layout-settle suppression: if we already have a URL and the
+                // new container size is within the hysteresis band, keep the
+                // current src to avoid the visible re-fetch flash.
+                if (src && !dimsChangedMeaningfully(nextWidth, nextHeight)) {
+                    return src;
+                }
+
+                lastDimsRef.current = { w: nextWidth, h: nextHeight };
                 setHeight(currentHeight => currentHeight === nextHeight ? currentHeight : nextHeight);
                 setWidth(currentWidth => currentWidth === nextWidth ? currentWidth : nextWidth);
                 return generateCoreImageURL({
@@ -85,6 +110,11 @@ export const PrimaryImage = ({
             const nextWidth = resolveDimension(ref.current.clientWidth, defaultDimensions?.width, min_w);
             const nextHeight = resolveDimension(ref.current.clientHeight, defaultDimensions?.height, min_h);
 
+            if (src && !dimsChangedMeaningfully(nextWidth, nextHeight)) {
+                return src;
+            }
+
+            lastDimsRef.current = { w: nextWidth, h: nextHeight };
             setHeight(currentHeight => currentHeight === nextHeight ? currentHeight : nextHeight);
             setWidth(currentWidth => currentWidth === nextWidth ? currentWidth : nextWidth);
 
