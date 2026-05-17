@@ -17,10 +17,12 @@ const BannerStructures = ({ title, data }) => {
 
                 <div className='w-full flex items-center justify-between mb-14 mt-14'>
                     <h3 className='lg:text-[120px] lg:leading-[55px]
-                    sm:text-[58px]
-                    sm:leading-[70px]
                     text-[45px]
-                    leading-[55px]
+                    sm:text-[58px]
+                    leading-tight
+                    sm:leading-tight
+                    leading-[48px]
+                    sm:leading-[60px]
                     text-white font-recklessRegular uppercase'>{title}</h3>
                     <CustomLink to={"/types-of-tents"} className='flex items-center justify-center tracking-[5px] hover:tracking-[8px] transform transition-all duration-300 border border-white h-[45px] lg:w-[292px] w-full text-white uppercase text-[12px] font-haasRegular'>
                         see gallery
