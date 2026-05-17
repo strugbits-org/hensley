@@ -56,13 +56,25 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     const getSubItemsForMenu = (menuItem) => {
         if (!menuItem) return [];
 
+        let items = [];
         if (Array.isArray(menuItem.children) && menuItem.children.length) {
-            return sortByOrderNumber(menuItem.children);
+            items = sortByOrderNumber(menuItem.children);
+        } else {
+            items = sortByOrderNumber(
+                headerSubMenu.filter(item => item.Header_menuItems?.some(subItem => subItem._id === menuItem?._id))
+            );
         }
 
-        return sortByOrderNumber(
-            headerSubMenu.filter(item => item.Header_menuItems?.some(subItem => subItem._id === menuItem?._id))
-        );
+        // Enforce Contact before Career
+        const contactIndex = items.findIndex(item => String(item.title).toLowerCase() === 'contact');
+        const careerIndex = items.findIndex(item => String(item.title).toLowerCase() === 'careers' || String(item.title).toLowerCase() === 'career');
+        
+        if (contactIndex !== -1 && careerIndex !== -1 && contactIndex > careerIndex) {
+            const contactItem = items.splice(contactIndex, 1)[0];
+            items.splice(careerIndex, 0, contactItem);
+        }
+
+        return items;
     };
 
     const getNestedItemsForSubMenu = (item) => {

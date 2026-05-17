@@ -30,7 +30,7 @@ function HeroSection({ data = {} }) {
           <div className="lg:max-w-[600px] lg:text-left text-center ml-auto mr-0">
             <p
               className="text-secondary uppercase text-lg
-            sm:text-[14px]
+            sm:text-[18px]
             sm:leading-[20px]
             font-haasRegular mb-4"
             >
@@ -55,7 +55,7 @@ function HeroSection({ data = {} }) {
             </CustomLink>
           </div>
         </div>
-        <div className="w-full h-full lg:px-[24px] min-h-[500px]">
+        <div className="w-full h-full lg:px-[24px] md:h-screen sm:h-[500px]">
           <PrimaryImage
             url={heroImage}
             size="tablet"
