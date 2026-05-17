@@ -2,19 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
-  --primary: #F0DEA2;
-  --primary-alt: #F4F1EC;
+  --primary: #f0dea2;
+  --primary-alt: #f4f1ec;
   --primary-glass: rgba(240, 222, 162, 0.65);
-  --secondary: #57442D;
-  --secondary-alt: #2C2216;
-  --secondary-glass: rgba(244, 241, 236, 0.20);
-  --primary-border: #E0D6CA;
+  --secondary: #57442d;
+  --secondary-alt: #2c2216;
+  --secondary-glass: rgba(244, 241, 236, 0.2);
+  --primary-border: #e0d6ca;
   --glass-white: #ffffffa2;
 }
 
-html{
+html {
   scroll-behavior: smooth;
 }
 
@@ -36,7 +35,6 @@ body {
   background: var(--primary-alt);
 }
 
-
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -49,7 +47,7 @@ body {
 .loader-secondary {
   width: 48px;
   height: 48px;
-  background: #FFF;
+  background: #fff;
   display: inline-block;
   border-radius: 50%;
   box-sizing: border-box;
@@ -65,8 +63,7 @@ body {
     transform: scale(1);
     opacity: 0;
   }
-} 
-
+}
 
 .loader {
   width: 50px;
@@ -80,49 +77,97 @@ body {
 
 @keyframes l20-1 {
   0% {
-    clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%)
+    clip-path: polygon(50% 50%, 0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%);
   }
 
   12.5% {
-    clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 0%)
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 0%,
+      100% 0%,
+      100% 0%
+    );
   }
 
   25% {
-    clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%)
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 100%,
+      100% 100%,
+      100% 100%
+    );
   }
 
   50% {
-    clip-path: polygon(50% 50%, 0 0, 50% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)
+    clip-path: polygon(
+      50% 50%,
+      0 0,
+      50% 0%,
+      100% 0%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
   }
 
   62.5% {
-    clip-path: polygon(50% 50%, 100% 0, 100% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)
+    clip-path: polygon(
+      50% 50%,
+      100% 0,
+      100% 0%,
+      100% 0%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
   }
 
   75% {
-    clip-path: polygon(50% 50%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 50% 100%, 0% 100%)
+    clip-path: polygon(
+      50% 50%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      100% 100%,
+      50% 100%,
+      0% 100%
+    );
   }
 
   100% {
-    clip-path: polygon(50% 50%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 0% 100%)
+    clip-path: polygon(
+      50% 50%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      50% 100%,
+      0% 100%
+    );
   }
 }
 
 @keyframes l20-2 {
   0% {
-    transform: scaleY(1) rotate(0deg)
+    transform: scaleY(1) rotate(0deg);
   }
 
   49.99% {
-    transform: scaleY(1) rotate(135deg)
+    transform: scaleY(1) rotate(135deg);
   }
 
   50% {
-    transform: scaleY(-1) rotate(0deg)
+    transform: scaleY(-1) rotate(0deg);
   }
 
   100% {
-    transform: scaleY(-1) rotate(-135deg)
+    transform: scaleY(-1) rotate(-135deg);
   }
 }
 
@@ -130,11 +175,11 @@ body {
   @apply uppercase font-haasLight tracking-widest;
 }
 .custom-date-picker .air-datepicker-body--day-name {
-  @apply text-secondary-alt ;
+  @apply text-secondary-alt;
 }
 
 .custom-date-picker .air-datepicker-cell {
-  @apply hover:bg-primary-alt text-secondary-alt font-haasLight rounded-none ;
+  @apply hover:bg-primary-alt text-secondary-alt font-haasLight rounded-none;
 }
 .custom-date-picker .air-datepicker-cell.-selected- {
   @apply bg-primary hover:bg-primary rounded-none text-secondary-alt font-haasLight;
@@ -155,4 +200,22 @@ body {
 
 .react-tabs__tab--selected {
   @apply bg-primary text-secondary-alt;
+}
+
+.hero-video::-webkit-media-controls {
+  display: none !important;
+  opacity: 0 !important;
+}
+
+.hero-video::-webkit-media-controls-start-playback-button {
+  display: none !important;
+  -webkit-appearance: none;
+}
+
+.hero-video::-webkit-media-controls-play-button {
+  display: none !important;
+}
+
+.hero-video::-webkit-media-controls-overlay-play-button {
+  display: none !important;
 }

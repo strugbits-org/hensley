@@ -1,7 +1,15 @@
 "use server";
-import { findSortIndexByCategory, logError } from "@/utils";
+import { cache } from "react";
+import { logError } from "@/utils";
 import { fetchOurCategoriesData } from "..";
-import { queryProductCollectionBySlug, queryProductCollections, queryProductsByCollectionIdsPaginated, queryProductBanners } from "../payloadCollections";
+import {
+    queryProductCollectionBySlug,
+    queryProductCollections,
+    queryProductsByCollectionIdsPaginated,
+    queryProductsByCollectionIdsPaginatedSlim,
+    queryProductsByIdsSlim,
+    queryProductBanners,
+} from "../payloadCollections";
 
 
 export const fetchCategoryPageDetails = async () => {
@@ -9,12 +17,17 @@ export const fetchCategoryPageDetails = async () => {
 };
 
 
-export const fetchSelectedCollectionData = async (slug) => {
+// Normalise the slug at the service boundary: Payload stores slugs as
+// lowercase, but URLs reach us in mixed case. Doing this here means
+// generateMetadata and the page handler hit the same cache key.
+const normaliseCollectionSlug = (slug) => (slug ? String(slug).toLowerCase() : slug);
+
+export const fetchSelectedCollectionData = cache(async (rawSlug) => {
     try {
-        const [ourCategoriesData, selectedCategory, categoriesSortData, productBannersData, pageDetails, allCollections] = await Promise.all([
+        const slug = normaliseCollectionSlug(rawSlug);
+        const [ourCategoriesData, selectedCategory, productBannersData, pageDetails, allCollections] = await Promise.all([
             fetchOurCategoriesData(),
             queryProductCollectionBySlug(slug),
-            fetchCategoriesSortStructure(),
             fetchProductBannersData(),
             fetchCategoryPageDetails(),
             queryProductCollections(),
@@ -56,7 +69,6 @@ export const fetchSelectedCollectionData = async (slug) => {
         };
 
         const collectionIds = getAllDescendantIds(selectedCategory);
-        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory.id);
 
         // Extract ordered product IDs from the productOrder relationship field.
         // The field is populated at depth 2 so items may be objects or plain IDs.
@@ -66,7 +78,7 @@ export const fetchSelectedCollectionData = async (slug) => {
                 .filter(Boolean)
             : [];
 
-        const sortedProducts = await fetchSortedProducts({
+        const sortedProducts = await fetchSortedProductsForListing({
             collectionIds,
             limit: 12,
             skip: 0,
@@ -77,10 +89,10 @@ export const fetchSelectedCollectionData = async (slug) => {
             selectedCategory,
             ourCategoriesData,
             subCategories,
-            categoriesSortData,
+            categoriesSortData: [],
             productBannersData,
             collectionIds,
-            sortIndex,
+            sortIndex: 0,
             sortedProducts,
             productOrder,
             pageDetails,
@@ -92,7 +104,7 @@ export const fetchSelectedCollectionData = async (slug) => {
         logError(`Error fetching selected collection data: ${error.message}`, error);
         return null;
     }
-}
+});
 
 export const fetchSubcategoriesData = async () => {
     return null;
@@ -135,7 +147,32 @@ export const fetchSortedProducts = async ({ collectionIds = [], limit = 12, skip
     }
 };
 
-export const fetchCollectionPagePaths = async () => {
+// PLP-only sorted-products fetcher. Same shape as fetchSortedProducts but
+// uses the slim product select (drops variants/productOptions/recommended/
+// seo). Used for the initial 12 products on /subcategory and /collections
+// AND for subsequent load-more / filter-change calls from the client
+// ProductListing component.
+export const fetchSortedProductsForListing = async ({ collectionIds = [], limit = 12, skip = 0, productOrder } = {}) => {
+    try {
+        if (Array.isArray(productOrder) && productOrder.length > 0) {
+            const pageIds = productOrder.slice(skip, skip + limit);
+            const docs = await queryProductsByIdsSlim(pageIds);
+            const idIndex = new Map(pageIds.map((id, i) => [id, i]));
+            const sorted = [...docs].sort((a, b) => {
+                const ia = idIndex.get(a.id ?? a._id) ?? 9999;
+                const ib = idIndex.get(b.id ?? b._id) ?? 9999;
+                return ia - ib;
+            });
+            return { items: sorted, hasNext: skip + limit < productOrder.length };
+        }
+        return queryProductsByCollectionIdsPaginatedSlim({ collections: collectionIds, limit, skip });
+    } catch (error) {
+        logError(`Error fetching sorted products (listing) data: ${error.message}`, error);
+        return { items: [], hasNext: false };
+    }
+};
+
+export const fetchCollectionPagePaths = cache(async () => {
     try {
         // /collections/[slug] only hosts featured collections — non-featured
         // (and featured-duplicates routed via subcategory) live at /subcategory/[slug].
@@ -154,4 +191,4 @@ export const fetchCollectionPagePaths = async () => {
         logError(`Error fetching collection page params: ${error.message}`, error);
         return [];
     }
-};
+});

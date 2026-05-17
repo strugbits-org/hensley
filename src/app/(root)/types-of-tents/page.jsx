@@ -1,5 +1,5 @@
 import Tents from "@/components/Tents";
-import { fetchFeaturedBlogs, fetchFeaturedProjects, fetchMasterClassTenting, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsData } from "@/services";
+import { fetchFeaturedBlogs, fetchFeaturedProjects, fetchMasterClassTenting, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsDataForListing } from "@/services";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -7,9 +7,9 @@ import { notFound } from "next/navigation";
 export async function generateMetadata() {
   try {
     const metaData = await fetchPageMetaData("types-of-tents");
-    const { title, noFollowTag } = metaData;
+    const { title, robotsTag } = metaData;
     const metadata = { title };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) metadata.robots = "noindex,nofollow";
+    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) metadata.robots = robotsTag;
     return metadata;
   } catch (error) {
     logError("Error in metadata(typesTent page):", error);
@@ -20,7 +20,7 @@ export async function generateMetadata() {
 export default async function Page() {
   try {
     const [tents, pageDetails, masterClassTentingURL] = await Promise.all([
-      fetchTentsData(),
+      fetchTentsDataForListing(),
       fetchTentListingPageDetails(),
       fetchMasterClassTenting()
     ]);

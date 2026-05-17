@@ -1,7 +1,8 @@
 "use server";
-import { findSortIndexByCategory, logError } from "@/utils";
+import { cache } from "react";
+import { logError } from "@/utils";
 import { fetchOurCategoriesData } from "..";
-import { fetchCategoriesSortStructure, fetchProductBannersData, fetchSortedProducts } from "../collections";
+import { fetchProductBannersData, fetchSortedProductsForListing } from "../collections";
 import { queryProductCollectionBySlug, queryProductCollections } from "../payloadCollections";
 
 
@@ -9,18 +10,26 @@ export const fetchsubCategoriesPageDetails = async () => {
     return { ourCategoriesTitle: "Our Categories" };
 };
 
-export const fetchSelectedCategoryData = async (slug) => {
+// Normalise the slug at the service boundary: Payload stores slugs as
+// lowercase, but URLs reach us in mixed case (e.g. /subcategory/HIGHLIGHTS).
+// Doing this here means generateMetadata and the page handler hit the same
+// cache key and we don't burn an upstream request on a doomed query.
+const normaliseCategorySlug = (slug) => {
+    if (!slug) return slug;
+    const lower = String(slug).toLowerCase();
+    return lower === "bars-&-backbars" ? "bars-backbars" : lower;
+};
+
+export const fetchSelectedCategoryData = cache(async (rawSlug) => {
     try {
-        const [ourCategoriesData, categoriesSortData, productBannersData, pageDetails, allCollections] = await Promise.all([
+        const slug = normaliseCategorySlug(rawSlug);
+        const [ourCategoriesData, productBannersData, pageDetails, allCollections, selectedCategory] = await Promise.all([
             fetchOurCategoriesData(),
-            fetchCategoriesSortStructure(),
             fetchProductBannersData(),
             fetchsubCategoriesPageDetails(),
             queryProductCollections(),
+            queryProductCollectionBySlug(slug),
         ]);
-
-        // const selectedCategory = categoriesData.find(category => category.slug === slug);
-        const selectedCategory = await queryProductCollectionBySlug(slug);
 
         if (!selectedCategory) {
             throw new Error(`Category with slug "${slug}" not found`);
@@ -57,7 +66,6 @@ export const fetchSelectedCategoryData = async (slug) => {
         };
 
         const collectionIds = getAllDescendantIds(selectedCategory);
-        const sortIndex = findSortIndexByCategory(categoriesSortData, selectedCategory.id);
 
         // Extract ordered product IDs from the productOrder relationship field.
         const productOrder = Array.isArray(selectedCategory.productOrder)
@@ -66,7 +74,7 @@ export const fetchSelectedCategoryData = async (slug) => {
                 .filter(Boolean)
             : [];
 
-        const sortedProducts = await fetchSortedProducts({
+        const sortedProducts = await fetchSortedProductsForListing({
             collectionIds,
             limit: 12,
             skip: 0,
@@ -77,10 +85,10 @@ export const fetchSelectedCategoryData = async (slug) => {
             selectedCategory,
             ourCategoriesData,
             subCategories,
-            categoriesSortData,
+            categoriesSortData: [],
             productBannersData,
             collectionIds,
-            sortIndex,
+            sortIndex: 0,
             sortedProducts,
             productOrder,
             pageDetails,
@@ -92,9 +100,9 @@ export const fetchSelectedCategoryData = async (slug) => {
         logError(`Error fetching selected collection data: ${error.message}`, error);
         return null;
     }
-}
+});
 
-export const fetchSubCategoryPagePaths = async () => {
+export const fetchSubCategoryPagePaths = cache(async () => {
     try {
         const allCollections = await queryProductCollections();
         const seen = new Set();
@@ -112,7 +120,7 @@ export const fetchSubCategoryPagePaths = async () => {
         logError(`Error fetching sub category page params: ${error.message}`, error);
         return [];
     }
-};
+});
 
 export const fetchAllCategoriesForSorting = async () => {
     return [];

@@ -674,9 +674,8 @@ export const queryProductSlugs = cache(async () => {
 // name/slug + their own subcategory IDs for DAG traversal), and productOrder
 // reduced to ID strings (the ordered IDs feed the paginated products query).
 // At depth 2 with no projection this response ballooned to ~23MB — over the
-// 10MB Next.js data cache limit AND the Vercel response body cap, causing
-// FALLBACK_BODY_TOO_LARGE. Selecting fields + populating products as IDs only
-// keeps the payload tiny; `cache: 'no-store'` skips the data-cache attempt.
+// 10MB Next.js data cache limit. Selecting fields + populating products as
+// IDs only keeps the payload tiny so it fits the data cache.
 export const queryProductCollectionBySlug = async (slug) => {
     try {
         const result = await sdk.find({
@@ -693,12 +692,13 @@ export const queryProductCollectionBySlug = async (slug) => {
                 slug: true,
                 subcategories: true,
                 productOrder: true,
+                parent: true
             },
             populate: {
-                'product-collections': { name: true, slug: true, subcategories: true },
+                'product-collections': { name: true, slug: true, subcategories: true, parent: true },
                 products: {},
             },
-        }, { cache: 'no-store' });
+        });
 
         return result.docs?.[0] || null;
     } catch (error) {
@@ -768,6 +768,83 @@ export const queryProductsByCollectionIdsForHome = async (collections) => {
         throw error;
     }
 }
+
+// Field set the PLP grid + AddToCart-from-grid actually need. Same shape
+// as the homepage best-sellers variant. ProductCard reads title/sku/type/
+// slug/mainMedia/ribbon/collections; AddToCart re-fetches by id when the
+// modal opens and needs more.
+const PLP_LISTING_PRODUCT_SELECT = {
+    title: true,
+    name: true,
+    slug: true,
+    sku: true,
+    type: true,
+    ribbon: true,
+    collections: true,
+    mainMedia: true,
+    mediaItems: true,
+    price: true,
+    compareAtPrice: true,
+    formattedPrice: true,
+    description: true,
+    additionalInfoSections: true,
+    bundleItems: true,
+    tentConfig: true,
+};
+
+// Slim paginated variant for /subcategory and /collections PLPs. Trims off
+// variants/productOptions/recommendedProducts/seo and other heavy graph
+// edges. Same return shape as queryProductsByCollectionIdsPaginated.
+export const queryProductsByCollectionIdsPaginatedSlim = async ({ collections = [], limit = 12, skip = 0 } = {}) => {
+    try {
+        const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
+        const query = {
+            collection: 'products',
+            limit,
+            page,
+            draft: false,
+            locale: "en",
+            depth: 1,
+            select: PLP_LISTING_PRODUCT_SELECT,
+        };
+
+        if (collections.length > 0) {
+            query.where = { collections: { in: collections } };
+        }
+
+        const result = await sdk.find(query);
+
+        return {
+            items: result.docs || [],
+            hasNext: result.hasNextPage ?? false,
+        };
+    } catch (error) {
+        logError('Error querying products by collection IDs (paginated slim):', error);
+        return { items: [], hasNext: false };
+    }
+};
+
+// Slim by-IDs variant. Used by /subcategory and /collections when the
+// collection has an explicit productOrder, so we fetch the configured page
+// slice in the configured order.
+export const queryProductsByIdsSlim = async (ids = []) => {
+    if (!ids || !ids.length) return [];
+    try {
+        const result = await sdk.find({
+            collection: 'products',
+            where: { id: { in: ids } },
+            pagination: false,
+            draft: false,
+            locale: 'en',
+            depth: 1,
+            select: PLP_LISTING_PRODUCT_SELECT,
+        });
+        return ensureArray(result?.docs);
+    } catch (error) {
+        logError('Error querying products by IDs (slim):', error);
+        return [];
+    }
+};
 
 export const queryProductsByCollectionIdsPaginated = async ({ collections = [], limit = 12, skip = 0 } = {}) => {
     try {
@@ -958,9 +1035,14 @@ export const normalizePayloadBlog = (blog) => {
         : null;
     const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
     const displayDate = blog.createdAt || blog.updatedAt || "";
+    // No `...blog` or `...author` spread: previously the raw Payload doc leaked
+    // through (raw content richText body, raw coverImage media doc, _status,
+    // tenantId, createdAt/updatedAt, etc.) inflating the server→client payload.
+    // The detail page reads richContent via blogRef.richContent — no consumer
+    // reads raw fields directly (audit verified).
     return {
-        ...blog,
         _id: blog.id || blog._id,
+        id: blog.id || blog._id,
         slug: blog.slug || "",
         publishDate: displayDate,
         blogRef: {
@@ -970,14 +1052,11 @@ export const normalizePayloadBlog = (blog) => {
             excerpt: blog.excerpt || "",
             richContent: blog.content || null,
         },
-        author: author
-            ? {
-                ...author,
-                nickname: displayName || "",
-                firstName: author.firstName || "",
-                lastName: author.lastName || "",
-            }
-            : { nickname: "", firstName: "", lastName: "" },
+        author: {
+            nickname: displayName || "",
+            firstName: author?.firstName || "",
+            lastName: author?.lastName || "",
+        },
         markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
         blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
@@ -990,23 +1069,34 @@ export const normalizePayloadProject = (project) => {
     if (!project || typeof project !== "object") return project;
     const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
     const heroImageUrl = resolveMediaUrl(project.heroImage, "tablet");
-    const galleryImages = ensureArray(project.galleryImages).map((item) => {
-        if (typeof item === "string") return item;
-        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
-        return imgUrl;
+    // Single pass over galleryImages: previously walked twice (once for URL
+    // strings, once for {url, caption} objects), doubling resolveMediaUrl
+    // calls per project. We tag each entry with isString so the URL-only and
+    // object-only outputs preserve the original semantics: string entries
+    // pass through unresolved to galleryImages and are dropped from
+    // galleryImageObjects; object entries get resolveMediaUrl'd into both.
+    const galleryItems = ensureArray(project.galleryImages).map((item) => {
+        if (typeof item === "string") return { isString: true, value: item };
+        if (!item) return null;
+        const url = resolveMediaUrl(item?.image || item, "tablet");
+        return url ? { isString: false, url, caption: item?.caption || "" } : null;
     }).filter(Boolean);
-    const galleryImageObjects = ensureArray(project.galleryImages).map((item) => {
-        if (!item || typeof item === "string") return null;
-        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
-        return imgUrl ? { url: imgUrl, caption: item?.caption || "" } : null;
-    }).filter(Boolean);
+    const galleryImages = galleryItems.map((g) => (g.isString ? g.value : g.url));
+    const galleryImageObjects = galleryItems
+        .filter((g) => !g.isString)
+        .map(({ url, caption }) => ({ url, caption }));
     const excerpt = project.excerpt || (project.description ? project.description.slice(0, 120) + (project.description.length > 120 ? "..." : "") : "");
     const testimonial = project.testimonial || null;
     const meta = project.meta || {};
 
+    // No `...project` spread: previously the raw Payload doc leaked through
+    // (raw richText description blob, raw cover/hero media docs, _status,
+    // tenantId, createdAt/updatedAt, originalProject, etc.) inflating the
+    // server→client payload with fields no consumer reads. The only spread
+    // dependency was `noFollowTag`, now mapped explicitly.
     return {
-        ...project,
         _id: project.id || project._id,
+        id: project.id || project._id,
         slug: project.slug || "",
         publishDate: project.publishDate || project.publishedDate || "",
         eventDate: project.eventDate || "",
@@ -1016,6 +1106,7 @@ export const normalizePayloadProject = (project) => {
         tags: ensureArray(project.tags),
         isFeatured: project.isFeatured || false,
         order: project.order ?? 0,
+        noFollowTag: project.noFollowTag || false,
         portfolioRef: {
             title: project.title || "",
             coverImage: { imageInfo: coverImageUrl },
@@ -1085,6 +1176,57 @@ export const normalizePayloadProjectForHome = (project) => {
     };
 };
 
+// Listing-page blog normalizer. Same as the homepage variant but also
+// includes blogRef.excerpt because the featured EventHighLight card on
+// /blog reads it. Drops content/storeProducts/meta still.
+export const normalizePayloadBlogForListing = (blog) => {
+    if (!blog || typeof blog !== "object") return blog;
+    const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
+    const author = blog.author && typeof blog.author === "object" ? blog.author : null;
+    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayDate = blog.publishedDate || blog.createdAt || blog.updatedAt || "";
+    return {
+        _id: blog.id || blog._id,
+        id: blog.id || blog._id,
+        slug: blog.slug || "",
+        blogRef: {
+            title: blog.title || "",
+            coverImage: coverImageUrl,
+            publishedDate: displayDate,
+            excerpt: blog.excerpt || "",
+        },
+        author: { nickname: displayName || "" },
+        markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
+        blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
+    };
+};
+
+// Listing-page project normalizer. ProjectCard + EventHighLight read
+// portfolioRef.{title, coverImage.imageInfo, description}, publishDate,
+// markets, studios, portfolioCategories. Drops hero/gallery/testimonial/
+// storeProducts/meta hydration.
+export const normalizePayloadProjectForListing = (project) => {
+    if (!project || typeof project !== "object") return project;
+    const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
+    return {
+        _id: project.id || project._id,
+        id: project.id || project._id,
+        slug: project.slug || "",
+        order: project.order ?? 0,
+        publishDate: project.publishDate || project.publishedDate || "",
+        portfolioRef: {
+            title: project.title || "",
+            slug: project.slug || "",
+            coverImage: { imageInfo: coverImageUrl },
+            description: project.description || "",
+        },
+        markets: ensureArray(project.markets).map(normalizePayloadMarketRef),
+        studios: ensureArray(project.studios).map(normalizePayloadStudioRef),
+        portfolioCategories: ensureArray(project.portfolioCategories).map(normalizePayloadProjectCategoryRef),
+    };
+};
+
 export const normalizePayloadBlogCategory = (cat) => {
     if (!cat || typeof cat !== "object") return cat;
     return {
@@ -1120,7 +1262,7 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1 } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
@@ -1131,6 +1273,7 @@ export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, d
             draft: false,
             locale: "en",
             depth,
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1139,7 +1282,7 @@ export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, d
     }
 };
 
-export const queryBlogBySlug = async (slug) => {
+export const queryBlogBySlug = async (slug, { depth = 2, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
@@ -1147,7 +1290,8 @@ export const queryBlogBySlug = async (slug) => {
             limit: 1,
             draft: false,
             locale: "en",
-            depth: 2,
+            depth,
+            ...(select ? { select } : {}),
         });
         return result?.docs?.[0] || null;
     } catch (error) {
@@ -1177,7 +1321,7 @@ export const queryBlogCategories = async () => {
 // Payload SDK queries — Projects
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryProjects = async ({ where = {}, sort = "order", limit, depth = 2 } = {}) => {
+export const queryProjects = async ({ where = {}, sort = "order", limit, depth = 2, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "projects",
@@ -1188,6 +1332,7 @@ export const queryProjects = async ({ where = {}, sort = "order", limit, depth =
             draft: false,
             locale: "en",
             depth,
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1196,7 +1341,7 @@ export const queryProjects = async ({ where = {}, sort = "order", limit, depth =
     }
 };
 
-export const queryProjectBySlug = async (slug, { draft = false } = {}) => {
+export const queryProjectBySlug = async (slug, { draft = false, depth = 2, select } = {}) => {
     try {
         const whereClause = draft
             ? { slug: { equals: slug } }
@@ -1207,7 +1352,8 @@ export const queryProjectBySlug = async (slug, { draft = false } = {}) => {
             limit: 1,
             draft,
             locale: "en",
-            depth: 2,
+            depth,
+            ...(select ? { select } : {}),
         });
         return result?.docs?.[0] || null;
     } catch (error) {
@@ -1268,6 +1414,7 @@ export const queryMarkets = async (options = {}) => {
             sort = "order",
             draft = false,
             locale = "en",
+            select,
         } = options;
 
         const result = await sdk.find({
@@ -1279,6 +1426,7 @@ export const queryMarkets = async (options = {}) => {
             depth,
             ...(where ? { where } : {}),
             ...(typeof limit === "number" ? { limit } : {}),
+            ...(select ? { select } : {}),
         });
         return ensureArray(result?.docs);
     } catch (error) {
@@ -1369,7 +1517,7 @@ export const sectionToObject = (section) => {
 
 // ── New First-Class Collection Queries ───────────────────────────────────────
 
-const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1 }) => {
+const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, sort = "order", limit = 100, depth = 1, select }) => {
     const baseWhere = {
         and: [
             { tenant: { equals: tenantId } },
@@ -1387,6 +1535,7 @@ const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, so
         draft: false,
         locale: "en",
         pagination: false,
+        ...(select ? { select } : {}),
     });
 
     return ensureArray(result?.docs);
@@ -1394,7 +1543,17 @@ const findPublishedByTenant = async ({ collection, tenantId, extraWhere = {}, so
 
 export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "how-we-do-it", tenantId, limit: 10 });
+        return await findPublishedByTenant({
+            collection: "how-we-do-it",
+            tenantId,
+            limit: 10,
+            select: {
+                title: true,
+                content: true,
+                image: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying how-we-do-it: ${error.message}`, error);
         return [];
@@ -1403,7 +1562,19 @@ export async function queryHowWeDoIt(tenantId = CORE_TENANT_ID) {
 
 export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "dream-team-members", tenantId, limit: 100 });
+        return await findPublishedByTenant({
+            collection: "dream-team-members",
+            tenantId,
+            limit: 100,
+            select: {
+                name: true,
+                jobTitle: true,
+                title: true,
+                photo: true,
+                image: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying dream-team-members: ${error.message}`, error);
         return [];
@@ -1412,7 +1583,19 @@ export async function queryDreamTeamMembers(tenantId = CORE_TENANT_ID) {
 
 export async function queryPartnerBrands(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "partner-brands", tenantId, limit: 10 });
+        return await findPublishedByTenant({
+            collection: "partner-brands",
+            tenantId,
+            limit: 10,
+            select: {
+                title: true,
+                description: true,
+                logo: true,
+                buttonLabel: true,
+                buttonLink: true,
+                order: true,
+            },
+        });
     } catch (error) {
         logError(`Error querying partner-brands: ${error.message}`, error);
         return [];
@@ -1426,6 +1609,19 @@ export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 
             tenantId,
             extraWhere: { type: { equals: type } },
             limit: 20,
+            select: {
+                name: true,
+                authorName: true,
+                title: true,
+                authorTitle: true,
+                feedback: true,
+                description: true,
+                image: true,
+                avatar: true,
+                sectionTitle: true,
+                type: true,
+                order: true,
+            },
         });
     } catch (error) {
         logError(`Error querying testimonials (type=${type}): ${error.message}`, error);

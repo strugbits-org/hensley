@@ -65,6 +65,7 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         );
     };
 
+
     const getNestedItemsForSubMenu = (item) => {
         if (!item) return [];
 
@@ -149,8 +150,12 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                 data: sortByOrderNumber(itemIsMarkets ? marketsData : tentsData),
             };
             if (selectedMenu) {
-                setSelectedMenu(false);
-                setTimeout(() => setSelectedMenu(newMenu), 50);
+                if (selectedMenu.title === newMenu.title) {
+                    setSelectedMenu(false);
+                } else {
+                    setSelectedMenu(false);
+                    setTimeout(() => setSelectedMenu(newMenu), 50);
+                }
             } else {
                 setSelectedMenu(newMenu);
             }
@@ -181,10 +186,14 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
             };
 
             if (selectedMenu) {
-                setSelectedMenu(false);
-                setTimeout(() => {
-                    setSelectedMenu(newMenu);
-                }, 50);
+                if (selectedMenu.title === newMenu.title) {
+                    setSelectedMenu(false);
+                } else {
+                    setSelectedMenu(false);
+                    setTimeout(() => {
+                        setSelectedMenu(newMenu);
+                    }, 50);
+                }
             } else {
                 setSelectedMenu(newMenu);
             }
@@ -244,28 +253,28 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         }
     }
 
-    const fetchCartItems = async () => {
-        try {
-            const response = await getProductsCart();
-            if (response === "Token has expired") {
-                removeCookie("authToken", { path: "/" });
-                removeCookie("userData", { path: "/" });
-                removeCookie("cartQuantity", { path: "/" });
-                removeCookie("userTokens", { path: "/" });
-                setTimeout(() => {
-                    router.push("/");
-                }, 500);
-                return;
-            }
-            const lineItems = response?.lineItems || [];
-            const total = calculateTotalCartQuantity(lineItems);
-            if (total !== cookies.cartQuantity) {
-                setCookie("cartQuantity", total, { path: "/" });
-            }
-        } catch (error) {
-            console.error("Error fetching cart items:", error);
-        }
-    };
+    // const fetchCartItems = async () => {
+    //     try {
+    //         const response = await getProductsCart();
+    //         if (response === "Token has expired") {
+    //             removeCookie("authToken", { path: "/" });
+    //             removeCookie("userData", { path: "/" });
+    //             removeCookie("cartQuantity", { path: "/" });
+    //             removeCookie("userTokens", { path: "/" });
+    //             setTimeout(() => {
+    //                 router.push("/");
+    //             }, 500);
+    //             return;
+    //         }
+    //         const lineItems = response?.lineItems || [];
+    //         const total = calculateTotalCartQuantity(lineItems);
+    //         if (total !== cookies.cartQuantity) {
+    //             setCookie("cartQuantity", total, { path: "/" });
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching cart items:", error);
+    //     }
+    // };
 
     // useEffect(() => {
     //     fetchCartItems();
@@ -320,16 +329,30 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         actions.setTentsIds(ids);
     }, [tentsData]);
 
+    useEffect(() => {
+            const handleClickOutside = (event) => {
+            if (window.innerWidth >= 1024 && selectedMenu) {
+                const desktopMenu = document.querySelector('.desktop-menu');
+                if (desktopMenu && !desktopMenu.contains(event.target)) {
+                    setSelectedMenu(false);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [selectedMenu]);
+
     return (
         <>
             <header>
-                <div className='hidden lg:block fixed inset-x-0 top-0 z-50 desktop-menu'>
+                <div className='hidden lg:block fixed inset-x-0 top-0 z-[110] desktop-menu'>
                     <div className="h-[45px] relative">
                         <div className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px]"></div>
                         <nav className="h-full flex items-center justify-between" aria-label="Main Navigation">
                             {/* Logo */}
                             <div className="flex p-2 lg:px-6">
-                                <CustomLink to="/" onClick={closeAllModals}>
+                                <CustomLink to="/" onClick={() => {closeAllModals(); setActiveMenu(defaultActiveMenu); }}>
                                     <span className="sr-only">Hensley Event Resources</span>
                                     <Image src={logo} className='min-w-[184px]' alt="Hensley Event Resources Logo" />
                                 </CustomLink>
@@ -431,11 +454,11 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                     </Suspense>
                 </div>
 
-                <div className="relative z-50">
-                    <div className='mobile-menu lg:hidden fixed inset-x-3 top-3 z-50 px-6 py-2'>
+                <div className="relative z-[110]">
+                    <div className='mobile-menu lg:hidden fixed inset-x-3 top-3 z-[110] px-6 py-2'>
                         <div className={`absolute inset-0 -z-10 backdrop-blur-[20px] brightness-[50px] ${isMobileMenuOpen ? "bg-glass-white" : "bg-secondary-glass"}`}></div>
                         <div className="flex p-2 lg:px-6 justify-between">
-                            <CustomLink to="/" onClick={closeAllModals}>
+                            <CustomLink to="/" onClick={() => {closeAllModals(); setActiveMenu(defaultActiveMenu); }}>
                                 <span className="sr-only">Hensley Event Resources</span>
                                 <Image src={logo} className={`min-w-[174px] ${isMobileMenuOpen ? "hidden" : "block"}`} alt="Hensley Event Resources Logo" />
                                 <Image src={icon} className={`h-7 min-w-[27px] ${isMobileMenuOpen ? "block" : "hidden"}`} alt="Hensley Event Resources Logo" />

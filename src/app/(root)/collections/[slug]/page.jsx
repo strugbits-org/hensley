@@ -4,6 +4,11 @@ import { fetchCollectionPagePaths, fetchSelectedCollectionData } from "@/service
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
+// Pre-render every featured collection slug at build time and serve them as
+// static HTML. Unknown slugs fall through to on-demand rendering (then cached).
+export const dynamicParams = true;
+export const revalidate = +process.env.REVALIDATE_TIME || 86400;
+
 
 
 export async function generateMetadata({ params }) {
@@ -18,12 +23,12 @@ export async function generateMetadata({ params }) {
      fetchSelectedCollectionData(slug)
     ]);
 
-    const { title, noFollowTag } = metaData || {};
+    const { title, robotsTag } = metaData || {};
     const { selectedCategory } = subCategoryData || {};
     const fullTitle = (selectedCategory?.name || slug) + " " + (title || "");
     const metadata = { title: fullTitle };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
-      metadata.robots = "noindex,nofollow";
+    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
+      metadata.robots = robotsTag;
     }
 
     return metadata;
@@ -55,7 +60,6 @@ export default async function Page({ params }) {
 
     if (!data) {
       notFound();
-      return;
     }
 
     return (

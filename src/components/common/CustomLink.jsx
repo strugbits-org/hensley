@@ -8,40 +8,38 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
   const router = useRouter();
   const pathname = usePathname();
 
-  const delayedRedirect = (e) => {
-    e.preventDefault();
-
+  const handleClick = (e) => {
     if (typeof window !== 'undefined') {
       document.body.classList.remove('overflow-hidden');
-    };
+    }
 
     if (onClick) onClick();
 
+    // Empty target: just scroll. Don't navigate.
     if (to === undefined || !to || to === "") {
+      e.preventDefault();
       scrollToTop();
       return;
-    };
+    }
 
+    // Same-path click: scroll to top, no loader theatre, no navigation.
     if (pathname === to) {
-      loaderActions.show();
+      e.preventDefault();
       scrollToTop();
-      setTimeout(() => loaderActions.hide(), 900);
       return;
     }
 
-    if (target === undefined || !target || target === "") {
-      loaderActions.show();
-      setTimeout(() => {
-        router.push(to);
-        router.refresh();
-      }, 600);
-    } else {
-      window.open(to, target);
+    // External / new-tab: let the browser handle it.
+    if (target) {
+      return;
     }
 
+    // Internal navigation: show the loader and let Next's <Link> push
+    // immediately. The loader hides on route change via LoaderProvider.
+    loaderActions.show();
   };
 
-  if (to && (typeof to === "string" && to && to.startsWith("tel") || to.startsWith("mailto"))) {
+  if (to && typeof to === "string" && (to.startsWith("tel") || to.startsWith("mailto"))) {
     return (
       <a
         href={to || ""}
@@ -56,11 +54,10 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
 
   return (
     <Link
-      prefetch={false}
       href={to || ""}
       target={target}
       className={className}
-      onClick={delayedRedirect}
+      onClick={handleClick}
       {...attributes}
     >
       {children}

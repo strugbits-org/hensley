@@ -4,6 +4,11 @@ import { SubCategoryPage } from "@/components/SubCategory";
 import { fetchSelectedCategoryData, fetchSubCategoryPagePaths } from "@/services/subcategory";
 import { fetchPageMetaData } from "@/services";
 
+// Pre-render every known subcategory slug at build time and serve them as
+// static HTML. Unknown slugs fall through to on-demand rendering (then cached).
+export const dynamicParams = true;
+export const revalidate = +process.env.REVALIDATE_TIME || 86400;
+
 
 export async function generateMetadata({ params }) {
   try {
@@ -13,16 +18,16 @@ export async function generateMetadata({ params }) {
       metaData,
       subCategoryData
     ] = await Promise.all([
-      fetchPageMetaData("market"),
-      fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug)
+      fetchPageMetaData("subcategory"),
+      fetchSelectedCategoryData(slug)
     ]);
 
-    const { title, noFollowTag } = metaData || {};
+    const { title, robotsTag } = metaData || {};
     const { selectedCategory } = subCategoryData || {};
     const fullTitle = (selectedCategory?.name || slug) + " " + (title || "");
     const metadata = { title: fullTitle };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
-      metadata.robots = "noindex,nofollow";
+    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
+      metadata.robots = robotsTag;
     }
 
     return metadata;
@@ -43,11 +48,11 @@ export const generateStaticParams = async () => {
 
 export default async function Page({ params }) {
   try {
-    const slug = decodeURIComponent(params.slug?.toLowerCase());
+    const slug = decodeURIComponent(params.slug);
     if (!slug) {
       throw new Error("Slug is required");
     }
-    const data = await fetchSelectedCategoryData(slug === "bars-&-backbars" ? "bars-backbars" : slug);
+    const data = await fetchSelectedCategoryData(slug);
 
     if (!data) {
       notFound();

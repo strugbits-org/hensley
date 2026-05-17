@@ -6,7 +6,7 @@ export const ProductsFilterPopup = ({ selectedCategory, subCategories, onFilterC
     const filterIcon = isActive ? "/icons/0e0ac5_afdc5e19d5f849fa973b191220040065.svg" : "/icons/0e0ac5_4aae04aee0b3485b8d8e621d030eecbe.svg";
     if (hidden) return null;
     return (
-        <div className={`z-10 absolute right-6 ${type !== "subCategory" ? 'lg:hidden' : 'top-0'}`}>
+        <div className={`z-10 absolute right-4 ${type !== "subCategory" ? 'lg:hidden' : 'top-0'}`}>
             <div onClick={() => setIsActive(!isActive)} className={`cursor-pointer absolute right-full top-0 flex z-20 justify-center items-center w-[55px] h-[55px] border border-secondary-alt rounded-[50px] transition-all duration-300 ${type === "subCategory" && isActive ? 'border-transparent hover:border-secondary-alt' : ''}`}>
                 <PrimaryImage url={filterIcon} alt={"cat-tab"} />
             </div>

@@ -168,24 +168,6 @@ export const formatDateNumeric = (d) => {
     return `${month}/${day}/${year}`;
 };
 
-
-export const findSortIndexByCategory = (data, categoryId) => {
-    const sortMapping = {
-        'Highlights': 'highlightSubCategoryIndex',
-        'Premium': 'premiumSubCategoryIndex',
-        'Main': 'categorySortIndex',
-        'L1': 'l1SubCategoryIndex',
-        'L2': 'l2SubCategoryIndex'
-    }
-
-    const category = data.find(item => 
-        item.collections === categoryId || 
-        item.collections?._id === categoryId
-    );
-    const sortIndex = category?.sortTitle?.[0];
-    return sortIndex ? sortMapping[sortIndex] : null;
-};
-
 export const formatTotalPrice = (price) => {
     return '$' + (parseFloat(price) || 0).toFixed(2);
 }
@@ -458,23 +440,13 @@ export const richTextToHTML = (content) => {
 export const richTextToPlainText = (content) => {
     if (!content) return "";
 
-    if (typeof content === "string") {
-        return content
-            .replace(/<br\s*\/?>/gi, "\n")
-            .replace(/<[^>]*>/g, " ")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\s+\n/g, "\n")
-            .replace(/\n\s+/g, "\n")
-            .replace(/\n{3,}/g, "\n\n")
-            .replace(/[ \t]{2,}/g, " ")
-            .trim();
-    }
-
     if (content?.root?.type === "root") {
         return extractLexicalNodeText(content.root)
             .replace(/\n{3,}/g, "\n\n")
             .trim();
     }
+
+    if (typeof content === "string") return content.trim();
 
     return "";
 };
@@ -545,7 +517,6 @@ export const normalizeProductForDisplay = (product = {}) => {
         compareAtPrice: compareAtPrice || null,
         formattedPrice: product?.formattedPrice || formatTotalPrice(price),
         formattedCompareAtPrice: compareAtPrice ? formatTotalPrice(compareAtPrice) : "",
-        description: descriptionHtml,
         descriptionHtml,
         descriptionText,
         additionalInfoSections,

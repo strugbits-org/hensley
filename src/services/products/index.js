@@ -1,8 +1,27 @@
 "use server";
+import { cache } from "react";
 import { logError, normalizeProductForDisplay } from "@/utils";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
-import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProject, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload, queryProductSlugs } from "../payloadCollections";
+import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProjectForListing, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload, queryProductSlugs } from "../payloadCollections";
+
+// Field set FeaturedProjects (PDP/tent/pool-cover) + the Tents listing actually
+// render: portfolioRef.{title, slug, coverImage.imageInfo}. Listing slim already
+// covers it — reuse PROJECT_LISTING_SELECT-equivalent fields here so the
+// featured fetch stays small and drops gallery/hero/testimonial/storeProducts.
+const FEATURED_PROJECT_SELECT = {
+    title: true,
+    slug: true,
+    description: true,
+    coverImage: true,
+    publishDate: true,
+    publishedDate: true,
+    order: true,
+    isHidden: true,
+    markets: true,
+    studios: true,
+    portfolioCategories: true,
+};
 
 const baseUrl = process.env.BASE_URL;
 
@@ -101,7 +120,11 @@ export const fetchProductCollectionData = async (id, productData = null) => {
     }
 }
 
-export const fetchFeaturedProjects = async (id) => {
+// Request-cached + slimmed. FeaturedProjects/OurProjects sliders only render
+// portfolioRef.{title,slug,coverImage.imageInfo} so we skip depth:2 hydration
+// of hero, galleryImages, testimonial, storeProducts, meta. cache() dedupes the
+// per-tent fan-out on /types-of-tents within a single request.
+export const fetchFeaturedProjects = cache(async (id) => {
     try {
         if (!id || (typeof id !== "string" && typeof id !== "number")) {
             return [];
@@ -109,13 +132,15 @@ export const fetchFeaturedProjects = async (id) => {
         const payloadProjects = await queryProjects({
             where: { storeProducts: { contains: id } },
             sort: "order",
+            depth: 1,
+            select: FEATURED_PROJECT_SELECT,
         });
-        return payloadProjects.map(normalizePayloadProject);
+        return payloadProjects.map(normalizePayloadProjectForListing);
     } catch (error) {
         logError(`Error fetching featured projects: ${error.message}`, error);
         return [];
     }
-}
+})
 
 // fetchMatchedProducts removed — replaced by product.recommendedProducts from bps-core.
 

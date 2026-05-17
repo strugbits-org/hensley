@@ -29,6 +29,7 @@ export const PrimaryImage = ({
     if (!url) return null;
 
     const ref = useRef();
+    const lastDimsRef = useRef({ w: 0, h: 0 });
     const [src, setSrc] = useState();
     const [height, setHeight] = useState();
     const [width, setWidth] = useState();
@@ -39,6 +40,21 @@ export const PrimaryImage = ({
         const numericMinimumValue = Number(minimumValue) || 0;
 
         return Math.max(numericMeasuredValue, numericFallbackValue, numericMinimumValue, 1);
+    };
+
+    // Suppress re-fetches during layout settle. Only re-fetch when the
+    // container has grown meaningfully larger than any size we've already
+    // fetched — a shrinking container can keep using the higher-resolution
+    // image we already loaded (no visible flash, no aspect-crop jump from
+    // the CDN re-cropping at a new size). Slider transitions and flex
+    // reflows commonly cause shrink-then-grow churn that this skips.
+    const SIZE_HYSTERESIS = 0.15;
+    const dimsChangedMeaningfully = (nextW, nextH) => {
+        const { w: prevW, h: prevH } = lastDimsRef.current;
+        if (!prevW || !prevH) return true;
+        const growW = (nextW - prevW) / prevW;
+        const growH = (nextH - prevH) / prevH;
+        return growW > SIZE_HYSTERESIS || growH > SIZE_HYSTERESIS;
     };
 
     const isWixUrl = (u) => typeof u === 'string' && (u.startsWith('wix:image://v1/') || u.startsWith('wix:vector://v1/'));
@@ -60,12 +76,27 @@ export const PrimaryImage = ({
             if (ref.current) {
                 const nextWidth = resolveDimension(ref.current.clientWidth, defaultDimensions?.width, min_w);
                 const nextHeight = resolveDimension(ref.current.clientHeight, defaultDimensions?.height, min_h);
+
+                // Layout-settle suppression: if we already have a URL and the
+                // new container size is within the hysteresis band, keep the
+                // current src to avoid the visible re-fetch flash.
+                if (src && !dimsChangedMeaningfully(nextWidth, nextHeight)) {
+                    return src;
+                }
+
+                // Track the largest dimensions we've requested on each axis
+                // independently. A resize that is wider-but-shorter shouldn't
+                // discard the taller image we already have, since the next
+                // resize back to the original aspect would otherwise re-fetch.
+                const requestW = Math.max(lastDimsRef.current.w || 0, nextWidth);
+                const requestH = Math.max(lastDimsRef.current.h || 0, nextHeight);
+                lastDimsRef.current = { w: requestW, h: requestH };
                 setHeight(currentHeight => currentHeight === nextHeight ? currentHeight : nextHeight);
                 setWidth(currentWidth => currentWidth === nextWidth ? currentWidth : nextWidth);
                 return generateCoreImageURL({
                     url: baseUrl,
-                    w: nextWidth,
-                    h: nextHeight,
+                    w: requestW,
+                    h: requestH,
                     q: Number(q) || 75,
                     // PrimaryImage defaults `fit` to "fill"; that maps to the CDN
                     // default so we omit it from the query.
@@ -85,20 +116,30 @@ export const PrimaryImage = ({
             const nextWidth = resolveDimension(ref.current.clientWidth, defaultDimensions?.width, min_w);
             const nextHeight = resolveDimension(ref.current.clientHeight, defaultDimensions?.height, min_h);
 
+            if (src && !dimsChangedMeaningfully(nextWidth, nextHeight)) {
+                return src;
+            }
+
+            // See Core-path comment above: track max dims per-axis so a
+            // narrower-but-taller (or vice versa) resize doesn't drop the
+            // already-loaded image.
+            const requestW = Math.max(lastDimsRef.current.w || 0, nextWidth);
+            const requestH = Math.max(lastDimsRef.current.h || 0, nextHeight);
+            lastDimsRef.current = { w: requestW, h: requestH };
             setHeight(currentHeight => currentHeight === nextHeight ? currentHeight : nextHeight);
             setWidth(currentWidth => currentWidth === nextWidth ? currentWidth : nextWidth);
 
             switch (type) {
                 case "default":
-                    return generateImageURL({ wix_url: url, w: nextWidth, h: nextHeight, original, fit, q });
+                    return generateImageURL({ wix_url: url, w: requestW, h: requestH, original, fit, q });
                 case "alternate":
-                    return generateImageURLAlternate({ wix_url: url, w: nextWidth, h: nextHeight, original, fit, q });
+                    return generateImageURLAlternate({ wix_url: url, w: requestW, h: requestH, original, fit, q });
                 case "svg":
                     return generateSVGURL(url);
                 case "product":
-                    return `${url}/v1/${fit}/w_${nextWidth},h_${nextHeight},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
+                    return `${url}/v1/${fit}/w_${requestW},h_${requestH},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
                 case "insta":
-                    return `https://static.wixstatic.com/media/${url}/v1/${fit}/w_${nextWidth},h_${nextHeight},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
+                    return `https://static.wixstatic.com/media/${url}/v1/${fit}/w_${requestW},h_${requestH},al_c,q_${q},usm_0.66_1.00_0.01,enc_auto/compress.webp`;
                 default:
                     return "";
             }

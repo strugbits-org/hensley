@@ -5,7 +5,7 @@ import SectionTitle from "../common/SectionTitle";
 import { resolveCoreMediaUrl } from "@/utils";
 
 const CareerOpportunities = ({ data }) => {
-  const { subtitle, title, buttonLabel, detail, video } = data;
+  const { subtitle, title, detail, video } = data;
 
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -22,18 +22,7 @@ const CareerOpportunities = ({ data }) => {
     }
   };
 
-  const getWixVideoUrl = (wixVideoUri) => {
-    if (!wixVideoUri) return null;
-    const resolvedUrl = resolveCoreMediaUrl(wixVideoUri);
-    if (!resolvedUrl.startsWith('wix:')) return resolvedUrl;
-    
-    const match = resolvedUrl.match(/wix:video:\/\/v1\/([a-zA-Z0-9_]+)/);
-    return match
-      ? `https://video.wixstatic.com/video/${match[1]}/1080p/mp4/file.mp4`
-      : resolvedUrl;
-  };
-
-  const videoSrc = getWixVideoUrl(video);
+  const videoSrc = resolveCoreMediaUrl(video);
 
   const paragraphs = detail
     ?.split(/\n\s*\n/)
@@ -80,6 +69,7 @@ const CareerOpportunities = ({ data }) => {
               ref={videoRef}
               src={videoSrc}
               controls
+              controlsList="nodownload noremoteplayback"
               loop
               muted
               onPlay={() => setIsPlaying(true)}

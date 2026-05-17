@@ -41,7 +41,11 @@ function SecondaryProductCard({ data, type = 'listing', allCollections = [] }) {
                     ) : (
                         <Image src={imageUrl} loader={coreImageLoader} alt={name || 'Product'} width={400} height={400} sizes="(max-width: 1024px) 50vw, 33vw" loading="eager" quality={70} className="w-full aspect-[0.749] object-contain transition-transform duration-300 group-hover:scale-105" />
                     )
-                ) : null}
+                ) : (
+                    <div className="w-full aspect-[0.749] flex items-center justify-center bg-primary-bg">
+                        <span className="font-haasRegular text-[11px] uppercase tracking-widest text-secondary-alt opacity-60">No image</span>
+                    </div>
+                )}
             </CustomLink>
 
             <div className="max-w-full flex gap-2 py-[7px] justify-between items-center max-lg:flex-col">
