@@ -47,7 +47,7 @@ function HeroSection({ heroSectionData }) {
           </div>
         </div>
 
-        <div className="lg:w-1/2 p-5 md:h-screen sm:h-[500px] md:w-full relative">
+        <div className="lg:w-1/2 p-3 h-[500px] md:h-screen md:w-full relative">
           <PrimaryImage timeout={0} url={image} size="tablet" customClasses={"h-full w-full object-cover "} />
           <Image
             src={arrow}

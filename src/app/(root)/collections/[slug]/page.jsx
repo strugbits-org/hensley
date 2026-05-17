@@ -60,7 +60,6 @@ export default async function Page({ params }) {
 
     if (!data) {
       notFound();
-      return;
     }
 
     return (
