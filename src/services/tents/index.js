@@ -1,12 +1,33 @@
+import { cache } from "react";
 import { logError, resolveCoreMediaUrl } from "@/utils";
 import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
 import { fetchMasterClassTenting } from "..";
 import {
     queryBlogs,
-    normalizePayloadBlog,
+    normalizePayloadBlogForListing,
     queryProductsFromPayload,
     queryProductCollectionBySlug,
 } from "../payloadCollections";
+
+// Slim featured-blog projection: FeaturedBlogCard reads
+// {blogRef.{title,coverImage}, markets, studios, slug, author.nickname}.
+// The *ForListing normalizer is a superset, so reuse and drop depth:2
+// hydration of content body + storeProducts + meta.
+const FEATURED_BLOG_SELECT = {
+    title: true,
+    slug: true,
+    excerpt: true,
+    coverImage: true,
+    author: true,
+    markets: true,
+    studios: true,
+    blogCategories: true,
+    publishedDate: true,
+    createdAt: true,
+    updatedAt: true,
+    order: true,
+    isHidden: true,
+};
 
 const sortByConfiguredOrder = (products, orderedIds) => {
     if (!orderedIds?.length) return products;
@@ -183,18 +204,22 @@ export const fetchTentPageData = async (slug) => {
     }
 };
 
-export const fetchFeaturedBlogs = async (productId) => {
+// Request-cached + slimmed. Mirrors the fetchFeaturedBlogs export in
+// services/index.js — both feed the FeaturedBlogs slider.
+export const fetchFeaturedBlogs = cache(async (productId) => {
     try {
         if (!productId) return [];
         const payloadBlogs = await queryBlogs({
             where: { storeProducts: { contains: productId } },
+            depth: 1,
+            select: FEATURED_BLOG_SELECT,
         });
-        return payloadBlogs.map(normalizePayloadBlog);
+        return payloadBlogs.map(normalizePayloadBlogForListing);
     } catch (error) {
         logError(`Error fetching featured blogs: ${error.message}`, error);
         return [];
     }
-};
+});
 
 // ---------------------------------------------------------------------------
 // Normalization – map a raw Payload product (type: 'tent', depth >= 2) to the

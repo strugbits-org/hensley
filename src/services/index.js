@@ -18,8 +18,10 @@ import {
   normalizePayloadStudio,
   normalizePayloadProject,
   normalizePayloadProjectForHome,
+  normalizePayloadProjectForListing,
   normalizePayloadBlog,
   normalizePayloadBlogForHome,
+  normalizePayloadBlogForListing,
   querySection,
   sectionToObject,
   queryTestimonialsByType,
@@ -384,30 +386,75 @@ export const fetchBlogsData = async () => {
   }
 };
 
-export const fetchFeaturedBlogs = async (productId) => {
+// Field sets / normalizers slimmed for the FeaturedBlogs + FeaturedProjects
+// sliders. FeaturedBlogCard reads {blogRef.{title,coverImage}, markets, studios,
+// slug, author.nickname}; FeaturedProjects/OurProjects read portfolioRef.
+// {title, slug, coverImage.imageInfo}. The *ForListing normalizers already
+// produce a superset of those, so reuse them and drop depth:2 hydration of
+// content body, hero/gallery, testimonial, storeProducts, meta.
+const FEATURED_BLOG_SELECT = {
+  title: true,
+  slug: true,
+  excerpt: true,
+  coverImage: true,
+  author: true,
+  markets: true,
+  studios: true,
+  blogCategories: true,
+  publishedDate: true,
+  createdAt: true,
+  updatedAt: true,
+  order: true,
+  isHidden: true,
+};
+
+const FEATURED_PROJECT_SELECT = {
+  title: true,
+  slug: true,
+  description: true,
+  coverImage: true,
+  publishDate: true,
+  publishedDate: true,
+  order: true,
+  isHidden: true,
+  markets: true,
+  studios: true,
+  portfolioCategories: true,
+};
+
+// Request-cached: /types-of-tents fans out featured fetches across N tents in
+// the same request — cache() ensures shared ids hit once. Per-id memoization
+// still costs N calls when ids differ, but each is now slim.
+export const fetchFeaturedBlogs = cache(async (productId) => {
   try {
+    if (!productId) return [];
     const payloadBlogs = await queryBlogs({
       where: { storeProducts: { contains: productId } },
+      depth: 1,
+      select: FEATURED_BLOG_SELECT,
     });
-    return payloadBlogs.map(normalizePayloadBlog);
+    return payloadBlogs.map(normalizePayloadBlogForListing);
   } catch (error) {
     logError(`Error fetching featured blogs: ${error.message}`, error);
     return [];
   }
-}
+})
 
-export const fetchFeaturedProjects = async (id) => {
+export const fetchFeaturedProjects = cache(async (id) => {
   try {
+    if (!id) return [];
     const payloadProjects = await queryProjects({
       where: { storeProducts: { contains: id } },
       sort: "order",
+      depth: 1,
+      select: FEATURED_PROJECT_SELECT,
     });
-    return payloadProjects.map(normalizePayloadProject);
+    return payloadProjects.map(normalizePayloadProjectForListing);
   } catch (error) {
     logError(`Error fetching featured projects: ${error.message}`, error);
     return [];
   }
-}
+})
 
 export const fetchBestSellers = async () => {
   try {
