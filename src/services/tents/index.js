@@ -162,6 +162,82 @@ export const fetchAllTentsForHeader = async () => {
     }
 };
 
+// ---------------------------------------------------------------------------
+// Listing variant for /types-of-tents. Reads ONLY the fields TentsTypes,
+// TentTypesSlider, and BannerStructures actually render:
+//   - id (used by the page to fan out featured-projects/blogs fetches)
+//   - title, slug, mainMedia (cards + banner background)
+//   - additionalInfoSections (INFO / PROS / CONS in BannerStructures)
+// Skips depth:2 hydration of mediaItems, recommendedProducts, collections,
+// productOptions, tentConfig, description, price — none of which the listing
+// page renders. Drops the heavy normalizeTentItem chain that builds the
+// gallery + recommendedProducts summaries.
+// ---------------------------------------------------------------------------
+
+const fetchTentProductsForListing = async () => {
+    const tentsCollection = await queryProductCollectionBySlug("tents").catch(() => null);
+    const orderedIds = resolveProductOrderIds(tentsCollection);
+
+    const where = {
+        and: [
+            { type: { equals: "tent" } },
+            { visible: { equals: true } },
+            { status: { equals: "active" } },
+        ],
+    };
+
+    const { docs } = await queryProductsFromPayload({
+        where,
+        depth: 1,
+        limit: 100,
+        select: {
+            title: true,
+            slug: true,
+            type: true,
+            mainMedia: true,
+            additionalInfoSections: true,
+        },
+    });
+
+    return sortByConfiguredOrder(docs, orderedIds);
+};
+
+// Shape matches what Tents/TentsTypes/BannerStructures destructure:
+//   item.tent.{_id, id, name, title, slug, mainMedia, additionalInfoSections}
+//   item.{id, _id, title, slug}
+// The page maps over the result and reads `item.tent._id` to call
+// fetchFeaturedProjects/Blogs — so the id MUST be on tent._id.
+const normalizeTentItemForListing = (product, orderNumber = 0) => {
+    const mainMediaUrl = resolveCoreMediaUrl(product.mainMedia, "tablet");
+    const additionalInfoSections = product.additionalInfoSections ?? [];
+    return {
+        _id: product.id,
+        id: product.id,
+        title: product.title || "",
+        slug: `/${product.slug || ""}`,
+        orderNumber,
+        tent: {
+            _id: product.id,
+            id: product.id,
+            name: product.title || "",
+            title: product.title || "",
+            slug: product.slug || "",
+            mainMedia: mainMediaUrl,
+            additionalInfoSections,
+        },
+    };
+};
+
+export const fetchAllTentsForListing = async () => {
+    try {
+        const products = await fetchTentProductsForListing();
+        return products.map((p, i) => normalizeTentItemForListing(p, i + 1));
+    } catch (error) {
+        logError(`Error fetching all tents (listing): ${error.message}`, error);
+        return [];
+    }
+};
+
 export const fetchTentPageDetails = async () => {
     return {
         matchItWithTitle: "MATCH IT WITH",

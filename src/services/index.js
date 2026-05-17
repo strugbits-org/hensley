@@ -250,10 +250,22 @@ export const fetchTentsData = cache(async () => {
 // images/additionalInfoSections and a few IDs for the tents-id store. Skips
 // the full depth-2 product graph and the heavy normalizer fields (variants,
 // productOptions, recommendedProducts, mediaItems gallery) that only the PDP
-// and types-of-tents page consume.
+// consumes.
 export const fetchTentsDataForHeader = cache(async () => {
   const { fetchAllTentsForHeader } = await import("./tents");
   return fetchAllTentsForHeader();
+});
+
+// /types-of-tents listing variant. Same depth-1 slim select as the header,
+// but the normalizer produces the {tent, ...} shape that TentsTypes /
+// TentTypesSlider / BannerStructures destructure. The page also reads
+// item.tent._id to fan out featured projects + blogs per tent, so the id is
+// surfaced. Drops the depth:2 product graph and the heavy normalizeTentItem
+// chain (gallery, recommendedProducts, collections summary, productOptions,
+// tentConfig) — none of which the listing renders.
+export const fetchTentsDataForListing = cache(async () => {
+  const { fetchAllTentsForListing } = await import("./tents");
+  return fetchAllTentsForListing();
 });
 
 export const fetchMasterClassTenting = async () => {

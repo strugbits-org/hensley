@@ -1066,16 +1066,22 @@ export const normalizePayloadProject = (project) => {
     if (!project || typeof project !== "object") return project;
     const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
     const heroImageUrl = resolveMediaUrl(project.heroImage, "tablet");
-    const galleryImages = ensureArray(project.galleryImages).map((item) => {
-        if (typeof item === "string") return item;
-        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
-        return imgUrl;
+    // Single pass over galleryImages: previously walked twice (once for URL
+    // strings, once for {url, caption} objects), doubling resolveMediaUrl
+    // calls per project. We tag each entry with isString so the URL-only and
+    // object-only outputs preserve the original semantics: string entries
+    // pass through unresolved to galleryImages and are dropped from
+    // galleryImageObjects; object entries get resolveMediaUrl'd into both.
+    const galleryItems = ensureArray(project.galleryImages).map((item) => {
+        if (typeof item === "string") return { isString: true, value: item };
+        if (!item) return null;
+        const url = resolveMediaUrl(item?.image || item, "tablet");
+        return url ? { isString: false, url, caption: item?.caption || "" } : null;
     }).filter(Boolean);
-    const galleryImageObjects = ensureArray(project.galleryImages).map((item) => {
-        if (!item || typeof item === "string") return null;
-        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
-        return imgUrl ? { url: imgUrl, caption: item?.caption || "" } : null;
-    }).filter(Boolean);
+    const galleryImages = galleryItems.map((g) => (g.isString ? g.value : g.url));
+    const galleryImageObjects = galleryItems
+        .filter((g) => !g.isString)
+        .map(({ url, caption }) => ({ url, caption }));
     const excerpt = project.excerpt || (project.description ? project.description.slice(0, 120) + (project.description.length > 120 ? "..." : "") : "");
     const testimonial = project.testimonial || null;
     const meta = project.meta || {};
