@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useRef } from "react";
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryButton } from "../common/PrimaryButton";
