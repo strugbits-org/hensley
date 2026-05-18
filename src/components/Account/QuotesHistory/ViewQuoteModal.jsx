@@ -2,7 +2,7 @@
 import { CartCollection, CartNormal, CartTent } from '@/components/Cart/CartItems';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
-import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
+import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError } from '@/utils';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -230,13 +230,15 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
                                                 <p className='font-haasLight text-base uppercase'>{date}</p>
                                                 <h2 className='uppercase text-[140px] text-secondary-alt font-recklessRegular text-center w-full leading-[120px] max-lg:text-[55px] max-lg:leading-[50px] max-md:text-[35px] '>{data.eventDescription || data.eventDescriptionPo || data.quoteNumber}</h2>
                                             </div>
-                                            <div className='w-full '>
-                                                <div className='w-full bg-[#F4F1EC] pt-[18px] pb-[17px]'>
-                                                    <h4 className='text-center text-[35px] font-recklessRegular leading-[39px]'>
-                                                        {formattedTotalPrice}
-                                                    </h4>
+                                            {!HIDE_PRICES && (
+                                                <div className='w-full '>
+                                                    <div className='w-full bg-[#F4F1EC] pt-[18px] pb-[17px]'>
+                                                        <h4 className='text-center text-[35px] font-recklessRegular leading-[39px]'>
+                                                            {formattedTotalPrice}
+                                                        </h4>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                             <div className=''>
                                                 {cartItems.map((item, index) => {
                                                     const product = typeof item.product === 'object' ? item.product : {};
