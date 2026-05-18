@@ -107,7 +107,7 @@ export const fetchSubCategoryPagePaths = cache(async () => {
         const allCollections = await queryProductCollections();
         const seen = new Set();
         return (Array.isArray(allCollections) ? allCollections : [])
-            .filter(c => c.slug)
+            .filter(c => c.slug && c.visible !== false)
             .reduce((acc, c) => {
                 const slug = c.slug.trim().replace("/", "");
                 if (slug && !seen.has(slug)) {
