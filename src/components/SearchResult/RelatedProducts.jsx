@@ -10,14 +10,22 @@ import { logError } from '@/utils'
 
 const RelatedProducts = ({ data, term, pageSize, savedProducts, setSavedProducts, pageTitle, allCollections = [] }) => {
     const [loading, setLoading] = useState(false);
-    const [searchCompleted, setSearchCompleted] = useState(false);
-    const [products, setProducts] = useState([]);
+    // Derive initial completion synchronously from the incoming page so the
+    // AutoClickWrapper can't intersect a stale "not yet complete" state and
+    // fire a redundant load-more before a useEffect updates the flag.
+    const [searchCompleted, setSearchCompleted] = useState(() => data.length < pageSize);
+    const [products, setProducts] = useState(() => data);
 
     const handleLoadMore = async () => {
+        // Defensive: AutoClickWrapper recreates the observer on every render
+        // (onIntersect is a new function ref each time), so without this
+        // guard a quick re-intersect could fire a fetch after we've already
+        // determined the result set is exhausted.
+        if (loading || searchCompleted) return;
         try {
             setLoading(true);
             const ids = products.map((x) => x.product._id);
-            const productsData = await searchProducts({ term, pageLimit: 24, skipProducts: ids });
+            const productsData = await searchProducts({ term, pageLimit: pageSize, skip: products.length, skipProducts: ids });
             if (productsData.length < pageSize) setSearchCompleted(true);
 
             setProducts([...products, ...productsData]);
@@ -28,15 +36,11 @@ const RelatedProducts = ({ data, term, pageSize, savedProducts, setSavedProducts
         }
     };
 
+    // Re-sync when the search term changes and a new initial page arrives.
     useEffect(() => {
-        if (data.length > 0) {
-            setProducts(data);
-        }
-
-        if (data.length === 0 || data.length < pageSize) {
-            setSearchCompleted(true);
-        }
-    }, [data]);
+        setProducts(data);
+        setSearchCompleted(data.length < pageSize);
+    }, [data, pageSize]);
 
     return (
         <div className='px-[24px] w-full h-full border-b border-primary-border pb-12'>

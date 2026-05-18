@@ -19,40 +19,58 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
     const [tentsData, setTentsData] = useState([]);
     const [productsData, setProductsData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
     const pageSize = 24;
 
     const searchParams = useSearchParams();
+    const searchTerm = (searchParams.get('query') || '').trim();
 
-    const setInitialValues = async () => {
-        const [markets, products] = await Promise.all([
-            searchMarkets(searchTerm),
-            searchProducts({ term: searchTerm, pageLimit: pageSize })
-        ]);
-        setMarketsData(markets);
-        setProductsData(products);
-        setLoading(false);
-        loaderActions.hide();
-
-        const otherData = await searchOtherData(searchTerm);
-        const { tents, projects, blogs } = otherData;
-        setBlogsData(blogs);
-        setProjectsData(projects);
-        setTentsData(tents);
-    };
-
+    // Re-fires whenever the URL's query string changes, even when the
+    // resolved term is identical to the previous render (re-submitting the
+    // same term from the modal would otherwise leave the global loader
+    // stuck on, because no state changed and no effect re-ran).
     useEffect(() => {
-        if (searchTerm.trim()) {
-            setInitialValues();
-        } else {
-            loaderActions.hide();
+        let cancelled = false;
+
+        if (!searchTerm) {
+            setMarketsData([]);
+            setProductsData([]);
+            setBlogsData([]);
+            setProjectsData([]);
+            setTentsData([]);
             setLoading(false);
+            loaderActions.hide();
+            return;
         }
-    }, [searchTerm]);
 
-    useEffect(() => {
-        const term = (searchParams.get('query') || '').trim();
-        setSearchTerm(term);
+        setLoading(true);
+
+        const run = async () => {
+            try {
+                const [markets, products, otherData] = await Promise.all([
+                    searchMarkets(searchTerm),
+                    searchProducts({ term: searchTerm, pageLimit: pageSize }),
+                    searchOtherData(searchTerm),
+                ]);
+                if (cancelled) return;
+                const { tents, projects, blogs } = otherData;
+                setMarketsData(markets);
+                setProductsData(products);
+                setBlogsData(blogs);
+                setProjectsData(projects);
+                setTentsData(tents);
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                    loaderActions.hide();
+                }
+            }
+        };
+
+        run();
+
+        return () => {
+            cancelled = true;
+        };
     }, [searchParams]);
 
     const hasResults = productsData.length || marketsData.length || blogsData.length || projectsData.length || tentsData.length;
