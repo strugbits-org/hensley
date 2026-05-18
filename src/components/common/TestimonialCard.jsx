@@ -17,7 +17,7 @@ export const TestimonialCard = ({ data, classes, imageExp, titleClass }) => {
   const displayImage = avatar || image;
   return (
     <div
-      className={`flex flex-col lg:flex-row group  bg-primary lg:bg-transparent relative min-h-[499px] lg:h-full w-full lg:border border-primary-border duration-300 ease-in-out max-w-[1240px] flex-shrink-0 ${classes}`}
+      className={`flex flex-col lg:flex-row group  bg-primary lg:bg-transparent relative min-h-[499px] lg:h-[499px] lg:max-h-[600px] w-full lg:border border-primary-border duration-300 ease-in-out max-w-[1240px] flex-shrink-0 ${classes}`}
     >
       <div
         className={`w-full lg:w-1/2 max-h-[364px] lg:max-h-none h-full relative flex p-3 lg:p-6 ${imageExp ? "group-hover:lg:p-0" : "lg:p-6"} transition-all duration-300 ease-in-out`}
