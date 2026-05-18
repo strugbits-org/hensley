@@ -30,21 +30,23 @@ export const MarketTentModal = ({ selectedMenu, closeModal }) => {
                                 
                                 <hr className="mb-3 xl:mb-4 border-primary-alt" />
                                 
-                                <div className="flex items-center justify-between gap-2">
+                                <div className="flex flex-col gap-2">
                                     {tagline ? (
                                         <div>
-                                            <p className="my-2 xl:my-4 text-[13px] lg:text-[13px] xl:text-[15px] uppercase tracking-wider text-primary-alt font-haasLight line-clamp-2">
+                                            <p className="my-2 xl:my-4 text-[13px] lg:text-[13px] xl:text-[15px] uppercase tracking-wider text-primary-alt font-haasLight">
                                                 {tagline}
                                             </p>
                                         </div>
                                     ) : tent?.additionalInfoSections?.length > 0 && (
-                                        <div className="text-[13px] lg:text-[13px] xl:text-[15px] uppercase tracking-wider text-primary-alt font-haasLight line-clamp-2">
+                                        <div className="text-[13px] lg:text-[13px] xl:text-[15px] uppercase tracking-wider text-primary-alt font-haasLight">
                                             {getAdditionalInfoSection(tent.additionalInfoSections, "INFO")}
                                         </div>
                                     )}
-                                    <CustomLink className={"hidden sm:block lg:hidden"} to={`/${type === "markets" ? "market" : "tent"}${slug}`}>
-                                        <PrimaryButton className="border border-primary-alt text-primary-alt hover:bg-primary-alt hover:text-secondary font-haasRegular tracking-widest text-sm min-w-[198px]">{buttonLabel || buttonLabelMenu}</PrimaryButton>
-                                    </CustomLink>
+                                    <div className="lg:hidden mt-2 flex justify-start">
+                                        <PrimaryButton className="border border-primary-alt text-primary-alt hover:bg-primary-alt hover:text-secondary font-haasRegular tracking-widest text-sm min-w-[198px]">
+                                            {buttonLabel || buttonLabelMenu || "SEE MORE"}
+                                        </PrimaryButton>
+                                    </div>
                                 </div>
                                 
                                 <hr className="border-primary-alt my-3 xl:my-4" />

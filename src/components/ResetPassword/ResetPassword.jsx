@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -8,6 +9,8 @@ import { lightboxActions } from '@/store/lightboxStore';
 import { logError } from '@/utils';
 import { resetPassword } from '@/services/auth/authentication';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import eyeOpenIcon from '@/assets/icons/eye-open.svg';
+import eyeClosedIcon from '@/assets/icons/eye-closed.svg';
 
 // Validation schema
 const schema = yup.object({
@@ -25,7 +28,20 @@ const schema = yup.object({
         .oneOf([yup.ref('password')], 'Passwords must match')
 }).required();
 
-const InputField = ({ id, label, placeholder, classes, borderColor = 'black', type = "text", register, error, disabled }) => {
+const InputField = ({
+    id,
+    label,
+    placeholder,
+    classes,
+    borderColor = 'black',
+    type = "text",
+    register,
+    error,
+    disabled = false,
+    togglePassWord = false,
+    showPassword,
+    onToggle
+}) => {
     const [isFocused, setIsFocused] = useState(false);
 
     const handleBlur = () => {
@@ -36,7 +52,7 @@ const InputField = ({ id, label, placeholder, classes, borderColor = 'black', ty
         setIsFocused(true);
     };
 
-    const isEmpty = error ? true : false;
+    const hasError = !!error;
 
     return (
         <div className={`gap-y-[8px] flex flex-col ${classes}`}>
@@ -45,24 +61,38 @@ const InputField = ({ id, label, placeholder, classes, borderColor = 'black', ty
                     {label}
                 </label>
             )}
-            <input
-                type={type}
-                id={id}
-                placeholder={placeholder}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                disabled={disabled}
-                {...register}
-                className={`
-                    w-full placeholder-secondary font-haasLight p-3 rounded-sm
-                    border-b 
-                    ${isEmpty ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
-                    ${!isEmpty && 'hover:border-b-2'}
-                    outline-none transition-all duration-300
-                    ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}
-                `}
-            />
-            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+            <div className='relative'>
+                <input
+                    type={type}
+                    id={id}
+                    placeholder={placeholder}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    disabled={disabled}
+                    {...register}
+                    className={`
+                        w-full placeholder-secondary font-haasLight p-3 rounded-sm
+                        border-b transition-all duration-300 outline-none
+                        ${hasError ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
+                        ${!hasError ? 'hover:border-b-2' : ''}
+                        ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''}
+                    `}
+                />
+                {togglePassWord && (
+                    <button
+                        type="button"
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 transition-opacity duration-200 ${disabled ? 'cursor-not-allowed' : ''}`}
+                        onClick={onToggle}
+                        disabled={disabled}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                        <Image className="size-6" src={showPassword ? eyeOpenIcon : eyeClosedIcon} alt="" width={24} height={24} />
+                    </button>
+                )}
+            </div>
+            {hasError && (
+                <p className="text-red-500 text-sm mt-1 font-haasLight">{error}</p>
+            )}
         </div>
     );
 };
@@ -161,21 +191,6 @@ function ResetPassword({ token }) {
         }
     };
 
-    const renderEyeIcon = (show, toggle) => (
-        <button type="button" className="absolute right-4 bottom-4" onClick={toggle} disabled={isSubmitting}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="26.674" height="19.001" viewBox="0 0 26.674 19.001">
-                <g fill="none">
-                    <path d="M0,9.5A14.416,14.416,0,0,1,13.337,0,14.417,14.417,0,0,1,26.674,9.5,14.417,14.417,0,0,1,13.337,19,14.416,14.416,0,0,1,0,9.5Z" stroke="none" />
-                    <path d="M13.337 1C10.628 1 8.019 1.854 5.792 3.471 3.708 4.983 2.083 7.062 1.076 9.5c1.007 2.438 2.632 4.517 4.716 6.03 2.227 1.616 4.836 2.471 7.545 2.471s5.318-.855 7.545-2.471c2.084-1.513 3.709-3.592 4.716-6.03-1.007-2.438-2.632-4.517-4.716-6.03C18.655 1.854 16.046 1 13.337 1zm0-1C19.373 0 24.54 3.93 26.674 9.5c-2.133 5.57-7.3 9.5-13.337 9.5C7.301 19 2.134 15.07.001 9.5 2.134 3.93 7.301 0 13.337 0z" stroke="none" fill="#2c2216" fillOpacity={show ? 1 : 0.5} />
-                </g>
-                <g transform="translate(8 4)" fill="none" stroke="#2c2216" strokeWidth="1">
-                    <circle cx="5.5" cy="5.5" r="5.5" stroke="none" />
-                    <circle cx="5.5" cy="5.5" r="5" fill="none" />
-                </g>
-            </svg>
-        </button>
-    );
-
     const handleBackToLogin = () => {
         lightboxActions.showLightBox('login');
     };
@@ -244,7 +259,7 @@ function ResetPassword({ token }) {
                                 Enter your new password below to reset your account password.
                             </p>
 
-                            <div className='w-full relative'>
+                            <div className='w-full'>
                                 <InputField
                                     id="password"
                                     label="Enter new password"
@@ -255,11 +270,13 @@ function ResetPassword({ token }) {
                                     register={register('password')}
                                     error={errors.password?.message}
                                     disabled={isSubmitting}
+                                    togglePassWord={true}
+                                    showPassword={showPassword}
+                                    onToggle={() => setShowPassword(!showPassword)}
                                 />
-                                {renderEyeIcon(showPassword, () => setShowPassword(!showPassword))}
                             </div>
 
-                            <div className='w-full relative'>
+                            <div className='w-full'>
                                 <InputField
                                     id="confirmPassword"
                                     label="Confirm new password"
@@ -270,8 +287,10 @@ function ResetPassword({ token }) {
                                     register={register('confirmPassword')}
                                     error={errors.confirmPassword?.message}
                                     disabled={isSubmitting}
+                                    togglePassWord={true}
+                                    showPassword={showConfirmPassword}
+                                    onToggle={() => setShowConfirmPassword(!showConfirmPassword)}
                                 />
-                                {renderEyeIcon(showConfirmPassword, () => setShowConfirmPassword(!showConfirmPassword))}
                             </div>
 
                             <button

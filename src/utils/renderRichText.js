@@ -690,7 +690,7 @@ export const convertToHTMLRichContent = ({
 
             html += `<div className="image-container ${class_image_container}" style="text-align: ${alignment};">`;
             html += `<img className="${class_image}" src="${imageSrc}" ${altText} ${width} ${height} />`;
-            if (imageData.caption) html += `<p class="text-xs text-center mt-1 text-secondary-alt font-haasRegular">${imageData.caption}</p>`;
+            if (imageData.caption) html += `<p class="text-sm text-center mt-3 text-secondary-alt font-haasRegular">${imageData.caption}</p>`;
             html += '</div>';
         }
         else if (node.type === 'GALLERY') {
@@ -731,7 +731,7 @@ export const convertToHTMLRichContent = ({
                 const altAttr = img.alt ? `alt="${img.alt}"` : '';
                 html += `<div class="gallery-block-item">`;
                 html += `<img class="${class_image} w-full h-auto object-cover" src="${src}" ${altAttr} />`;
-                if (img.caption) html += `<p class="text-xs text-center mt-1 text-secondary-alt font-haasRegular">${img.caption}</p>`;
+                if (img.caption) html += `<p class="text-sm text-center mt-1 text-secondary-alt font-haasRegular">${img.caption}</p>`;
                 html += `</div>`;
             });
             html += `</div>`;
@@ -750,7 +750,7 @@ export const convertToHTMLRichContent = ({
                 html += wrapper;
                 html += `<img class="${class_image} w-full h-auto object-cover" src="${src}" ${altAttr} />`;
                 html += wrapperClose;
-                if (slide.caption) html += `<p class="text-xs text-center mt-1 text-secondary-alt font-haasRegular">${slide.caption}</p>`;
+                if (slide.caption) html += `<p class="text-sm text-center mt-1 text-secondary-alt font-haasRegular">${slide.caption}</p>`;
                 html += `</div>`;
             });
             html += `</div>`;

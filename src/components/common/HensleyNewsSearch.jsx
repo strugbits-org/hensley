@@ -14,7 +14,7 @@ export const HensleyNewsSearch = ({ data, pageDetails, loop = true, origin = "ce
 
     const [sliderRef] = useKeenSlider(
         {
-            loop: loop,
+            loop: loop && data?.length > 4,
             mode: "free-snap",
             slides: {
                 origin: origin,

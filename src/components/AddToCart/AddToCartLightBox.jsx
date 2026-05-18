@@ -9,7 +9,7 @@ export const AddToCartLightBox = ({ data, onClose, allCollections = [] }) => {
 
     return (
         <Transition appear show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={onClose}>
+            <Dialog as="div" className="relative z-[200]" onClose={onClose}>
                 <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"

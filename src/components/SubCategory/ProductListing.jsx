@@ -188,7 +188,7 @@ export const ProductListing = ({ data }) => {
 
             <hr className='hidden lg:block border border-primary-border my-8 w-full' />
 
-            <ul className='w-full grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2 lg:gap-x-[31px] sm:gap-x-[12px] gap-x-[10px] lg:gap-y-[20px] sm:gap-y-[12px] gap-y-[20px]'>
+            <ul className={`w-full grid sm:grid-cols-3 grid-cols-2 lg:gap-x-[31px] sm:gap-x-[12px] gap-x-[10px] lg:gap-y-[20px] sm:gap-y-[12px] gap-y-[20px] ${products?.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
                 {products.map((productData, index) => {
                     const banners = isMobile ? bannersMobile : bannersDesktop;
                     const shouldInsertBanner = (index + 1) % pageSize === 0 && banners.length > 0;

@@ -80,7 +80,7 @@ export const SaveProductButton = ({ productData, type = "primary" }) => {
 
     return (
         <div
-            className={`flex group/cart absolute right-[24px] top-[23px] border border-secondary-alt rounded-full items-center justify-center shrink-0 cursor-pointer transition-colors w-[36px] h-[36px] ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''} ${type === 'primary' ? 'lg:w-[56px] lg:h-[56px]' : ''}`}
+            className={`flex group/cart absolute z-10 bg-white right-3 top-3 md:right-[24px] md:top-[23px] border border-secondary-alt rounded-full items-center justify-center shrink-0 cursor-pointer transition-colors w-[36px] h-[36px] ${isUpdating ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#EBEBE6]'} ${type === 'primary' ? 'lg:w-[56px] lg:h-[56px]' : ''}`}
             onClick={handleSaveToggle}
             role="button"
             aria-label={isProductSaved ? "Remove from saved products" : "Save product"}

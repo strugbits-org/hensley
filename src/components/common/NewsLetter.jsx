@@ -74,7 +74,7 @@ export const NewsLetter = ({ data }) => {
             </p>
             
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-                <div className="flex gap-2 gap-x-[24px]  w-full sm:max-w-[450px]">
+                <div className="flex gap-2 gap-x-3 sm:gap-x-[24px]  w-full sm:max-w-[450px]">
                     <div className="flex-1">
                         <input 
                             type="email" 
@@ -92,7 +92,7 @@ export const NewsLetter = ({ data }) => {
                                     : 'border-primary hover:border-opacity-80'
                                 }
                                 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}
-                            `}
+                             `}
                         />
                     </div>
                     
@@ -101,8 +101,8 @@ export const NewsLetter = ({ data }) => {
                         disabled={isSubmitting}
                         className={`
                             border border-primary text-primary transition-all duration-300 
-                            ease-in-out p-5 grow px-12 hover:bg-primary hover:text-secondary-alt 
-                            text-sm font-haasMedium uppercase tracking-widest max-w-[150px]
+                            ease-in-out p-5 grow px-5 sm:px-12 hover:bg-primary hover:text-secondary-alt 
+                            text-sm font-haasMedium uppercase tracking-widest max-w-[100px] sm:max-w-[150px]
                             ${isSubmitting 
                                 ? 'opacity-70 cursor-not-allowed hover:bg-transparent hover:text-primary' 
                                 : ''
