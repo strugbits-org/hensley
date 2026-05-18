@@ -30,7 +30,7 @@ export const HeroSection = ({ data }) => {
   }, []);
 
   return (
-    <div className="relative h-[100dvh] isolate px-6 lg:px-8 flex flex-col items-center justify-between pb-[70px] pt-[160px] overflow-hidden">
+    <div className="relative h-[100dvh] isolate px-6 lg:px-8 flex flex-col items-center justify-between pb-[70px] pt-[120px] lg:pb-[70px] lg:pt-[140px] xl:pb-[80px] xl:pt-[150px] 2xl:pb-[90px] 2xl:pt-[160px] overflow-hidden">
       {videoSrc && (
         <video
           ref={videoRef}
@@ -50,7 +50,7 @@ export const HeroSection = ({ data }) => {
       </span>
 
       <div className="flex flex-col items-center gap-y-6">
-        <h1 className="text-[32px] xs:text-[45px] md:text-[60px] lg:text-[75px] xl:text-[85px] leading-[1.1] text-primary-alt font-recklessRegular text-center">
+        <h1 style={{ fontSize: 'clamp(32px, 7vw, 200px)' }} className="text-[32px] xs:text-[45px] md:text-[60px] lg:text-[90px] xl:text-[100px] 2xl:text-[130px] leading-[1.05] text-primary-alt font-recklessRegular text-center max-w-[90vw]">
           {title}
         </h1>
 
