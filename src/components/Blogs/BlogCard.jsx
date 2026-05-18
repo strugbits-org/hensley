@@ -3,10 +3,14 @@ import Image from 'next/image';
 import { PrimaryImage } from '../common/PrimaryImage';
 import { MarketsStudiosTags } from './MarketsStudiosTags';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
+import { formatDate } from '@/utils';
 import arrowDark from '@/assets/icons/arrow-dark.svg';
 
 function BlogCard({ data, handleFilterChange, selectedTags }) {
     const { slug, author, blogRef, markets, studios, blogCategories } = data;
+    const authorName = author?.nickname || "";
+    const formattedDate = blogRef?.publishedDate ? formatDate(blogRef.publishedDate) : "";
+    const dateAuthorLine = [formattedDate, authorName].filter(Boolean).join(" - ");
 
     const redirectWithLoader = useRedirectWithLoader();
 
@@ -40,8 +44,8 @@ function BlogCard({ data, handleFilterChange, selectedTags }) {
             </div>
 
             <div className='px-6'>
-                <p className='text-[12px] leading-[20px] text-secondary-alt font-haasRegular mb-3'>
-                    {author?.nickname || author?.firstName || author?.lastName}
+                <p className='text-[12px] leading-[20px] uppercase text-secondary-alt font-haasRegular mb-3'>
+                    {dateAuthorLine}
                 </p>
 
                 <MarketsStudiosTags markets={markets} studios={studios} categories={blogCategories} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />

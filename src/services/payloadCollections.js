@@ -1036,7 +1036,13 @@ export const normalizePayloadBlog = (blog) => {
     const author = blog.author && typeof blog.author === "object"
         ? blog.author
         : null;
-    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    // Prefer the virtual `authorNickName` field (filled by bps-core's
+    // attachAuthorNickname afterRead hook) — works whether or not `author`
+    // was populated by depth. Falls back to the populated user shape so the
+    // normalizer still works if the hook is ever bypassed.
+    const displayName = (typeof blog.authorNickName === "string" && blog.authorNickName)
+        || author?.username
+        || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
     const displayDate = blog.createdAt || blog.updatedAt || "";
     // No `...blog` or `...author` spread: previously the raw Payload doc leaked
     // through (raw content richText body, raw coverImage media doc, _status,
@@ -1142,7 +1148,9 @@ export const normalizePayloadBlogForHome = (blog) => {
     if (!blog || typeof blog !== "object") return blog;
     const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
     const author = blog.author && typeof blog.author === "object" ? blog.author : null;
-    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayName = (typeof blog.authorNickName === "string" && blog.authorNickName)
+        || author?.username
+        || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
     const displayDate = blog.publishedDate || blog.createdAt || blog.updatedAt || "";
     return {
         _id: blog.id || blog._id,
@@ -1186,7 +1194,9 @@ export const normalizePayloadBlogForListing = (blog) => {
     if (!blog || typeof blog !== "object") return blog;
     const coverImageUrl = resolveMediaUrl(blog.coverImage, "card");
     const author = blog.author && typeof blog.author === "object" ? blog.author : null;
-    const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
+    const displayName = (typeof blog.authorNickName === "string" && blog.authorNickName)
+        || author?.username
+        || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
     const displayDate = blog.publishedDate || blog.createdAt || blog.updatedAt || "";
     return {
         _id: blog.id || blog._id,
@@ -1634,7 +1644,7 @@ export async function queryTestimonialsByType(tenantId = CORE_TENANT_ID, type = 
 
 export async function queryInstagramFeedItems(tenantId = CORE_TENANT_ID) {
     try {
-        return await findPublishedByTenant({ collection: "instagram-feed-items", tenantId, limit: 12 });
+        return await findPublishedByTenant({ collection: "instagram-feed-items", tenantId, limit: 24 });
     } catch (error) {
         logError(`Error querying instagram-feed-items: ${error.message}`, error);
         return [];

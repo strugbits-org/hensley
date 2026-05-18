@@ -1,10 +1,13 @@
 import React from 'react'
 import { MarketsStudiosTags } from '../Blogs/MarketsStudiosTags';
-import { resolveCoreMediaUrl } from '@/utils';
+import { formatDate, resolveCoreMediaUrl } from '@/utils';
 
 const EventHighLight = ({ data }) => {
     const { author, blogRef, markets, studios } = data;
     const imageURL = resolveCoreMediaUrl(blogRef.coverImage, "tablet") || "";
+    const authorName = author?.nickname || "";
+    const formattedDate = blogRef?.publishedDate ? formatDate(blogRef.publishedDate) : "";
+    const dateAuthorLine = [formattedDate, authorName].filter(Boolean).join(" - ");
     
     const scrollToBottom = () => {
         window.scrollTo({
@@ -28,12 +31,12 @@ const EventHighLight = ({ data }) => {
                         {blogRef.title}
                     </span>
 
-                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:hidden block '>{author?.nickname || author?.firstName || author?.lastName}</span>
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:hidden block '>{dateAuthorLine}</span>
                     <MarketsStudiosTags markets={markets} studios={studios} count={2} />
 
                 </div>
                 <div className='lg:w-1/2 text-right flex flex-col gap-y-[15px] '>
-                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:block hidden '>{author?.nickname || author?.firstName || author?.lastName}</span>
+                    <span className='font-haasRegular uppercase text-[12px] text-secondary-alt lg:block hidden '>{dateAuthorLine}</span>
                     <span className='font-haasRegular uppercase text-[12px] text-secondary-alt text-left block max-lg:mt-[60px] '>{blogRef.excerpt}</span>
                 </div>
 

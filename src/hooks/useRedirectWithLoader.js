@@ -10,7 +10,16 @@ const useRedirectWithLoader = () => {
       document.body.classList.remove('overflow-hidden');
     }
 
-    if (!slug || pathname === slug) return;
+    if (!slug) return;
+
+    // Compare full path (incl. query) against the current location so
+    // repeat-navigations to the exact same URL don't trip the global
+    // loader. Next's router.push is a no-op when the URL is identical,
+    // which would otherwise leave the loader showing forever.
+    const currentFullPath = typeof window !== 'undefined'
+      ? `${pathname}${window.location.search}`
+      : pathname;
+    if (currentFullPath === slug) return;
 
     loaderActions.show();
     router.push(slug);
