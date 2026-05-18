@@ -42,7 +42,7 @@ const FORM_STRUCTURE = {
 const FIELD_CONFIGS = {
   firstName: { type: 'text', placeholder: 'Enter your first name', gridSpan: '' },
   lastName: { type: 'text', placeholder: 'Enter your last name', gridSpan: '' },
-  email: { type: 'email', placeholder: 'exemplo@myemail.com',  },
+  email: { type: 'email', placeholder: 'example@myemail.com',  },
   phone: { type: 'tel', placeholder: '+1 (415) 000-00000',  },
   password: { type: 'password', placeholder: '********', gridSpan: '' },
   confirmPassword: { type: 'password', placeholder: '********', gridSpan: '' }

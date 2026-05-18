@@ -27,7 +27,7 @@ const FIELD_CONFIGS = {
     first_name_abae: { type: 'text', placeholder: 'John', borderColor: 'secondary-alt' },
     last_name_d97c: { type: 'text', placeholder: 'Doe', borderColor: 'black' },
     phone_4c77: { type: 'tel', placeholder: '+1 (415) 000-00000', borderColor: 'black' },
-    email_5139: { type: 'email', placeholder: 'exemplo@myemail.com', borderColor: 'black' },
+    email_5139: { type: 'email', placeholder: 'example@myemail.com', borderColor: 'black' },
     long_answer_3524: { type: 'textarea', placeholder: 'Write your message', borderColor: 'secondary-alt' }
 };
 
