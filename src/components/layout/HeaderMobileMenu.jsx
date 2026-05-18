@@ -121,7 +121,7 @@ export const HeaderMobileMenu = ({
                                 </nav>
 
                                 {selectedMenu && (selectedMenu.type === "submenu" || selectedMenu.type === "tents") && (
-                                    <div className="bg-white z-10 absolute inset-0 py-12 px-4 overflow-auto hide-scrollbar">
+                                    <div className="bg-white z-10 absolute inset-x-0 top-0 h-fit py-12 px-4 shadow-xl pb-16 border-b border-primary-border">
                                         <div className="relative flex items-center justify-center flex-col">
                                             <button className="absolute left-0" onClick={() => setSelectedMenu(false)}>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="27.979" height="27.87" viewBox="0 0 27.979 27.87">

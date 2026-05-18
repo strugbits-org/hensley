@@ -73,11 +73,11 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
                             e.stopPropagation() || instanceRef.current?.prev()
                         }
                         disabled={currentSlide === 0}
-                        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        className="absolute top-1/2 left-2 sm:left-4 lg:left-8 transform -translate-y-1/2 w-10 h-10 lg:w-[60px] lg:h-[60px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
                     >
-                        <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                        <MdOutlineChevronLeft className="w-[18px] h-[18px] lg:w-[20px] lg:h-[20px]" />
                     </button>
-
+ 
                     <button
                         onClick={(e) =>
                             e.stopPropagation() || instanceRef.current?.next()
@@ -86,9 +86,9 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
                             currentSlide ===
                             instanceRef.current.track.details.slides.length - 1
                         }
-                        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        className="absolute top-1/2 right-2 sm:right-4 lg:right-8 transform -translate-y-1/2 w-10 h-10 lg:w-[60px] lg:h-[60px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
                     >
-                        <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                        <MdOutlineChevronRight className="w-[18px] h-[18px] lg:w-[20px] lg:h-[20px]" />
                     </button>
                 </>
             ))}
