@@ -243,7 +243,7 @@ export const fetchTentPageDetails = cache(async () => {
     const fallback = {
         matchItWithTitle: "MATCH IT WITH",
         featuredProductTitle: "Products Featured in this Project Entry",
-        masterClassTentingURL: process.env.MASTER_CLASS_TENTING_URL || "",
+        masterClassTentingURL: "",
     };
     try {
         const [tentSection, listingSection] = await Promise.all([

@@ -238,7 +238,7 @@ export const fetchTentListingPageDetails = cache(async () => {
   const fallback = {
     featuredProductTitle: "Products Featured in this Project Entry",
     downloadBtnLabel: "Download Master Class Tenting Guide",
-    masterClassTentingURL: process.env.MASTER_CLASS_TENTING_URL || "",
+    masterClassTentingURL: "",
   };
   try {
     const section = await querySection("tent-listing-page-details");
