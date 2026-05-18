@@ -93,18 +93,70 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
     return [{ size: productSize, formattedPrice: product.formattedPrice }];
   }, [isProductCollection, product]);
 
+  const [referringCollection, setReferringCollection] = useState(null);
+
+  // Pick the breadcrumb category from the referring page when available, so
+  // the crumb reflects the path the user actually took (e.g. /subcategory/china
+  // → "HOME / CHINA") instead of always defaulting to product.collections[0].
+  // Only honor referrers that point to a collection this product belongs to.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const collections = productData?.product?.collections || [];
+
+    // Prefer sessionStorage (set by the listing pages on click-through — works
+    // for Next.js client-side nav where document.referrer is empty).
+    let candidateSlug = null;
+    try {
+      const raw = sessionStorage.getItem('lastCategoryCrumb');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        candidateSlug = parsed?.slug || null;
+      }
+    } catch {
+      // sessionStorage unavailable — fall through to referrer
+    }
+
+    // Fallback: document.referrer (works for full page loads / hard nav).
+    if (!candidateSlug && document.referrer) {
+      try {
+        const refUrl = new URL(document.referrer);
+        if (refUrl.origin === window.location.origin) {
+          const match = refUrl.pathname.match(/^\/(?:subcategory|collections)\/([^/]+)\/?$/);
+          if (match) {
+            candidateSlug = decodeURIComponent(match[1]);
+          }
+        }
+      } catch {
+        // malformed referrer — ignore
+      }
+    }
+
+    if (!candidateSlug) return;
+
+    const lower = candidateSlug.toLowerCase();
+    const hit = collections.find((c) => (c?.slug || '').toLowerCase() === lower);
+
+    if (hit?.slug && hit?.name) {
+      setReferringCollection({ name: hit.name, slug: hit.slug });
+    } else {
+      // Stored crumb doesn't belong to this product — drop it and evict it
+      // from sessionStorage so it can't leak into the next product view.
+      try { sessionStorage.removeItem('lastCategoryCrumb'); } catch {}
+    }
+  }, [productData?.product?.collections]);
+
   const breadcrumbItems = useMemo(() => {
     const items = [{ label: 'Home', to: '/' }];
 
-    product.collectionBreadcrumbs?.forEach((collection) => {
-      if (collection?.slug) {
-        items.push({ label: collection.name, to: `/subcategory/${collection.slug}` });
-      }
-    });
+    if (referringCollection) {
+      items.push({ label: referringCollection.name });
+    } else {
+      items.push({ label: product.name || product.title || 'Product' });
+    }
 
-    items.push({ label: product.name || product.title || 'Product' });
     return items;
-  }, [product.collectionBreadcrumbs, product.name, product.title]);
+  }, [referringCollection, product.name, product.title]);
 
   const totalPrice = useMemo(() => {
     if (isProductCollection) {
@@ -288,9 +340,13 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
   return (
     <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]'>
 
-      <div className='xl:w-1/2'>
+      <div className='xl:w-1/2 relative'>
         <ProductSlider product={product} />
         <ProductSlider_tab product={product} />
+        <SaveProductButton
+          key={product._id}
+          productData={productData}
+        />
       </div>
 
       <div className='xl:w-1/2 flex flex-col items-center relative'>
@@ -338,10 +394,6 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
         </div>
 
         <AddToCartButton classes={'lg:!h-[200px] lg:!mt-3'} text={isUpdatingCart ? "Please wait..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
-        <SaveProductButton
-          key={product._id}
-          productData={productData}
-        />
       </div>
     </div>
   );

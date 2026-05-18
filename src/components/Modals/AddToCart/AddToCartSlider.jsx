@@ -43,10 +43,12 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
         []
     );
 
+    const hasMedia = mediaItems && mediaItems.length > 0;
+
     return (
         <div className={`relative w-full lg:h-full ${noWidthConstraint ? '' : 'sm:max-w-[45%]'} ${isTent ? 'h-auto' : 'h-full'}`}>
             <div ref={sliderRef} className="keen-slider">
-                {mediaItems.map((item, index) => (
+                {hasMedia ? mediaItems.map((item, index) => (
                     <div key={item.id || index} className={`keen-slider__slide lg:!max-h-[400px] number-slide${index + 1} p-4 ${isTent ? '!max-h-[250px]' : '!max-h-[400px]'}`}>
                         <PrimaryImage
                             key={item.id || index}
@@ -56,7 +58,13 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
                             fit='fit'
                             customClasses={"h-full w-full object-contain"} />
                     </div>
-                ))}
+                )) : (
+                    <div className={`keen-slider__slide p-4 h-full lg:!max-h-[400px] ${isTent ? '!max-h-[250px]' : '!max-h-[400px]'}`}>
+                        <div className="h-full w-full min-h-[400px] flex items-center justify-center">
+                            <span className="font-haasRegular text-[12px] uppercase tracking-widest text-secondary-alt opacity-60">No image</span>
+                        </div>
+                    </div>
+                )}
             </div>
             {(mediaItems && mediaItems.length > 1) && (instanceRef.current && (
                 <>

@@ -37,7 +37,7 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
             <ProductBadge ribbon={ribbon} />
             <CustomLink to={productPath} className={`h-[217px] lg:h-full overflow-hidden flex justify-center items-center p-2 lg:p-14 ${type === 'listing' ? 'bg-white' : 'min-h-[450px]'}`}>
             {productImageSrc ? (
-                <Image src={productImageSrc} loader={coreImageLoader} alt={title} width={500} height={500} loading="eager" quality={70} sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw" className={"aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
+                <Image src={productImageSrc} loader={coreImageLoader} alt={title} width={500} height={500} loading="eager" quality={70} sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw" className={"lg:aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
             ) : null}
             </CustomLink>
 
@@ -71,7 +71,7 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
                     </div>
 
                     <button
-                        className={`${btnClass} w-full 2xl:w-auto min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary lg:px-4 lg:py-3 gap-x-7 ${type === 'listing' ? 'p-2' : 'px-4 py-3'}`}
+                        className={`${btnClass} w-full 2xl:w-auto lg:min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary lg:px-4 lg:py-3 gap-x-7 ${type === 'listing' ? 'p-2' : 'px-4 py-3'}`}
                         onClick={handleAddToCart}
                     >
                         <span className="uppercase font-haasRegular text-[12px]">add to cart</span>

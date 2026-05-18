@@ -26,7 +26,7 @@ const useDebounce = (callback, delay) => {
 };
 
 export const ProductListing = ({ data }) => {
-    const { selectedCategory, sortedProducts, subCategories, collectionIds, productBannersData, productOrder = [] } = data;
+    const { selectedCategory, allCollections, sortedProducts, subCategories, collectionIds, productBannersData, productOrder = [] } = data;
 
     let bannerIndex = -1;
     const pageSize = 12;
@@ -143,12 +143,35 @@ export const ProductListing = ({ data }) => {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+    
+    
+    // Remember which category the user was browsing so the product page can
+    // render a breadcrumb that reflects the path they took (Home > China >
+    // Product) instead of always defaulting to product.collections[0].
+    useEffect(() => {
+        if (typeof window === 'undefined' || !selectedCategory?.slug) return;
+        try {
+            sessionStorage.setItem(
+                'lastCategoryCrumb',
+                JSON.stringify({ slug: selectedCategory.slug, name: selectedCategory.name })
+            );
+        } catch {
+            // sessionStorage unavailable (private mode, etc.) — ignore
+        }
+    }, [selectedCategory?.slug, selectedCategory?.name]);
 
+    const parent = allCollections.find(col => 
+        col.subcategories?.some(sub => {
+            const subId = sub.id || sub._id || sub;
+            return subId === selectedCategory.id || subId === selectedCategory._id;
+        })
+    );
+    
     return (
         <div className='flex flex-col items-center lg:px-[24px] px-[12px]'>
             {/* Title Section */}
             <div className='w-full relative flex flex-col justify-center pt-[55px] pb-[23px] lg:gap-y-0 gap-y-[10px]'>
-                <h4 className='uppercase text-center color-secondary-alt lg:font-recklessRegular font-recklessLight lg:text-[35px]'>{selectedCategory?.name}</h4>
+                <h4 className='uppercase text-center text-[#2C2216] lg:font-recklessRegular font-recklessLight lg:text-[35px]'>{parent?.name}</h4>
 
                 <div className='relative lg:block flex flex-col justify-center items-center lg:gap-y-0 gap-y-[10px]'>
                     <SectionTitle text={selectedCategory?.name} classes="xl:text-[200px] lg:text-[95px] border-none" />
@@ -165,9 +188,7 @@ export const ProductListing = ({ data }) => {
 
             <hr className='hidden lg:block border border-primary-border my-8 w-full' />
 
-            <ul className='w-full grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2
-      lg:gap-x-[31px] sm:gap-x-[12px] gap-x-[10px]
-      lg:gap-y-[20px] sm:gap-y-[12px] gap-y-[20px]'>
+            <ul className='w-full grid lg:grid-cols-4 sm:grid-cols-3 grid-cols-2 lg:gap-x-[31px] sm:gap-x-[12px] gap-x-[10px] lg:gap-y-[20px] sm:gap-y-[12px] gap-y-[20px]'>
                 {products.map((productData, index) => {
                     const banners = isMobile ? bannersMobile : bannersDesktop;
                     const shouldInsertBanner = (index + 1) % pageSize === 0 && banners.length > 0;

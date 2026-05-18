@@ -32,41 +32,40 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
         setMarketsData(markets);
         setProductsData(products);
         setLoading(false);
-        setTimeout(() => {
-            loaderActions.hide();
-        }, 500);
+        loaderActions.hide();
 
         const otherData = await searchOtherData(searchTerm);
         const { tents, projects, blogs } = otherData;
         setBlogsData(blogs);
         setProjectsData(projects);
         setTentsData(tents);
-
-        // setTimeout(() => {
-        //     fetchSavedProducts();
-        // }, 1000);
     };
 
     useEffect(() => {
-        if (searchTerm) {
+        if (searchTerm.trim()) {
             setInitialValues();
         } else {
-            setTimeout(() => {
-                loaderActions.hide();
-                setLoading(false);
-            }, 5000);
+            loaderActions.hide();
+            setLoading(false);
         }
     }, [searchTerm]);
 
     useEffect(() => {
-        const term = searchParams.get('query') || '';
+        const term = (searchParams.get('query') || '').trim();
         setSearchTerm(term);
     }, [searchParams]);
 
+    const hasResults = productsData.length || marketsData.length || blogsData.length || projectsData.length || tentsData.length;
+    const emptyMessage = loading
+        ? 'Searching for results...'
+        : !searchTerm
+            ? 'Enter a search term'
+            : `No results found for "${searchTerm}"`;
+
     return (
         <>
-            {!productsData.length && !marketsData.length && !blogsData.length && !projectsData.length && !tentsData.length && (
-                <div className='h-screen flex justify-center items-center'><span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>{loading ? `Searching for results...` : "No results found"}</span></div>
+            {!hasResults && (
+                <div className='h-screen flex justify-center items-center'><span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>{emptyMessage}</span></div>
             )}
             {marketsData.length > 0 && <OurMarkets pageTitle={ourMarketsTitle} data={marketsData} />}
             {productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} allCollections={allCollections} />}

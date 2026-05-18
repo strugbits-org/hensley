@@ -143,19 +143,38 @@ function Listing({ data }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Remember which category the user was browsing so the product page can
+  // render a breadcrumb that reflects the path they took (Home > Tabletop >
+  // Product) instead of always defaulting to product.collections[0].
+  useEffect(() => {
+    if (typeof window === 'undefined' || !selectedCategory?.slug) return;
+    try {
+      sessionStorage.setItem(
+        'lastCategoryCrumb',
+        JSON.stringify({ slug: selectedCategory.slug, name: selectedCategory.name })
+      );
+    } catch {
+      // sessionStorage unavailable (private mode, etc.) — ignore
+    }
+  }, [selectedCategory?.slug, selectedCategory?.name]);
+
   return (
     <>
       <div className='w-full relative flex items-center py-10'>
         <SectionTitle text={selectedCategory?.name} classes="text-[35px] border-none" />
-        <ProductsFilterPopup
-          selectedCategory={selectedCategory}
-          subCategories={subCategories}
-          onFilterChange={handleFilterChange}
-          selectedFilters={selectedFilters}
-        />
+        {subCategories.length > 0 && (
+          <ProductsFilterPopup
+            selectedCategory={selectedCategory}
+            subCategories={subCategories}
+            onFilterChange={handleFilterChange}
+            selectedFilters={selectedFilters}
+          />
+        )}
       </div>
 
-      <ProductFilterCardSubCategories data={subCategories} />
+      {subCategories.length > 0 && (
+        <ProductFilterCardSubCategories data={subCategories} />
+      )}
 
       <div className="w-full flex flex-col lg:flex-row justify-center items-stretch gap-6 lg:px-0 px-[12px]">
         {subCategories.length > 0 && (<div className="lg:w-1/4 w-full lg:h-screen pl-[24px] lg:block hidden">

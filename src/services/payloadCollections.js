@@ -692,9 +692,10 @@ export const queryProductCollectionBySlug = async (slug) => {
                 slug: true,
                 subcategories: true,
                 productOrder: true,
+                parent: true
             },
             populate: {
-                'product-collections': { name: true, slug: true, subcategories: true },
+                'product-collections': { name: true, slug: true, subcategories: true, parent: true },
                 products: {},
             },
         });
@@ -1034,9 +1035,14 @@ export const normalizePayloadBlog = (blog) => {
         : null;
     const displayName = author?.username || [author?.firstName, author?.lastName].filter(Boolean).join(" ");
     const displayDate = blog.createdAt || blog.updatedAt || "";
+    // No `...blog` or `...author` spread: previously the raw Payload doc leaked
+    // through (raw content richText body, raw coverImage media doc, _status,
+    // tenantId, createdAt/updatedAt, etc.) inflating the server→client payload.
+    // The detail page reads richContent via blogRef.richContent — no consumer
+    // reads raw fields directly (audit verified).
     return {
-        ...blog,
         _id: blog.id || blog._id,
+        id: blog.id || blog._id,
         slug: blog.slug || "",
         publishDate: displayDate,
         blogRef: {
@@ -1046,14 +1052,11 @@ export const normalizePayloadBlog = (blog) => {
             excerpt: blog.excerpt || "",
             richContent: blog.content || null,
         },
-        author: author
-            ? {
-                ...author,
-                nickname: displayName || "",
-                firstName: author.firstName || "",
-                lastName: author.lastName || "",
-            }
-            : { nickname: "", firstName: "", lastName: "" },
+        author: {
+            nickname: displayName || "",
+            firstName: author?.firstName || "",
+            lastName: author?.lastName || "",
+        },
         markets: ensureArray(blog.markets).map(normalizePayloadMarketRef),
         studios: ensureArray(blog.studios).map(normalizePayloadStudioRef),
         blogCategories: ensureArray(blog.blogCategories).map(normalizePayloadBlogCategoryRef),
@@ -1066,23 +1069,34 @@ export const normalizePayloadProject = (project) => {
     if (!project || typeof project !== "object") return project;
     const coverImageUrl = resolveMediaUrl(project.coverImage, "tablet");
     const heroImageUrl = resolveMediaUrl(project.heroImage, "tablet");
-    const galleryImages = ensureArray(project.galleryImages).map((item) => {
-        if (typeof item === "string") return item;
-        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
-        return imgUrl;
+    // Single pass over galleryImages: previously walked twice (once for URL
+    // strings, once for {url, caption} objects), doubling resolveMediaUrl
+    // calls per project. We tag each entry with isString so the URL-only and
+    // object-only outputs preserve the original semantics: string entries
+    // pass through unresolved to galleryImages and are dropped from
+    // galleryImageObjects; object entries get resolveMediaUrl'd into both.
+    const galleryItems = ensureArray(project.galleryImages).map((item) => {
+        if (typeof item === "string") return { isString: true, value: item };
+        if (!item) return null;
+        const url = resolveMediaUrl(item?.image || item, "tablet");
+        return url ? { isString: false, url, caption: item?.caption || "" } : null;
     }).filter(Boolean);
-    const galleryImageObjects = ensureArray(project.galleryImages).map((item) => {
-        if (!item || typeof item === "string") return null;
-        const imgUrl = resolveMediaUrl(item?.image || item, "tablet");
-        return imgUrl ? { url: imgUrl, caption: item?.caption || "" } : null;
-    }).filter(Boolean);
+    const galleryImages = galleryItems.map((g) => (g.isString ? g.value : g.url));
+    const galleryImageObjects = galleryItems
+        .filter((g) => !g.isString)
+        .map(({ url, caption }) => ({ url, caption }));
     const excerpt = project.excerpt || (project.description ? project.description.slice(0, 120) + (project.description.length > 120 ? "..." : "") : "");
     const testimonial = project.testimonial || null;
     const meta = project.meta || {};
 
+    // No `...project` spread: previously the raw Payload doc leaked through
+    // (raw richText description blob, raw cover/hero media docs, _status,
+    // tenantId, createdAt/updatedAt, originalProject, etc.) inflating the
+    // server→client payload with fields no consumer reads. The only spread
+    // dependency was `noFollowTag`, now mapped explicitly.
     return {
-        ...project,
         _id: project.id || project._id,
+        id: project.id || project._id,
         slug: project.slug || "",
         publishDate: project.publishDate || project.publishedDate || "",
         eventDate: project.eventDate || "",
@@ -1092,6 +1106,7 @@ export const normalizePayloadProject = (project) => {
         tags: ensureArray(project.tags),
         isFeatured: project.isFeatured || false,
         order: project.order ?? 0,
+        noFollowTag: project.noFollowTag || false,
         portfolioRef: {
             title: project.title || "",
             coverImage: { imageInfo: coverImageUrl },
@@ -1267,7 +1282,7 @@ export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, d
     }
 };
 
-export const queryBlogBySlug = async (slug) => {
+export const queryBlogBySlug = async (slug, { depth = 2, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
@@ -1275,7 +1290,8 @@ export const queryBlogBySlug = async (slug) => {
             limit: 1,
             draft: false,
             locale: "en",
-            depth: 2,
+            depth,
+            ...(select ? { select } : {}),
         });
         return result?.docs?.[0] || null;
     } catch (error) {
@@ -1325,7 +1341,7 @@ export const queryProjects = async ({ where = {}, sort = "order", limit, depth =
     }
 };
 
-export const queryProjectBySlug = async (slug, { draft = false } = {}) => {
+export const queryProjectBySlug = async (slug, { draft = false, depth = 2, select } = {}) => {
     try {
         const whereClause = draft
             ? { slug: { equals: slug } }
@@ -1336,7 +1352,8 @@ export const queryProjectBySlug = async (slug, { draft = false } = {}) => {
             limit: 1,
             draft,
             locale: "en",
-            depth: 2,
+            depth,
+            ...(select ? { select } : {}),
         });
         return result?.docs?.[0] || null;
     } catch (error) {

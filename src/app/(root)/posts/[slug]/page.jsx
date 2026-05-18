@@ -1,12 +1,15 @@
 import BlogDetails from "@/components/BlogDetails";
-import { fetchBlogs, fetchPostPageData, fetchSelectedBlog } from "@/services/blogs";
+import { fetchBlogs, fetchBlogMetadataBySlug, fetchPostPageData } from "@/services/blogs";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
 export const generateMetadata = async ({ params }) => {
   try {
     const slug = decodeURIComponent(params.slug);
-    const blog = await fetchSelectedBlog(slug);
+    // Slim metadata-only fetch — see fetchBlogMetadataBySlug docstring.
+    // Avoids the depth:2 double-fetch that Next 14 imposes when generateMetadata
+    // and the page body share a slug.
+    const blog = await fetchBlogMetadataBySlug(slug);
     if (!blog) return {};
     return {
       title: blog.blogRef?.title || "",

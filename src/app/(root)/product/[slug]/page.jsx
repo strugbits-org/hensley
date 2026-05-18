@@ -20,15 +20,15 @@ export async function generateMetadata({ params }) {
       queryProductsBySlug(slug)
     ]);
 
-    const { title, noFollowTag } = metaData;
+    const { title, robotsTag } = metaData;
     const normalizedProduct = normalizeProductForDisplay(product || {});
     const fullTitle = `${normalizedProduct.name} ${title}`;
     const metadata = {
       title: fullTitle,
       description: richTextToPlainText(product?.description).slice(0, 160) || undefined,
     };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && noFollowTag) {
-      metadata.robots = "noindex,nofollow";
+    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
+      metadata.robots = robotsTag;
     }
 
     return metadata;

@@ -56,26 +56,15 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     const getSubItemsForMenu = (menuItem) => {
         if (!menuItem) return [];
 
-        let items = [];
         if (Array.isArray(menuItem.children) && menuItem.children.length) {
-            items = sortByOrderNumber(menuItem.children);
-        } else {
-            items = sortByOrderNumber(
-                headerSubMenu.filter(item => item.Header_menuItems?.some(subItem => subItem._id === menuItem?._id))
-            );
+            return sortByOrderNumber(menuItem.children);
         }
 
-        // Enforce Contact before Career
-        const contactIndex = items.findIndex(item => String(item.title).toLowerCase() === 'contact');
-        const careerIndex = items.findIndex(item => String(item.title).toLowerCase() === 'careers' || String(item.title).toLowerCase() === 'career');
-        
-        if (contactIndex !== -1 && careerIndex !== -1 && contactIndex > careerIndex) {
-            const contactItem = items.splice(contactIndex, 1)[0];
-            items.splice(careerIndex, 0, contactItem);
-        }
-
-        return items;
+        return sortByOrderNumber(
+            headerSubMenu.filter(item => item.Header_menuItems?.some(subItem => subItem._id === menuItem?._id))
+        );
     };
+
 
     const getNestedItemsForSubMenu = (item) => {
         if (!item) return [];
@@ -161,8 +150,12 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                 data: sortByOrderNumber(itemIsMarkets ? marketsData : tentsData),
             };
             if (selectedMenu) {
-                setSelectedMenu(false);
-                setTimeout(() => setSelectedMenu(newMenu), 50);
+                if (selectedMenu.title === newMenu.title) {
+                    setSelectedMenu(false);
+                } else {
+                    setSelectedMenu(false);
+                    setTimeout(() => setSelectedMenu(newMenu), 50);
+                }
             } else {
                 setSelectedMenu(newMenu);
             }
@@ -193,10 +186,14 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
             };
 
             if (selectedMenu) {
-                setSelectedMenu(false);
-                setTimeout(() => {
-                    setSelectedMenu(newMenu);
-                }, 50);
+                if (selectedMenu.title === newMenu.title) {
+                    setSelectedMenu(false);
+                } else {
+                    setSelectedMenu(false);
+                    setTimeout(() => {
+                        setSelectedMenu(newMenu);
+                    }, 50);
+                }
             } else {
                 setSelectedMenu(newMenu);
             }
@@ -256,28 +253,28 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         }
     }
 
-    const fetchCartItems = async () => {
-        try {
-            const response = await getProductsCart();
-            if (response === "Token has expired") {
-                removeCookie("authToken", { path: "/" });
-                removeCookie("userData", { path: "/" });
-                removeCookie("cartQuantity", { path: "/" });
-                removeCookie("userTokens", { path: "/" });
-                setTimeout(() => {
-                    router.push("/");
-                }, 500);
-                return;
-            }
-            const lineItems = response?.lineItems || [];
-            const total = calculateTotalCartQuantity(lineItems);
-            if (total !== cookies.cartQuantity) {
-                setCookie("cartQuantity", total, { path: "/" });
-            }
-        } catch (error) {
-            console.error("Error fetching cart items:", error);
-        }
-    };
+    // const fetchCartItems = async () => {
+    //     try {
+    //         const response = await getProductsCart();
+    //         if (response === "Token has expired") {
+    //             removeCookie("authToken", { path: "/" });
+    //             removeCookie("userData", { path: "/" });
+    //             removeCookie("cartQuantity", { path: "/" });
+    //             removeCookie("userTokens", { path: "/" });
+    //             setTimeout(() => {
+    //                 router.push("/");
+    //             }, 500);
+    //             return;
+    //         }
+    //         const lineItems = response?.lineItems || [];
+    //         const total = calculateTotalCartQuantity(lineItems);
+    //         if (total !== cookies.cartQuantity) {
+    //             setCookie("cartQuantity", total, { path: "/" });
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching cart items:", error);
+    //     }
+    // };
 
     // useEffect(() => {
     //     fetchCartItems();
@@ -331,6 +328,20 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         ));
         actions.setTentsIds(ids);
     }, [tentsData]);
+
+    useEffect(() => {
+            const handleClickOutside = (event) => {
+            if (window.innerWidth >= 1024 && selectedMenu) {
+                const desktopMenu = document.querySelector('.desktop-menu');
+                if (desktopMenu && !desktopMenu.contains(event.target)) {
+                    setSelectedMenu(false);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [selectedMenu]);
 
     return (
         <>

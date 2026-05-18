@@ -255,7 +255,12 @@ export const generateCoreImageURL = ({
   const params = new URLSearchParams();
   const snappedW = snapToCoreBucket(w);
   if (snappedW) params.set("w", String(snappedW));
-  if (Number.isFinite(Number(h)) && Number(h) > 0) params.set("h", String(Math.round(Number(h))));
+  // Bucket height the same way as width. Sending the exact measured pixel
+  // height made the URL change on every layout-settle delta, which (with
+  // fit=fill) caused the CDN to crop a different aspect each time — visible
+  // as crop "jumps" inside object-cover containers.
+  const snappedH = snapToCoreBucket(h);
+  if (snappedH) params.set("h", String(snappedH));
   if (q && Number(q) !== 75) params.set("q", String(Number(q)));
   if (f && f !== "webp") params.set("f", f);
   if (fit) params.set("fit", fit);
