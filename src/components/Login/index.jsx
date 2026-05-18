@@ -55,7 +55,7 @@ const InputField = ({
         <div className={`gap-y-[8px] flex flex-col ${classes}`}>
             {label && (
                 <label htmlFor={id} className=" !text-[16px] uppercase block font-medium text-secondary-alt font-haasBold">
-                    {label} 
+                    {label}
                 </label>
             )}
             <div className='relative'>
@@ -307,27 +307,30 @@ const Login = ({ classes, close, isLightbox = true, data = {} }) => {
 
                 {/* Terms & Conditions */}
                 <div className='w-full flex justify-center items-center'>
-                    {/* <span className='text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center'>
-                        By continuing, you are agreeing with
-                        <a href="#" className='text-secondary underline hover:opacity-70 transition-opacity duration-200'>
-                            Blueprint <br /> Studios Terms & Conditions
-                        </a>
-                        {' '}and{' '}
-                        <a href="#" className='text-secondary underline hover:opacity-70 transition-opacity duration-200'>
-                            Privacy Policy.
-                        </a>
-                    </span> */}
-                    <div className='w-full sm:max-w-[370px] '>
-                        {convertToHTMLRichContent({ 
-                            content: agreementContent, 
-                            class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center',
-                            class_a: 'text-[12px] text-secondary underline hover:opacity-70 transition-opacity duration-200'
-                        })}
-                    </div>
+                    {agreementContent ? (
+                        <div className='w-full sm:max-w-[370px] '>
+                            {convertToHTMLRichContent({
+                                content: agreementContent,
+                                class_p: 'text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center',
+                                class_a: 'text-[12px] text-secondary underline hover:opacity-70 transition-opacity duration-200'
+                            })}
+                        </div>
+                    ) : (
+                        <span className='w-full text-[12px] leading-[16px] text-secondary-alt font-haasRegular uppercase text-center block'>
+                            BY CONTINUING, YOU ARE AGREEING WITH<br />
+                            <a href="/terms-of-use" className='text-secondary underline hover:opacity-70 transition-opacity duration-200'>
+                                HENSLEY TERMS & CONDITIONS
+                            </a>
+                            {' '}AND{' '}
+                            <a href="/privacy-policy" className='text-secondary underline hover:opacity-70 transition-opacity duration-200'>
+                                PRIVACY POLICY.
+                            </a>
+                        </span>
+                    )}
                 </div>
 
                 {/* New User Section */}
-                <span className='font-recklessLight text-[28px] leading-[20px] text-secondary-alt block lg:mt-0 mt-[100px]'>
+                <span className='font-recklessRegular text-[28px] leading-[20px] text-secondary-alt block lg:mt-0 mt-[100px]'>
                     {newToHensleyText}
                 </span>
 
