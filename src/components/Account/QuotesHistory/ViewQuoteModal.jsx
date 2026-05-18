@@ -198,7 +198,7 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
 
     return (
         <Transition appear show={data !== undefined && data !== null} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={onClose}>
+            <Dialog as="div" className="relative z-[200]" onClose={onClose}>
                 <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"

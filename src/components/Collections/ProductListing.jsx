@@ -185,8 +185,8 @@ function Listing({ data }) {
             selectedFilters={selectedFilters}
           />
         </div>)}
-        <div className={`w-full min-h-screen lg:pb-[28px] lg:pt-[28px] sm:pt-[12px] sm:pb-[12px] pb-[12px] lg:border-t lg:border-b border-primary-border ${subCategories.length > 0 ? 'lg:w-3/4 lg:pr-6' : 'lg:w-full px-6'}`}>
-          <ul className={`grid grid-cols-2 md:grid-cols-3 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px] ${subCategories.length > 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
+        <div className={`w-full min-h-auto lg:pb-[28px] lg:pt-[28px] sm:pt-[12px] sm:pb-[12px] pb-[12px] lg:border-t lg:border-b border-primary-border ${subCategories.length > 0 ? 'lg:w-3/4 lg:pr-6' : 'lg:w-full px-6'}`}>
+          <ul className={`grid grid-cols-2 md:grid-cols-3 lg:gap-x-[24px] sm:gap-x-[12px] lg:gap-y-[31px] gap-y-[13px] gap-x-[12px] sm:gap-y-[12px] ${products?.length === 3 ? 'lg:grid-cols-3' : (subCategories.length > 0 ? 'lg:grid-cols-3' : 'lg:grid-cols-4')}`}>
             {products.map((productData, index) => {
               const banners = isMobile ? bannersMobile : bannersDesktop;
               const shouldInsertBanner = (index + 1) % pageSize === 0 && banners.length > 0;

@@ -25,12 +25,12 @@ function NewsCard({ data, classes }) {
     return (
         <CustomLink to={`/posts/${slug}`} className={`relative group border cursor-pointer border-primary-border hover:border-secondary-alt pb-6 ${classes}`}>
             <div className='overflow-hidden'>
-                <PrimaryImage alt={title} url={coverImage} size="card" customClasses={"h-full w-full min-h-[528px] max-h-[528px] object-cover transition-transform duration-300 group-hover:scale-105"} />
+                <PrimaryImage alt={title} url={coverImage} size="card" customClasses={"h-full w-full min-h-[300px] max-h-[300px] lg:min-h-[528px] lg:max-h-[528px] object-cover transition-transform duration-300 group-hover:scale-105"} />
             </div>
 
             <div className='w-full flex gap-1 p-6 pb-0'>
                 <div className='grow'>
-                    <h2 className="uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular mb-3">
+                    <h2 className="uppercase text-[16px] leading-[18px] lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular mb-3">
                         {title}
                     </h2>
                 </div>
