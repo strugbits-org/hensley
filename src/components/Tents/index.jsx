@@ -8,8 +8,8 @@ import { DownloadButton } from './DownloadButton'
 import { FeaturedBlogs } from '../Product/FeaturedBlogs'
 
 const Tents = ({ data }) => {
-    const { tents, fullTentData, pageDetails, masterClassTentingURL } = data;
-    const { featuredProductTitle, downloadBtnLabel } = pageDetails
+    const { tents, fullTentData, pageDetails } = data;
+    const { featuredProductTitle, downloadBtnLabel, masterClassTentingURL } = pageDetails
 
     return (
         <>

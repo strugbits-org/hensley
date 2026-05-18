@@ -234,12 +234,28 @@ export const fetchSelectedMarketsData = async (slug) => {
 
 
 
-export const fetchTentListingPageDetails = async () => {
-  return {
+export const fetchTentListingPageDetails = cache(async () => {
+  const fallback = {
     featuredProductTitle: "Products Featured in this Project Entry",
     downloadBtnLabel: "Download Master Class Tenting Guide",
+    masterClassTentingURL: process.env.MASTER_CLASS_TENTING_URL || "",
   };
-};
+  try {
+    const section = await querySection("tent-listing-page-details");
+    if (section) {
+      const details = sectionToObject(section);
+      const resolvedUrl = resolveCoreMediaUrl(details.masterClassTentingURL);
+      return {
+        ...fallback,
+        ...details,
+        masterClassTentingURL: resolvedUrl || fallback.masterClassTentingURL,
+      };
+    }
+  } catch (error) {
+    logError(`Error fetching tent listing page details: ${error.message}`, error);
+  }
+  return fallback;
+});
 
 export const fetchTentsData = cache(async () => {
   const { fetchAllTents } = await import("./tents");
@@ -267,10 +283,6 @@ export const fetchTentsDataForListing = cache(async () => {
   const { fetchAllTentsForListing } = await import("./tents");
   return fetchAllTentsForListing();
 });
-
-export const fetchMasterClassTenting = async () => {
-  return process.env.MASTER_CLASS_TENTING_URL || "";
-};
 
 const mapStorefrontFooterToLayoutData = (footer) => {
   const brandTitle = footer?.brand?.title || footer?.brand?.eyebrow || "";

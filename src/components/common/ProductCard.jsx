@@ -22,7 +22,7 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
     if (product?.type === 'tent') {
         productPath = `/tent/${product.slug}`;
     } else if (product?.type === 'pool_cover') {
-        productPath = `/pool-cover/${product.slug}`;
+        productPath = `/pool-covers/${product.slug}`;
     }
 
     const isTent = product?.type === 'tent' || actions.isTentProduct(product);

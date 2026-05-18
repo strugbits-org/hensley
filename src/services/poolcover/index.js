@@ -177,13 +177,6 @@ const normalizePoolCoverItem = (product, orderNumber = 0) => {
     }));
 
     const mainMediaUrl = resolveCoreMediaUrl(product.mainMedia, "tablet");
-    if (mainMediaUrl && !gallery.some((g) => g.src === mainMediaUrl)) {
-        gallery.unshift({
-            id: product.mainMedia?.id || "main-media",
-            src: mainMediaUrl,
-            alt: product.mainMedia?.alt || product.title || "Pool cover main image",
-        });
-    }
 
     const poolCoverConfig = product.poolCoverConfig || {};
     const relevantImages = Array.isArray(poolCoverConfig.relevantImages)
