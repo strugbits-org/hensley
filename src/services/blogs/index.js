@@ -18,12 +18,17 @@ import {
 
 // Field set the listing + "other blogs" cards actually read. Excludes
 // content body, storeProducts, meta, hero/gallery images.
+// `authorNickName` is a virtual field on the Blog (filled by the
+// attachAuthorNickname afterRead hook in bps-core) — we read it instead of
+// the related User doc because the frontend API key has no `users.read`
+// permission (users is excluded from API_KEY_ALLOWED_COLLECTIONS).
 const BLOG_LISTING_SELECT = {
     title: true,
     slug: true,
     excerpt: true,
     coverImage: true,
     author: true,
+    authorNickName: true,
     markets: true,
     studios: true,
     blogCategories: true,

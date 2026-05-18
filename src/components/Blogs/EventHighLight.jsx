@@ -5,11 +5,15 @@ import { PrimaryImage } from '../common/PrimaryImage'
 import { CustomLink } from '../common/CustomLink'
 import { MarketsStudiosTags } from './MarketsStudiosTags'
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader'
+import { formatDate } from '@/utils'
 
 const EventHighLight = ({ data, handleFilterChange, selectedTags, pageTitle="" }) => {
     if (!data) return;
     const {hensleyNewsTitle} = pageTitle;
     const { slug, author, blogRef, markets, studios, blogCategories } = data;
+    const authorName = author?.nickname || "";
+    const formattedDate = blogRef?.publishedDate ? formatDate(blogRef.publishedDate) : "";
+    const dateAuthorLine = [formattedDate, authorName].filter(Boolean).join(" - ");
     const redirectWithLoader = useRedirectWithLoader();
 
     const handleRedirection = () => {
@@ -29,7 +33,7 @@ const EventHighLight = ({ data, handleFilterChange, selectedTags, pageTitle="" }
                 <div className='lg:w-2/5  flex flex-row lg:flex-col gap-x-[20px] lg:px-0 max-lg:py-[40px] lg:gap-y-[15px] relative '>
                     <div className=' max-lg:w-1/2  flex flex-col gap-y-[15px]'>
                         <div className='w-full flex gap-x-[10px] justify-end'>
-                            <span className='font-haasRegular uppercase text-[12px] text-secondary-altinline'>{author?.nickname || author?.firstName || author?.lastName}</span>
+                            <span className='font-haasRegular uppercase text-[12px] text-secondary-altinline'>{dateAuthorLine}</span>
                         </div>
 
                         <span className='uppercase text-secondary-alt lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[32px] text-[25px] leading-[23px] font-recklessRegular block '>
