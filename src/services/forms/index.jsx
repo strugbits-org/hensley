@@ -1,10 +1,8 @@
 import { logError } from "@/utils";
 
-const BASE_URL = process.env.BASE_URL;
-
 export const postForm = async (name, payload) => {
     try {
-        const response = await fetch(`${BASE_URL}/api/submissions/${name}`, {
+        const response = await fetch(`/api/submissions/${name}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

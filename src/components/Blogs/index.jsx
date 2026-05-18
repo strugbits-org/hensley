@@ -62,6 +62,12 @@ const Blogs = ({ data }) => {
         setPageLimit(PAGE_SIZE);
     }, [PAGE_SIZE]);
 
+    // Called by FilterCardSubCategories when the dropdown closes
+    const handleApplyFilters = useCallback((tags) => {
+        setSelectedTags(tags);
+        setPageLimit(PAGE_SIZE);
+    }, [PAGE_SIZE]);
+
     useEffect(() => {
         setPageLimit(PAGE_SIZE);
     }, [selectedTags, PAGE_SIZE]);
@@ -74,6 +80,7 @@ const Blogs = ({ data }) => {
                 <FilterCardSubCategories
                     data={categoriesMarketStudios}
                     handleFilterChange={handleFilterChange}
+                    onApplyFilters={handleApplyFilters}
                     selectedTags={selectedTags}
                 />
             </div>

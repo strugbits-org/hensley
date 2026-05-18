@@ -45,7 +45,6 @@ const buildDefaultValues = (fields = []) => {
 
 export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     const poolConfig = productData?.poolCoverConfig || {};
-    const presetRelevantImages = poolConfig.relevantImages || [];
     const fallbackFields = [
         {
             label: 'PLEASE SHARE THE APPROX. SIZE OF THE AREA YOU YOUR POOL IS',
@@ -89,7 +88,6 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     const redirectWithLoader = useRedirectWithLoader();
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
     const [relevantImages, setRelevantImages] = useState([]);
-    const [selectedPresetImages, setSelectedPresetImages] = useState(new Set());
     const [uploading, setUploading] = useState(false);
 
     const {
@@ -118,12 +116,9 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             const productId = productData._id;
             const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
             
-            // Combine uploaded image IDs and selected preset image IDs.
             const uploadedImageIds = relevantImages
                 .map((x) => x.id)
                 .filter(Boolean);
-            const selectedPresetImageIds = Array.from(selectedPresetImages).filter(Boolean);
-            const allImageIds = Array.from(new Set([...uploadedImageIds, ...selectedPresetImageIds]));
 
             const customTextFields = {};
             quoteFields.forEach((field) => {
@@ -132,8 +127,8 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                 customTextFields[label] = typeof val === 'string' ? val.toUpperCase() : val || '-';
             });
 
-            if (allImageIds.length) {
-                customTextFields["RELEVENT IMAGES"] = allImageIds.join("~~");
+            if (uploadedImageIds.length) {
+                customTextFields["RELEVENT IMAGES"] = uploadedImageIds.join("~~");
             }
             customTextFields["POOLCOVER"] = "true";
 
@@ -156,7 +151,6 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             setTimeout(() => {
                 reset();
                 setFormData(defaultValues);
-                setSelectedPresetImages(new Set());
             }, 1000);
             redirectWithLoader("/cart");
 
@@ -187,18 +181,6 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     };
     const handleRemoveImage = (imageId) => {
         setRelevantImages(prev => prev.filter(image => image.id !== imageId));
-    };
-
-    const handleTogglePresetImage = (imageId) => {
-        setSelectedPresetImages(prev => {
-            const newSet = new Set(prev);
-            if (newSet.has(imageId)) {
-                newSet.delete(imageId);
-            } else {
-                newSet.add(imageId);
-            }
-            return newSet;
-        });
     };
 
     return (
@@ -294,7 +276,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         );
                     })}
 
-                    <div className='lg:col-span-4 col-span-2'>
+                    <div className={`lg:col-span-4 col-span-2 ${relevantImages.length === 0 ? 'mb-[39px]' : ''}`}>
                         <label htmlFor="file-upload" className="cursor-pointer">
                             <span className="block text-[16px] leading-[19px] font-haasBold uppercase font-medium text-secondary-alt mb-4">PLEASE SHARE ANY RELEVANT VENUE OR INSPIRATION IMAGES</span>
                             <div className='w-full min-w-48 lg:min-w-72 uppercase tracking-widest hover:font-bold [word-spacing:3px] text-sm transition-all duration-300'>
@@ -312,35 +294,6 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                             disabled={isSubmitting || uploading}
                         />
                     </div>
-
-                    {presetRelevantImages.length > 0 && (
-                        <div className='lg:col-span-4 col-span-2'>
-                            <span className="block text-[14px] leading-[17px] font-haasBold uppercase font-medium text-secondary-alt mb-3">Or select from our reference images:</span>
-                            <div className="grid grid-cols-5 gap-2">
-                                {presetRelevantImages.map((image) => (
-                                    <button
-                                        key={image.id}
-                                        onClick={() => handleTogglePresetImage(image.id)}
-                                        type="button"
-                                        className={`relative col-span-1 h-[120px] cursor-pointer p-2 transition-all duration-200 border-2 ${
-                                            selectedPresetImages.has(image.id)
-                                                ? 'bg-secondary-alt border-secondary-alt'
-                                                : 'bg-white border-gray-300 hover:border-secondary-alt'
-                                        }`}
-                                    >
-                                        {selectedPresetImages.has(image.id) && (
-                                            <div className="absolute top-1 right-1 bg-white rounded-full p-1">
-                                                <svg className="w-4 h-4 text-secondary-alt" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                </svg>
-                                            </div>
-                                        )}
-                                        <img src={image.src} alt={image.alt} className="h-full w-full object-contain" />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
 
                     <div className={`lg:col-span-4 col-span-2 grid grid-cols-5 gap-2 ${relevantImages.length === 0 ? 'hidden' : ''}`}>
                         {relevantImages.map((image) => (

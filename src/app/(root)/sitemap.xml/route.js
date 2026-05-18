@@ -9,7 +9,7 @@ export async function GET() {
     { loc: `${baseUrl}/project/sitemap.xml`, lastmod: new Date().toISOString() },
     { loc: `${baseUrl}/subcategory/sitemap.xml`, lastmod: new Date().toISOString() },
     { loc: `${baseUrl}/tent/sitemap.xml`, lastmod: new Date().toISOString() },
-    { loc: `${baseUrl}/pool-cover/sitemap.xml`, lastmod: new Date().toISOString() },
+    { loc: `${baseUrl}/pool-covers/sitemap.xml`, lastmod: new Date().toISOString() },
     { loc: `${baseUrl}/market/sitemap.xml`, lastmod: new Date().toISOString() },
   ];
 

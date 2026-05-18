@@ -480,7 +480,8 @@ export const convertToHTMLRichContent = ({
     class_gallery_item = "",
     class_table = "",
     class_table_row = "",
-    class_table_cell = ""
+    class_table_cell = "",
+    class_a = ""
 }) => {
     if (!content) return null;
     if (typeof content === 'string') return content;
@@ -512,7 +513,8 @@ export const convertToHTMLRichContent = ({
                         } else if (decoration.type === 'LINK') {
                             const url = decoration.linkData?.link?.url || '#';
                             const target = decoration.linkData?.link?.target?.toLowerCase() === 'blank' ? ' target="_blank" rel="noopener noreferrer"' : '';
-                            decorationsHTML += `<a href="${url}"${target}>`;
+                            const classAttr = class_a ? ` class="${class_a}"` : '';
+                            decorationsHTML += `<a href="${url}"${target}${classAttr}>`;
                             closingTags.unshift('</a>');
                         } else if (decoration.type === 'UNDERLINE') {
                             decorationsHTML += '<u>';
@@ -537,7 +539,11 @@ export const convertToHTMLRichContent = ({
                     });
                 }
 
-                textHTML += decorationsHTML + textNode.textData.text + closingTags.join('');
+                let textVal = textNode.textData.text || '';
+                // Inject <br/> after "agreeing with" to force 2-line rendering
+                textVal = textVal.replace(/(agreeing with|AGREEING WITH)/gi, '$1<br/>');
+
+                textHTML += decorationsHTML + textVal + closingTags.join('');
             }
         });
         return textHTML;

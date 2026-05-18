@@ -88,7 +88,11 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         const destination = getMenuUrl(item);
 
         if (item.type === "lightbox" && item.lightbox) {
-            lightboxActions.showLightBox(item.lightbox);
+            if (isMobile && item.lightbox === "contact") {
+                redirectWithLoader("/contact");
+            } else {
+                lightboxActions.showLightBox(item.lightbox);
+            }
             if (isMobile && isMobileMenuOpen) toggleMobileMenu();
             return true;
         }

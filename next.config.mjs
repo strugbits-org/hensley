@@ -49,6 +49,15 @@ const nextConfig = {
             bodySizeLimit: '10mb',
         },
     },
+    async redirects() {
+        return [
+            {
+                source: '/pool-cover/:slug*',
+                destination: '/pool-covers/:slug*',
+                permanent: true,
+            },
+        ];
+    },
 };
 
 export default nextConfig;  

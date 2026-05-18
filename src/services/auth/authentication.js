@@ -1,12 +1,10 @@
 import { logError } from "@/utils";
 import { getAuthToken, getCartId } from ".";
-const baseUrl = process.env.BASE_URL;
-
 export const signUpUser = async (userData) => {
     try {
         const cartId = await getCartId(false);
         if (cartId) userData.cartId = cartId;
-        const response = await fetch(`${baseUrl}/api/auth/signup`, {
+        const response = await fetch(`/api/auth/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -31,7 +29,7 @@ export const signInUser = async (userData) => {
         const cartId = await getCartId(false);
         if (cartId) userData.cartId = cartId;
 
-        const response = await fetch(`${baseUrl}/api/auth/login`, {
+        const response = await fetch(`/api/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -54,7 +52,7 @@ export const signInUser = async (userData) => {
 
 export const forgotPassword = async (userData) => {
     try {
-        const response = await fetch(`${baseUrl}/api/auth/forgotPassword`, {
+        const response = await fetch(`/api/auth/forgotPassword`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -77,7 +75,7 @@ export const forgotPassword = async (userData) => {
 export const resetPassword = async (userData, token) => {
     try {
         const response = await fetch(
-            `${baseUrl}/api/auth/resetPassword?reset-id=${token}`,
+            `/api/auth/resetPassword?reset-id=${token}`,
             {
                 method: "PUT",
                 headers: {
@@ -104,7 +102,7 @@ export const updateProfile = async (userData) => {
     try {
         const authToken = await getAuthToken();
 
-        const response = await fetch(`${baseUrl}/api/auth/updateProfile`, {
+        const response = await fetch(`/api/auth/updateProfile`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -129,7 +127,7 @@ export const updateProfile = async (userData) => {
 export const changePassword = async (userData) => {
     try {
         const authToken = await getAuthToken();
-        const response = await fetch(`${baseUrl}/api/auth/changePassword`, {
+        const response = await fetch(`/api/auth/changePassword`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

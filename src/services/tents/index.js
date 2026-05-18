@@ -1,12 +1,13 @@
 import { cache } from "react";
 import { logError, resolveCoreMediaUrl } from "@/utils";
 import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
-import { fetchMasterClassTenting } from "..";
 import {
     queryBlogs,
     normalizePayloadBlogForListing,
     queryProductsFromPayload,
     queryProductCollectionBySlug,
+    querySection,
+    sectionToObject,
 } from "../payloadCollections";
 
 // Slim featured-blog projection: FeaturedBlogCard reads
@@ -238,12 +239,26 @@ export const fetchAllTentsForListing = async () => {
     }
 };
 
-export const fetchTentPageDetails = async () => {
-    return {
+export const fetchTentPageDetails = cache(async () => {
+    const fallback = {
         matchItWithTitle: "MATCH IT WITH",
         featuredProductTitle: "Products Featured in this Project Entry",
+        masterClassTentingURL: "",
     };
-};
+    try {
+        const [tentSection, listingSection] = await Promise.all([
+            querySection("dynamic-tent-page-details"),
+            querySection("tent-listing-page-details"),
+        ]);
+        const tentDetails = tentSection ? sectionToObject(tentSection) : {};
+        const listingDetails = listingSection ? sectionToObject(listingSection) : {};
+        const resolvedUrl = resolveCoreMediaUrl(listingDetails.masterClassTentingURL);
+        return { ...fallback, ...tentDetails, masterClassTentingURL: resolvedUrl || fallback.masterClassTentingURL };
+    } catch (error) {
+        logError(`Error fetching tent page details: ${error.message}`, error);
+    }
+    return fallback;
+});
 
 export const fetchTentPageData = async (slug) => {
     try {
@@ -260,12 +275,10 @@ export const fetchTentPageData = async (slug) => {
             featuredProjectsData,
             matchedProducts,
             pageDetails,
-            masterClassTentingURL,
         ] = await Promise.all([
             fetchFeaturedProjects(productId),
             fetchMatchedProductsForProduct({ payloadProduct: matchSourceProduct, wixProductId: productId }),
             fetchTentPageDetails(),
-            fetchMasterClassTenting(),
         ]);
 
         return {
@@ -273,7 +286,7 @@ export const fetchTentPageData = async (slug) => {
             featuredProjectsData,
             matchedProducts,
             pageDetails,
-            masterClassTentingURL,
+            masterClassTentingURL: pageDetails?.masterClassTentingURL || "",
         };
     } catch (error) {
         logError(`Error fetching tent page data: ${error.message}`, error);

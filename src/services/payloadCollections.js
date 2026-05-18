@@ -681,7 +681,10 @@ export const queryProductCollectionBySlug = async (slug) => {
         const result = await sdk.find({
             collection: 'product-collections',
             where: {
-                slug: { equals: slug }
+                and: [
+                    { slug: { equals: slug } },
+                    { visible: { not_equals: false } },
+                ],
             },
             limit: 1,
             draft: false,

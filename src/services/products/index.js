@@ -3,7 +3,7 @@ import { cache } from "react";
 import { logError, normalizeProductForDisplay } from "@/utils";
 import { getAuthToken } from "../auth";
 import { getProductsCart } from "../cart/CartApis";
-import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProjectForListing, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload, queryProductSlugs } from "../payloadCollections";
+import { queryProductById, queryProductsByCollectionIds, queryProductsBySlug, queryProjects, normalizePayloadProjectForListing, queryProductCollections, queryProductsByIds, queryAllProducts, queryProductsFromPayload, queryProductSlugs, querySection, sectionToObject } from "../payloadCollections";
 
 // Field set FeaturedProjects (PDP/tent/pool-cover) + the Tents listing actually
 // render: portfolioRef.{title, slug, coverImage.imageInfo}. Listing slim already
@@ -208,12 +208,21 @@ export const fetchMatchedProductsForProduct = async ({ payloadProduct = null } =
 };
 
 
-export const fetchProductPageDetails = async () => {
-    return {
+export const fetchProductPageDetails = cache(async () => {
+    const fallback = {
         matchItWithTitle: "MATCH IT WITH",
         featuredProductTitle: "Products Featured in this Project Entry",
     };
-};
+    try {
+        const section = await querySection("dynamic-product-page-details");
+        if (section) {
+            return { ...fallback, ...sectionToObject(section) };
+        }
+    } catch (error) {
+        logError(`Error fetching product page details: ${error.message}`, error);
+    }
+    return fallback;
+});
 
 export const fetchProductPageData = async (slug) => {
     // Fetch the core product first. Only a genuine "no such slug" should 404;

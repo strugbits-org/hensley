@@ -6,7 +6,7 @@ export async function GET() {
   const pages = await fetchAllPagesMetaData();
 
   const page_routes = pages.reverse().map((x) => x.slug);
-  const dynamicPages = ["collections", "posts", "product", "project", "subcategory", "tent", "pool-cover", "market"];
+  const dynamicPages = ["collections", "posts", "product", "project", "subcategory", "tent", "pool-covers", "market"];
   const filtered_routes = page_routes.filter(route => !dynamicPages.includes(route));
 
   const sitemaps = filtered_routes.map((slug) => ({

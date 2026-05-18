@@ -37,7 +37,7 @@ export const TestimonialCard = ({ data, classes, imageExp, titleClass }) => {
           {feedback || description}
         </p>
         <span
-          className={`mt-auto text-center lg:text-start text-[12px] leading-[42px] lg:text-[12px] lg:leading-[42px]  tracking-wider text-secondary-alt font-recklessRegular ${titleClass}`}
+          className={`text-center lg:text-start text-[12px] leading-[42px] lg:text-[12px] lg:leading-[42px]  tracking-wider text-secondary-alt font-recklessRegular  mt-2 `}
         >
           {displayTitle}
         </span>
