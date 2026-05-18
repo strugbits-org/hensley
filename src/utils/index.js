@@ -172,6 +172,11 @@ export const formatTotalPrice = (price) => {
     return '$' + (parseFloat(price) || 0).toFixed(2);
 }
 
+// When NEXT_PUBLIC_HIDE_PRICES=true, all price renderings are stripped from the
+// UI (and the rendered HTML source). Read once at module load so the flag is
+// inlined by Next.js at build time and remains a constant across renders.
+export const HIDE_PRICES = process.env.NEXT_PUBLIC_HIDE_PRICES === 'true';
+
 
 export const mapProductSetItems = (data) => {
     try {

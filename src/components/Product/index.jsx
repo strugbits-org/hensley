@@ -4,7 +4,7 @@ import ProductSlider from './ProductSlider'
 import ProductSlider_tab from './ProductSlider_tab'
 import { AddToCartButton } from './AddtoQuoteButton'
 import ProductDescription from '../common/helpers/ProductDescription';
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError, normalizeProductForDisplay } from '@/utils';
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError, normalizeProductForDisplay } from '@/utils';
 import { SaveProductButton } from '../common/SaveProductButton';
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
@@ -170,7 +170,10 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
   }, [isProductCollection, productSetItems, product.price, cartQuantity]);
 
   const visibleHeaders = useMemo(() =>
-    INFO_HEADERS.filter(header => !header.setItem || isProductCollection),
+    INFO_HEADERS.filter(header => {
+      if (HIDE_PRICES && header.title === 'Price') return false;
+      return !header.setItem || isProductCollection;
+    }),
     [isProductCollection]
   );
 
@@ -299,7 +302,9 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
         <tr key={`${item.product}-${index}`}>
           <td className="py-2 font-semibold border-b border-black">{item.product}</td>
           <td className="border-b border-black font-haasRegular text-center">{item.size}</td>
-          <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+          {!HIDE_PRICES && (
+            <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+          )}
           <td className="border-b border-black font-haasRegular">
             <QuantityControls
               quantity={item.quantity}
@@ -313,7 +318,9 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
     return productInfoSection.map((item, index) => (
       <tr key={`item-${index}`}>
         <td className="border-b border-black font-haasRegular text-left">{item.size}</td>
-        <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+        {!HIDE_PRICES && (
+          <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+        )}
         <td className="border-b border-black font-haasRegular">
           <QuantityControls
             quantity={cartQuantity}
@@ -366,10 +373,12 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
             {product.name}
           </h1>
 
-          <div className='lg:mb-[48px] sm:mb-[10px] flex lg:justify-end gap-x-[28px]'>
-            <span className='text-[35px] text-secondary-alt font-recklessRegular'>{totalPrice}</span>
-            <span className='text-[35px] text-secondary-alt font-recklessRegular uppercase'>(total)</span>
-          </div>
+          {!HIDE_PRICES && (
+            <div className='lg:mb-[48px] sm:mb-[10px] flex lg:justify-end gap-x-[28px]'>
+              <span className='text-[35px] text-secondary-alt font-recklessRegular'>{totalPrice}</span>
+              <span className='text-[35px] text-secondary-alt font-recklessRegular uppercase'>(total)</span>
+            </div>
+          )}
 
           <table className="w-full text-left border-separate border-spacing-y-[24px] mb-20">
             <thead>

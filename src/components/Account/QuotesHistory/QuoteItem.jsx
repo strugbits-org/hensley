@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, logError } from '@/utils';
+import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, HIDE_PRICES, logError } from '@/utils';
 import { FiArrowUpRight } from "react-icons/fi";
 import { lightboxActions } from '@/store/lightboxStore';
 import { AddProductToCart } from '@/services/cart/CartApis';
@@ -126,11 +126,13 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                     </time>
                 </div>
 
-                <div className='quote-price'>
-                    <span className="font-recklessLight text-xl">
-                        {formattedTotalPrice}
-                    </span>
-                </div>
+                {!HIDE_PRICES && (
+                    <div className='quote-price'>
+                        <span className="font-recklessLight text-xl">
+                            {formattedTotalPrice}
+                        </span>
+                    </div>
+                )}
 
                 <div className='quote-actions'>
                     <div className="flex gap-x-6 max-lg:gap-x-3">
@@ -173,11 +175,13 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
                         </time>
                     </div>
 
-                    <div className='quote-price-mobile'>
-                        <span className="font-recklessLight text-xl">
-                            {formattedTotalPrice}
-                        </span>
-                    </div>
+                    {!HIDE_PRICES && (
+                        <div className='quote-price-mobile'>
+                            <span className="font-recklessLight text-xl">
+                                {formattedTotalPrice}
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className='quote-actions-mobile'>

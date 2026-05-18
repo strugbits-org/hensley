@@ -4,7 +4,7 @@ import { AddToCartSlider } from './AddToCartSlider'
 import { AddToQuoteButton } from './AddtoQuoteButton'
 import ProductDescription from '@/components/common/helpers/ProductDescription'
 import { QuantityControls } from '@/components/Product'
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, logError, normalizeProductForDisplay } from '@/utils'
+import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError, normalizeProductForDisplay } from '@/utils'
 import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
 import { useCookies } from 'react-cookie'
 import { lightboxActions } from '@/store/lightboxStore'
@@ -57,7 +57,10 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
   }, [isProductCollection, productSetItems, product.price, cartQuantity]);
 
   const visibleHeaders = useMemo(() =>
-    INFO_HEADERS.filter(header => !header.setItem || isProductCollection),
+    INFO_HEADERS.filter(header => {
+      if (HIDE_PRICES && header.title === 'Price') return false;
+      return !header.setItem || isProductCollection;
+    }),
     [isProductCollection]
   );
 
@@ -67,7 +70,9 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
         <tr key={`${item.product}-${index}`}>
           <td className="text-sm py-2 font-bold border-b border-black">{item.product}</td>
           <td className="text-sm border-b border-black font-haasRegular text-center">{item.size}</td>
-          <td className="text-sm text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+          {!HIDE_PRICES && (
+            <td className="text-sm text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+          )}
           <td className="text-sm border-b border-black font-haasRegular">
             <QuantityControls
               quantity={item.quantity}
@@ -81,7 +86,9 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
     return productInfoSection.map((item, index) => (
       <tr key={`item-${index}`}>
         <td className="border-b border-black font-haasRegular text-left">{item.size}</td>
-        <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+        {!HIDE_PRICES && (
+          <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+        )}
         <td className="border-b border-black font-haasRegular">
           <QuantityControls
             quantity={cartQuantity}
@@ -295,18 +302,20 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
               </svg>
             </button>
           </div>
-          <div className='w-full flex gap-x-[20px] sm:justify-end justify-start '>
-            <span
-              className='
+          {!HIDE_PRICES && (
+            <div className='w-full flex gap-x-[20px] sm:justify-end justify-start '>
+              <span
+                className='
         text-[25px]
         text-secondary-alt
         font-recklessRegular
         uppercase
         block
         '
-            >{totalPrice}</span>
-            <span className='text-[25px] text-secondary-alt font-recklessRegular block uppercase '>(total)</span>
-          </div>
+              >{totalPrice}</span>
+              <span className='text-[25px] text-secondary-alt font-recklessRegular block uppercase '>(total)</span>
+            </div>
+          )}
           <table className="w-full text-left border-separate border-spacing-y-[15px]">
             <thead>
               <tr className="text-xs max-lg:hidden uppercase text-gray-500 border-b border-black">

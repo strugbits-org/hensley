@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { PrimaryImage } from '../common/PrimaryImage';
-import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
+import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError } from '@/utils';
 import { lightboxActions } from '@/store/lightboxStore';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
@@ -59,6 +59,10 @@ const INFO_HEADERS = [
     'Quantity'
 ];
 
+const visibleInfoHeaders = HIDE_PRICES
+    ? INFO_HEADERS.filter(title => title !== 'Price')
+    : INFO_HEADERS;
+
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
 const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
@@ -112,7 +116,9 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, r
         <tr className='border-b border-primary-border align-bottom' key={`item-${index}`}>
             <td className="pt-2 pb-4 font-semibold lg:block hidden min-w-[260px]">{item.product}</td>
             <td className="pt-2 pb-4 font-haasRegular text-center ">{item.size}</td>
-            <td className="pt-2 pb-4 text-center font-haasRegular">{item.formattedPrice}</td>
+            {!HIDE_PRICES && (
+                <td className="pt-2 pb-4 text-center font-haasRegular">{item.formattedPrice}</td>
+            )}
             <td className="pt-2 pb-4 font-haasRegular">
                 <QuantityControls
                     quantity={quantity || item.quantity}
@@ -315,12 +321,14 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
                 <div className='w-full flex flex-col'>
                     <div className='sm:flex justify-between items-center sm:h-[104px]'>
                         <span className='block lg:text-[16px] text-[20px] font-medium text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
-                        <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px] mr-[100px]'>{formattedPrice}</span>
+                        {!HIDE_PRICES && (
+                            <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px] mr-[100px]'>{formattedPrice}</span>
+                        )}
                     </div>
                     <table className="lg:max-w-[766px] max-w-full w-full text-left border-spacing-y-[15px] border-collapse">
                         <thead>
                             <tr className="text-xs uppercase text-gray-500">
-                                {INFO_HEADERS.map((title, index) => (
+                                {visibleInfoHeaders.map((title, index) => (
                                     <th
                                         key={title}
                                         className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}
@@ -447,16 +455,18 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
                 lg:mb-[27px]
                 '>{productName}</span>
 
-                    <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase
+                    {!HIDE_PRICES && (
+                        <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
                 lg:mb-[27px]
                 mr-[100px]
                 '>{data.price?.amount || data.price}</span>
+                    )}
                 </div>
                 <table className="max-lg:border-b max-lg:mb-4 border-primary-border lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left lg:border-separate lg:border-spacing-y-[15px] border-spacing-y-[12px] xl:pr-[30px] lg:pr-[50px] ">
                     <thead>
                         <tr className="text-xs uppercase text-gray-500 ">
-                            {INFO_HEADERS.map((title, index) => (
+                            {visibleInfoHeaders.map((title, index) => (
                                 <th
                                     key={title}
                                     className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}
@@ -470,7 +480,9 @@ const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityContro
                         {renderTableRows({ handleQuantityChange, quantity: data.quantity, productInfoSection: productInfoSection, readOnly: enableQuantityControls ? false : readOnly })}
                     </tbody>
                 </table>
-                <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
+                {!HIDE_PRICES && (
+                    <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
+                )}
 
                 {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
                     <span>{isLoading ? "PLEASE WAIT..." : (addToCartButtonLabel || "Add to Cart")}</span>
