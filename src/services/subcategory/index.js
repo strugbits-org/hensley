@@ -3,12 +3,21 @@ import { cache } from "react";
 import { logError } from "@/utils";
 import { fetchOurCategoriesData } from "..";
 import { fetchProductBannersData, fetchSortedProductsForListing } from "../collections";
-import { queryProductCollectionBySlug, queryProductCollections } from "../payloadCollections";
+import { queryProductCollectionBySlug, queryProductCollections, querySection, sectionToObject } from "../payloadCollections";
 
 
-export const fetchsubCategoriesPageDetails = async () => {
-    return { ourCategoriesTitle: "Our Categories" };
-};
+export const fetchsubCategoriesPageDetails = cache(async () => {
+    const fallback = { ourCategoriesTitle: "Our Categories" };
+    try {
+        const section = await querySection("sub-category-page-details");
+        if (section) {
+            return { ...fallback, ...sectionToObject(section) };
+        }
+    } catch (error) {
+        logError(`Error fetching sub category page details: ${error.message}`, error);
+    }
+    return fallback;
+});
 
 // Normalise the slug at the service boundary: Payload stores slugs as
 // lowercase, but URLs reach us in mixed case (e.g. /subcategory/HIGHLIGHTS).

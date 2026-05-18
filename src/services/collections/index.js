@@ -9,12 +9,23 @@ import {
     queryProductsByCollectionIdsPaginatedSlim,
     queryProductsByIdsSlim,
     queryProductBanners,
+    querySection,
+    sectionToObject,
 } from "../payloadCollections";
 
 
-export const fetchCategoryPageDetails = async () => {
-    return { ourCategoryTitle: "Our Categories" };
-};
+export const fetchCategoryPageDetails = cache(async () => {
+    const fallback = { ourCategoryTitle: "Our Categories" };
+    try {
+        const section = await querySection("category-page-details");
+        if (section) {
+            return { ...fallback, ...sectionToObject(section) };
+        }
+    } catch (error) {
+        logError(`Error fetching category page details: ${error.message}`, error);
+    }
+    return fallback;
+});
 
 
 // Normalise the slug at the service boundary: Payload stores slugs as
