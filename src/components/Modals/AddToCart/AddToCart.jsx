@@ -284,7 +284,7 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
       </div>
       <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative'>
         <div className='w-full flex flex-col  gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
-          <div className='w-full flex justify-between relative '>
+          <div className='w-full flex justify-between relative pr-8'>
             <span className='
             text-[35px]
             leading-[30px]
@@ -292,7 +292,6 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             font-recklessRegular
             uppercase
             w-full
-            max-w-[350px]
             '>{product.name || product.title}</span>
             <button onClick={onClose} className='close-button absolute top-0 right-0'>
               <svg preserveAspectRatio="xMidYMid meet" width="24.707" height="24.707" data-bbox="25.975 25.975 148.05 148.05" xmlns="http://www.w3.org/2000/svg" viewBox="25.975 25.975 148.05 148.05" role="presentation" aria-hidden="true">

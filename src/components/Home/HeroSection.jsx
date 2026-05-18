@@ -12,6 +12,44 @@ export const HeroSection = ({ data }) => {
 
   const videoSrc = resolveCoreMediaUrl(backgroundVideo) || null;
 
+  const renderTitle = (text) => {
+    if (!text) return null;
+    if (typeof text !== "string") return text;
+
+    const words = text.trim().split(/\s+/);
+    if (words.length <= 1) return text;
+
+    return (
+      <>
+        {words.map((word, index) => {
+          const isLastWord = index === words.length - 1;
+          const isSecondToLastWord = index === words.length - 2;
+
+          if (isLastWord) {
+            return null;
+          }
+
+          if (isSecondToLastWord) {
+            return (
+              <span key={index} className="min-[431px]:whitespace-nowrap">
+                {word}
+                <br className="inline min-[431px]:hidden" />{" "}
+                {words[index + 1]}
+              </span>
+            );
+          }
+
+          return (
+            <span key={index}>
+              {word}
+              <br />
+            </span>
+          );
+        })}
+      </>
+    );
+  };
+
   useEffect(() => {
     const video = videoRef.current;
 
@@ -50,12 +88,12 @@ export const HeroSection = ({ data }) => {
       </span>
 
       <div className="flex flex-col items-center gap-y-6">
-        <h1 style={{ fontSize: 'clamp(32px, 7vw, 200px)' }} className="text-[32px] xs:text-[45px] md:text-[60px] lg:text-[90px] xl:text-[100px] 2xl:text-[130px] leading-[1.05] text-primary-alt font-recklessRegular text-center max-w-[90vw]">
-          {title}
+        <h1 style={{ fontSize: 'clamp(32px, 8vw, 120px)', lineHeight: '0.8' }} className="text-primary-alt font-recklessRegular text-center max-w-[95vw]">
+          {renderTitle(title)}
         </h1>
 
         <CustomLink to={buttonAction}>
-          <PrimaryButton className="border border-primary-alt text-primary-alt text-sm hover:bg-secondary-alt px-8 py-3 lg:py-4">
+          <PrimaryButton className="border border-primary-alt mt-3 md:mt-6 lg:mt-8 text-primary-alt text-sm hover:bg-secondary-alt px-8 py-3 lg:py-4">
             {buttonLabel}
           </PrimaryButton>
         </CustomLink>

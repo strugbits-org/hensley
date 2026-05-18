@@ -8,26 +8,23 @@ import { useSearchParams } from 'next/navigation'
 import { searchMarkets, searchOtherData, searchProducts } from '@/services/search'
 import { loaderActions } from '@/store/loaderStore';
 import { HensleyNewsSearch } from '../common/HensleyNewsSearch';
+import Loading from '@/app/loading';
 
 const SearchResult = ({ pageDetails, allCollections = [] }) => {
 
     const { relatedPostTitle, tentsTypeTitle, ourMarketsTitle, relatedProductTitle, relatedProjectTitle } = pageDetails;
+
+    const searchParams = useSearchParams();
+    const searchTerm = (searchParams.get('query') || '').trim();
 
     const [marketsData, setMarketsData] = useState([]);
     const [blogsData, setBlogsData] = useState([]);
     const [projectsData, setProjectsData] = useState([]);
     const [tentsData, setTentsData] = useState([]);
     const [productsData, setProductsData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!!searchTerm);
     const pageSize = 24;
 
-    const searchParams = useSearchParams();
-    const searchTerm = (searchParams.get('query') || '').trim();
-
-    // Re-fires whenever the URL's query string changes, even when the
-    // resolved term is identical to the previous render (re-submitting the
-    // same term from the modal would otherwise leave the global loader
-    // stuck on, because no state changed and no effect re-ran).
     useEffect(() => {
         let cancelled = false;
 
@@ -74,22 +71,29 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
     }, [searchParams]);
 
     const hasResults = productsData.length || marketsData.length || blogsData.length || projectsData.length || tentsData.length;
-    const emptyMessage = loading
-        ? 'Searching for results...'
-        : !searchTerm
-            ? 'Enter a search term'
-            : `No results found for "${searchTerm}"`;
+    const emptyMessage = !searchTerm
+        ? 'Enter a search term'
+        : `No results found for "${searchTerm}"`;
 
     return (
         <>
-            {!hasResults && (
-                <div className='h-screen flex justify-center items-center'><span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>{emptyMessage}</span></div>
+            {loading && (
+                <div className='h-screen flex justify-center items-center'>
+                    <Loading custom type='secondary' />
+                </div>
             )}
-            {marketsData.length > 0 && <OurMarkets pageTitle={ourMarketsTitle} data={marketsData} />}
-            {productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} allCollections={allCollections} />}
-            {tentsData.length > 0 && <TentTypes pageTitle={tentsTypeTitle} data={tentsData} />}
-            {blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: relatedPostTitle }} />}
-            {projectsData.length > 0 && <RelatedProjects pageTitle={relatedProjectTitle} data={projectsData} />}
+            {!loading && !hasResults && (
+                <div className='h-screen flex justify-center items-center'>
+                    <span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>
+                        {emptyMessage}
+                    </span>
+                </div>
+            )}
+            {!loading && marketsData.length > 0 && <OurMarkets pageTitle={ourMarketsTitle} data={marketsData} />}
+            {!loading && productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} allCollections={allCollections} />}
+            {!loading && tentsData.length > 0 && <TentTypes pageTitle={tentsTypeTitle} data={tentsData} />}
+            {!loading && blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: relatedPostTitle }} />}
+            {!loading && projectsData.length > 0 && <RelatedProjects pageTitle={relatedProjectTitle} data={projectsData} />}
         </>
     )
 }

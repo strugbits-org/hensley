@@ -96,7 +96,7 @@ export const Footer = ({ data }) => {
         <div className="order-1 w-full md:w-1/2 lg:w-2/6">
           <NewsLetter data={footerData} />
         </div>
-        <div className="order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-80 md:mt-0">
+        <div className="order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-10 md:mt-0">
           {branches.map((address, index) => (
             <div className="w-2/5 lg:w-1/2 pr-2" key={index}>
               <h2 className="text-sm font-haasMedium uppercase text-primary mb-1">

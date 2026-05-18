@@ -33,11 +33,11 @@ function ProductCard({ data: product, type = 'listing', btnClass, allCollections
     };
 
     return (
-        <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between max-lg:h-full h-[620px] ${type !== 'listing' ? 'bg-primary-alt col-span-1.5 md:col-span-2' : ''}`}>
+        <div className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-[294px] md:h-auto ${type !== 'listing' ? 'bg-primary-alt col-span-1.5 md:col-span-2' : ''}`}>
             <ProductBadge ribbon={ribbon} />
-            <CustomLink to={productPath} className={`h-[217px] lg:h-full overflow-hidden flex justify-center items-center p-2 lg:p-14 ${type === 'listing' ? 'bg-white' : 'min-h-[450px]'}`}>
+            <CustomLink to={productPath} className={`w-full h-[188px] md:h-auto md:aspect-square overflow-hidden flex justify-center items-center px-2 py-3 md:px-4 lg:px-6 xl:px-10 2xl:px-14 ${type === 'listing' ? 'bg-white' : 'min-h-[450px]'}`}>
             {productImageSrc ? (
-                <Image src={productImageSrc} loader={coreImageLoader} alt={title} width={500} height={500} loading="eager" quality={70} sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw" className={"lg:aspect-square min-h-[217px] md:min-h-[263px] 2xl:min-h-[515px] max-h-[550px] h-full w-full transition-transform duration-300 group-hover:scale-105 flex-shrink-0 object-contain"} />
+                <Image src={productImageSrc} loader={coreImageLoader} alt={title} width={500} height={500} loading="eager" quality={70} sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw" className={"w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"} />
             ) : null}
             </CustomLink>
 
