@@ -179,13 +179,6 @@ const normalizePoolCoverItem = (product, orderNumber = 0) => {
     const mainMediaUrl = resolveCoreMediaUrl(product.mainMedia, "tablet");
 
     const poolCoverConfig = product.poolCoverConfig || {};
-    const relevantImages = Array.isArray(poolCoverConfig.relevantImages)
-        ? poolCoverConfig.relevantImages.map((m, i) => ({
-              id: m?.id || `relevant-image-${i}`,
-              src: resolveCoreMediaUrl(m, "card"),
-              alt: m?.alt || `Relevant reference image ${i + 1}`,
-          }))
-        : [];
 
     const collections = buildCollectionSummary(product.collections);
     const recommendedProducts = normalizeRecommendedProducts(product);
@@ -205,7 +198,6 @@ const normalizePoolCoverItem = (product, orderNumber = 0) => {
         poolCoverConfig: {
             quoteIntroText: poolCoverConfig.quoteIntroText ?? "",
             quoteSubmitLabel: poolCoverConfig.quoteSubmitLabel ?? "Request a Quote",
-            relevantImages,
             quoteRequestFields: Array.isArray(poolCoverConfig.quoteRequestFields)
                 ? poolCoverConfig.quoteRequestFields
                 : [],
