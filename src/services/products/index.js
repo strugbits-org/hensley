@@ -80,7 +80,7 @@ const mapBundleItemsToCollectionData = (bundleItems) => {
                     additionalInfoSections: product.additionalInfoSections || [],
                 },
                 quantity: item.quantity || 1,
-                optional: item.optional || false,
+                required: !!item.required,
                 variant: item.variant,
             };
         });

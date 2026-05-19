@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from './Button';
 import { getAdditionalInfoSection, resolveCoreMediaUrl } from '@/utils';
 import { CustomLink } from '../common/CustomLink';
 
@@ -35,7 +34,6 @@ const BannerStructures = ({ title, data }) => {
                     }
                 </div>
             </div>
-            <Button text="add to quote" classes={"lg:!hidden !block sm:!w-[492px] sm:!h-[90px]"} />
         </div>
     )
 }

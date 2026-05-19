@@ -374,19 +374,42 @@ export const addToCart = async (memberId, token, lineItems) => {
       const existingIndex = mergedItems.findIndex((item) => getComparableLineItemKey(item) === newItemKey);
 
       if (existingIndex >= 0) {
-        // Update quantity of existing item
-        mergedItems[existingIndex] = {
-          ...mergedItems[existingIndex],
-          product:
-            typeof mergedItems[existingIndex].product === "object"
-              ? mergedItems[existingIndex].product.id
-              : mergedItems[existingIndex].product,
-          variant:
-            typeof mergedItems[existingIndex].variant === "object"
-              ? mergedItems[existingIndex].variant?.id
-              : mergedItems[existingIndex].variant,
-          quantity: Number(mergedItems[existingIndex].quantity || 0) + Number(newItem.quantity || 0),
-        };
+        const existing = mergedItems[existingIndex];
+        const isSet = newItem.itemType === "set" || existing.itemType === "set";
+
+        if (isSet) {
+          // For bundle/set lines, the frontend ships the complete desired setItems
+          // (existing items preserved + new items merged), so REPLACE setItems
+          // rather than spreading the existing item. Bundle quantity stays at 1.
+          mergedItems[existingIndex] = {
+            ...existing,
+            product:
+              typeof existing.product === "object"
+                ? existing.product.id
+                : existing.product,
+            variant:
+              typeof existing.variant === "object"
+                ? existing.variant?.id
+                : existing.variant,
+            itemType: "set",
+            setItems: newItem.setItems,
+            quantity: 1,
+          };
+        } else {
+          // Non-set items: sum quantities and keep existing fields
+          mergedItems[existingIndex] = {
+            ...existing,
+            product:
+              typeof existing.product === "object"
+                ? existing.product.id
+                : existing.product,
+            variant:
+              typeof existing.variant === "object"
+                ? existing.variant?.id
+                : existing.variant,
+            quantity: Number(existing.quantity || 0) + Number(newItem.quantity || 0),
+          };
+        }
       } else {
         // Add new item
         mergedItems.push(newItem);
@@ -707,10 +730,23 @@ export const addToVisitorCart = async (visitorId, lineItems) => {
       const existingIndex = mergedItems.findIndex((item) => getComparableLineItemKey(item) === newItemKey);
 
       if (existingIndex >= 0) {
-        mergedItems[existingIndex] = {
-          ...normalizeItemToIds(mergedItems[existingIndex]),
-          quantity: Number(mergedItems[existingIndex].quantity || 0) + Number(newItem.quantity || 0),
-        };
+        const existing = mergedItems[existingIndex];
+        const isSet = newItem.itemType === "set" || existing.itemType === "set";
+
+        if (isSet) {
+          // Replace setItems on set lines (frontend ships the complete desired list)
+          mergedItems[existingIndex] = {
+            ...normalizeItemToIds(existing),
+            itemType: "set",
+            setItems: newItem.setItems,
+            quantity: 1,
+          };
+        } else {
+          mergedItems[existingIndex] = {
+            ...normalizeItemToIds(existing),
+            quantity: Number(existing.quantity || 0) + Number(newItem.quantity || 0),
+          };
+        }
       } else {
         mergedItems.push(newItem);
       }

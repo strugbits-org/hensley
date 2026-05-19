@@ -65,13 +65,14 @@ const visibleInfoHeaders = HIDE_PRICES
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
+const QuantityControls = ({ quantity, onQuantityChange, readOnly, minQuantity = QUANTITY_LIMITS.MIN }) => (
     <div className="mx-auto h-full w-[120px] border-b border-secondary-alt pb-1 flex items-end justify-center font-haasRegular">
         {!readOnly ? (
             <>
                 <button
-                    className="h-[20px] select-none text-xl font-light hover:opacity-70 transition-opacity"
+                    className="h-[20px] select-none text-xl font-light hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
                     onClick={() => onQuantityChange(quantity - 1)}
+                    disabled={quantity <= minQuantity}
                     aria-label="Decrease quantity"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1">
@@ -81,10 +82,13 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
                 <input
                     className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
                     type="number"
-                    min={QUANTITY_LIMITS.MIN}
+                    min={minQuantity}
                     max={QUANTITY_LIMITS.MAX}
                     value={quantity}
-                    onInput={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN, true)}
+                    onInput={(e) => {
+                        const parsed = parseInt(e.target.value, 10);
+                        onQuantityChange(Number.isFinite(parsed) ? parsed : minQuantity, true);
+                    }}
                     aria-label="Quantity"
                 />
                 <button
@@ -111,7 +115,7 @@ const QuantityControls = ({ quantity, onQuantityChange, readOnly }) => (
     </div>
 );
 
-const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, readOnly }) => {
+const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, readOnly, minQuantity }) => {
     return productInfoSection.map((item, index) => (
         <tr className='border-b border-primary-border align-bottom' key={`item-${index}`}>
             <td className="pt-2 pb-4 font-semibold lg:block hidden min-w-[260px]">{item.product}</td>
@@ -124,6 +128,7 @@ const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, r
                     quantity={quantity || item.quantity}
                     onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id || item.product, isDisabled)}
                     readOnly={readOnly}
+                    minQuantity={minQuantity}
                 />
             </td>
         </tr>
@@ -227,17 +232,19 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
     const productInfoSection = useMemo(() => {
         // Check for new setItems format first
         if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
-            return data.setItems.map(item => ({
-                product: item.productName ||
-                    (typeof item.product === 'object'
-                        ? (item.product?.title || item.product?.name)
-                        : item.product) ||
-                    '',
-                size: item.size || '',
-                price: parseFloat(item.unitPrice) || 0,
-                quantity: parseInt(item.quantity, 10) || 1,
-                formattedPrice: formatTotalPrice(parseFloat(item.unitPrice) || 0),
-            }));
+            return data.setItems
+                .map(item => ({
+                    product: item.productName ||
+                        (typeof item.product === 'object'
+                            ? (item.product?.title || item.product?.name)
+                            : item.product) ||
+                        '',
+                    size: item.size || '',
+                    price: parseFloat(item.unitPrice) || 0,
+                    quantity: parseInt(item.quantity, 10) || 0,
+                    formattedPrice: formatTotalPrice(parseFloat(item.unitPrice) || 0),
+                }))
+                .filter(item => item.quantity > 0);
         }
         
         // Fall back to old string format (productSetItems)
@@ -339,7 +346,7 @@ const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityCo
                             </tr>
                         </thead>
                         <tbody>
-                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly: enableQuantityControls ? false : readOnly, showBorders: true })}
+                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly: enableQuantityControls ? false : readOnly, showBorders: true, minQuantity: 0 })}
                         </tbody>
                     </table>
                 </div>

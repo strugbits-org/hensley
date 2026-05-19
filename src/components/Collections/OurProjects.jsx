@@ -15,13 +15,17 @@ export default function OurProjects({ data, loop = true }) {
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const [sliderRef] = useKeenSlider({
-        loop,
+        // Disable loop when there's only one slide. keen-slider's loop math
+        // assumes >1 slides and produces a nonsense negative transform that
+        // pushes the single slide offscreen on mobile (where origin: "center"
+        // amplifies the error). Desktop already sidesteps this via perView: 1.
+        loop: loop && data.length > 1,
         defaultAnimation: {
             duration: 2000,
         },
         breakpoints: {
             "(max-width: 1024px)": {
-                slides: { perView: 1.2, spacing: 10, origin: "center" },
+                slides: { perView: data.length === 1 ? 1 : 1.2, spacing: 10, origin: "center" },
             },
             "(min-width: 1024px)": {
                 slides: { perView: data.length === 1 ? 1 : 1.2, spacing: 10, },
