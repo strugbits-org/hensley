@@ -137,11 +137,7 @@ const Cart = () => {
   const handleCollectionQuantityChange = useCallback((data, value, id, disabled) => {
     const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
 
-    if (
-      isNaN(numValue) ||
-      numValue < QUANTITY_LIMITS.MIN ||
-      numValue > QUANTITY_LIMITS.MAX
-    ) {
+    if (isNaN(numValue) || numValue < 0 || numValue > QUANTITY_LIMITS.MAX) {
       return;
     }
 
@@ -149,15 +145,32 @@ const Cart = () => {
 
     // Check for new setItems format first
     if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
-      updatedData = {
-        ...data,
-        setItems: data.setItems.map(item =>
-          (item.productName === id || item.product === id)
-            ? { ...item, quantity: numValue }
-            : item
-        ),
-      };
+      // Block removing the last item — a bundle must keep at least one active item.
+      if (numValue === 0) {
+        const activeCount = data.setItems.filter(item => parseInt(item.quantity, 10) > 0).length;
+        const targetActive = data.setItems.some(item => (item.productName === id || item.product === id) && parseInt(item.quantity, 10) > 0);
+        if (targetActive && activeCount <= 1) {
+          lightboxActions.setBasicLightBoxDetails({
+            title: "Cannot remove",
+            description: "At least one item is required in this bundle. Remove the entire bundle if you no longer want it.",
+            buttonText: "OK",
+            open: true,
+          });
+          return;
+        }
+      }
+
+      // Drop optional items that hit 0; otherwise just update the quantity
+      const nextSetItems = numValue === 0
+        ? data.setItems.filter(item => !(item.productName === id || item.product === id))
+        : data.setItems.map(item =>
+            (item.productName === id || item.product === id)
+              ? { ...item, quantity: numValue }
+              : item
+          );
+      updatedData = { ...data, setItems: nextSetItems };
     } else if (data.productSetItems) {
+      if (numValue < QUANTITY_LIMITS.MIN) return;
       // Fall back to old string format
       const updatedSet = data.productSetItems.map(item => {
         const set = item.split("~");

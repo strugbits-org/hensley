@@ -18,16 +18,16 @@ const Tents = ({ data }) => {
                 const tentSlug = (item?.tentData?.slug || item?.tentData?.tent?.slug || "").replace(/^\//, "");
                 return (
                     <div key={tentSlug || item?.tentData?._id} id={tentSlug}>
-                        <BannerStructures tent={item?.tentData} data={item?.tentData?.tent} />
-                        <OurProjects data={item.portfolio} />
-                        <FeaturedBlogs data={item?.blogs} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
+                        <BannerStructures key={tentSlug || item?.tentData?._id} tent={item?.tentData} data={item?.tentData?.tent} />
+                        <OurProjects key={tentSlug || item?.tentData?._id} data={item.portfolio} />
+                        <FeaturedBlogs key={tentSlug || item?.tentData?._id} data={item?.blogs} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
                     </div>
                 )
             })}
 
             <div className='w-full flex justify-center items-center'>
                 <a href={masterClassTentingURL} download target='_blank'>
-                    <DownloadButton text={downloadBtnLabel} classes={"w-[656px]"} iconTrue={"true"} />
+                    <DownloadButton text={downloadBtnLabel} classes={"w-full sm:w-[656px] max-w-full"} iconTrue={"true"} />
                 </a>
             </div>
         </>

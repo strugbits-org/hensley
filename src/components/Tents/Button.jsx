@@ -29,19 +29,20 @@ export const Button = ({ text, classes, iconTrue }) => {
     return (
 
         <button className={`
-            lg:h-[150px] 
+            lg:h-[150px]
        sm:mt-[40px]
 w-full
          h-[90px]
          my-[33px]
-         bg-primary tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
+         px-[50px]
+         bg-primary tracking-[3px] sm:tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         ${classes}
         `}>
             <span
                 className='
-             font-haasLight uppercase 
-             text-[16px]
+             font-haasLight uppercase
+             text-[14px] sm:text-[16px]
         group-hover:font-haasBold
             '
             >{text}</span>

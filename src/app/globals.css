@@ -171,6 +171,9 @@ body {
   }
 }
 
+.custom-date-picker {
+  --adp-z-index: 9999;
+}
 .custom-date-picker .air-datepicker-nav--title {
   @apply uppercase font-haasLight tracking-widest;
 }

@@ -30,7 +30,7 @@ export const FeaturedBlogs = ({ data, pageDetails, loop = true, origin = "center
             },
             breakpoints: {
                 "(max-width: 768px)": {
-                    slides: { perView: 1.2, spacing: 5, origin: "center" },
+                    slides: { perView: data?.length === 1 ? 1 : 1.2, spacing: 5, origin: "center" },
                 },
                 "(min-width: 768px) and (max-width: 1024px)": {
                     slides: { perView: 2, spacing: 4, origin: "center" },

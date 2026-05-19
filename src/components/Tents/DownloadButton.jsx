@@ -6,18 +6,19 @@ export const DownloadButton = ({ text, classes, iconTrue }) => {
     return (
 
         <button className={`
-            lg:h-[150px] 
+            lg:h-[150px]
        sm:mt-[40px]
          h-[90px]
          my-[33px]
-         bg-primary tracking-[4px] group  transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
+         px-[60px]
+         bg-primary tracking-[1px] sm:tracking-[4px] group  transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         ${classes}
         `}>
             <span
                 className='
-             font-haasLight uppercase 
-             text-[16px]
+             font-haasLight uppercase
+             text-[12px] sm:text-[16px]
         group-hover:font-haasBold
             '
             >{text}</span>

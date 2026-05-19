@@ -32,7 +32,6 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [productInCart, setProductInCart] = useState();
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
   const isProductCollection = isPayloadBundle;
@@ -77,6 +76,7 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             <QuantityControls
               quantity={item.quantity}
               onQuantityChange={(value) => handleQuantityChange(value, item.id)}
+              minQuantity={0}
             />
           </td>
         </tr>
@@ -101,16 +101,18 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
 
   const handleQuantityChange = useCallback((value, itemId) => {
     if (isLoading) return;
-    const numValue = typeof value === 'string' ? parseInt(value) || QUANTITY_LIMITS.MIN : value;
-    if (numValue < QUANTITY_LIMITS.MIN || numValue > QUANTITY_LIMITS.MAX) return;
+    const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+    if (!Number.isFinite(numValue) || numValue > QUANTITY_LIMITS.MAX) return;
 
     if (isProductCollection) {
+      if (numValue < 0) return;
       setProductSetItems(prev =>
         prev.map(item =>
           item.id === itemId ? { ...item, quantity: numValue } : item
         )
       );
     } else {
+      if (numValue < QUANTITY_LIMITS.MIN) return;
       setCartQuantity(numValue);
     }
   }, [isProductCollection, isLoading]);
@@ -124,14 +126,39 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
 
       if (isProductCollection) {
         let setItemsData;
+        const itemsForQuote = productSetItems.filter((item) => parseInt(item.quantity, 10) > 0);
 
-        if (productInCart) {
+        if (itemsForQuote.length === 0) {
+          setIsLoading(false);
+          lightboxActions.setBasicLightBoxDetails({
+            title: "No items selected",
+            description: "Please set quantity for at least one item before adding to your quote.",
+            buttonText: "OK",
+            open: true,
+          });
+          return;
+        }
+
+        // Re-fetch cart state to avoid acting on stale productInCart (e.g. user added once then re-submits from the same modal)
+        const currentProductInCart = await checkProductInCart(productId, isProductCollection);
+
+        if (currentProductInCart) {
           // Check for new setItems format first, then fall back to string format
-          const existingSetItems = productInCart.setItems || [];
-          
+          const existingSetItems = currentProductInCart.setItems || [];
+
           if (existingSetItems.length > 0) {
-            // New format - merge with existing setItems
-            setItemsData = productSetItems.map((item) => {
+            // New format - merge with existing setItems and preserve items not touched in this submission
+            const newItemNames = new Set(itemsForQuote.map((item) => item.product));
+            const preservedExisting = existingSetItems
+              .filter((si) => !newItemNames.has(si.productName))
+              .map((si) => ({
+                product: si.product || null,
+                productName: si.productName,
+                size: si.size,
+                quantity: parseInt(si.quantity, 10),
+                unitPrice: parseFloat(si.unitPrice) || 0,
+              }));
+            const merged = itemsForQuote.map((item) => {
               const existingItem = existingSetItems.find((si) => si.productName === item.product);
               const oldQuantity = existingItem ? parseInt(existingItem.quantity, 10) : 0;
               return {
@@ -142,13 +169,14 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
                 unitPrice: parseFloat(item.price) || 0,
               };
             });
+            setItemsData = [...preservedExisting, ...merged];
           } else {
             // Old format - parse from string and convert
-            const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
+            const rawDescriptionLines = currentProductInCart.descriptionLines || currentProductInCart.customTextFieldValues || currentProductInCart.customTextFields || [];
             const descriptionLines = formatDescriptionLines(rawDescriptionLines);
             const existingSet = descriptionLines.find(x => x.title === "Set")?.value || "";
 
-            setItemsData = productSetItems.map((item) => {
+            setItemsData = itemsForQuote.map((item) => {
               const existingItemStr = existingSet.split("; ").find((field) => field.includes(item.product));
               const oldQuantity = existingItemStr ? parseInt(existingItemStr.split("~")[3], 10) : 0;
               return {
@@ -161,10 +189,10 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             });
           }
 
-          await removeProductFromCart([productInCart._id]);
+          await removeProductFromCart([currentProductInCart._id]);
         } else {
           // Create new cart item with structured setItems
-          setItemsData = productSetItems.map((item) => ({
+          setItemsData = itemsForQuote.map((item) => ({
             product: item.productId || null,
             productName: item.product,
             size: item.size,
@@ -251,7 +279,8 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
           size: findProductSize(set.product.additionalInfoSections),
           formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
           price: set.product.price,
-          quantity: set.quantity
+          quantity: set.quantity,
+          required: !!set.required,
         }));
         setProductSetItems(items);
       } catch (error) {
@@ -260,14 +289,6 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
     };
 
     loadBundleItems();
-
-    checkProductInCart(productId, isPayloadBundle)
-      .then(existInCart => {
-        if (!isCancelled) setProductInCart(existInCart);
-      })
-      .catch(error => {
-        logError("Error while checking product in cart", error);
-      });
 
     return () => { isCancelled = true; };
   }, [product._id, product.id, isPayloadBundle]);
@@ -329,6 +350,11 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
               {renderTableRows()}
             </tbody>
           </table>
+          {isProductCollection && (
+            <p className='text-[11px] text-secondary-alt font-haasLight italic -mt-[8px]'>
+              Items with quantity 0 will not be added to your quote.
+            </p>
+          )}
           {product.descriptionText && (
             <div className='py-[10px]'>
               <ProductDescription maxChars={130} text={product.description} />

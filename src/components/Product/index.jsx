@@ -10,6 +10,7 @@ import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApi
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { useCookies } from 'react-cookie';
 import { checkProductInCart } from '@/services/products';
+import { lightboxActions } from '@/store/lightboxStore';
 import { BreadCrumbs } from '../common/BreadCrumbs';
 import { ProductBadge, resolveProductRibbon } from '../common/ProductBadge';
 
@@ -22,12 +23,12 @@ const INFO_HEADERS = [
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-export const QuantityControls = ({ quantity, onQuantityChange }) => (
+export const QuantityControls = ({ quantity, onQuantityChange, minQuantity = QUANTITY_LIMITS.MIN }) => (
   <div className="flex items-center justify-center gap-x-[30px] font-haasRegular">
     <button
       className="select-none text-xl font-light hover:opacity-70 transition-opacity"
       onClick={() => onQuantityChange(quantity - 1)}
-      disabled={quantity <= QUANTITY_LIMITS.MIN}
+      disabled={quantity <= minQuantity}
       aria-label="Decrease quantity"
     >
       -
@@ -35,10 +36,13 @@ export const QuantityControls = ({ quantity, onQuantityChange }) => (
     <input
       className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
       type="number"
-      min={QUANTITY_LIMITS.MIN}
+      min={minQuantity}
       max={QUANTITY_LIMITS.MAX}
       value={quantity}
-      onChange={(e) => onQuantityChange(parseInt(e.target.value) || QUANTITY_LIMITS.MIN)}
+      onChange={(e) => {
+        const parsed = parseInt(e.target.value, 10);
+        onQuantityChange(Number.isFinite(parsed) ? parsed : minQuantity);
+      }}
       aria-label="Quantity"
     />
     <button
@@ -58,7 +62,6 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
   const [productSetItems, setProductSetItems] = useState([]);
   const [cartQuantity, setCartQuantity] = useState(1);
   const [isUpdatingCart, setIsUpdatingCart] = useState(false);
-  const [productInCart, setProductInCart] = useState();
 
   const redirectWithLoader = useRedirectWithLoader();
 
@@ -80,7 +83,8 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
       size: findProductSize(set.product.additionalInfoSections),
       formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
       price: set.product.price,
-      quantity: set.quantity
+      quantity: set.quantity,
+      required: !!set.required,
     }));
 
     setProductSetItems(items);
@@ -178,16 +182,18 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
   );
 
   const handleQuantityChange = useCallback((value, itemId) => {
-    const numValue = typeof value === 'string' ? parseInt(value) || QUANTITY_LIMITS.MIN : value;
-    if (numValue < QUANTITY_LIMITS.MIN || numValue > QUANTITY_LIMITS.MAX) return;
+    const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
+    if (!Number.isFinite(numValue) || numValue > QUANTITY_LIMITS.MAX) return;
 
     if (isProductCollection) {
+      if (numValue < 0) return;
       setProductSetItems(prev =>
         prev.map(item =>
           item.id === itemId ? { ...item, quantity: numValue } : item
         )
       );
     } else {
+      if (numValue < QUANTITY_LIMITS.MIN) return;
       setCartQuantity(numValue);
     }
   }, [isProductCollection]);
@@ -201,14 +207,38 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
 
       if (isProductCollection) {
         let setItemsData;
+        const itemsForQuote = productSetItems.filter((item) => parseInt(item.quantity, 10) > 0);
 
-        if (productInCart) {
+        if (itemsForQuote.length === 0) {
+          lightboxActions.setBasicLightBoxDetails({
+            title: "No items selected",
+            description: "Please set quantity for at least one item before adding to your quote.",
+            buttonText: "OK",
+            open: true,
+          });
+          return;
+        }
+
+        // Re-fetch cart state to avoid acting on stale productInCart (e.g. user added once then re-submits from the same page)
+        const currentProductInCart = await checkProductInCart(productId, isProductCollection);
+
+        if (currentProductInCart) {
           // Update existing cart item - check for new setItems format first, then fall back to string format
-          const existingSetItems = productInCart.setItems || [];
-          
+          const existingSetItems = currentProductInCart.setItems || [];
+
           if (existingSetItems.length > 0) {
-            // New format - merge with existing setItems
-            setItemsData = productSetItems.map((item) => {
+            // New format - merge with existing setItems and preserve items not touched in this submission
+            const newItemNames = new Set(itemsForQuote.map((item) => item.product));
+            const preservedExisting = existingSetItems
+              .filter((si) => !newItemNames.has(si.productName))
+              .map((si) => ({
+                product: si.product || null,
+                productName: si.productName,
+                size: si.size,
+                quantity: parseInt(si.quantity, 10),
+                unitPrice: parseFloat(si.unitPrice) || 0,
+              }));
+            const merged = itemsForQuote.map((item) => {
               const existingItem = existingSetItems.find((si) => si.productName === item.product);
               const oldQuantity = existingItem ? parseInt(existingItem.quantity, 10) : 0;
               return {
@@ -219,13 +249,14 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
                 unitPrice: parseFloat(item.price) || 0,
               };
             });
+            setItemsData = [...preservedExisting, ...merged];
           } else {
             // Old format - parse from string and convert
-            const rawDescriptionLines = productInCart.descriptionLines || productInCart.customTextFieldValues || productInCart.customTextFields || [];
+            const rawDescriptionLines = currentProductInCart.descriptionLines || currentProductInCart.customTextFieldValues || currentProductInCart.customTextFields || [];
             const descriptionLines = formatDescriptionLines(rawDescriptionLines);
             const existingSet = descriptionLines.find(x => x.title === "Set")?.value || "";
 
-            setItemsData = productSetItems.map((item) => {
+            setItemsData = itemsForQuote.map((item) => {
               const existingItemStr = existingSet.split("; ").find((field) => field.includes(item.product));
               const oldQuantity = existingItemStr ? parseInt(existingItemStr.split("~")[3], 10) : 0;
               return {
@@ -238,10 +269,10 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
             });
           }
 
-          await removeProductFromCart([productInCart._id]);
+          await removeProductFromCart([currentProductInCart._id]);
         } else {
           // Create new cart item with structured setItems
-          setItemsData = productSetItems.map((item) => ({
+          setItemsData = itemsForQuote.map((item) => ({
             product: item.productId || null,
             productName: item.product,
             size: item.size,
@@ -309,6 +340,7 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
             <QuantityControls
               quantity={item.quantity}
               onQuantityChange={(value) => handleQuantityChange(value, item.id)}
+              minQuantity={0}
             />
           </td>
         </tr>
@@ -330,19 +362,6 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
       </tr>
     ));
   };
-
-  const setInitialData = async () => {
-    try {
-      const existInCart = await checkProductInCart(product._id, isProductCollection);
-      setProductInCart(existInCart);
-    } catch (error) {
-      logError("Error while fetching product data", error);
-    }
-  };
-
-  useEffect(() => {
-    setInitialData();
-  }, [product._id, isProductCollection]);
 
   return (
     <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]'>
@@ -398,6 +417,12 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
               {renderTableRows()}
             </tbody>
           </table>
+
+          {isProductCollection && (
+            <p className='text-[11px] text-secondary-alt font-haasLight italic -mt-[14px] mb-6'>
+              Items with quantity 0 will not be added to your quote.
+            </p>
+          )}
 
           <ProductDescription text={product.description} />
         </div>
