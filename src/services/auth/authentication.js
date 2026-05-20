@@ -39,14 +39,18 @@ export const signInUser = async (userData) => {
 
         if (!response.ok) {
             const data = await response.json();
-            throw new Error(data.message);
+            const err = new Error(data.message);
+            err.code = data.code;
+            throw err;
         }
         const data = await response.json();
 
         return data;
     } catch (error) {
         logError(error);
-        throw new Error(error.message);
+        const err = new Error(error.message);
+        err.code = error.code;
+        throw err;
     }
 };
 

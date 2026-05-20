@@ -159,7 +159,21 @@ const Login = ({ classes, close, isLightbox = true, data = {} }) => {
 
         } catch (error) {
             logError(error);
-            toast.error(error.message || "Invalid email or password. Please try again.");
+            if (error.code === "PASSWORD_RESET_REQUIRED") {
+                if (isLightbox && close) close();
+                lightboxActions.hideLightBox("login");
+                lightboxActions.setBasicLightBoxDetails({
+                    open: true,
+                    title: "Reset your password",
+                    description: error.message,
+                    buttonText: "Got it",
+                    buttonLink: "",
+                    type: "info",
+                    disableClose: false,
+                });
+            } else {
+                toast.error(error.message || "Invalid email or password. Please try again.");
+            }
             // Reset submitting state after delay
             setTimeout(() => setIsSubmitting(false), 3000);
         }

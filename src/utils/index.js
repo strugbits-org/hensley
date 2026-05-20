@@ -251,6 +251,28 @@ export const calculateCartTotalPrice = (lineItems) => {
 export const formatDescriptionLines = (items = []) =>
     items.map(({ title, value }) => ({ title, value }));
 
+// A quote line item is renderable only if it resolves to a real product
+// reference, OR it is a self-describing item (tent / pool cover / product set)
+// that doesn't need a single product relationship. Migrated Wix quotes can
+// contain line items whose product never mapped to a Core product — those are
+// excluded from the quote detail and history views.
+export const lineItemHasProductReference = (item) => {
+    const p = item?.product;
+    const hasRef = (p && typeof p === 'object')
+        ? Boolean(p.id || p._id)
+        : (typeof p === 'string' && p.length > 0);
+    if (hasRef) return true;
+
+    const itemType = item?.itemType || item?.product?.itemType;
+    if (itemType === 'tent' || itemType === 'pool_cover' || itemType === 'set') return true;
+    if (Array.isArray(item?.setItems) && item.setItems.length > 0) return true;
+
+    const descriptionLines = formatDescriptionLines(item?.customTextFieldValues || item?.customTextFields || []);
+    if (descriptionLines.find((x) => x.title === 'Set' || x.title === 'TENT TYPE' || x.title === 'POOLCOVER')?.value) return true;
+
+    return false;
+};
+
 export function formatLineItemsForQuote(lineItems) {
     const formattedCartData = [];
     let counter = 0;

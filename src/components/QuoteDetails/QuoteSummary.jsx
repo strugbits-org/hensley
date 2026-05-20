@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { calculateCartTotalPrice, formatDescriptionLines, formatTotalPrice } from '@/utils';
+import { calculateCartTotalPrice, formatDescriptionLines, formatTotalPrice, lineItemHasProductReference } from '@/utils';
 import { CartNormal, CartCollection, CartTent } from '../Cart/CartItems';
 import PriceDisplay from './PriceDisplay';
 
@@ -7,7 +7,7 @@ const QuoteSummary = ({ data }) => {
 
   const [totalPrice, setTotalPrice] = useState(0);
 
-  const normalizedLineItems = (data?.lineItems || []).map((item) => {
+  const normalizedLineItems = (data?.lineItems || []).filter(lineItemHasProductReference).map((item) => {
     const product = typeof item?.product === 'object' && item?.product ? item.product : {};
     const rawCustomFields = item?.customTextFieldValues || item?.customTextFields || product?.customTextFieldValues || product?.customTextFields || [];
     const customTextFields = Array.isArray(rawCustomFields) && rawCustomFields[0]?.name
