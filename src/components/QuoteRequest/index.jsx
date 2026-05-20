@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Submit } from "./Button";
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { formatDateNumeric, logError } from '@/utils';
-import AirDatepicker from 'air-datepicker';
-import localeEn from 'air-datepicker/locale/en';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { formatDateNumeric, logError } from "@/utils";
+import AirDatepicker from "air-datepicker";
+import localeEn from "air-datepicker/locale/en";
 import { getProductsCart } from "@/services/cart/CartApis";
 import { createPriceQuote } from "@/services/quotes/QuoteApis";
 import { useCookies } from "react-cookie";
@@ -14,74 +14,121 @@ import { lightboxActions } from "@/store/lightboxStore";
 import useUserData from "@/hooks/useUserData";
 
 // Validation schema
-const schema = yup.object({
-  eventDate: yup.string().required('Event date is required'),
-  deliveryDate: yup.string()
-    .required('Delivery date is required')
-    .test('delivery-before-event', 'Delivery date must be before event date', function (value) {
-      const { eventDate } = this.parent;
-      if (!value || !eventDate) return true;
-      return new Date(value) <= new Date(eventDate);
-    }),
-  pickupDate: yup.string()
-    .required('Pickup date is required')
-    .test('pickup-after-event', 'Pickup date must be after event date', function (value) {
-      const { eventDate } = this.parent;
-      if (!value || !eventDate) return true;
-      return new Date(value) >= new Date(eventDate);
-    }),
-  eventLocation: yup.string(),
-  eventDescription: yup.string(),
-  billTo: yup.string().required('Bill to is required'),
-  streetAddress: yup.string().required('Street address is required'),
-  addressLine2: yup.string(),
-  city: yup.string().required('City is required'),
-  state: yup.string().required('State is required'),
-  zipCode: yup.string().required('ZIP code is required'),
-  specialInstructions: yup.string(),
-  city1: yup.string(),
-  state1: yup.string(),
-  name: yup.string().required('Name is required'),
-  email: yup.string().email('Email is invalid').required('Email is required'),
-  phone: yup.string().required('Phone number is required'),
-}).required();
+const schema = yup
+  .object({
+    eventDate: yup.string().required("Event date is required"),
+    deliveryDate: yup
+      .string()
+      .required("Delivery date is required")
+      .test(
+        "delivery-before-event",
+        "Delivery date must be before event date",
+        function (value) {
+          const { eventDate } = this.parent;
+          if (!value || !eventDate) return true;
+          return new Date(value) <= new Date(eventDate);
+        },
+      ),
+    pickupDate: yup
+      .string()
+      .required("Pickup date is required")
+      .test(
+        "pickup-after-event",
+        "Pickup date must be after event date",
+        function (value) {
+          const { eventDate } = this.parent;
+          if (!value || !eventDate) return true;
+          return new Date(value) >= new Date(eventDate);
+        },
+      ),
+    eventLocation: yup.string(),
+    eventDescription: yup.string(),
+    billTo: yup.string().required("Bill to is required"),
+    streetAddress: yup.string().required("Street address is required"),
+    addressLine2: yup.string(),
+    city: yup.string().required("City is required"),
+    state: yup.string().required("State is required"),
+    zipCode: yup.string().required("ZIP code is required"),
+    specialInstructions: yup.string(),
+    city1: yup.string(),
+    state1: yup.string(),
+    name: yup.string().required("Name is required"),
+    email: yup.string().email("Email is invalid").required("Email is required"),
+    phone: yup.string().required("Phone number is required"),
+  })
+  .required();
 
 // Form structure
 const FORM_STRUCTURE = {
-  eventDetails: ['eventDate', 'deliveryDate', 'pickupDate', 'eventLocation', 'eventDescription'],
-  billingDetails: ['billTo', 'streetAddress', 'addressLine2', 'city', 'state', 'zipCode'],
-  specialInstructions: ['specialInstructions', 'city1', 'state1'],
-  orderBy: ['name', 'email', 'phone']
+  eventDetails: [
+    "eventDate",
+    "deliveryDate",
+    "pickupDate",
+    "eventLocation",
+    "eventDescription",
+  ],
+  billingDetails: [
+    "billTo",
+    "streetAddress",
+    "addressLine2",
+    "city",
+    "state",
+    "zipCode",
+  ],
+  specialInstructions: ["specialInstructions", "city1", "state1"],
+  orderBy: ["name", "email", "phone"],
 };
 
 // Field configurations
 const FIELD_CONFIGS = {
-  eventDate: { type: 'text', placeholder: 'MM / DD / YY', readOnly: true },
-  deliveryDate: { type: 'text', placeholder: 'MM / DD / YY', readOnly: true },
-  pickupDate: { type: 'text', placeholder: 'MM / DD / YY', readOnly: true },
-  eventLocation: { type: 'text', placeholder: '' },
-  eventDescription: { type: 'text', placeholder: '', gridSpan: 'md:col-span-2' },
-  billTo: { type: 'text', placeholder: 'CUSTOMER/ACCOUNT NAME' },
-  streetAddress: { type: 'text', placeholder: '' },
-  addressLine2: { type: 'text', placeholder: '' },
-  city: { type: 'text', placeholder: '' },
-  state: { type: 'text', placeholder: '' },
-  zipCode: { type: 'text', placeholder: '' },
-  specialInstructions: { type: 'text', placeholder: '' },
-  city1: { type: 'text', placeholder: '' },
-  state1: { type: 'text', placeholder: '' },
-  name: { type: 'text', placeholder: 'GABRIEL MACCHI' },
-  email: { type: 'email', placeholder: 'GABRIEL@PETRICHDESIGN' },
-  phone: { type: 'tel', placeholder: '(123) 456-7890' }
+  eventDate: { type: "text", placeholder: "MM / DD / YY", readOnly: true },
+  deliveryDate: { type: "text", placeholder: "MM / DD / YY", readOnly: true },
+  pickupDate: { type: "text", placeholder: "MM / DD / YY", readOnly: true },
+  eventLocation: { type: "text", placeholder: "" },
+  eventDescription: {
+    type: "text",
+    placeholder: "",
+    gridSpan: "md:col-span-2",
+  },
+  billTo: { type: "text", placeholder: "CUSTOMER/ACCOUNT NAME" },
+  streetAddress: { type: "text", placeholder: "" },
+  addressLine2: { type: "text", placeholder: "" },
+  city: { type: "text", placeholder: "" },
+  state: { type: "text", placeholder: "" },
+  zipCode: { type: "text", placeholder: "" },
+  specialInstructions: { type: "text", placeholder: "" },
+  city1: { type: "text", placeholder: "" },
+  state1: { type: "text", placeholder: "" },
+  name: { type: "text", placeholder: "GABRIEL MACCHI" },
+  email: { type: "email", placeholder: "GABRIEL@PETRICHDESIGN" },
+  phone: { type: "tel", placeholder: "(123) 456-7890" },
 };
 
 export const QuoteRequest = ({ content, data = "" }) => {
-
-  const { tagline, sections, submitButtonLabel, description, labels, title } = data;
+  const { tagline, sections, submitButtonLabel, description, labels, title } =
+    data;
 
   const { eventDetails, billingDetails, orderBy } = sections;
 
-  const { eventDate, deliveryDate, pickupDate, eventLocation, eventDescription, billTo, streetAddress, addressLine2, city, state, zipCode, specialInstructions, city1, state1, name, email: emailLabel, phone: phoneLabel } = labels;
+  const {
+    eventDate,
+    deliveryDate,
+    pickupDate,
+    eventLocation,
+    eventDescription,
+    billTo,
+    streetAddress,
+    addressLine2,
+    city,
+    state,
+    zipCode,
+    specialInstructions,
+    city1,
+    state1,
+    name,
+    email: emailLabel,
+    phone: phoneLabel,
+  } = labels;
 
   // Default content structure
   const defaultContent = {
@@ -93,7 +140,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
     sections: {
       eventDetails,
       billingDetails,
-      orderBy
+      orderBy,
     },
     labels: {
       eventDate,
@@ -116,24 +163,26 @@ export const QuoteRequest = ({ content, data = "" }) => {
     },
     orderTypes: [
       { id: "DELIVERED", label: "DELIVERED" },
-      { id: "WILL CALL", label: "WILL CALL" }
+      { id: "WILL CALL", label: "WILL CALL" },
     ],
     buttons: {
       submit: submitButtonLabel,
-      submitting: "SUBMITTING..."
+      submitting: "SUBMITTING...",
     },
     messages: {
       emptyCart: {
         title: "Your cart is empty",
-        description: "Please add items to your cart before submitting a quote request.",
-        buttonText: "Continue Shopping"
+        description:
+          "Please add items to your cart before submitting a quote request.",
+        buttonText: "Continue Shopping",
       },
       success: {
         title: "THANKS FOR CHOOSING US!",
-        description: "Your quote request has been sent and we will contact you shortly via email.",
-        buttonText: "Continue Shopping"
-      }
-    }
+        description:
+          "Your quote request has been sent and we will contact you shortly via email.",
+        buttonText: "Continue Shopping",
+      },
+    },
   };
 
   // Use provided content or fall back to defaults
@@ -149,7 +198,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
   // Check if user is logged in (has email from member data)
   const isLoggedIn = Boolean(email);
   // Build full name from available data
-  const fullName = [firstName, lastName].filter(Boolean).join(' ').trim();
+  const fullName = [firstName, lastName].filter(Boolean).join(" ").trim();
 
   const {
     register,
@@ -162,19 +211,19 @@ export const QuoteRequest = ({ content, data = "" }) => {
     resolver: yupResolver(schema),
     defaultValues: {
       ...(isLoggedIn && {
-        name: fullName || '',
-        email: email || '',
-        phone: phone || ''
-      })
-    }
+        name: fullName || "",
+        email: email || "",
+        phone: phone || "",
+      }),
+    },
   });
 
   // Set form values when user data is available
   useEffect(() => {
     if (isLoggedIn) {
-      if (fullName) setValue('name', fullName);
-      setValue('email', email);
-      if (phone) setValue('phone', phone);
+      if (fullName) setValue("name", fullName);
+      setValue("email", email);
+      if (phone) setValue("phone", phone);
     }
   }, [firstName, lastName, email, phone, setValue, fullName, isLoggedIn]);
 
@@ -193,34 +242,36 @@ export const QuoteRequest = ({ content, data = "" }) => {
 
     const datePickerConfigs = [
       {
-        id: 'eventDate',
+        id: "eventDate",
         onSelect: ({ date, datepicker }) => {
-          setValue('eventDate', date);
-          trigger('eventDate');
-          const dateStr = date ? formatDateNumeric(date) : '';
+          setValue("eventDate", date);
+          trigger("eventDate");
+          const dateStr = date ? formatDateNumeric(date) : "";
           datepicker.$el.value = dateStr;
-          datePickerInstances.deliveryDate?.update({ maxDate: date || undefined });
+          datePickerInstances.deliveryDate?.update({
+            maxDate: date || undefined,
+          });
           datePickerInstances.pickupDate?.update({ minDate: date || today });
-        }
+        },
       },
       {
-        id: 'deliveryDate',
+        id: "deliveryDate",
         onSelect: ({ date, datepicker }) => {
-          setValue('deliveryDate', date);
-          trigger('deliveryDate');
-          const dateStr = date ? formatDateNumeric(date) : '';
+          setValue("deliveryDate", date);
+          trigger("deliveryDate");
+          const dateStr = date ? formatDateNumeric(date) : "";
           datepicker.$el.value = dateStr;
-        }
+        },
       },
       {
-        id: 'pickupDate',
+        id: "pickupDate",
         onSelect: ({ date, datepicker }) => {
-          setValue('pickupDate', date);
-          trigger('pickupDate');
-          const dateStr = date ? formatDateNumeric(date) : '';
+          setValue("pickupDate", date);
+          trigger("pickupDate");
+          const dateStr = date ? formatDateNumeric(date) : "";
           datepicker.$el.value = dateStr;
-        }
-      }
+        },
+      },
     ];
 
     datePickerConfigs.forEach(({ id, onSelect }) => {
@@ -228,7 +279,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
       if (element) {
         datePickerInstances[id] = new AirDatepicker(element, {
           ...baseConfig,
-          onSelect
+          onSelect,
         });
       }
     });
@@ -236,7 +287,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
     setDatepickers(datePickerInstances);
 
     return () => {
-      Object.values(datePickerInstances).forEach(dp => dp?.destroy?.());
+      Object.values(datePickerInstances).forEach((dp) => dp?.destroy?.());
     };
   }, [setValue, trigger]);
 
@@ -251,7 +302,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
           buttonText: formContent.messages.emptyCart.buttonText,
           buttonLink: "/",
           disableClose: true,
-          open: true
+          open: true,
         });
         return;
       }
@@ -271,14 +322,14 @@ export const QuoteRequest = ({ content, data = "" }) => {
       const submissionData = { orderType: orderType, ...data };
       await createPriceQuote({
         lineItems: cartItems,
-        quoteDetails: submissionData
+        quoteDetails: submissionData,
       });
 
       setTimeout(() => {
         reset();
         setOrderType("DELIVERED");
-        Object.values(datepickers).forEach(dp => {
-          if (dp && typeof dp.clear === 'function') {
+        Object.values(datepickers).forEach((dp) => {
+          if (dp && typeof dp.clear === "function") {
             dp.clear();
           }
         });
@@ -301,12 +352,16 @@ export const QuoteRequest = ({ content, data = "" }) => {
     }
   };
 
-  const renderField = ({ fieldId, gridClass = '', inputClass = 'uppercase' }) => {
+  const renderField = ({
+    fieldId,
+    gridClass = "",
+    inputClass = "uppercase",
+  }) => {
     const config = FIELD_CONFIGS[fieldId];
     const error = errors[fieldId]?.message;
 
     // Email should be read-only for logged-in users
-    const isEmailField = fieldId === 'email';
+    const isEmailField = fieldId === "email";
     const shouldBeReadOnly = isEmailField && isLoggedIn;
 
     return (
@@ -319,8 +374,9 @@ export const QuoteRequest = ({ content, data = "" }) => {
           type={config.type}
           {...register(fieldId)}
           placeholder={config.placeholder}
-          className={`w-full border-b font-haasRegular border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-secondary ${inputClass} ${error ? 'border-b-red-500' : ''
-            } ${shouldBeReadOnly ? '!bg-gray-100 cursor-not-allowed' : ''}`}
+          className={`w-full border-b font-haasRegular border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-secondary ${inputClass} ${
+            error ? "border-b-red-500" : ""
+          } ${shouldBeReadOnly ? "!bg-gray-100 cursor-not-allowed" : ""}`}
           disabled={isSubmitting}
           readOnly={config.readOnly || shouldBeReadOnly}
         />
@@ -334,7 +390,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
       {/* Header */}
       <div className="w-full border-secondary-alt">
         <div className="container mx-auto max-w-5xl px-4 py-12 font-['neue-haas-display'] text-center">
-          <h1 className="text-[90px] leading-[85px] font-['reckless-neue-regular'] text-secondary-alt mb-5 uppercase">
+          <h1 className="text-[35px] md:text-[65px] lg:text-[90px] leading-[85px] font-['reckless-neue-regular'] text-secondary-alt mb-5 uppercase">
             {formContent.header.title}
           </h1>
           <p className="text-[30px] leading-[30px] text-secondary-alt font-recklessRegular uppercase mt-[27px] mb-[30px]">
@@ -350,14 +406,17 @@ export const QuoteRequest = ({ content, data = "" }) => {
       <div className="w-full border-secondary-alt">
         <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px]">
           <div className="w-full flex justify-center">
-            <div className="w-[608px] bg-[#F5E9C2] rounded-sm p-5 flex justify-center">
-              <div className="flex lg:flex-row flex-col items-center space-x-10">
-                <p className="font-medium lg:text-[16px] text-[25px] text-secondary-alt font-recklessRegular tracking-wide lg:mb-0 mb-[22px]">
+            <div className="w-[608px] max-w-full bg-[#F5E9C2] rounded-sm p-5 flex justify-center">
+              <div className="flex lg:flex-row flex-col items-center lg:space-x-10 lg:space-y-0 space-y-3">
+                <p className="font-medium lg:text-[16px] text-[25px] text-secondary-alt font-recklessRegular tracking-wide lg:mb-0 mb-0">
                   YOUR ORDER IS:
                 </p>
-                <div className="flex gap-x-[48px]">
+                <div className="flex gap-x-[24px] sm:gap-x-[48px]">
                   {formContent.orderTypes.map((type) => (
-                    <label key={type.id} className="inline-flex items-center cursor-pointer">
+                    <label
+                      key={type.id}
+                      className="inline-flex items-center cursor-pointer whitespace-nowrap"
+                    >
                       <input
                         type="radio"
                         name="orderType"
@@ -367,7 +426,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
                         className="form-radio h-[34px] w-[34px] accent-[#57442D] focus:ring-[#57442D]"
                         disabled={isSubmitting}
                       />
-                      <span className="ml-2 font-medium text-secondary-alt font-recklessRegular">
+                      <span className="ml-2 font-medium text-secondary-alt font-recklessRegular whitespace-nowrap">
                         {type.label}
                       </span>
                     </label>
@@ -383,12 +442,18 @@ export const QuoteRequest = ({ content, data = "" }) => {
       <div className="w-full border-b border-primary-border">
         <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {FORM_STRUCTURE.eventDetails.slice(0, 3).map((fieldId) =>
-              renderField({ fieldId })
-            )}
+            {FORM_STRUCTURE.eventDetails
+              .slice(0, 3)
+              .map((fieldId) => renderField({ fieldId }))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {FORM_STRUCTURE.eventDetails.slice(3).map((fieldId) => renderField({ fieldId, gridClass: fieldId === 'eventDescription' ? 'lg:col-span-2' : '' }))}
+            {FORM_STRUCTURE.eventDetails.slice(3).map((fieldId) =>
+              renderField({
+                fieldId,
+                gridClass:
+                  fieldId === "eventDescription" ? "lg:col-span-2" : "",
+              }),
+            )}
           </div>
         </div>
       </div>
@@ -400,10 +465,14 @@ export const QuoteRequest = ({ content, data = "" }) => {
             {formContent.sections.billingDetails}
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {FORM_STRUCTURE.billingDetails.slice(0, 3).map((fieldId) => renderField({ fieldId }))}
+            {FORM_STRUCTURE.billingDetails
+              .slice(0, 3)
+              .map((fieldId) => renderField({ fieldId }))}
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {FORM_STRUCTURE.billingDetails.slice(3, 6).map((fieldId) => renderField({ fieldId }))}
+            {FORM_STRUCTURE.billingDetails
+              .slice(3, 6)
+              .map((fieldId) => renderField({ fieldId }))}
           </div>
         </div>
       </div>
@@ -412,7 +481,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
       <div className="w-full border-b border-primary-border">
         <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {FORM_STRUCTURE.specialInstructions.map((fieldId) =>
+            {FORM_STRUCTURE.specialInstructions.map((fieldId) => (
               <div key={fieldId}>
                 <label className="block text-[13px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
                   {formContent.labels[fieldId]}
@@ -425,7 +494,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
                   disabled={isSubmitting}
                 />
               </div>
-            )}
+            ))}
           </div>
         </div>
       </div>
@@ -437,11 +506,17 @@ export const QuoteRequest = ({ content, data = "" }) => {
             {formContent.sections.orderBy}
           </h2>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {FORM_STRUCTURE.orderBy.map((fieldId) => renderField({ fieldId, inputClass: 'order-by' }))}
+            {FORM_STRUCTURE.orderBy.map((fieldId) =>
+              renderField({ fieldId, inputClass: "order-by" }),
+            )}
           </div>
           <div className="mt-8">
             <Submit
-              text={isSubmitting ? formContent.buttons.submitting : formContent.buttons.submit}
+              text={
+                isSubmitting ?
+                  formContent.buttons.submitting
+                : formContent.buttons.submit
+              }
               disabled={isSubmitting}
             />
           </div>

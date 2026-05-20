@@ -1,29 +1,44 @@
 "use client";
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import ProductSlider from './ProductSlider'
-import ProductSlider_tab from './ProductSlider_tab'
-import { AddToCartButton } from './AddtoQuoteButton'
-import ProductDescription from '../common/helpers/ProductDescription';
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError, normalizeProductForDisplay } from '@/utils';
-import { SaveProductButton } from '../common/SaveProductButton';
-import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis';
-import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
-import { useCookies } from 'react-cookie';
-import { checkProductInCart } from '@/services/products';
-import { lightboxActions } from '@/store/lightboxStore';
-import { BreadCrumbs } from '../common/BreadCrumbs';
-import { ProductBadge, resolveProductRibbon } from '../common/ProductBadge';
+import React, { useMemo, useState, useCallback, useEffect } from "react";
+import ProductSlider from "./ProductSlider";
+import ProductSlider_tab from "./ProductSlider_tab";
+import { AddToCartButton } from "./AddtoQuoteButton";
+import ProductDescription from "../common/helpers/ProductDescription";
+import {
+  calculateTotalCartQuantity,
+  findProductSize,
+  formatDescriptionLines,
+  formatTotalPrice,
+  HIDE_PRICES,
+  logError,
+  normalizeProductForDisplay,
+} from "@/utils";
+import { SaveProductButton } from "../common/SaveProductButton";
+import {
+  AddProductToCart,
+  removeProductFromCart,
+} from "@/services/cart/CartApis";
+import useRedirectWithLoader from "@/hooks/useRedirectWithLoader";
+import { useCookies } from "react-cookie";
+import { checkProductInCart } from "@/services/products";
+import { lightboxActions } from "@/store/lightboxStore";
+import { BreadCrumbs } from "../common/BreadCrumbs";
+import { ProductBadge, resolveProductRibbon } from "../common/ProductBadge";
 
 const INFO_HEADERS = [
-  { title: 'Product', setItem: true },
-  { title: 'Size', setItem: false },
-  { title: 'Price', setItem: false },
-  { title: 'Quantity', setItem: false }
+  { title: "Product", setItem: true },
+  { title: "Size", setItem: false },
+  { title: "Price", setItem: false },
+  { title: "Quantity", setItem: false },
 ];
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-export const QuantityControls = ({ quantity, onQuantityChange, minQuantity = QUANTITY_LIMITS.MIN }) => (
+export const QuantityControls = ({
+  quantity,
+  onQuantityChange,
+  minQuantity = QUANTITY_LIMITS.MIN,
+}) => (
   <div className="flex items-center justify-center gap-x-[30px] font-haasRegular">
     <button
       className="select-none text-xl font-light hover:opacity-70 transition-opacity"
@@ -56,7 +71,11 @@ export const QuantityControls = ({ quantity, onQuantityChange, minQuantity = QUA
   </div>
 );
 
-export const Product = ({ data, matchedProducts = [], allCollections = [] }) => {
+export const Product = ({
+  data,
+  matchedProducts = [],
+  allCollections = [],
+}) => {
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
 
   const [productSetItems, setProductSetItems] = useState([]);
@@ -66,7 +85,10 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
   const redirectWithLoader = useRedirectWithLoader();
 
   const { productData, productCollectionData } = data;
-  const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
+  const product = useMemo(
+    () => normalizeProductForDisplay(productData?.product || {}),
+    [productData?.product],
+  );
   const ribbon = resolveProductRibbon(productData?.product, allCollections);
 
   const isProductCollection = productData?.isProductCollection || false;
@@ -77,11 +99,12 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
       return;
     }
 
-    const items = productCollectionData.map(set => ({
+    const items = productCollectionData.map((set) => ({
       id: set.product._id || set.product.id,
       product: set.product.name || set.product.title,
       size: findProductSize(set.product.additionalInfoSections),
-      formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
+      formattedPrice:
+        set.product.formattedPrice || formatTotalPrice(set.product.price),
       price: set.product.price,
       quantity: set.quantity,
       required: !!set.required,
@@ -104,7 +127,7 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
   // → "HOME / CHINA") instead of always defaulting to product.collections[0].
   // Only honor referrers that point to a collection this product belongs to.
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     const collections = productData?.product?.collections || [];
 
@@ -112,7 +135,7 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
     // for Next.js client-side nav where document.referrer is empty).
     let candidateSlug = null;
     try {
-      const raw = sessionStorage.getItem('lastCategoryCrumb');
+      const raw = sessionStorage.getItem("lastCategoryCrumb");
       if (raw) {
         const parsed = JSON.parse(raw);
         candidateSlug = parsed?.slug || null;
@@ -126,7 +149,9 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
       try {
         const refUrl = new URL(document.referrer);
         if (refUrl.origin === window.location.origin) {
-          const match = refUrl.pathname.match(/^\/(?:subcategory|collections)\/([^/]+)\/?$/);
+          const match = refUrl.pathname.match(
+            /^\/(?:subcategory|collections)\/([^/]+)\/?$/,
+          );
           if (match) {
             candidateSlug = decodeURIComponent(match[1]);
           }
@@ -139,24 +164,28 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
     if (!candidateSlug) return;
 
     const lower = candidateSlug.toLowerCase();
-    const hit = collections.find((c) => (c?.slug || '').toLowerCase() === lower);
+    const hit = collections.find(
+      (c) => (c?.slug || "").toLowerCase() === lower,
+    );
 
     if (hit?.slug && hit?.name) {
       setReferringCollection({ name: hit.name, slug: hit.slug });
     } else {
       // Stored crumb doesn't belong to this product — drop it and evict it
       // from sessionStorage so it can't leak into the next product view.
-      try { sessionStorage.removeItem('lastCategoryCrumb'); } catch {}
+      try {
+        sessionStorage.removeItem("lastCategoryCrumb");
+      } catch {}
     }
   }, [productData?.product?.collections]);
 
   const breadcrumbItems = useMemo(() => {
-    const items = [{ label: 'Home', to: '/' }];
+    const items = [{ label: "Home", to: "/" }];
 
     if (referringCollection) {
       items.push({ label: referringCollection.name });
     } else {
-      items.push({ label: product.name || product.title || 'Product' });
+      items.push({ label: product.name || product.title || "Product" });
     }
 
     return items;
@@ -166,37 +195,41 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
     if (isProductCollection) {
       const collectionTotal = productSetItems.reduce((total, item) => {
         const itemPrice = parseFloat(item.price) || 0;
-        return total + (itemPrice * item.quantity);
+        return total + itemPrice * item.quantity;
       }, 0);
       return formatTotalPrice(collectionTotal);
     }
     return formatTotalPrice(product.price * cartQuantity);
   }, [isProductCollection, productSetItems, product.price, cartQuantity]);
 
-  const visibleHeaders = useMemo(() =>
-    INFO_HEADERS.filter(header => {
-      if (HIDE_PRICES && header.title === 'Price') return false;
-      return !header.setItem || isProductCollection;
-    }),
-    [isProductCollection]
+  const visibleHeaders = useMemo(
+    () =>
+      INFO_HEADERS.filter((header) => {
+        if (HIDE_PRICES && header.title === "Price") return false;
+        return !header.setItem || isProductCollection;
+      }),
+    [isProductCollection],
   );
 
-  const handleQuantityChange = useCallback((value, itemId) => {
-    const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
-    if (!Number.isFinite(numValue) || numValue > QUANTITY_LIMITS.MAX) return;
+  const handleQuantityChange = useCallback(
+    (value, itemId) => {
+      const numValue = typeof value === "string" ? parseInt(value, 10) : value;
+      if (!Number.isFinite(numValue) || numValue > QUANTITY_LIMITS.MAX) return;
 
-    if (isProductCollection) {
-      if (numValue < 0) return;
-      setProductSetItems(prev =>
-        prev.map(item =>
-          item.id === itemId ? { ...item, quantity: numValue } : item
-        )
-      );
-    } else {
-      if (numValue < QUANTITY_LIMITS.MIN) return;
-      setCartQuantity(numValue);
-    }
-  }, [isProductCollection]);
+      if (isProductCollection) {
+        if (numValue < 0) return;
+        setProductSetItems((prev) =>
+          prev.map((item) =>
+            item.id === itemId ? { ...item, quantity: numValue } : item,
+          ),
+        );
+      } else {
+        if (numValue < QUANTITY_LIMITS.MIN) return;
+        setCartQuantity(numValue);
+      }
+    },
+    [isProductCollection],
+  );
 
   const handleAddToCart = async () => {
     setIsUpdatingCart(true);
@@ -207,12 +240,15 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
 
       if (isProductCollection) {
         let setItemsData;
-        const itemsForQuote = productSetItems.filter((item) => parseInt(item.quantity, 10) > 0);
+        const itemsForQuote = productSetItems.filter(
+          (item) => parseInt(item.quantity, 10) > 0,
+        );
 
         if (itemsForQuote.length === 0) {
           lightboxActions.setBasicLightBoxDetails({
             title: "No items selected",
-            description: "Please set quantity for at least one item before adding to your quote.",
+            description:
+              "Please set quantity for at least one item before adding to your quote.",
             buttonText: "OK",
             open: true,
           });
@@ -220,7 +256,10 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
         }
 
         // Re-fetch cart state to avoid acting on stale productInCart (e.g. user added once then re-submits from the same page)
-        const currentProductInCart = await checkProductInCart(productId, isProductCollection);
+        const currentProductInCart = await checkProductInCart(
+          productId,
+          isProductCollection,
+        );
 
         if (currentProductInCart) {
           // Update existing cart item - check for new setItems format first, then fall back to string format
@@ -228,7 +267,9 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
 
           if (existingSetItems.length > 0) {
             // New format - merge with existing setItems and preserve items not touched in this submission
-            const newItemNames = new Set(itemsForQuote.map((item) => item.product));
+            const newItemNames = new Set(
+              itemsForQuote.map((item) => item.product),
+            );
             const preservedExisting = existingSetItems
               .filter((si) => !newItemNames.has(si.productName))
               .map((si) => ({
@@ -239,8 +280,11 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
                 unitPrice: parseFloat(si.unitPrice) || 0,
               }));
             const merged = itemsForQuote.map((item) => {
-              const existingItem = existingSetItems.find((si) => si.productName === item.product);
-              const oldQuantity = existingItem ? parseInt(existingItem.quantity, 10) : 0;
+              const existingItem = existingSetItems.find(
+                (si) => si.productName === item.product,
+              );
+              const oldQuantity =
+                existingItem ? parseInt(existingItem.quantity, 10) : 0;
               return {
                 product: item.productId || null,
                 productName: item.product,
@@ -252,13 +296,24 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
             setItemsData = [...preservedExisting, ...merged];
           } else {
             // Old format - parse from string and convert
-            const rawDescriptionLines = currentProductInCart.descriptionLines || currentProductInCart.customTextFieldValues || currentProductInCart.customTextFields || [];
-            const descriptionLines = formatDescriptionLines(rawDescriptionLines);
-            const existingSet = descriptionLines.find(x => x.title === "Set")?.value || "";
+            const rawDescriptionLines =
+              currentProductInCart.descriptionLines ||
+              currentProductInCart.customTextFieldValues ||
+              currentProductInCart.customTextFields ||
+              [];
+            const descriptionLines =
+              formatDescriptionLines(rawDescriptionLines);
+            const existingSet =
+              descriptionLines.find((x) => x.title === "Set")?.value || "";
 
             setItemsData = itemsForQuote.map((item) => {
-              const existingItemStr = existingSet.split("; ").find((field) => field.includes(item.product));
-              const oldQuantity = existingItemStr ? parseInt(existingItemStr.split("~")[3], 10) : 0;
+              const existingItemStr = existingSet
+                .split("; ")
+                .find((field) => field.includes(item.product));
+              const oldQuantity =
+                existingItemStr ?
+                  parseInt(existingItemStr.split("~")[3], 10)
+                : 0;
               return {
                 product: item.productId || null,
                 productName: item.product,
@@ -281,33 +336,37 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
           }));
         }
 
-        lineItems = [{
-          catalogReference: {
-            appId,
-            catalogItemId: productId,
-            options: {
-              customTextFields: {}
+        lineItems = [
+          {
+            catalogReference: {
+              appId,
+              catalogItemId: productId,
+              options: {
+                customTextFields: {},
+              },
             },
+            setItems: setItemsData,
+            quantity: 1,
+            price: product.price || 0,
           },
-          setItems: setItemsData,
-          quantity: 1,
-          price: product.price || 0,
-        }];
+        ];
       } else {
         // Single product
         const size = findProductSize(product.additionalInfoSections);
 
-        lineItems = [{
-          catalogReference: {
-            appId,
-            catalogItemId: productId,
-            options: {
-              customTextFields: { size }
+        lineItems = [
+          {
+            catalogReference: {
+              appId,
+              catalogItemId: productId,
+              options: {
+                customTextFields: { size },
+              },
             },
+            quantity: cartQuantity,
+            price: product.price || 0,
           },
-          quantity: cartQuantity,
-          price: product.price || 0,
-        }];
+        ];
       }
 
       const cartData = { lineItems };
@@ -331,10 +390,16 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
     if (isProductCollection) {
       return productSetItems.map((item, index) => (
         <tr key={`${item.product}-${index}`}>
-          <td className="py-2 font-semibold border-b border-black">{item.product}</td>
-          <td className="border-b border-black font-haasRegular text-center">{item.size}</td>
+          <td className="py-2 font-semibold border-b border-black">
+            {item.product}
+          </td>
+          <td className="border-b border-black font-haasRegular text-center">
+            {item.size}
+          </td>
           {!HIDE_PRICES && (
-            <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+            <td className="text-center border-b border-black font-haasRegular">
+              {item.formattedPrice}
+            </td>
           )}
           <td className="border-b border-black font-haasRegular">
             <QuantityControls
@@ -349,9 +414,13 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
 
     return productInfoSection.map((item, index) => (
       <tr key={`item-${index}`}>
-        <td className="border-b border-black font-haasRegular text-left">{item.size}</td>
+        <td className="border-b border-black font-haasRegular text-left">
+          {item.size}
+        </td>
         {!HIDE_PRICES && (
-          <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+          <td className="text-center border-b border-black font-haasRegular">
+            {item.formattedPrice}
+          </td>
         )}
         <td className="border-b border-black font-haasRegular">
           <QuantityControls
@@ -364,62 +433,65 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
   };
 
   return (
-    <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]'>
-
-      <div className='xl:w-1/2 relative'>
+    <div className="w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]">
+      <div className="lg:w-1/2 w-full relative">
         <ProductSlider product={product} />
-        <ProductSlider_tab product={product} />
-        <SaveProductButton
-          key={product._id}
-          productData={productData}
-        />
+        <ProductSlider_tab product={product} productData={productData} />
       </div>
 
-      <div className='xl:w-1/2 flex flex-col items-center relative'>
-        <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
-          <div className='w-full flex items-center my-8'>
+      <div className="lg:w-1/2 w-full flex flex-col items-center relative h-full">
+        <div className="lg:max-w-[656px] sm:max-w-[492px] w-full flex-1 overflow-y-auto hide-scrollbar">
+          <div className="w-full flex items-center justify-between mt-2 mb-6 relative">
             <BreadCrumbs items={breadcrumbItems} />
+            <SaveProductButton
+              key={product._id}
+              productData={productData}
+              className="lg:flex hidden relative right-0 top-0 md:right-0 md:top-0 shrink-0"
+            />
           </div>
 
           {ribbon && (
-            <div className='mb-3'>
-              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full'>
+            <div className="mb-3">
+              <span className="inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full">
                 {ribbon}
               </span>
             </div>
           )}
-          <h1 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[15px] lg:mb-[28px] sm:mt-[9px] sm:mb-[9px]'>
+          <h1 className="uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[10px] lg:mb-[15px] sm:mt-[9px] sm:mb-[9px]">
             {product.name}
           </h1>
 
           {!HIDE_PRICES && (
-            <div className='lg:mb-[48px] sm:mb-[10px] flex lg:justify-end gap-x-[28px]'>
-              <span className='text-[35px] text-secondary-alt font-recklessRegular'>{totalPrice}</span>
-              <span className='text-[35px] text-secondary-alt font-recklessRegular uppercase'>(total)</span>
+            <div className="lg:mb-[20px] sm:mb-[10px] flex lg:justify-end gap-x-[28px]">
+              <span className="text-[35px] text-secondary-alt font-recklessRegular">
+                {totalPrice}
+              </span>
+              <span className="text-[35px] text-secondary-alt font-recklessRegular uppercase">
+                (total)
+              </span>
             </div>
           )}
 
-          <table className="w-full text-left border-separate border-spacing-y-[24px] mb-20">
+          <table className="w-full text-left border-separate border-spacing-y-[12px] mb-6">
             <thead>
               <tr className="text-xs uppercase text-gray-500 border-b border-black">
                 {visibleHeaders.map((header, index) => (
                   <th
                     key={header.title}
-                    className={`pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'
-                      }`}
+                    className={`pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt ${
+                      index === 0 ? "text-left" : "text-center"
+                    }`}
                   >
                     {header.title}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {renderTableRows()}
-            </tbody>
+            <tbody>{renderTableRows()}</tbody>
           </table>
 
           {isProductCollection && (
-            <p className='text-[11px] text-secondary-alt font-haasLight italic -mt-[14px] mb-6'>
+            <p className="text-[11px] text-secondary-alt font-haasLight italic -mt-[14px] mb-6">
               Items with quantity 0 will not be added to your quote.
             </p>
           )}
@@ -427,7 +499,14 @@ export const Product = ({ data, matchedProducts = [], allCollections = [] }) => 
           <ProductDescription text={product.description} />
         </div>
 
-        <AddToCartButton classes={'lg:!h-[200px] lg:!mt-3'} text={isUpdatingCart ? "Please wait..." : "Add to Quote"} disabled={isUpdatingCart} onClick={handleAddToCart} />
+        <AddToCartButton
+          classes={
+            "h-[80px] md:h-[90px] lg:!h-[113px] lg:!mt-3 lg:w-full lg:max-w-[656px] sm:max-w-[492px] w-full"
+          }
+          text={isUpdatingCart ? "Please wait..." : "Add to Quote"}
+          disabled={isUpdatingCart}
+          onClick={handleAddToCart}
+        />
       </div>
     </div>
   );

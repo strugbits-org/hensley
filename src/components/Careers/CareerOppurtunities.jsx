@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import SectionTitle from "../common/SectionTitle";
 
 import { resolveCoreMediaUrl } from "@/utils";
@@ -8,21 +8,26 @@ const CareerOpportunities = ({ data }) => {
   const { subtitle, title, detail, video } = data;
 
   const videoRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
 
-  const handlePlay = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (video.paused) {
-      video.play();
-    } else {
-      video.pause();
-    }
-  };
-
   const videoSrc = resolveCoreMediaUrl(video);
+
+  useEffect(() => {
+    const videoElement = videoRef.current;
+
+    if (!videoElement) return;
+
+    videoElement.muted = true;
+    videoElement.playsInline = true;
+
+    const playPromise = videoElement.play();
+
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // iOS low power mode may block autoplay
+      });
+    }
+  }, []);
 
   const paragraphs = detail
     ?.split(/\n\s*\n/)
@@ -68,46 +73,17 @@ const CareerOpportunities = ({ data }) => {
             <video
               ref={videoRef}
               src={videoSrc}
-              controls
-              controlsList="nodownload noremoteplayback"
-              loop
+              autoPlay
               muted
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              className="w-full h-full object-cover"
+              loop
+              playsInline
+              webkit-playsinline="true"
+              preload="auto"
+              disablePictureInPicture
+              className="w-full h-full object-cover pointer-events-none"
             >
               Your browser does not support the video tag.
             </video>
-
-            {!isPlaying && (
-              <button
-                onClick={handlePlay}
-                className="absolute inset-0 z-10 flex items-center justify-center"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="lg:h-[172px] lg:w-[172px] sm:h-[154px] sm:w-[154px] h-[85px] w-[85px]"
-                  viewBox="0 0 172 172"
-                >
-                  <g transform="translate(-0.497 0.001)">
-                    <g
-                      transform="translate(0.497 -0.001)"
-                      fill="none"
-                      stroke="#fff"
-                      strokeWidth="3"
-                    >
-                      <circle cx="86" cy="86" r="86" stroke="none" />
-                      <circle cx="86" cy="86" r="84.5" fill="none" />
-                    </g>
-                    <path
-                      d="M42,0,84,74H0Z"
-                      transform="translate(133.497 45) rotate(90)"
-                      fill="#fff"
-                    />
-                  </g>
-                </svg>
-              </button>
-            )}
           </div>
           )}
 
