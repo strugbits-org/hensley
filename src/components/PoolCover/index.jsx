@@ -17,7 +17,7 @@ const ProductPoolCover = ({ productData, matchedProducts = [], allCollections = 
       <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] '>
         <div className='xl:w-1/2 '>
           <ProductSlider product={{ ...covers, mediaItems: covers?.mainMedia ? [{ id: 'main-media', src: covers.mainMedia, alt: covers?.name || '' }] : [] }} />
-          <ProductSlider_tab product={{ ...covers, mediaItems: covers?.mainMedia ? [{ id: 'main-media', src: covers.mainMedia, alt: covers?.name || '' }] : [] }} />
+          <ProductSlider_tab product={{ ...covers, mediaItems: covers?.mainMedia ? [{ id: 'main-media', src: covers.mainMedia, alt: covers?.name || '' }] : [] }} productData={{ ...productData.productData, product: covers }} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
           {ribbon && (

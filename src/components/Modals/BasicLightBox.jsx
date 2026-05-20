@@ -5,7 +5,12 @@ import { PrimaryButton } from '../common/PrimaryButton';
 import { CustomLink } from '../common/CustomLink';
 
 export const BasicLightBox = ({ data, onClose }) => {
-    const { title, description, buttonText, buttonLink, open, disableClose, secondaryButtonText, secondaryButtonLink, onSecondaryClick } = data;
+    const { title, description, buttonText, buttonLink, open, disableClose, secondaryButtonText, secondaryButtonLink, onSecondaryClick, onButtonClick } = data;
+
+    const handlePrimaryClick = () => {
+        if (typeof onButtonClick === 'function') onButtonClick();
+        onClose();
+    };
 
     const handleSecondaryClick = () => {
         if (typeof onSecondaryClick === 'function') onSecondaryClick();
@@ -43,9 +48,13 @@ export const BasicLightBox = ({ data, onClose }) => {
                                     <h2 className='text-center text-[30px] leading-[42px] lg:text-[40px] lg:leading-[42px] uppercase tracking-wider text-secondary-alt font-recklessRegular'>{title}</h2>
                                     <p className='text-center text-[20px] text-secondary-alt font-haasRegular max-w-lg mx-auto'>{description}</p>
                                     <div className='flex flex-col sm:flex-row gap-4 items-center justify-center'>
-                                        <CustomLink to={buttonLink} onClick={onClose}>
-                                            <PrimaryButton className="bg-primary hover:bg-secondary-alt hover:text-primary max-h-[60px] max-w-[240px] px-8 py-4 hover:[letter-spacing:4px]">{buttonText}</PrimaryButton>
-                                        </CustomLink>
+                                        {buttonLink ? (
+                                            <CustomLink to={buttonLink} onClick={onClose}>
+                                                <PrimaryButton className="bg-primary hover:bg-secondary-alt hover:text-primary max-h-[60px] max-w-[240px] px-8 py-4 hover:[letter-spacing:4px]">{buttonText}</PrimaryButton>
+                                            </CustomLink>
+                                        ) : (
+                                            <PrimaryButton onClick={handlePrimaryClick} className="bg-primary hover:bg-secondary-alt hover:text-primary max-h-[60px] max-w-[240px] px-8 py-4 hover:[letter-spacing:4px]">{buttonText}</PrimaryButton>
+                                        )}
                                         {secondaryButtonText && (
                                             secondaryButtonLink ? (
                                                 <CustomLink to={secondaryButtonLink} onClick={handleSecondaryClick}>
