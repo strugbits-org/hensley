@@ -157,14 +157,14 @@ export const QuoteDetails = ({ data, content }) => {
         <div className="w-full border-secondary-alt">
           <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px]">
             <div className="w-full flex justify-center">
-              <div className="w-[608px] bg-[#F5E9C2] rounded-sm p-5 flex justify-center">
-                <div className="flex lg:flex-row flex-col items-center space-x-10">
-                  <p className="font-medium lg:text-[16px] text-[25px] text-secondary-alt font-recklessRegular tracking-wide lg:mb-0 mb-[22px]">
+              <div className="w-[608px] max-w-full bg-[#F5E9C2] rounded-sm p-5 flex justify-center">
+                <div className="flex lg:flex-row flex-col items-center lg:space-x-10 lg:space-y-0 space-y-3">
+                  <p className="font-medium lg:text-[16px] text-[25px] text-secondary-alt font-recklessRegular tracking-wide lg:mb-0 mb-0">
                     YOUR ORDER IS:
                   </p>
-                  <div className="flex gap-x-[48px]">
+                  <div className="flex gap-x-[24px] sm:gap-x-[48px]">
                     {formContent.orderTypes.map((type) => (
-                      <label key={type.id} className="inline-flex items-center cursor-default">
+                      <label key={type.id} className="inline-flex items-center cursor-default whitespace-nowrap">
                         <input
                           type="radio"
                           name="orderType"
@@ -173,7 +173,7 @@ export const QuoteDetails = ({ data, content }) => {
                           className="form-radio h-[34px] w-[34px] accent-[#57442D] focus:ring-[#57442D] pointer-events-none"
                           readOnly
                         />
-                        <span className="ml-2 font-medium text-secondary-alt font-recklessRegular">
+                        <span className="ml-2 font-medium text-secondary-alt font-recklessRegular whitespace-nowrap">
                           {type.label}
                         </span>
                       </label>

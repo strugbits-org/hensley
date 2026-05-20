@@ -1,9 +1,15 @@
-import React, { useMemo, useState } from 'react'
-import { PrimaryImage } from '../common/PrimaryImage';
-import { calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError } from '@/utils';
-import { lightboxActions } from '@/store/lightboxStore';
-import { AddProductToCart } from '@/services/cart/CartApis';
-import { useCookies } from 'react-cookie';
+import React, { useMemo, useState } from "react";
+import { PrimaryImage } from "../common/PrimaryImage";
+import {
+  calculateTotalCartQuantity,
+  formatDescriptionLines,
+  formatTotalPrice,
+  HIDE_PRICES,
+  logError,
+} from "@/utils";
+import { lightboxActions } from "@/store/lightboxStore";
+import { AddProductToCart } from "@/services/cart/CartApis";
+import { useCookies } from "react-cookie";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 
@@ -14,507 +20,879 @@ const CART_APP_ID = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
 // the Payload-shaped rows surfaced by the View Quote modal, which expose the
 // product id on `_id` and custom fields on `customTextFields`.
 const buildLineItemFromRowData = (data) => {
-    if (!data) return null;
+  if (!data) return null;
 
-    if (data.catalogReference?.catalogItemId) {
-        const item = {
-            catalogReference: data.catalogReference,
-            quantity: Number(data.quantity) || 1,
-        };
-        if (Array.isArray(data.setItems) && data.setItems.length > 0) item.setItems = data.setItems;
-        return item;
-    }
-
-    const productId = data.productId || data._id || data.id;
-    if (!productId) return null;
-
-    const customTextFieldsArray = Array.isArray(data.customTextFields) ? data.customTextFields : [];
-    const customTextFieldsData = customTextFieldsArray.reduce((acc, { title, value }) => {
-        if (title) acc[title] = value;
-        return acc;
-    }, {});
-    if (data.size && !customTextFieldsData.size) customTextFieldsData.size = data.size;
-
+  if (data.catalogReference?.catalogItemId) {
     const item = {
-        catalogReference: {
-            appId: CART_APP_ID,
-            catalogItemId: productId,
-            options: {
-                variantId: data.variantId || data.variant?.id || null,
-                options: data.selectedOptions || null,
-                customTextFields: customTextFieldsData,
-            },
-        },
-        quantity: Number(data.quantity) || 1,
-        priceAtAdd: Number(data.unitPrice ?? data.priceAtAdd ?? data.price ?? 0) || 0,
+      catalogReference: data.catalogReference,
+      quantity: Number(data.quantity) || 1,
     };
-    if (Array.isArray(data.setItems) && data.setItems.length > 0) item.setItems = data.setItems;
+    if (Array.isArray(data.setItems) && data.setItems.length > 0)
+      item.setItems = data.setItems;
     return item;
+  }
+
+  const productId = data.productId || data._id || data.id;
+  if (!productId) return null;
+
+  const customTextFieldsArray =
+    Array.isArray(data.customTextFields) ? data.customTextFields : [];
+  const customTextFieldsData = customTextFieldsArray.reduce(
+    (acc, { title, value }) => {
+      if (title) acc[title] = value;
+      return acc;
+    },
+    {},
+  );
+  if (data.size && !customTextFieldsData.size)
+    customTextFieldsData.size = data.size;
+
+  const item = {
+    catalogReference: {
+      appId: CART_APP_ID,
+      catalogItemId: productId,
+      options: {
+        variantId: data.variantId || data.variant?.id || null,
+        options: data.selectedOptions || null,
+        customTextFields: customTextFieldsData,
+      },
+    },
+    quantity: Number(data.quantity) || 1,
+    priceAtAdd:
+      Number(data.unitPrice ?? data.priceAtAdd ?? data.price ?? 0) || 0,
+  };
+  if (Array.isArray(data.setItems) && data.setItems.length > 0)
+    item.setItems = data.setItems;
+  return item;
 };
 
-const INFO_HEADERS = [
-    'Product',
-    'Size',
-    'Price',
-    'Quantity'
-];
+const INFO_HEADERS = ["Product", "Size", "Price", "Quantity"];
 
-const visibleInfoHeaders = HIDE_PRICES
-    ? INFO_HEADERS.filter(title => title !== 'Price')
-    : INFO_HEADERS;
+const visibleInfoHeaders =
+  HIDE_PRICES ?
+    INFO_HEADERS.filter((title) => title !== "Price")
+  : INFO_HEADERS;
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
-const QuantityControls = ({ quantity, onQuantityChange, readOnly, minQuantity = QUANTITY_LIMITS.MIN }) => (
-    <div className="mx-auto h-full w-[120px] border-b border-secondary-alt pb-1 flex items-end justify-center font-haasRegular">
-        {!readOnly ? (
-            <>
-                <button
-                    className="h-[20px] select-none text-xl font-light hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
-                    onClick={() => onQuantityChange(quantity - 1)}
-                    disabled={quantity <= minQuantity}
-                    aria-label="Decrease quantity"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="1" viewBox="0 0 15 1">
-                        <line id="Line_460" data-name="Line 460" x1="15" transform="translate(15 0.5) rotate(180)" fill="none" stroke="#000" strokeWidth="1" />
-                    </svg>
-                </button>
-                <input
-                    className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
-                    type="number"
-                    min={minQuantity}
-                    max={QUANTITY_LIMITS.MAX}
-                    value={quantity}
-                    onInput={(e) => {
-                        const parsed = parseInt(e.target.value, 10);
-                        onQuantityChange(Number.isFinite(parsed) ? parsed : minQuantity, true);
-                    }}
-                    aria-label="Quantity"
-                />
-                <button
-                    className="select-none text-xl font-light hover:opacity-70 transition-opacity"
-                    onClick={() => onQuantityChange(quantity + 1)}
-                    disabled={quantity >= QUANTITY_LIMITS.MAX}
-                    aria-label="Increase quantity"
-                >
-                    <svg id="Group_3960" data-name="Group 3960" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 15 15">
-                        <line id="Line_1" data-name="Line 1" y2="15" transform="translate(7.5 15) rotate(180)" fill="none" stroke="#000" strokeWidth="1" />
-                        <line id="Line_2" data-name="Line 2" x1="15" transform="translate(15 7.5) rotate(180)" fill="none" stroke="#000" strokeWidth="1" />
-                    </svg>
-
-                </button></>
-        ) : (
-            <input
-                className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
-                type="number"
-                value={quantity}
-                aria-label="Quantity"
-                readOnly
+const QuantityControls = ({
+  quantity,
+  onQuantityChange,
+  readOnly,
+  minQuantity = QUANTITY_LIMITS.MIN,
+}) => (
+  <div className="mx-auto h-full w-[120px] border-b border-secondary-alt pb-1 flex items-end justify-center font-haasRegular">
+    {!readOnly ?
+      <>
+        <button
+          className="h-[20px] select-none text-xl font-light hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+          onClick={() => onQuantityChange(quantity - 1)}
+          disabled={quantity <= minQuantity}
+          aria-label="Decrease quantity"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="1"
+            viewBox="0 0 15 1"
+          >
+            <line
+              id="Line_460"
+              data-name="Line 460"
+              x1="15"
+              transform="translate(15 0.5) rotate(180)"
+              fill="none"
+              stroke="#000"
+              strokeWidth="1"
             />
-        )}
-    </div>
+          </svg>
+        </button>
+        <input
+          className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+          type="number"
+          min={minQuantity}
+          max={QUANTITY_LIMITS.MAX}
+          value={quantity}
+          onInput={(e) => {
+            const parsed = parseInt(e.target.value, 10);
+            onQuantityChange(
+              Number.isFinite(parsed) ? parsed : minQuantity,
+              true,
+            );
+          }}
+          aria-label="Quantity"
+        />
+        <button
+          className="select-none text-xl font-light hover:opacity-70 transition-opacity"
+          onClick={() => onQuantityChange(quantity + 1)}
+          disabled={quantity >= QUANTITY_LIMITS.MAX}
+          aria-label="Increase quantity"
+        >
+          <svg
+            id="Group_3960"
+            data-name="Group 3960"
+            xmlns="http://www.w3.org/2000/svg"
+            width="15"
+            height="15"
+            viewBox="0 0 15 15"
+          >
+            <line
+              id="Line_1"
+              data-name="Line 1"
+              y2="15"
+              transform="translate(7.5 15) rotate(180)"
+              fill="none"
+              stroke="#000"
+              strokeWidth="1"
+            />
+            <line
+              id="Line_2"
+              data-name="Line 2"
+              x1="15"
+              transform="translate(15 7.5) rotate(180)"
+              fill="none"
+              stroke="#000"
+              strokeWidth="1"
+            />
+          </svg>
+        </button>
+      </>
+    : <input
+        className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+        type="number"
+        value={quantity}
+        aria-label="Quantity"
+        readOnly
+      />
+    }
+  </div>
 );
 
-const renderTableRows = ({ productInfoSection, quantity, handleQuantityChange, readOnly, minQuantity }) => {
-    return productInfoSection.map((item, index) => (
-        <tr className='border-b border-primary-border align-bottom' key={`item-${index}`}>
-            <td className="pt-2 pb-4 font-semibold lg:block hidden min-w-[260px]">{item.product}</td>
-            <td className="pt-2 pb-4 font-haasRegular text-center ">{item.size}</td>
+const renderTableRows = ({
+  productInfoSection,
+  quantity,
+  handleQuantityChange,
+  readOnly,
+  minQuantity,
+}) => {
+  return productInfoSection.map((item, index) => (
+    <tr
+      className="border-b border-primary-border align-bottom"
+      key={`item-${index}`}
+    >
+      <td className="pt-2 pb-4 font-semibold lg:block hidden min-w-[260px]">
+        {item.product}
+      </td>
+      <td className="pt-2 pb-4 font-haasRegular text-center ">{item.size}</td>
+      {!HIDE_PRICES && (
+        <td className="pt-2 pb-4 text-center font-haasRegular">
+          {item.formattedPrice}
+        </td>
+      )}
+      <td className="pt-2 pb-4 font-haasRegular">
+        <QuantityControls
+          quantity={quantity || item.quantity}
+          onQuantityChange={(value, isDisabled) =>
+            handleQuantityChange(value, item._id || item.product, isDisabled)
+          }
+          readOnly={readOnly}
+          minQuantity={minQuantity}
+        />
+      </td>
+    </tr>
+  ));
+};
+
+const CartTent = ({
+  data,
+  descriptionLines,
+  actions = {},
+  readOnly = false,
+  showAddToCart = false,
+}) => {
+  const [cookies, setCookie] = useCookies(["cartQuantity"]);
+  const { removeProduct } = actions;
+  const productName =
+    data?.productName?.original ||
+    data?.productTitle ||
+    data?.name ||
+    data?.title;
+  const systemFields = ["POOLCOVER", "RELEVENT IMAGES"];
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleAddToCart = async () => {
+    try {
+      setIsLoading(true);
+      const product = buildLineItemFromRowData(data);
+      if (!product) {
+        logError("Cannot add item to cart — missing product id", data);
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Unable to add item",
+          description: "This product is no longer available.",
+          buttonText: "OK",
+          open: true,
+        });
+        return;
+      }
+
+      const cartData = { lineItems: [product] };
+
+      await AddProductToCart(cartData);
+      const newItems = calculateTotalCartQuantity(cartData.lineItems);
+      const total =
+        cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      setCookie("cartQuantity", total, { path: "/" });
+      lightboxActions.setBasicLightBoxDetails({
+        title: "Added to Cart",
+        description: "Products added to cart successfully",
+        buttonText: "View Cart",
+        buttonLink: "/cart",
+        open: true,
+      });
+    } catch (error) {
+      logError("Error while adding products to cart:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  return (
+    <div className="border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative">
+      <div className="h-[104px] w-[104px] bg-white">
+        <PrimaryImage
+          url={data?.image || data?.mediaItem?.src}
+          defaultDimensions={{ width: 350, height: 350 }}
+          alt={productName}
+          customClasses="h-full w-full object-contain"
+        />
+      </div>
+      <div className="w-full flex lg:flex-row flex-col lg:items-center pr-[45px] lg:pr-0">
+        <div>
+          <span className="block text-[16px] text-secondary-alt font-haasLight uppercase">
+            Product
+          </span>
+          <span className="block text-[16px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]">
+            {productName}
+          </span>
+          <div className="grid sm:grid-cols-2 grid-cols-1 gap-x-[26px] gap-y-[4px]">
+            {descriptionLines.map(({ title, value }) =>
+              systemFields.includes(title) ? null : (
+                <div key={title}>
+                  <span className="text-[12px] text-secondary-alt font-haasBold uppercase mr-[20px]">
+                    {title}
+                  </span>
+                  <span className="text-[12px] text-secondary-alt font-haasLight uppercase">
+                    {value}
+                  </span>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+        {showAddToCart && (
+          <button
+            onClick={handleAddToCart}
+            disabled={isLoading}
+            className="ml-auto break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300"
+          >
+            <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
+            <svg
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              width="7.169"
+              height="6.855"
+              viewBox="0 0 7.169 6.855"
+            >
+              <g
+                id="Group_3746"
+                data-name="Group 3746"
+                transform="translate(0.314 0.426)"
+              >
+                <g
+                  id="Group_2072"
+                  data-name="Group 2072"
+                  transform="translate(0 0)"
+                >
+                  <path
+                    id="Path_3283"
+                    data-name="Path 3283"
+                    d="M0,0H6.355V6.355"
+                    transform="translate(0 0.074)"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeMiterlimit="10"
+                    strokeWidth="1"
+                  />
+                  <line
+                    id="Line_14"
+                    data-name="Line 14"
+                    x1="6.326"
+                    y2="5.971"
+                    transform="translate(0.029 0)"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeMiterlimit="10"
+                    strokeWidth="1"
+                  />
+                </g>
+              </g>
+            </svg>
+          </button>
+        )}
+      </div>
+
+      {!readOnly && (
+        <button
+          onClick={() => removeProduct([data._id])}
+          className="absolute right-[24px] sm:top-[50px] top-[15px]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24.707"
+            height="24.707"
+            viewBox="0 0 24.707 24.707"
+          >
+            <g
+              id="Group_3737"
+              data-name="Group 3737"
+              transform="translate(-473.646 -948.646)"
+            >
+              <line
+                id="Line_259"
+                data-name="Line 259"
+                x2="24"
+                y2="24"
+                transform="translate(474 949)"
+                fill="none"
+                stroke="#fe120d"
+                strokeWidth="1"
+              />
+              <line
+                id="Line_260"
+                data-name="Line 260"
+                y1="24"
+                x2="24"
+                transform="translate(474 949)"
+                fill="none"
+                stroke="#fe120d"
+                strokeWidth="1"
+              />
+            </g>
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+};
+
+const CartCollection = ({
+  data,
+  actions = {},
+  readOnly = false,
+  enableQuantityControls = false,
+  showAddToCart = false,
+  addToCartButtonLabel = "",
+}) => {
+  const { removeProduct, handleQuantityChange } = actions;
+  const [cookies, setCookie] = useCookies(["cartQuantity"]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const productName =
+    data?.productName?.original ||
+    data?.productTitle ||
+    data?.name ||
+    data?.title;
+
+  // Support both new structured setItems format and old string format
+  const productInfoSection = useMemo(() => {
+    // Check for new setItems format first
+    if (
+      data.setItems &&
+      Array.isArray(data.setItems) &&
+      data.setItems.length > 0
+    ) {
+      return data.setItems
+        .map((item) => ({
+          product:
+            item.productName ||
+            (typeof item.product === "object" ?
+              item.product?.title || item.product?.name
+            : item.product) ||
+            "",
+          size: item.size || "",
+          price: parseFloat(item.unitPrice) || 0,
+          quantity: parseInt(item.quantity, 10) || 0,
+          formattedPrice: formatTotalPrice(parseFloat(item.unitPrice) || 0),
+        }))
+        .filter((item) => item.quantity > 0);
+    }
+
+    // Fall back to old string format (productSetItems)
+    if (data.productSetItems && Array.isArray(data.productSetItems)) {
+      return data.productSetItems.map((item) => {
+        const set = item.split("~");
+        const price = parseFloat(set[2]);
+        const quantity = parseInt(set[3]);
+
+        return {
+          product: set[0],
+          size: set[1],
+          price,
+          quantity,
+          formattedPrice: formatTotalPrice(price),
+        };
+      });
+    }
+
+    return [];
+  }, [data.setItems, data.productSetItems]);
+
+  const price = useMemo(
+    () =>
+      productInfoSection.reduce(
+        (acc, { price, quantity }) => acc + price * quantity,
+        0,
+      ),
+    [productInfoSection],
+  );
+  const formattedPrice = formatTotalPrice(price);
+
+  const handleAddToCart = async () => {
+    try {
+      setIsLoading(true);
+      const product = buildLineItemFromRowData(data);
+      if (!product) {
+        logError("Cannot add item to cart — missing product id", data);
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Unable to add item",
+          description: "This product is no longer available.",
+          buttonText: "OK",
+          open: true,
+        });
+        return;
+      }
+
+      const cartData = { lineItems: [product] };
+
+      await AddProductToCart(cartData);
+      const newItems = calculateTotalCartQuantity(cartData.lineItems);
+      const total =
+        cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      setCookie("cartQuantity", total, { path: "/" });
+      lightboxActions.setBasicLightBoxDetails({
+        title: "Added to Cart",
+        description: "Products added to cart successfully",
+        buttonText: "View Cart",
+        buttonLink: "/cart",
+        open: true,
+      });
+    } catch (error) {
+      logError("Error while adding products to cart:", error);
+      lightboxActions.setBasicLightBoxDetails({
+        title: "Something went wrong",
+        description: "Error while adding products to cart",
+        buttonText: "Try Again",
+        open: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative">
+      <div
+        className="
+            h-[104px]
+            w-[104px]
+            min-w-[50px]
+           bg-white
+            "
+      >
+        <PrimaryImage
+          url={data?.image || data?.mediaItem?.src}
+          defaultDimensions={{ width: 350, height: 350 }}
+          alt={productName}
+          customClasses="h-full w-full object-contain"
+        />
+      </div>
+      <div className="w-full lg:flex justify-between items-center pr-[45px] lg:pr-0">
+        <div className="w-full flex flex-col">
+          <div className="sm:flex justify-between items-center sm:h-[104px]">
+            <span className="block lg:text-[16px] text-[20px] font-medium text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]">
+              {productName}
+            </span>
             {!HIDE_PRICES && (
-                <td className="pt-2 pb-4 text-center font-haasRegular">{item.formattedPrice}</td>
+              <span className="block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px] mr-[100px]">
+                {formattedPrice}
+              </span>
             )}
-            <td className="pt-2 pb-4 font-haasRegular">
-                <QuantityControls
-                    quantity={quantity || item.quantity}
-                    onQuantityChange={(value, isDisabled) => handleQuantityChange(value, item._id || item.product, isDisabled)}
-                    readOnly={readOnly}
-                    minQuantity={minQuantity}
-                />
-            </td>
-        </tr>
-    ));
-};
-
-const CartTent = ({ data, descriptionLines, actions = {}, readOnly = false, showAddToCart = false }) => {
-    const [cookies, setCookie] = useCookies(["cartQuantity"]);
-    const { removeProduct } = actions;
-    const productName = data?.productName?.original || data?.productTitle || data?.name || data?.title;
-    const systemFields = ["POOLCOVER", "RELEVENT IMAGES"];
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleAddToCart = async () => {
-        try {
-            setIsLoading(true);
-            const product = buildLineItemFromRowData(data);
-            if (!product) {
-                logError("Cannot add item to cart — missing product id", data);
-                lightboxActions.setBasicLightBoxDetails({
-                    title: "Unable to add item",
-                    description: "This product is no longer available.",
-                    buttonText: "OK",
-                    open: true,
-                });
-                return;
-            }
-
-            const cartData = { lineItems: [product] };
-
-            await AddProductToCart(cartData);
-            const newItems = calculateTotalCartQuantity(cartData.lineItems);
-            const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
-            setCookie("cartQuantity", total, { path: "/" });
-            lightboxActions.setBasicLightBoxDetails({
-                title: "Added to Cart",
-                description: "Products added to cart successfully",
-                buttonText: "View Cart",
-                buttonLink: "/cart",
-                open: true,
-            })
-        } catch (error) {
-            logError("Error while adding products to cart:", error);
-        } finally {
-            setIsLoading(false);
-        }
-    }
-    return (
-        <div className='border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
-            <div className='h-[104px] w-[104px] bg-white'>
-                <PrimaryImage url={data?.image || data?.mediaItem?.src} defaultDimensions={{ width: 350, height: 350 }} alt={productName} customClasses='h-full w-full object-contain' />
-            </div>
-            <div className='w-full flex lg:flex-row flex-col lg:items-center'>
-                <div>
-                    <span className='block text-[16px] text-secondary-alt font-haasLight uppercase'>Product</span>
-                    <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
-                    <div className='grid sm:grid-cols-2 grid-cols-1 gap-x-[26px] gap-y-[4px]'>
-                        {descriptionLines.map(({ title, value }) => systemFields.includes(title) ? null : (
-                            <div key={title}>
-                                <span className='text-[12px] text-secondary-alt font-haasBold uppercase mr-[20px]'>{title}</span>
-                                <span className='text-[12px] text-secondary-alt font-haasLight uppercase'>{value}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='ml-auto break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
-                    <span>{isLoading ? "Adding..." : "Add to Cart"}</span>
-                    <svg fill='currentColor' xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
-                        <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
-                            <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
-                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
-                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
-                            </g>
-                        </g>
-                    </svg>
-                </button>}
-            </div>
-
-            {!readOnly && (
-                <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[50px] top-[15px]'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                        <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                            <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                            <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                        </g>
-                    </svg>
-                </button>
-            )}
+          </div>
+          <table className="lg:max-w-[766px] max-w-full w-full text-left border-spacing-y-[15px] border-collapse">
+            <thead>
+              <tr className="text-xs uppercase text-gray-500">
+                {visibleInfoHeaders.map((title, index) => (
+                  <th
+                    key={title}
+                    className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? "text-left" : "text-center"}`}
+                  >
+                    {title}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {renderTableRows({
+                handleQuantityChange,
+                productInfoSection: productInfoSection,
+                readOnly: enableQuantityControls ? false : readOnly,
+                showBorders: true,
+                minQuantity: 0,
+              })}
+            </tbody>
+          </table>
         </div>
-    );
+
+        {showAddToCart && (
+          <button
+            onClick={handleAddToCart}
+            disabled={isLoading}
+            className="min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300"
+          >
+            <span>
+              {isLoading ?
+                "PLEASE WAIT..."
+              : addToCartButtonLabel || "Add to Cart"}
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="7.169"
+              height="6.855"
+              viewBox="0 0 7.169 6.855"
+            >
+              <g
+                id="Group_3746"
+                data-name="Group 3746"
+                transform="translate(0.314 0.426)"
+              >
+                <g
+                  id="Group_2072"
+                  data-name="Group 2072"
+                  transform="translate(0 0)"
+                >
+                  <path
+                    id="Path_3283"
+                    data-name="Path 3283"
+                    d="M0,0H6.355V6.355"
+                    transform="translate(0 0.074)"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeMiterlimit="10"
+                    strokeWidth="1"
+                  />
+                  <line
+                    id="Line_14"
+                    data-name="Line 14"
+                    x1="6.326"
+                    y2="5.971"
+                    transform="translate(0.029 0)"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeMiterlimit="10"
+                    strokeWidth="1"
+                  />
+                </g>
+              </g>
+            </svg>
+          </button>
+        )}
+      </div>
+      {!readOnly && (
+        <button
+          onClick={() => removeProduct([data._id])}
+          className="absolute right-[24px] sm:top-[35px] top-[15px]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24.707"
+            height="24.707"
+            viewBox="0 0 24.707 24.707"
+          >
+            <g
+              id="Group_3737"
+              data-name="Group 3737"
+              transform="translate(-473.646 -948.646)"
+            >
+              <line
+                id="Line_259"
+                data-name="Line 259"
+                x2="24"
+                y2="24"
+                transform="translate(474 949)"
+                fill="none"
+                stroke="#fe120d"
+                strokeWidth="1"
+              />
+              <line
+                id="Line_260"
+                data-name="Line 260"
+                y1="24"
+                x2="24"
+                transform="translate(474 949)"
+                fill="none"
+                stroke="#fe120d"
+                strokeWidth="1"
+              />
+            </g>
+          </svg>
+        </button>
+      )}
+    </div>
+  );
 };
 
-const CartCollection = ({ data, actions = {}, readOnly = false, enableQuantityControls = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
-    const { removeProduct, handleQuantityChange } = actions;
-    const [cookies, setCookie] = useCookies(["cartQuantity"]);
-    const [isLoading, setIsLoading] = useState(false);
+const CartNormal = ({
+  data,
+  actions = {},
+  readOnly = false,
+  enableQuantityControls = false,
+  showAddToCart = false,
+  addToCartButtonLabel = "",
+}) => {
+  const { removeProduct, handleQuantityChange } = actions;
+  const [cookies, setCookie] = useCookies(["cartQuantity"]);
+  const [isLoading, setIsLoading] = useState(false);
+  const productName =
+    data?.productName?.original ||
+    data?.productTitle ||
+    data?.name ||
+    data?.title;
 
-    const productName = data?.productName?.original || data?.productTitle || data?.name || data?.title;
+  const productSize = () => {
+    if (!data.customTextFields) return data.size;
+    return data.customTextFields.find((x) => x.title === "size")?.value;
+  };
+  const price = (data?.price?.amount || data.price) * data.quantity;
+  const formattedPrice = formatTotalPrice(price);
 
-    // Support both new structured setItems format and old string format
-    const productInfoSection = useMemo(() => {
-        // Check for new setItems format first
-        if (data.setItems && Array.isArray(data.setItems) && data.setItems.length > 0) {
-            return data.setItems
-                .map(item => ({
-                    product: item.productName ||
-                        (typeof item.product === 'object'
-                            ? (item.product?.title || item.product?.name)
-                            : item.product) ||
-                        '',
-                    size: item.size || '',
-                    price: parseFloat(item.unitPrice) || 0,
-                    quantity: parseInt(item.quantity, 10) || 0,
-                    formattedPrice: formatTotalPrice(parseFloat(item.unitPrice) || 0),
-                }))
-                .filter(item => item.quantity > 0);
-        }
-        
-        // Fall back to old string format (productSetItems)
-        if (data.productSetItems && Array.isArray(data.productSetItems)) {
-            return data.productSetItems.map(item => {
-                const set = item.split("~");
-                const price = parseFloat(set[2]);
-                const quantity = parseInt(set[3]);
+  const productInfoSection = [
+    {
+      product: productName,
+      price: data?.price?.amount || data?.price,
+      size: productSize(),
+      formattedPrice:
+        data?.fullPrice?.formattedAmount || formatTotalPrice(data.price),
+      _id: data._id || data.id,
+    },
+  ];
 
-                return {
-                    product: set[0],
-                    size: set[1],
-                    price,
-                    quantity,
-                    formattedPrice: formatTotalPrice(price),
-                };
-            });
-        }
-        
-        return [];
-    }, [data.setItems, data.productSetItems]);
+  const handleAddToCart = async () => {
+    try {
+      setIsLoading(true);
+      const product = buildLineItemFromRowData(data);
+      if (!product) {
+        logError("Cannot add item to cart — missing product id", data);
+        lightboxActions.setBasicLightBoxDetails({
+          title: "Unable to add item",
+          description: "This product is no longer available.",
+          buttonText: "OK",
+          open: true,
+        });
+        return;
+      }
 
-    const price = useMemo(() =>
-        productInfoSection.reduce((acc, { price, quantity }) => acc + (price * quantity), 0),
-        [productInfoSection]
-    );
-    const formattedPrice = formatTotalPrice(price);
+      const cartData = { lineItems: [product] };
 
-    const handleAddToCart = async () => {
-        try {
-            setIsLoading(true);
-            const product = buildLineItemFromRowData(data);
-            if (!product) {
-                logError("Cannot add item to cart — missing product id", data);
-                lightboxActions.setBasicLightBoxDetails({
-                    title: "Unable to add item",
-                    description: "This product is no longer available.",
-                    buttonText: "OK",
-                    open: true,
-                });
-                return;
-            }
-
-            const cartData = { lineItems: [product] };
-
-            await AddProductToCart(cartData);
-            const newItems = calculateTotalCartQuantity(cartData.lineItems);
-            const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
-            setCookie("cartQuantity", total, { path: "/" });
-            lightboxActions.setBasicLightBoxDetails({
-                title: "Added to Cart",
-                description: "Products added to cart successfully",
-                buttonText: "View Cart",
-                buttonLink: "/cart",
-                open: true,
-            })
-        } catch (error) {
-            logError("Error while adding products to cart:", error);
-            lightboxActions.setBasicLightBoxDetails({
-                title: "Something went wrong",
-                description: "Error while adding products to cart",
-                buttonText: "Try Again",
-                open: true,
-            })
-        } finally {
-            setIsLoading(false);
-        }
+      await AddProductToCart(cartData);
+      const newItems = calculateTotalCartQuantity(cartData.lineItems);
+      const total =
+        cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      setCookie("cartQuantity", total, { path: "/" });
+      lightboxActions.setBasicLightBoxDetails({
+        title: "Added to Cart",
+        description: "Products added to cart successfully",
+        buttonText: "View Cart",
+        buttonLink: "/cart",
+        open: true,
+      });
+    } catch (error) {
+      logError("Error while adding products to cart:", error);
+      lightboxActions.setBasicLightBoxDetails({
+        title: "Something went wrong",
+        description: "Error while adding products to cart",
+        buttonText: "Try Again",
+        open: true,
+      });
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    return (
-        <div className='border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative'>
-            <div className='
+  return (
+    <div className="border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex ">
+      <div
+        className="
             h-[104px]
             w-[104px]
             min-w-[50px]
            bg-white
-            '>
-                <PrimaryImage url={data?.image || data?.mediaItem?.src} defaultDimensions={{ width: 350, height: 350 }} alt={productName} customClasses='h-full w-full object-contain' />
-            </div>
-            <div className='w-full lg:flex justify-between items-center'>
-                <div className='w-full flex flex-col'>
-                    <div className='sm:flex justify-between items-center sm:h-[104px]'>
-                        <span className='block lg:text-[16px] text-[20px] font-medium text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]'>{productName}</span>
-                        {!HIDE_PRICES && (
-                            <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px] mr-[100px]'>{formattedPrice}</span>
-                        )}
-                    </div>
-                    <table className="lg:max-w-[766px] max-w-full w-full text-left border-spacing-y-[15px] border-collapse">
-                        <thead>
-                            <tr className="text-xs uppercase text-gray-500">
-                                {visibleInfoHeaders.map((title, index) => (
-                                    <th
-                                        key={title}
-                                        className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}
-                                    >
-                                        {title}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {renderTableRows({ handleQuantityChange, productInfoSection: productInfoSection, readOnly: enableQuantityControls ? false : readOnly, showBorders: true, minQuantity: 0 })}
-                        </tbody>
-                    </table>
-                </div>
-
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
-                    <span>{isLoading ? "PLEASE WAIT..." : (addToCartButtonLabel || "Add to Cart")}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
-                        <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
-                            <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
-                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
-                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
-                            </g>
-                        </g>
-                    </svg>
-                </button>
-                }
-            </div>
-            {!readOnly && (
-                <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                        <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                            <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                            <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                        </g>
-                    </svg>
-                </button>
-            )}
-        </div>
-    )
-}
-
-const CartNormal = ({ data, actions = {}, readOnly = false, enableQuantityControls = false, showAddToCart = false, addToCartButtonLabel = '' }) => {
-    const { removeProduct, handleQuantityChange } = actions;
-    const [cookies, setCookie] = useCookies(["cartQuantity"]);
-    const [isLoading, setIsLoading] = useState(false);
-    const productName = data?.productName?.original || data?.productTitle || data?.name || data?.title;
-
-    const productSize = () => {
-        if (!data.customTextFields) return data.size;
-        return data.customTextFields.find(x => x.title === "size")?.value;
-    }
-    const price = (data?.price?.amount || data.price) * data.quantity;
-    const formattedPrice = formatTotalPrice(price);
-
-    const productInfoSection = [
-        {
-            product: productName,
-            price: data?.price?.amount || data?.price,
-            size: productSize(),
-            formattedPrice: data?.fullPrice?.formattedAmount || formatTotalPrice(data.price),
-            _id: data._id || data.id
-        }
-    ]
-
-    const handleAddToCart = async () => {
-        try {
-            setIsLoading(true);
-            const product = buildLineItemFromRowData(data);
-            if (!product) {
-                logError("Cannot add item to cart — missing product id", data);
-                lightboxActions.setBasicLightBoxDetails({
-                    title: "Unable to add item",
-                    description: "This product is no longer available.",
-                    buttonText: "OK",
-                    open: true,
-                });
-                return;
-            }
-
-            const cartData = { lineItems: [product] };
-
-            await AddProductToCart(cartData);
-            const newItems = calculateTotalCartQuantity(cartData.lineItems);
-            const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
-            setCookie("cartQuantity", total, { path: "/" });
-            lightboxActions.setBasicLightBoxDetails({
-                title: "Added to Cart",
-                description: "Products added to cart successfully",
-                buttonText: "View Cart",
-                buttonLink: "/cart",
-                open: true,
-            })
-        } catch (error) {
-            logError("Error while adding products to cart:", error);
-            lightboxActions.setBasicLightBoxDetails({
-                title: "Something went wrong",
-                description: "Error while adding products to cart",
-                buttonText: "Try Again",
-                open: true,
-            })
-        } finally {
-            setIsLoading(false);
-        }
-    }
-
-    return (
-        <div className='border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex '>
-            <div className='
-            h-[104px]
-            w-[104px]
-            min-w-[50px]
-           bg-white
-            '>
-                <PrimaryImage url={data?.mediaItem?.src} alt={productName} customClasses='h-full w-full object-contain' />
-            </div>
-            <div className='w-full lg:flex justify-between items-center'>
-                <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>
-                    <span className='block 
+            "
+      >
+        <PrimaryImage
+          url={data?.mediaItem?.src}
+          alt={productName}
+          customClasses="h-full w-full object-contain"
+        />
+      </div>
+      <div className="w-full lg:flex justify-between items-center pr-[45px] lg:pr-0">
+        <div className="sm:flex lg:hidden justify-between items-center sm:h-[104px]">
+          <span
+            className="block 
                 lg:text-[16px]
                 text-[20px]
                  text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
                 lg:mb-[27px]
-                '>{productName}</span>
+                "
+          >
+            {productName}
+          </span>
 
-                    {!HIDE_PRICES && (
-                        <span className='block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase
+          {!HIDE_PRICES && (
+            <span
+              className="block lg:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
                 lg:mb-[27px]
                 mr-[100px]
-                '>{data.price?.amount || data.price}</span>
-                    )}
-                </div>
-                <table className="max-lg:border-b max-lg:mb-4 border-primary-border lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left lg:border-separate lg:border-spacing-y-[15px] border-spacing-y-[12px] xl:pr-[30px] lg:pr-[50px] ">
-                    <thead>
-                        <tr className="text-xs uppercase text-gray-500 ">
-                            {visibleInfoHeaders.map((title, index) => (
-                                <th
-                                    key={title}
-                                    className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}
-                                >
-                                    {title}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {renderTableRows({ handleQuantityChange, quantity: data.quantity, productInfoSection: productInfoSection, readOnly: enableQuantityControls ? false : readOnly })}
-                    </tbody>
-                </table>
-                {!HIDE_PRICES && (
-                    <span className='lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] '>{formattedPrice}</span>
-                )}
-
-                {showAddToCart && <button onClick={handleAddToCart} disabled={isLoading} className='break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300'>
-                    <span>{isLoading ? "PLEASE WAIT..." : (addToCartButtonLabel || "Add to Cart")}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="7.169" height="6.855" viewBox="0 0 7.169 6.855">
-                        <g id="Group_3746" data-name="Group 3746" transform="translate(0.314 0.426)">
-                            <g id="Group_2072" data-name="Group 2072" transform="translate(0 0)">
-                                <path id="Path_3283" data-name="Path 3283" d="M0,0H6.355V6.355" transform="translate(0 0.074)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
-                                <line id="Line_14" data-name="Line 14" x1="6.326" y2="5.971" transform="translate(0.029 0)" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="1" />
-                            </g>
-                        </g>
-                    </svg>
-                </button>}
-            </div>
-            {!readOnly && (
-                <button onClick={() => removeProduct([data._id])} className='absolute right-[24px] sm:top-[35px] top-[15px]'>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24.707" height="24.707" viewBox="0 0 24.707 24.707">
-                        <g id="Group_3737" data-name="Group 3737" transform="translate(-473.646 -948.646)">
-                            <line id="Line_259" data-name="Line 259" x2="24" y2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                            <line id="Line_260" data-name="Line 260" y1="24" x2="24" transform="translate(474 949)" fill="none" stroke="#fe120d" strokeWidth="1" />
-                        </g>
-                    </svg>
-                </button>
-            )}
+                "
+            >
+              {data.price?.amount || data.price}
+            </span>
+          )}
         </div>
-    )
-}
+        <table className="max-lg:border-b max-lg:mb-4 border-primary-border lg:max-w-[766px] md:max-w-[60%] max-w-full w-full text-left lg:border-separate lg:border-spacing-y-[15px] border-spacing-y-[12px] xl:pr-[30px] lg:pr-[50px] ">
+          <thead>
+            <tr className="text-xs uppercase text-gray-500 ">
+              {visibleInfoHeaders.map((title, index) => (
+                <th
+                  key={title}
+                  className={`font-light pb-2 w-1/4 max-lg:hidden text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? "text-left" : "text-center"}`}
+                >
+                  {title}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {renderTableRows({
+              handleQuantityChange,
+              quantity: data.quantity,
+              productInfoSection: productInfoSection,
+              readOnly: enableQuantityControls ? false : readOnly,
+            })}
+          </tbody>
+        </table>
+        {!HIDE_PRICES && (
+          <span className="lg:block mr-[100px] hidden sm:text-[16px] text-[20px] text-secondary-alt font-haasRegular uppercase lg:mt-[21px] sm:mb-[27px] ">
+            {formattedPrice}
+          </span>
+        )}
 
-export { CartTent, CartCollection, CartNormal }
+        {showAddToCart && (
+          <button
+            onClick={handleAddToCart}
+            disabled={isLoading}
+            className="break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300"
+          >
+            <span>
+              {isLoading ?
+                "PLEASE WAIT..."
+              : addToCartButtonLabel || "Add to Cart"}
+            </span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="7.169"
+              height="6.855"
+              viewBox="0 0 7.169 6.855"
+            >
+              <g
+                id="Group_3746"
+                data-name="Group 3746"
+                transform="translate(0.314 0.426)"
+              >
+                <g
+                  id="Group_2072"
+                  data-name="Group 2072"
+                  transform="translate(0 0)"
+                >
+                  <path
+                    id="Path_3283"
+                    data-name="Path 3283"
+                    d="M0,0H6.355V6.355"
+                    transform="translate(0 0.074)"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeMiterlimit="10"
+                    strokeWidth="1"
+                  />
+                  <line
+                    id="Line_14"
+                    data-name="Line 14"
+                    x1="6.326"
+                    y2="5.971"
+                    transform="translate(0.029 0)"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeMiterlimit="10"
+                    strokeWidth="1"
+                  />
+                </g>
+              </g>
+            </svg>
+          </button>
+        )}
+      </div>
+      {!readOnly && (
+        <button
+          onClick={() => removeProduct([data._id])}
+          className="absolute right-[24px] sm:top-[35px] top-[15px]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24.707"
+            height="24.707"
+            viewBox="0 0 24.707 24.707"
+          >
+            <g
+              id="Group_3737"
+              data-name="Group 3737"
+              transform="translate(-473.646 -948.646)"
+            >
+              <line
+                id="Line_259"
+                data-name="Line 259"
+                x2="24"
+                y2="24"
+                transform="translate(474 949)"
+                fill="none"
+                stroke="#fe120d"
+                strokeWidth="1"
+              />
+              <line
+                id="Line_260"
+                data-name="Line 260"
+                y1="24"
+                x2="24"
+                transform="translate(474 949)"
+                fill="none"
+                stroke="#fe120d"
+                strokeWidth="1"
+              />
+            </g>
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+};
+
+export { CartTent, CartCollection, CartNormal };

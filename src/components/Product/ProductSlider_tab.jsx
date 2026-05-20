@@ -4,8 +4,9 @@ import React, { useMemo, useState, useCallback } from 'react'
 import { useKeenSlider } from "keen-slider/react"
 import "keen-slider/keen-slider.min.css"
 import { PrimaryImage } from '../common/PrimaryImage'
+import { SaveProductButton } from '../common/SaveProductButton'
 
-const ProductSlider_tab = ({ product }) => {
+const ProductSlider_tab = ({ product, productData }) => {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [loaded, setLoaded] = useState(false)
 
@@ -14,18 +15,9 @@ const ProductSlider_tab = ({ product }) => {
   const sliderConfig = useMemo(() => ({
     loop: true,
     slides: {
-      perView: mediaItems.length >= 3 ? 2.4 : 2,
+      perView: 1,
       spacing: 10,
-      origin: mediaItems.length >= 3 ? 'center' : 'auto',
-    },
-    breakpoints: {
-      "(max-width: 768px)": {
-        slides: {
-          perView: 1,
-          spacing: 10,
-          origin: 'center',
-        },
-      },
+      origin: 'center',
     },
     slideChanged(slider) {
       setCurrentSlide(slider.track.details.rel)
@@ -33,7 +25,7 @@ const ProductSlider_tab = ({ product }) => {
     created() {
       setLoaded(true)
     },
-  }), [mediaItems.length])
+  }), [])
 
   const [sliderRef, instanceRef] = useKeenSlider(sliderConfig)
 
@@ -81,12 +73,17 @@ const ProductSlider_tab = ({ product }) => {
   }, [loaded, mediaItems, currentSlide, handleDotClick]);
 
   return (
-    <>
+    <div className="w-full mx-auto sm:max-w-[492px] lg:max-w-none relative">
       <div ref={sliderRef} className="lg:!hidden block keen-slider h-[492px]">
         {slideItems}
       </div>
       {dots}
-    </>
+      <SaveProductButton
+        key={product?._id}
+        productData={productData}
+        className="absolute right-4 top-4 z-20"
+      />
+    </div>
   )
 }
 
