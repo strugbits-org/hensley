@@ -45,6 +45,8 @@ const ProductSlider_tab = ({ product, productData }) => {
             fit='fit'
             url={slide.src}
             size="tablet"
+            priority={idx === 0}
+            loading={idx === 0 ? "eager" : "lazy"}
             alt={`Product image ${idx + 1}`}
             customClasses="h-full w-full object-contain p-4"
           />
