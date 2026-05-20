@@ -117,7 +117,7 @@ export const ProductListing = ({ data }) => {
     };
 
     useEffect(() => {
-        if (Array.isArray(productBannersData)) {
+        if (Array.isArray(productBannersData) && selectedCategory?.slug !== 'benches') {
             setBannersDesktop(
                 productBannersData
                     .filter(item => item.isDesktop)
@@ -135,7 +135,7 @@ export const ProductListing = ({ data }) => {
         setProducts(sortedProducts.items);
         setHasMore(sortedProducts.hasNext ?? false);
         setIsLoading(false);
-    }, [sortedProducts, productBannersData]);
+    }, [sortedProducts, productBannersData, selectedCategory?.slug]);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
