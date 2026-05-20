@@ -81,7 +81,7 @@ const ProductSlider_tab = ({ product, productData }) => {
       <SaveProductButton
         key={product?._id}
         productData={productData}
-        className="absolute right-4 top-4 z-20"
+        className="lg:hidden absolute right-4 top-4 z-20"
       />
     </div>
   )
