@@ -26,10 +26,9 @@ const buildDynamicSchema = (fields = []) => {
         const key = field.fieldKey;
         if (!key) return;
 
-        // Event type is always required; other fields follow the backend config.
-        const isRequired = Boolean(field.required) || key === 'eventType';
+        // Required flag is driven entirely by the backend tent config.
         let rule = yup.string().nullable();
-        if (isRequired) rule = rule.required(`${field.label} is required`);
+        if (field.required) rule = rule.required(`${field.label} is required`);
         shape[key] = rule;
     });
 
@@ -137,6 +136,20 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
         setValue(field, value);
         trigger(field);
+    };
+
+    // Validation failed: bring the first invalid field into view. The form lives
+    // inside a scrollable container, so errors otherwise stay hidden off-screen.
+    const onError = (formErrors) => {
+        const firstKey = Object.keys(formErrors || {})[0];
+        if (!firstKey) return;
+        const el =
+            document.getElementById(`${uid}-${firstKey}`) ||
+            document.querySelector(`[name="${firstKey}"]`);
+        if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (typeof el.focus === 'function') el.focus({ preventScroll: true });
+        }
     };
 
     // ---- Submission ----
@@ -308,6 +321,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         value={formData[key]}
                         onChange={(newState) => handleInputChange(key, newState)}
                         disabled={isSubmitting}
+                        required={field.required}
                     />
                 );
 
@@ -338,7 +352,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                 </form>
             </div>
             <AddToCartButton
-                onClick={handleSubmit(onSubmit)}
+                onClick={handleSubmit(onSubmit, onError)}
                 classes={'lg:!h-[200px] lg:!mt-3'}
                 text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
                 disabled={isSubmitting}

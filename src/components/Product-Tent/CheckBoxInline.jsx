@@ -8,7 +8,8 @@ export const CheckBoxInline = ({
     classes = "",
     type = "checkbox",
     value = null,
-    onChange = null
+    onChange = null,
+    required = false
 }) => {
     const { label, options } = data;
 
@@ -53,7 +54,7 @@ export const CheckBoxInline = ({
     return (
         <div className={`relative ${classes}`}>
             <span className="lg:text-[12px] mb-[12px] font-haasBold text-secondary-alt uppercase select-none block">
-                {label}
+                {label}{required ? '*' : ''}
             </span>
             {options.map((option, index) => (
                 <label key={index} className="flex items-center cursor-pointer mb-[10px]">

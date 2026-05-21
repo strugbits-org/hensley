@@ -281,7 +281,7 @@ const CartTent = ({
                     {title}
                   </span>
                   <span className="text-[12px] text-secondary-alt font-haasLight uppercase">
-                    {value}
+                    {value != null && String(value).trim() !== "" ? value : "-"}
                   </span>
                 </div>
               ),
