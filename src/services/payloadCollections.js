@@ -658,6 +658,7 @@ export const queryProductSlugs = cache(async () => {
     try {
         const result = await sdk.find({
             collection: 'products',
+            where: { visible: { not_equals: false } },
             pagination: false,
             draft: false,
             locale: 'en',
@@ -715,7 +716,8 @@ export const queryProductsByCollectionIds = async (collections) => {
         const result = await sdk.find({
             collection: 'products',
             where: {
-                collections: { in: collections }
+                collections: { in: collections },
+                visible: { not_equals: false }
             },
             draft: false,
             locale: "en",
@@ -740,7 +742,8 @@ export const queryProductsByCollectionIdsForHome = async (collections) => {
         const result = await sdk.find({
             collection: 'products',
             where: {
-                collections: { in: collections }
+                collections: { in: collections },
+                visible: { not_equals: false }
             },
             draft: false,
             locale: "en",
@@ -811,8 +814,9 @@ export const queryProductsByCollectionIdsPaginatedSlim = async ({ collections = 
             select: PLP_LISTING_PRODUCT_SELECT,
         };
 
+        query.where = { visible: { not_equals: false } };
         if (collections.length > 0) {
-            query.where = { collections: { in: collections } };
+            query.where.collections = { in: collections };
         }
 
         const result = await sdk.find(query);
@@ -835,7 +839,7 @@ export const queryProductsByIdsSlim = async (ids = []) => {
     try {
         const result = await sdk.find({
             collection: 'products',
-            where: { id: { in: ids } },
+            where: { id: { in: ids }, visible: { not_equals: false } },
             pagination: false,
             draft: false,
             locale: 'en',
@@ -861,8 +865,9 @@ export const queryProductsByCollectionIdsPaginated = async ({ collections = [], 
             depth: 1,
         };
 
+        query.where = { visible: { not_equals: false } };
         if (collections.length > 0) {
-            query.where = { collections: { in: collections } };
+            query.where.collections = { in: collections };
         }
 
         const result = await sdk.find(query);
@@ -882,7 +887,8 @@ export const queryProductsBySlug = async (slug) => {
         const result = await sdk.find({
             collection: 'products',
             where: {
-                slug: { equals: slug }
+                slug: { equals: slug },
+                visible: { not_equals: false }
             },
             limit: 1,
             draft: false,
@@ -902,7 +908,8 @@ export const queryProductById = async (id) => {
         const result = await sdk.find({
             collection: 'products',
             where: {
-                id: { equals: id }
+                id: { equals: id },
+                visible: { not_equals: false }
             },
             limit: 1,
             draft: false,
@@ -922,7 +929,7 @@ export const queryProductsByIds = async (ids = []) => {
     try {
         const result = await sdk.find({
             collection: 'products',
-            where: { id: { in: ids } },
+            where: { id: { in: ids }, visible: { not_equals: false } },
             pagination: false,
             draft: false,
             locale: 'en',
@@ -939,6 +946,7 @@ export const queryAllProducts = async ({ depth = 1 } = {}) => {
     try {
         const result = await sdk.find({
             collection: 'products',
+            where: { visible: { not_equals: false } },
             pagination: false,
             draft: false,
             locale: 'en',
