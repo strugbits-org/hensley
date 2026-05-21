@@ -7,7 +7,7 @@ import AirDatepicker from 'air-datepicker';
 import localeEn from 'air-datepicker/locale/en';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
-import { AddToCartButton, AddToCartButtonInline } from '../Product/AddtoQuoteButton';
+import { AddToCartButtonInline } from '../Product/AddtoQuoteButton';
 import parse from 'html-react-parser';
 import { CheckBoxInline } from './CheckBoxInline';
 
@@ -23,13 +23,11 @@ const buildDynamicSchema = (fields = []) => {
         const key = field.fieldKey;
         if (!key) return;
 
-        if (INPUT_TYPES_WITH_OPTIONS.has(field.inputType)) {
-            shape[key] = yup.string().nullable();
-        } else {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        }
+        // Event type is always required; other fields follow the backend config.
+        const isRequired = Boolean(field.required) || key === 'eventType';
+        let rule = yup.string().nullable();
+        if (isRequired) rule = rule.required(`${field.label} is required`);
+        shape[key] = rule;
     });
 
     if (shape.removalDate && shape.eventDate) {
@@ -141,7 +139,8 @@ export const AddToQuoteFormInline = ({ title, productData }) => {
             quoteFields.forEach((field) => {
                 const label = (field.label || field.fieldKey).toUpperCase();
                 const val = data[field.fieldKey];
-                customTextFields[label] = typeof val === 'string' ? val.toUpperCase() : val || '-';
+                const normalized = typeof val === 'string' ? val.trim().toUpperCase() : val;
+                customTextFields[label] = normalized || '-';
             });
 
             const cartData = {

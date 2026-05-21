@@ -26,21 +26,11 @@ const buildDynamicSchema = (fields = []) => {
         const key = field.fieldKey;
         if (!key) return;
 
-        if (field.inputType === 'number') {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        } else if (field.inputType === 'date') {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        } else if (INPUT_TYPES_WITH_OPTIONS.has(field.inputType)) {
-            shape[key] = yup.string().nullable();
-        } else {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        }
+        // Event type is always required; other fields follow the backend config.
+        const isRequired = Boolean(field.required) || key === 'eventType';
+        let rule = yup.string().nullable();
+        if (isRequired) rule = rule.required(`${field.label} is required`);
+        shape[key] = rule;
     });
 
     // Cross-field validation: removalDate must be after eventDate when both exist
@@ -162,7 +152,8 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             quoteFields.forEach((field) => {
                 const label = (field.label || field.fieldKey).toUpperCase();
                 const val = data[field.fieldKey];
-                customTextFields[label] = typeof val === 'string' ? val.toUpperCase() : val || '-';
+                const normalized = typeof val === 'string' ? val.trim().toUpperCase() : val;
+                customTextFields[label] = normalized || '-';
             });
 
             const cartData = {
