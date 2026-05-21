@@ -15,7 +15,7 @@ export const CardsSlider = ({ data, cardCss, loop = false }) => {
 
   const [sliderRef] = useKeenSlider(
     {
-      loop,
+      loop: loop && data?.length > 1,
       defaultAnimation: {
         duration: 2000,
       },
@@ -91,7 +91,7 @@ export const CardsSlider = ({ data, cardCss, loop = false }) => {
             </div>
           );
         })}
-        {data.length >= 4 && (
+        {data.length > 1 && (
           <>
             {(loop || currentSlide?.rel > 0) && (
               <button

@@ -14,7 +14,7 @@ export const FeaturedBlogs = ({ data, pageDetails, loop = true, origin = "center
     const [currentSlide, setCurrentSlide] = useState(0);
     const [sliderRef] = useKeenSlider(
         {
-            loop: loop,
+            loop: loop && data?.length > 1,
             mode: "free-snap",
             slides: {
                 origin: origin,
@@ -67,7 +67,7 @@ export const FeaturedBlogs = ({ data, pageDetails, loop = true, origin = "center
                             </div>
                         );
                     })}
-                    {(data.length >= 4) && (
+                    {(data.length > 1) && (
                         <>
                             {(loop || currentSlide?.rel > 0) && <button
                                 onClick={() => sliderInstance.current?.prev()}

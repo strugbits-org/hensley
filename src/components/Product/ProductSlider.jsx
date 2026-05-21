@@ -88,25 +88,29 @@ const SlideImage = React.memo(({ item, index, isMain = false }) => (
     key={`${isMain ? 'main' : 'thumb'}-${item.id || index}`}
   >
     {isMain ? (
-      <div className="w-full max-w-[650px] h-[793px] my-[1px] flex items-center justify-center bg-white border border-black px-[35px] py-[33px] overflow-hidden cursor-pointer">
+      <div className="w-[calc(100%-2px)] h-[calc(100%-2px)] mx-[1px] my-[1px] flex items-center justify-center bg-white border border-black px-[35px] py-[33px] overflow-hidden cursor-pointer">
         <PrimaryImage
           min_h={727}
           min_w={580}
           fit="fit"
           url={item.src}
           size="tablet"
+          priority={index === 0}
+          loading={index === 0 ? "eager" : "lazy"}
           alt={item.alt || `Product image ${index + 1}`}
           customClasses="w-full h-full object-contain transition-opacity duration-200"
         />
       </div>
     ) : (
-      <div className="w-[120px] h-[114px] my-[1px] flex items-center justify-center bg-white border border-black px-[15px] py-[14px] overflow-hidden cursor-pointer">
+      <div className="w-[calc(100%-2px)] h-[calc(100%-2px)] mx-[1px] my-[1px] flex items-center justify-center bg-white border border-black px-[15px] py-[14px] overflow-hidden cursor-pointer">
         <PrimaryImage
           min_h={85}
           min_w={89}
           fit="fit"
           url={item.src}
           size="thumbnail"
+          priority={index === 0}
+          loading={index === 0 ? "eager" : "lazy"}
           alt={item.alt || `Product image ${index + 1}`}
           customClasses="w-full h-full object-contain transition-opacity duration-200 hover:opacity-80"
         />

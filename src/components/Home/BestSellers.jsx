@@ -25,7 +25,7 @@ export const BestSellers = ({
 
     const [sliderRef] = useKeenSlider(
         {
-            loop,
+            loop: loop && data?.length > 1,
             mode: "free-snap",
             slides: {
                 origin,
@@ -94,7 +94,7 @@ export const BestSellers = ({
                         </div>
                     ))}
 
-                    {(data.length >= 4) && (
+                    {(data.length > 1) && (
                         <>
                             {(loop || currentSlide?.rel > 0) && <button
                                 onClick={() => sliderInstance.current?.prev()}
