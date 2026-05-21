@@ -20,7 +20,7 @@ const SLIDER_CONFIG = {
     vertical: true,
     slides: {
       perView: 6,
-      spacing: 26,
+      spacing: 20,
     },
   },
 };
@@ -84,18 +84,38 @@ function createThumbnailPlugin(mainRef) {
 
 const SlideImage = React.memo(({ item, index, isMain = false }) => (
   <div
-    className={`${THUMBNAIL_CLASSES.BASE} number-slide-${index + 1}`}
+    className={`${THUMBNAIL_CLASSES.BASE} number-slide-${index + 1} flex items-center justify-center w-full h-full`}
     key={`${isMain ? 'main' : 'thumb'}-${item.id || index}`}
   >
-    <PrimaryImage
-      min_h={200}
-      min_w={200}
-      fit="fit"
-      url={item.src}
-      size={isMain ? "tablet" : "thumbnail"}
-      alt={item.alt || `Product image ${index + 1}`}
-      customClasses={`border border-black cursor-pointer h-full w-full object-cover transition-opacity duration-200 ${!isMain ? 'hover:opacity-80 max-h-[150px]' : 'max-h-[800px]'}`}
-    />
+    {isMain ? (
+      <div className="w-[calc(100%-2px)] h-[calc(100%-2px)] mx-[1px] my-[1px] flex items-center justify-center bg-white border border-black px-[35px] py-[33px] overflow-hidden cursor-pointer">
+        <PrimaryImage
+          min_h={727}
+          min_w={580}
+          fit="fit"
+          url={item.src}
+          size="tablet"
+          priority={index === 0}
+          loading={index === 0 ? "eager" : "lazy"}
+          alt={item.alt || `Product image ${index + 1}`}
+          customClasses="w-full h-full object-contain transition-opacity duration-200"
+        />
+      </div>
+    ) : (
+      <div className="w-[calc(100%-2px)] h-[calc(100%-2px)] mx-[1px] my-[1px] flex items-center justify-center bg-white border border-black px-[15px] py-[14px] overflow-hidden cursor-pointer">
+        <PrimaryImage
+          min_h={85}
+          min_w={89}
+          fit="fit"
+          url={item.src}
+          size="thumbnail"
+          priority={index === 0}
+          loading={index === 0 ? "eager" : "lazy"}
+          alt={item.alt || `Product image ${index + 1}`}
+          customClasses="w-full h-full object-contain transition-opacity duration-200 hover:opacity-80"
+        />
+      </div>
+    )}
   </div>
 ));
 
@@ -121,7 +141,7 @@ export default function ProductSlider({ product }) {
 
   if (!mediaItems.length) {
     return (
-      <div className="lg:flex hidden w-full h-[937px] gap-x-[24px] items-center justify-center">
+      <div className="lg:flex hidden w-full h-[795px] gap-x-[24px] items-center justify-center">
         <div className="text-gray-500">No images available</div>
       </div>
     );
@@ -130,19 +150,19 @@ export default function ProductSlider({ product }) {
   return (
     <>
       {!isSliderReady && (
-        <div className="w-full h-[937px] flex items-center justify-center text-gray-400">
+        <div className="w-full h-[795px] flex items-center justify-center text-gray-400">
           <Loading custom type="secondary" />
         </div>
       )}
 
       <div
-        className={`lg:flex hidden w-full h-full gap-x-[24px] justify-between transition-opacity duration-300 ${!isSliderReady ? 'invisible opacity-0' : 'visible opacity-100'
+        className={`lg:flex hidden w-full max-w-[794px] h-[795px] gap-x-[24px] justify-between transition-opacity duration-300 ${!isSliderReady ? 'invisible opacity-0' : 'visible opacity-100'
           }`}
       >
         {/* Main Slider */}
         <div
           ref={sliderRef}
-          className="keen-slider !w-[85%]"
+          className="keen-slider !w-[calc(100%-144px)] h-[795px] p-[1px]"
           role="region"
           aria-label="Product images"
         >
@@ -159,7 +179,7 @@ export default function ProductSlider({ product }) {
         {/* Thumbnail Slider */}
         <div
           ref={thumbnailRef}
-          className="keen-slider !w-[15%] thumbnail grid grid-cols-1 overflow-hidden"
+          className="keen-slider !w-[120px] shrink-0 h-[795px] thumbnail grid grid-cols-1 overflow-hidden p-[1px]"
           role="region"
           aria-label="Product image thumbnails"
         >

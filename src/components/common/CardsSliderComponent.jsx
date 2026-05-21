@@ -15,7 +15,7 @@ export const CardsSlider = ({ data, cardCss, loop = false }) => {
 
   const [sliderRef] = useKeenSlider(
     {
-      loop,
+      loop: loop && data?.length > 1,
       defaultAnimation: {
         duration: 2000,
       },
@@ -38,19 +38,19 @@ export const CardsSlider = ({ data, cardCss, loop = false }) => {
         setCurrentSlide(slider.track.details);
       },
     },
-    []
+    [],
   );
 
   return (
-    <div className='w-full lg:px-10'>
+    <div className="w-full lg:px-10">
       {!isSliderReady && (
         <div className="w-full h-[300px] flex justify-center items-center">
-          <Loading custom type='secondary' />
+          <Loading custom type="secondary" />
         </div>
       )}
       <div
         ref={sliderRef}
-        className={`keen-slider mt-[30px] md:min-h-[850px] pb-[70px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
+        className={`keen-slider my-[30px] md:min-h-[850px] pb-[30px]  ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
       >
         {data.map((slide, index) => {
           return (
@@ -59,10 +59,25 @@ export const CardsSlider = ({ data, cardCss, loop = false }) => {
               className={`${cardCss} group max-w-[596px] w-full group keen-slider__slide border border-white flex flex-col p-[20px] sm:min-h-[680px]`}
             >
               <div className="h-[425px] relative overflow-hidden">
-                <PrimaryImage url={slide.image} size="card" customClasses={"h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"} alt={slide.heading} />
+                <PrimaryImage
+                  url={slide.image}
+                  size="card"
+                  customClasses={
+                    "h-full w-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
+                  }
+                  alt={slide.heading}
+                />
                 <div className="hidden lg:block ">
-                  <PrimaryImage url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"} alt={"Arrow"} customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-[90%] group-hover:h-[90%]" />
-                  <PrimaryImage url={"/icons/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"} alt={"Arrow"} customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] group-hover:invisible" />
+                  <PrimaryImage
+                    url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}
+                    alt={"Arrow"}
+                    customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-[90%] group-hover:h-[90%]"
+                  />
+                  <PrimaryImage
+                    url={"/icons/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"}
+                    alt={"Arrow"}
+                    customClasses="absolute fill-primary-alt left-5 bottom-5 w-[34px] h-[34px] group-hover:invisible"
+                  />
                 </div>
               </div>
               <div>
@@ -76,24 +91,28 @@ export const CardsSlider = ({ data, cardCss, loop = false }) => {
             </div>
           );
         })}
-        {(data.length >= 4) && (
+        {data.length > 1 && (
           <>
-            {(loop || currentSlide?.rel > 0) && <button
-              onClick={() => sliderInstance.current?.prev()}
-              className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-            >
-              <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
-            </button>}
+            {(loop || currentSlide?.rel > 0) && (
+              <button
+                onClick={() => sliderInstance.current?.prev()}
+                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+              >
+                <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+              </button>
+            )}
 
-            {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
-              onClick={() => sliderInstance.current?.next()}
-              className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
-            >
-              <MdOutlineChevronRight className="w-[20px] h-[20px]" />
-            </button>}
+            {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && (
+              <button
+                onClick={() => sliderInstance.current?.next()}
+                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+              >
+                <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+              </button>
+            )}
           </>
         )}
       </div>
     </div>
   );
-}
+};

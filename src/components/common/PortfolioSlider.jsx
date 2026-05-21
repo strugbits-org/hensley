@@ -16,7 +16,7 @@ function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
   const [sliderRef] = useKeenSlider(
     {
       mode: "free-snap",
-      loop,
+      loop: loop && data?.length > 1,
       breakpoints: {
         "(max-width: 768px)": {
           slides: { perView: 1.3, spacing: 15, origin: "center" },
@@ -25,7 +25,7 @@ function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
           slides: { perView: 1.5, spacing: 15, origin: "auto" },
         },
         "(min-width: 1025px)": {
-          loop: tab ? false : loop,
+          loop: tab ? false : (loop && data?.length > 1),
           slides: { perView: 2.5, spacing: 15, origin: tab ? 'auto' : 'center' },
         },
       },
@@ -93,7 +93,7 @@ function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
             </div>
           );
         })}
-        {(data.length >= 4) && (
+        {(data.length > 1) && (
           <>
             {(loop || currentSlide?.rel > 0) && <button
               onClick={() => sliderInstance.current?.prev()}

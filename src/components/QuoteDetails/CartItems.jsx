@@ -12,7 +12,7 @@ const CartTent = () => {
             '>
                 <Image src={image} className='h-full w-full object-contain' />
             </div>
-            <div className='flex lg:flex-row flex-col lg:items-center'>
+            <div className='flex lg:flex-row flex-col lg:items-center pr-[45px] lg:pr-0'>
                 <div>
                     <span className='block text-[16px] text-secondary-alt font-haasLight uppercase'>Product</span>
                     <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase
@@ -152,7 +152,7 @@ const CartCollection = () => {
             '>
                 <Image src={image} className='h-full w-full object-contain' />
             </div>
-            <div className='w-full '>
+            <div className='w-full pr-[45px] lg:pr-0'>
                 <div className='sm:flex hidden justify-between items-center sm:h-[104px]'>
                     <span className='block text-[16px] text-secondary-alt font-haasRegular uppercase
                 lg:mt-[21px]
@@ -253,7 +253,7 @@ const CartNormal = () => {
             '>
                 <Image src={image} className='h-full w-full object-contain' />
             </div>
-            <div className='w-full lg:flex justify-between'>
+            <div className='w-full lg:flex justify-between pr-[45px] lg:pr-0'>
                 <div className='sm:flex lg:hidden justify-between items-center sm:h-[104px]'>
                     <span className='block 
                 lg:text-[16px]

@@ -1,12 +1,40 @@
 import { NextResponse } from "next/server";
 import { logError } from "@/utils";
-import { payloadLogin } from "@/services/auth/payloadAuth";
+import { payloadLogin, payloadForgotPassword } from "@/services/auth/payloadAuth";
 import { mergeVisitorCartToMember } from "@/services/cart/payloadCart";
+import { apiKeySDK, MEMBER_COLLECTION } from "@/services/payloadSDK";
+
+const sdk = apiKeySDK();
 
 export const POST = async (req) => {
   try {
     const body = await req.json();
     const { email, password, cartId } = body;
+
+    // Wix-migrated customers don't know any Payload password, so they'd otherwise
+    // bounce off the credential check and never see why. Intercept before login.
+    try {
+      const found = await sdk.find({
+        collection: MEMBER_COLLECTION,
+        where: { email: { equals: email } },
+        limit: 1,
+        depth: 0,
+      });
+      const existing = found?.docs?.[0];
+      if (existing?.metadata?.forcePasswordReset) {
+        await payloadForgotPassword(email);
+        return NextResponse.json(
+          {
+            code: "PASSWORD_RESET_REQUIRED",
+            message:
+              "For your security, please reset your password. A reset link has been sent to your email.",
+          },
+          { status: 403 }
+        );
+      }
+    } catch (lookupError) {
+      logError("forcePasswordReset lookup failed:", lookupError);
+    }
 
     // Authenticate with Payload CMS
     const loginResponse = await payloadLogin(email, password);

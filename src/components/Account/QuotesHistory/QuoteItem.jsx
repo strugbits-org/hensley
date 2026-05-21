@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, HIDE_PRICES, logError } from '@/utils';
+import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatTotalPrice, HIDE_PRICES, lineItemHasProductReference, logError } from '@/utils';
 import { FiArrowUpRight } from "react-icons/fi";
 import { lightboxActions } from '@/store/lightboxStore';
 import { AddProductToCart } from '@/services/cart/CartApis';
@@ -10,7 +10,8 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
     const { viewButtonLabel, orderAgainButtonLabel } = data;
 
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
-    const totalPrice = useMemo(() => calculateCartTotalPrice(quote.lineItems));
+    const renderableLineItems = useMemo(() => (quote?.lineItems || []).filter(lineItemHasProductReference), [quote?.lineItems]);
+    const totalPrice = useMemo(() => calculateCartTotalPrice(renderableLineItems), [renderableLineItems]);
     const formattedTotalPrice = useMemo(() => formatTotalPrice(totalPrice), [totalPrice]);
     const [loading, setLoading] = useState(false);
 
@@ -23,7 +24,7 @@ export const QuoteItem = ({ quote, handleViewClick, data }) => {
             const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
             const products = [];
 
-            for (const item of quote?.lineItems || []) {
+            for (const item of renderableLineItems) {
                 try {
                     const productObj = typeof item?.product === "object" ? item.product : null;
                     const productId =

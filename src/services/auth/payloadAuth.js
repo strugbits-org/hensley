@@ -5,7 +5,7 @@
  */
 
 import { logError } from "@/utils";
-import { apiKeySDK, CORE_API_BASE_URL, CORE_TENANT_ID } from "../payloadSDK";
+import { apiKeySDK, CORE_API_BASE_URL, CORE_TENANT_ID, MEMBER_COLLECTION } from "../payloadSDK";
 
 const sdk = apiKeySDK();
 
@@ -18,7 +18,7 @@ const sdk = apiKeySDK();
 export const payloadLogin = async (email, password) => {
   try {
     const result = await sdk.login({
-      collection: 'members',
+      collection: MEMBER_COLLECTION,
       data: { email, password },
     });
     return result;
@@ -37,7 +37,7 @@ export const payloadRegister = async (userData) => {
   
   try {
     const result = await sdk.create({
-      collection: 'members',
+      collection: MEMBER_COLLECTION,
       data: {
         email,
         password,
@@ -61,7 +61,7 @@ export const payloadRegister = async (userData) => {
 export const payloadGetCurrentMember = async (token) => {
   try {
     const response = await fetch(
-      `${CORE_API_BASE_URL}/api/members/me?depth=1`,
+      `${CORE_API_BASE_URL}/api/${MEMBER_COLLECTION}/me?depth=1`,
       {
         method: 'GET',
         headers: {
@@ -88,7 +88,7 @@ export const payloadGetCurrentMember = async (token) => {
 export const payloadForgotPassword = async (email) => {
   try {
     const result = await sdk.forgotPassword({
-      collection: 'members',
+      collection: MEMBER_COLLECTION,
       data: { email },
     });
     return result;
@@ -106,7 +106,7 @@ export const payloadForgotPassword = async (email) => {
 export const payloadResetPassword = async (token, password) => {
   try {
     const result = await sdk.resetPassword({
-      collection: 'members',
+      collection: MEMBER_COLLECTION,
       data: { token, password },
     });
     return result;
@@ -126,7 +126,7 @@ export const payloadUpdateProfile = async (memberId, token, updates) => {
   try {
     const result = await sdk.update(
       {
-        collection: 'members',
+        collection: MEMBER_COLLECTION,
         id: memberId,
         data: updates,
       },
@@ -146,7 +146,7 @@ export const payloadUpdateProfile = async (memberId, token, updates) => {
 export const payloadRefreshToken = async (token) => {
   try {
     const result = await sdk.refreshToken(
-      { collection: 'members' },
+      { collection: MEMBER_COLLECTION },
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
     return result;
@@ -164,7 +164,7 @@ export const payloadLogout = async (token) => {
   try {
     await sdk.request({
       method: 'POST',
-      path: '/members/logout',
+      path: `/${MEMBER_COLLECTION}/logout`,
     }, { headers: { 'Authorization': `Bearer ${token}` } });
   } catch (error) {
     // Silently fail on logout

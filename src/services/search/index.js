@@ -132,9 +132,14 @@ export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipPro
         if (!tokens.length) return [];
 
         const excludeTent = { type: { not_equals: "tent" } };
+        // Bundle members (products included in a bundle) are flagged bundleOnly
+        // so they don't surface as standalone search hits — only the bundle does.
+        const excludeBundleOnly = { bundleOnly: { not_equals: true } };
+        // Products hidden from the store (visible=false) must not appear at all.
+        const excludeHidden = { visible: { not_equals: false } };
 
         const wherePlus = (fields) => ({
-            and: [excludeTent, ...buildTokenWhere(tokens, fields).and],
+            and: [excludeTent, excludeBundleOnly, excludeHidden, ...buildTokenWhere(tokens, fields).and],
         });
 
         const [byTitle, bySlug] = await Promise.all([

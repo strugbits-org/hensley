@@ -19,7 +19,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
     const [currentSlide, setCurrentSlide] = useState(0);
 
     const [sliderRef] = useKeenSlider({
-        loop,
+        loop: loop && safeData.length > 1,
         defaultAnimation: {
             duration: 2000,
         },
@@ -34,6 +34,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
         created(slider) {
             sliderInstance.current = slider;
             setIsSliderReady(true);
+            setCurrentSlide(slider.track.details);
         },
         detailsChanged(slider) {
             setCurrentSlide(slider.track.details);
@@ -80,7 +81,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
                     );
                 })}
                 {/* Arrows */}
-                {(safeData.length >= 4) && (
+                {(safeData.length > 1) && (
                     <>
                         {(loop || currentSlide?.rel > 0) && <button
                             onClick={() => sliderInstance.current?.prev()}

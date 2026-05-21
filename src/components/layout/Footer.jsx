@@ -1,7 +1,7 @@
-import facebookIcon from "@/assets/icons/facebook.png";
-import instagramIcon from "@/assets/icons/instagram.png";
-import linkedinIcon from "@/assets/icons/linkedin.png";
-import twitterIcon from "@/assets/icons/twitter.png";
+import facebookIcon from "@/assets/icons/facebook.svg";
+import instagramIcon from "@/assets/icons/instagram.svg";
+import linkedinIcon from "@/assets/icons/linkedin.svg";
+import twitterIcon from "@/assets/icons/x.svg";
 import { NewsLetter } from "../common/NewsLetter";
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
@@ -42,8 +42,8 @@ export const Footer = ({ data }) => {
     if (iconAsset) {
       return (
         <img
-          className="h-6 w-6 object-contain"
-          src={iconAsset.src}
+          className="h-6 w-6 object-contain hover:opacity-80 transition-opacity duration-300"
+          src={iconAsset.src || iconAsset}
           alt={item?.label || item?.title || platform}
         />
       );
