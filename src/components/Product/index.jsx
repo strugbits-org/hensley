@@ -501,7 +501,7 @@ export const Product = ({
 
         <AddToCartButton
           classes={
-            "h-[80px] md:h-[90px] lg:!h-[113px] lg:!mt-3 lg:w-full lg:max-w-[656px] sm:max-w-[492px] w-full"
+            "h-[90px] md:h-[90px] lg:!h-[130px] lg:!mt-3 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
           }
           text={isUpdatingCart ? "Please wait..." : "Add to Quote"}
           disabled={isUpdatingCart}

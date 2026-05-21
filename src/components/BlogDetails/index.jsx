@@ -24,7 +24,7 @@ const BlogDetails = ({ data }) => {
                     class_image: "w-full h-full object-cover object-center",
                 })}
             </div>
-            <FeaturedProducts classes={'z-10'} data={storeProducts} pageDetails={{ featuredProjectTitle: featuredProductTitle || "PRODUCTS FEATURED IN THIS POST ENTRY:" }} loop={false} origin="auto" />
+            <FeaturedProducts classes={'z-10'} data={storeProducts} pageDetails={{ featuredProjectTitle: featuredProductTitle || "PRODUCTS FEATURED IN THIS POST ENTRY:" }} loop={true} origin="auto" />
             <HensleyNews data={otherBlogs} pageDetails={{ hensleyNewsTitle: hensleyNewsTitle || "Other Posts" }} loop={false} origin="auto" titleType='secondary' />
         </>
     )

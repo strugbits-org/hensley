@@ -77,7 +77,7 @@ export default function OurProjects({ data, loop = true }) {
                     );
                 })}
                 {/* Arrows */}
-                {(data.length >= 4) && (
+                {(data.length > 1) && (
                     <>
                         {(loop || currentSlide?.rel > 0) && <button
                             onClick={() => sliderInstance.current?.prev()}
