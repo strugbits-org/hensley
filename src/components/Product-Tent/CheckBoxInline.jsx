@@ -9,7 +9,8 @@ export const CheckBoxInline = ({
     type = "checkbox",
     value = null,
     onChange = null,
-    required = false
+    required = false,
+    error = ""
 }) => {
     const { label, options } = data;
 
@@ -77,6 +78,7 @@ export const CheckBoxInline = ({
                     </span>
                 </label>
             ))}
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
     );
 };

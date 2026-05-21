@@ -300,6 +300,7 @@ export const AddToQuoteFormInline = ({ title, productData }) => {
                         onChange={(newState) => handleInputChange(key, newState)}
                         disabled={isSubmitting}
                         required={field.required}
+                        error={errorMsg}
                     />
                 );
 
