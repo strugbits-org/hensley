@@ -8,7 +8,6 @@ import { toast } from 'sonner';
 import { lightboxActions } from '@/store/lightboxStore';
 import { logError } from '@/utils';
 import { resetPassword } from '@/services/auth/authentication';
-import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import eyeOpenIcon from '@/assets/icons/eye-open.svg';
 import eyeClosedIcon from '@/assets/icons/eye-closed.svg';
 
@@ -123,7 +122,6 @@ function ResetPassword({ token }) {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
-    const redirectWithLoader = useRedirectWithLoader();
 
     const {
         register,
@@ -170,7 +168,7 @@ function ResetPassword({ token }) {
                     description: PAGE_DATA.messages.success.description,
                     buttonText: PAGE_DATA.messages.success.buttonText,
                     open: true,
-                    onClose: () => redirectWithLoader('/login')
+                    onButtonClick: () => lightboxActions.showLightBox('login')
                 });
                 reset();
                 setIsSubmitting(false);

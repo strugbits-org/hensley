@@ -14,7 +14,7 @@ export const SaveProductButton = ({ productData, type = "primary", className = "
     const savedProductsList = Array.isArray(savedProducts) ? savedProducts : [];
 
     // Get the actual product ID for comparison - handle both nested and flat structures
-    const currentProductId = productData.product?._id || productData.product?.id || productData._id;
+    const currentProductId = productData?.product?._id || productData?.product?.id || productData?._id;
     const isProductSaved = savedProductsList.some(savedProduct => {
         // Handle both object { product: { _id } } and string { product: "id" } formats
         const savedProductId = typeof savedProduct.product === 'string'
@@ -47,7 +47,7 @@ export const SaveProductButton = ({ productData, type = "primary", className = "
         }
 
         try {
-            const productId = productData.product?._id || productData.product?.id || productData._id;
+            const productId = productData?.product?._id || productData?.product?.id || productData?._id;
             if (!productId) {
                 throw new Error("Product ID not found");
             }

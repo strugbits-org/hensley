@@ -2,7 +2,7 @@
 import { CartCollection, CartNormal, CartTent } from '@/components/Cart/CartItems';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
-import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError } from '@/utils';
+import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, lineItemHasProductReference, logError } from '@/utils';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -189,7 +189,7 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
     }, [cartItems]);
 
     useEffect(() => {
-        const lineItems = data?.lineItems || [];
+        const lineItems = (data?.lineItems || []).filter(lineItemHasProductReference);
         setCartItems(lineItems);
     }, [data]);
 
