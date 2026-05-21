@@ -133,6 +133,11 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     }, [quoteFields.length]);
 
     const handleInputChange = (field, value) => {
+        if(field === 'numberOfGuests'){
+            // Only allow numeric input for numberOfGuests
+            const numericValue = value.replace(/\D/g, '');
+            value = numericValue;
+        }
         setFormData((prev) => ({ ...prev, [field]: value }));
         setValue(field, value);
         trigger(field);
@@ -214,6 +219,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     };
 
     const renderField = (field) => {
+       
         const key = field.fieldKey;
         const elId = `${uid}-${key}`;
         const errorMsg = errors[key]?.message;
@@ -322,6 +328,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         onChange={(newState) => handleInputChange(key, newState)}
                         disabled={isSubmitting}
                         required={field.required}
+                        error={errorMsg}
                     />
                 );
 
