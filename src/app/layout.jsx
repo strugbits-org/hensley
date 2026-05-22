@@ -14,6 +14,7 @@ import { Toaster } from "sonner";
 import { fetchLoginPageDetails } from "@/services/auth";
 import { InvalidateButtonPin } from "@/components/common/helpers/InvalidateButtonPin";
 import { SavedProductsHandler } from "@/components/common/helpers/SavedProductsHandler";
+import { SiteScripts } from "@/components/common/helpers/SiteScripts";
 
 const neueHaasDisplayRegular = localFont({
   src: '../assets/fonts/neue-haas-display-regular.woff2',
@@ -84,7 +85,7 @@ export default async function RootLayout({ children }) {
     queryProductCollections().catch(() => []),
   ]);
 
-  const { branches } = footerData;
+  const { branches, integrations } = footerData;
 
   return (
     <html lang="en" className={`${neueHaasDisplayRegular.variable} ${neueHaasDisplayLight.variable} ${neueHaasDisplayMedium.variable} ${neueHaasDisplayBold.variable} ${recklessNeueRegular.variable} ${recklessNeueBold.variable} ${recklessNeueLight.variable} ${recklessNeueMedium.variable}`}>
@@ -110,6 +111,7 @@ export default async function RootLayout({ children }) {
         />
         <InvalidateButtonPin />
         <SavedProductsHandler />
+        <SiteScripts integrations={integrations} />
       </body>
     </html>
   );

@@ -9,7 +9,6 @@
 # testing
 /coverage
 
-.env
 
 # next.js
 /.next/
@@ -38,3 +37,5 @@ yarn-error.log*
 next-env.d.ts
 .claude
 .scripts
+.docs
+config.bat

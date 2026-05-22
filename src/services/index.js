@@ -323,6 +323,11 @@ const mapStorefrontFooterToLayoutData = (footer) => {
     socialLinks,
     footerNaviationData: footerLinks,
     branches: mapStorefrontFooterBranches(footer),
+    integrations: footer?.tenant?.integrations ?? {
+      crispWebsiteId: null,
+      gtmId: null,
+      gaMeasurementId: null,
+    },
   };
 };
 
@@ -340,6 +345,7 @@ export const fetchFooterData = cache(async () => {
       socialLinks: [],
       footerNaviationData: [],
       branches: [],
+      integrations: { crispWebsiteId: null, gtmId: null, gaMeasurementId: null },
     };
   }
 });

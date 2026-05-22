@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { CopyIcon } from "./helpers/CopyIcon";
 import { copyToClipboard, richTextToHTML } from "@/utils";
 import { CustomLink } from "./CustomLink";
@@ -17,6 +17,14 @@ function ProductCard({
   allCollections = [],
 }) {
   const { title } = product;
+  const [copiedSkuId, setCopiedSkuId] = useState(null);
+  const [hoveredSizeIndex, setHoveredSizeIndex] = useState(null);
+
+  const handleSkuCopy = (sku) => {
+    copyToClipboard(sku);
+    setCopiedSkuId(sku);
+    setTimeout(() => setCopiedSkuId(null), 200);
+  };
 
   const ribbon = resolveProductRibbon(product, allCollections);
   const productImageSrc = resolveCoreMediaUrl(product.mainMedia, "card");
@@ -75,14 +83,14 @@ function ProductCard({
 
         <div className="mt-auto pt-2 w-full flex flex-col 2xl:flex-row justify-between items-center gap-4">
           <div
-            className={`2xl:w-2/3 w-full grow flex flex-row items-center gap-x-2 h-5 overflow-hidden ${type === "listing" ? "hidden lg:flex " : "flex"}`}
+            className={`2xl:w-2/3 w-full grow flex flex-row items-center gap-x-2 ${type === "listing" ? "hidden lg:flex " : "flex"}`}
           >
             {product.sku && (
               <div
-                onClick={() => copyToClipboard(product.sku)}
+                onClick={() => handleSkuCopy(product.sku)}
                 className="flex justify-center items-center flex-shrink-0"
               >
-                <span className="text-[10px] lg:text-[12px] text-secondary-alt mr-[8px] word-break">
+                <span className={`text-[10px] lg:text-[12px] text-secondary-alt mr-[8px] word-break transition-colors duration-200 ${copiedSkuId === product.sku ? 'bg-primary' : ''}`}>
                   {product.sku}
                 </span>
                 <CopyIcon />
@@ -93,12 +101,18 @@ function ProductCard({
               if (title == "Size") {
                 return (
                   <div
-                    className="text-[10px] lg:text-[12px] grow text-start text-secondary-alt [&_p]:m-0 [&_p]:inline [&_p]:text-inherit"
+                    className="relative"
                     key={index}
-                    dangerouslySetInnerHTML={{
-                      __html: richTextToHTML(description),
-                    }}
-                  ></div>
+                    onMouseEnter={() => setHoveredSizeIndex(index)}
+                    onMouseLeave={() => setHoveredSizeIndex(null)}
+                  >
+                    <div
+                      className={`text-[10px] lg:text-[12px] text-secondary-alt [&_p]:m-0 [&_p]:inline [&_p]:text-inherit px-2`}
+                      dangerouslySetInnerHTML={{
+                        __html: richTextToHTML(description),
+                      }}
+                    ></div>
+                  </div>
                 );
               }
             })}

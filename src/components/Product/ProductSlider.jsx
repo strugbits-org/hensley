@@ -82,6 +82,62 @@ function createThumbnailPlugin(mainRef) {
   };
 }
 
+// Added WheelControls Plugin for mouse wheel scrolling
+function WheelControls(slider) {
+  let touchTimeout;
+  let position;
+  let wheelActive;
+
+  function dispatch(e, name) {
+    position.x -= e.deltaX;
+    position.y -= e.deltaY;
+    slider.container.dispatchEvent(
+      new CustomEvent(name, {
+        detail: {
+          x: position.x,
+          y: position.y,
+        },
+      })
+    );
+  }
+
+  function wheelStart(e) {
+    position = {
+      x: e.pageX,
+      y: e.pageY,
+    };
+    dispatch(e, "ksDragStart");
+  }
+
+  function wheel(e) {
+    dispatch(e, "ksDrag");
+  }
+
+  function wheelEnd(e) {
+    dispatch(e, "ksDragEnd");
+  }
+
+  function eventWheel(e) {
+    e.preventDefault(); 
+    if (!wheelActive) {
+      wheelStart(e);
+      wheelActive = true;
+    }
+    wheel(e);
+    clearTimeout(touchTimeout);
+    touchTimeout = setTimeout(() => {
+      wheelActive = false;
+      wheelEnd(e);
+    }, 50);
+  }
+
+  slider.on("created", () => {
+    slider.container.addEventListener("wheel", eventWheel, {
+      passive: false,
+    });
+  });
+}
+
 const SlideImage = React.memo(({ item, index, isMain = false }) => (
   <div
     className={`${THUMBNAIL_CLASSES.BASE} number-slide-${index + 1} flex items-center justify-center w-full h-full`}
@@ -125,6 +181,7 @@ export default function ProductSlider({ product }) {
   const [isSliderReady, setIsSliderReady] = useState(false);
 
   const thumbnailPlugin = useMemo(() => createThumbnailPlugin, []);
+  
   const [sliderRef, instanceRef] = useKeenSlider({
     ...SLIDER_CONFIG.MAIN,
     created() {
@@ -132,9 +189,10 @@ export default function ProductSlider({ product }) {
     },
   });
 
+  // Updated to include WheelControls
   const [thumbnailRef] = useKeenSlider(
     SLIDER_CONFIG.THUMBNAIL,
-    [thumbnailPlugin(instanceRef)]
+    [thumbnailPlugin(instanceRef), WheelControls] 
   );
 
   const mediaItems = useMemo(() => product?.mediaItems || [], [product]);

@@ -26,21 +26,10 @@ const buildDynamicSchema = (fields = []) => {
         const key = field.fieldKey;
         if (!key) return;
 
-        if (field.inputType === 'number') {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        } else if (field.inputType === 'date') {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        } else if (INPUT_TYPES_WITH_OPTIONS.has(field.inputType)) {
-            shape[key] = yup.string().nullable();
-        } else {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        }
+        // Required flag is driven entirely by the backend tent config.
+        let rule = yup.string().nullable();
+        if (field.required) rule = rule.required(`${field.label} is required`);
+        shape[key] = rule;
     });
 
     // Cross-field validation: removalDate must be after eventDate when both exist
@@ -144,9 +133,28 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     }, [quoteFields.length]);
 
     const handleInputChange = (field, value) => {
+        if(field === 'numberOfGuests'){
+            // Only allow numeric input for numberOfGuests
+            const numericValue = value.replace(/\D/g, '');
+            value = numericValue;
+        }
         setFormData((prev) => ({ ...prev, [field]: value }));
         setValue(field, value);
         trigger(field);
+    };
+
+    // Validation failed: bring the first invalid field into view. The form lives
+    // inside a scrollable container, so errors otherwise stay hidden off-screen.
+    const onError = (formErrors) => {
+        const firstKey = Object.keys(formErrors || {})[0];
+        if (!firstKey) return;
+        const el =
+            document.getElementById(`${uid}-${firstKey}`) ||
+            document.querySelector(`[name="${firstKey}"]`);
+        if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (typeof el.focus === 'function') el.focus({ preventScroll: true });
+        }
     };
 
     // ---- Submission ----
@@ -162,7 +170,8 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             quoteFields.forEach((field) => {
                 const label = (field.label || field.fieldKey).toUpperCase();
                 const val = data[field.fieldKey];
-                customTextFields[label] = typeof val === 'string' ? val.toUpperCase() : val || '-';
+                const normalized = typeof val === 'string' ? val.trim().toUpperCase() : val;
+                customTextFields[label] = normalized || '-';
             });
 
             const cartData = {
@@ -210,6 +219,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     };
 
     const renderField = (field) => {
+       
         const key = field.fieldKey;
         const elId = `${uid}-${key}`;
         const errorMsg = errors[key]?.message;
@@ -317,6 +327,8 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         value={formData[key]}
                         onChange={(newState) => handleInputChange(key, newState)}
                         disabled={isSubmitting}
+                        required={field.required}
+                        error={errorMsg}
                     />
                 );
 
@@ -347,7 +359,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                 </form>
             </div>
             <AddToCartButton
-                onClick={handleSubmit(onSubmit)}
+                onClick={handleSubmit(onSubmit, onError)}
                 classes={'lg:!h-[200px] lg:!mt-3'}
                 text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
                 disabled={isSubmitting}

@@ -80,6 +80,7 @@ export const fetchPoolCoverPageData = async (slug) => {
         const matchSourceProduct = {
             ...productData.covers,
             collections: productData.covers?.collections || productData.collections || productData.productData?.collections || [],
+            recommendedProducts: productData.recommendedProducts || productData.productData?.recommendedProducts || [],
         };
         const [
             featuredProjectsData,

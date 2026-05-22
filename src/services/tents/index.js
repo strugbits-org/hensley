@@ -270,6 +270,7 @@ export const fetchTentPageData = async (slug) => {
         const matchSourceProduct = {
             ...productData.tent,
             collections: productData.tent?.collections || productData.collections || productData.productData?.collections || [],
+            recommendedProducts: productData.recommendedProducts || productData.productData?.recommendedProducts || [],
         };
         const [
             featuredProjectsData,
