@@ -8,7 +8,9 @@ export const CheckBox = ({
     classes = "",
     type = "checkbox",
     value = null,
-    onChange = null
+    onChange = null,
+    required = false,
+    error = ""
 }) => {
     const { label, options } = data;
 
@@ -53,7 +55,7 @@ export const CheckBox = ({
     return (
         <div className={`relative ${classes}`}>
             <span className="lg:text-[16px] mb-[25px] font-haasBold sm:text-[14px] text-[#2B2218] uppercase select-none block">
-                {label}
+                {label}{required ? '*' : ''}
             </span>
             {options.map((option, index) => (
                 <label key={index} className="flex items-center cursor-pointer mb-[10px]">
@@ -76,6 +78,7 @@ export const CheckBox = ({
                     </span>
                 </label>
             ))}
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         </div>
     );
 };
