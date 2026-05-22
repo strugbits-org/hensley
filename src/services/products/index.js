@@ -201,6 +201,7 @@ export const fetchMatchedProductsForProduct = async ({ payloadProduct = null } =
         }
         // Fall back to products in the same collections
         // return await fetchMatchedProductsFromCollections(payloadProduct);
+        return [];
     } catch (error) {
         logError(`Error fetching matched products for product page: ${error.message}`, error);
         return [];

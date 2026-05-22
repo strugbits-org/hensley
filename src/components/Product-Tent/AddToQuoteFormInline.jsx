@@ -7,7 +7,7 @@ import AirDatepicker from 'air-datepicker';
 import localeEn from 'air-datepicker/locale/en';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
-import { AddToCartButton, AddToCartButtonInline } from '../Product/AddtoQuoteButton';
+import { AddToCartButtonInline } from '../Product/AddtoQuoteButton';
 import parse from 'html-react-parser';
 import { CheckBoxInline } from './CheckBoxInline';
 
@@ -23,13 +23,10 @@ const buildDynamicSchema = (fields = []) => {
         const key = field.fieldKey;
         if (!key) return;
 
-        if (INPUT_TYPES_WITH_OPTIONS.has(field.inputType)) {
-            shape[key] = yup.string().nullable();
-        } else {
-            let rule = yup.string();
-            if (field.required) rule = rule.required(`${field.label} is required`);
-            shape[key] = rule;
-        }
+        // Required flag is driven entirely by the backend tent config.
+        let rule = yup.string().nullable();
+        if (field.required) rule = rule.required(`${field.label} is required`);
+        shape[key] = rule;
     });
 
     if (shape.removalDate && shape.eventDate) {
@@ -130,6 +127,20 @@ export const AddToQuoteFormInline = ({ title, productData }) => {
         trigger(field);
     };
 
+    // Validation failed: bring the first invalid field into view. The form lives
+    // inside a scrollable container, so errors otherwise stay hidden off-screen.
+    const onError = (formErrors) => {
+        const firstKey = Object.keys(formErrors || {})[0];
+        if (!firstKey) return;
+        const el =
+            document.getElementById(`${uid}-inline-${firstKey}`) ||
+            document.querySelector(`[name="${firstKey}"]`);
+        if (el && typeof el.scrollIntoView === 'function') {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (typeof el.focus === 'function') el.focus({ preventScroll: true });
+        }
+    };
+
     const onSubmit = async (data) => {
         setIsSubmitting(true);
 
@@ -141,7 +152,8 @@ export const AddToQuoteFormInline = ({ title, productData }) => {
             quoteFields.forEach((field) => {
                 const label = (field.label || field.fieldKey).toUpperCase();
                 const val = data[field.fieldKey];
-                customTextFields[label] = typeof val === 'string' ? val.toUpperCase() : val || '-';
+                const normalized = typeof val === 'string' ? val.trim().toUpperCase() : val;
+                customTextFields[label] = normalized || '-';
             });
 
             const cartData = {
@@ -287,6 +299,8 @@ export const AddToQuoteFormInline = ({ title, productData }) => {
                         value={formData[key]}
                         onChange={(newState) => handleInputChange(key, newState)}
                         disabled={isSubmitting}
+                        required={field.required}
+                        error={errorMsg}
                     />
                 );
 
@@ -312,7 +326,7 @@ export const AddToQuoteFormInline = ({ title, productData }) => {
             <div className='spacer h-28 lg:h-24'></div>
             <div className='absolute bottom-0 right-0 w-full sm:w-[55%] p-5 bg-primary-alt border-none'>
                 <AddToCartButtonInline
-                    onClick={handleSubmit(onSubmit)}
+                    onClick={handleSubmit(onSubmit, onError)}
                     classes={'h-[75px] lg:mt-4 mt-0'}
                     text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
                     disabled={isSubmitting}
