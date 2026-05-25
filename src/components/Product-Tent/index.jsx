@@ -22,7 +22,7 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
 
   return (
     <>
-      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] '>
+      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] '>
         <div className='xl:w-1/2 '>
           <ProductSlider product={sliderProduct} />
           <ProductSlider_tab product={sliderProduct} productData={{ ...productData.productData, product: tent }} />

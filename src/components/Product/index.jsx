@@ -440,7 +440,7 @@ export const Product = ({
       </div>
 
       <div className="lg:w-1/2 w-full flex flex-col items-center relative h-full">
-        <div className="lg:max-w-[656px] sm:max-w-[492px] w-full flex-1 overflow-y-auto hide-scrollbar">
+        <div className="lg:max-w-[656px] sm:max-w-[492px] w-full flex-1 overflow-y-auto hide-scrollbar lg:pb-[20vh]">
           <div className="w-full flex items-center justify-between mt-2 mb-6 relative">
             <BreadCrumbs items={breadcrumbItems} />
             <SaveProductButton
@@ -501,7 +501,7 @@ export const Product = ({
 
         <AddToCartButton
           classes={
-            "h-[90px] md:h-[90px] lg:!h-[130px] lg:!mt-3 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
+            "h-[90px] md:h-[90px] lg:!h-[130px] lg:!mt-0 lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
           }
           text={isUpdatingCart ? "Please wait..." : "Add to Quote"}
           disabled={isUpdatingCart}
