@@ -14,15 +14,15 @@ const ProductPoolCover = ({ productData, matchedProducts = [], allCollections = 
 
   return (
     <>
-      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] '>
+      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] 3xl:gap-x-[40px] px-[24px] 3xl:px-[40px] 3xl:py-[40px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] 3xl:h-[calc(100vh-160px)] '>
         <div className='xl:w-1/2 '>
           <ProductSlider product={{ ...covers, mediaItems: covers?.mainMedia ? [{ id: 'main-media', src: covers.mainMedia, alt: covers?.name || '' }] : [] }} />
           <ProductSlider_tab product={{ ...covers, mediaItems: covers?.mainMedia ? [{ id: 'main-media', src: covers.mainMedia, alt: covers?.name || '' }] : [] }} productData={{ ...productData.productData, product: covers }} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
           {ribbon && (
-            <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px]'>
-              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full'>
+            <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px] 3xl:max-w-[1400px]'>
+              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] 3xl:text-[18px] font-haasRegular uppercase px-3 py-1 3xl:px-5 3xl:py-2 rounded-full'>
                 {ribbon}
               </span>
             </div>
@@ -34,9 +34,9 @@ const ProductPoolCover = ({ productData, matchedProducts = [], allCollections = 
           />
         </div>
       </div>
-      <div className='w-full min-h-screen bg-secondary-alt pt-[75px] px-[24px]'>
+      <div className='w-full min-h-screen bg-secondary-alt pt-[75px] 3xl:pt-[120px] px-[24px] 3xl:px-[40px]'>
         <BannerStructures title={productData.title} data={productData.covers} />
-        <div className="w-full grid gap-[24px] mt-6 lg:grid-cols-[2fr_1fr] grid-cols-1">
+        <div className="w-full grid gap-[24px] 3xl:gap-[40px] mt-6 3xl:mt-12 lg:grid-cols-[2fr_1fr] grid-cols-1">
           {mediagallery.map((item, index) => {
             const position = index % 3;
             const colSpanClass =

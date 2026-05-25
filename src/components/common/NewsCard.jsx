@@ -30,7 +30,7 @@ function NewsCard({ data, classes }) {
 
             <div className='w-full flex gap-1 p-6 pb-0'>
                 <div className='grow'>
-                    <h2 className="uppercase text-[16px] leading-[18px] lg:text-[18px] lg:leading-[20px] 3xl:text-[28px] 3xl:leading-[32px] text-secondary-alt font-haasRegular mb-3">
+                    <h2 className="uppercase text-[16px] leading-[18px] lg:text-[18px] lg:leading-[20px] 3xl:text-[34px] 3xl:leading-[40px] text-secondary-alt font-haasRegular mb-3 3xl:mb-5">
                         {title}
                     </h2>
                 </div>
@@ -38,12 +38,12 @@ function NewsCard({ data, classes }) {
                     <PrimaryImage
                         url={"/icons/0e0ac5_87d58241be704c008a2500d6691fb318.png"}
                         alt="Arrow"
-                        customClasses="h-[20px] group-hover:lg:h-[44px] object-contain transition-all duration-300 ease-in-out"
+                        customClasses="h-[20px] 3xl:h-[32px] group-hover:lg:h-[44px] group-hover:3xl:h-[60px] object-contain transition-all duration-300 ease-in-out"
                     />
                 </div>
             </div>
             <div className='px-6'>
-                <p className='text-[12px] 3xl:text-[18px] leading-[20px] 3xl:leading-[28px] text-secondary-alt font-haasRegular mb-3 uppercase'>{metaInfoString}</p>
+                <p className='text-[12px] 3xl:text-[22px] leading-[20px] 3xl:leading-[30px] text-secondary-alt font-haasRegular mb-3 3xl:mb-5 uppercase'>{metaInfoString}</p>
 
                 <MarketsStudiosTags markets={markets} studios={studios} categories={blogCategories} />
             </div>

@@ -49,7 +49,7 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
         <div className={`relative w-full lg:h-full ${noWidthConstraint ? '' : 'sm:max-w-[45%]'} ${isTent ? 'h-auto' : 'h-full'}`}>
             <div ref={sliderRef} className="keen-slider">
                 {hasMedia ? mediaItems.map((item, index) => (
-                    <div key={item.id || index} className={`keen-slider__slide lg:!max-h-[400px] number-slide${index + 1} p-4 ${isTent ? '!max-h-[250px]' : '!max-h-[400px]'}`}>
+                    <div key={item.id || index} className={`keen-slider__slide lg:!max-h-[400px] 3xl:!max-h-[640px] number-slide${index + 1} p-4 ${isTent ? '!max-h-[250px]' : '3xl:!max-h-[640px] !max-h-[400px]'}`}>
                         <PrimaryImage
                             key={item.id || index}
                             url={item.src}
@@ -73,9 +73,9 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
                             e.stopPropagation() || instanceRef.current?.prev()
                         }
                         disabled={currentSlide === 0}
-                        className="absolute top-1/2 left-2 sm:left-4 lg:left-8 transform -translate-y-1/2 w-10 h-10 lg:w-[60px] lg:h-[60px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
+                        className="absolute top-1/2 left-2 sm:left-4 lg:left-8 transform -translate-y-1/2 w-10 h-10 lg:w-[60px] lg:h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
                     >
-                        <MdOutlineChevronLeft className="w-[18px] h-[18px] lg:w-[20px] lg:h-[20px]" />
+                        <MdOutlineChevronLeft className="w-[18px] h-[18px] lg:w-[20px] lg:h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                     </button>
  
                     <button
@@ -86,9 +86,9 @@ export const AddToCartSlider = ({ data, loop = true, origin = "center", isTent =
                             currentSlide ===
                             instanceRef.current.track.details.slides.length - 1
                         }
-                        className="absolute top-1/2 right-2 sm:right-4 lg:right-8 transform -translate-y-1/2 w-10 h-10 lg:w-[60px] lg:h-[60px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
+                        className="absolute top-1/2 right-2 sm:right-4 lg:right-8 transform -translate-y-1/2 w-10 h-10 lg:w-[60px] lg:h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md flex items-center justify-center z-10"
                     >
-                        <MdOutlineChevronRight className="w-[18px] h-[18px] lg:w-[20px] lg:h-[20px]" />
+                        <MdOutlineChevronRight className="w-[18px] h-[18px] lg:w-[20px] lg:h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                     </button>
                 </>
             ))}

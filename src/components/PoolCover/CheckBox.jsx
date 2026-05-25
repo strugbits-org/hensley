@@ -46,11 +46,11 @@ export const CheckBox = ({
 
     return (
         <div className={classes}>
-            <span className="lg:text-[16px] mb-[25px] font-haasBold sm:text-[14px] text-[#2B2218] uppercase select-none block">
+            <span className="lg:text-[16px] 3xl:text-[26px] mb-[25px] 3xl:mb-[40px] font-haasBold sm:text-[14px] text-[#2B2218] uppercase select-none block">
                 {label}
             </span>
             {options.map((option, index) => (
-                <label key={index} className="flex items-center cursor-pointer mb-[10px]">
+                <label key={index} className="flex items-center cursor-pointer mb-[10px] 3xl:mb-[18px]">
                     <input
                         type={type}
                         name={type === "radio" ? `radio-${label}` : undefined}
@@ -58,14 +58,14 @@ export const CheckBox = ({
                         onChange={() => handleChange(option)}
                         checked={isChecked(option)}
                     />
-                    <div className="relative w-4 h-4 border-[1.5px] border-secondary-alt bg-transparent">
+                    <div className="relative w-4 h-4 3xl:w-7 3xl:h-7 border-[1.5px] 3xl:border-2 border-secondary-alt bg-transparent flex-shrink-0">
                         {isChecked(option) && (
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-2 h-2 bg-secondary-alt"></div>
+                                <div className="w-2 h-2 3xl:w-3.5 3xl:h-3.5 bg-secondary-alt"></div>
                             </div>
                         )}
                     </div>
-                    <span className="lg:text-[16px] leading-[19px] font-haasLight sm:text-[14px] ml-[8px] text-[#2B2218] uppercase select-none">
+                    <span className="lg:text-[16px] 3xl:text-[26px] leading-[19px] 3xl:leading-[30px] font-haasLight sm:text-[14px] ml-[8px] 3xl:ml-[16px] text-[#2B2218] uppercase select-none">
                         {option}
                     </span>
                 </label>

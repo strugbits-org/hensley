@@ -66,7 +66,7 @@ function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
           <Loading custom type='secondary' />
         </div>
       )}
-      <div ref={sliderRef} className={` ${tab && 'lg:pl-[100px]'} keen-slider mt-[30px] md:min-h-[850px] 3xl:min-h-[1400px] pb-[70px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
+      <div ref={sliderRef} className={` ${tab && 'lg:pl-[100px]'} keen-slider mt-[30px] md:min-h-[850px] 3xl:min-h-[1200px] pb-[70px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
         {data.map((dt, index) => {
           const isActive = index === currentSlide?.rel;
 
@@ -101,16 +101,16 @@ function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
           <>
             {(loop || currentSlide?.rel > 0) && <button
               onClick={() => sliderInstance.current?.prev()}
-              className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+              className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
             >
-              <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+              <MdOutlineChevronLeft className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
             </button>}
 
             {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
               onClick={() => sliderInstance.current?.next()}
-              className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+              className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
             >
-              <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+              <MdOutlineChevronRight className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
             </button>}
           </>
         )}
