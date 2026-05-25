@@ -658,7 +658,31 @@ export const fetchContactPageData = async () => {
 };
 
 export const fetchAllPagesMetaData = async () => {
-  return [];
+  try {
+    const result = await sdk.find({
+      collection: 'pages',
+      where: {
+        tenant: { equals: CORE_TENANT_ID },
+        _status: { equals: 'published' }
+      },
+      limit: 0,
+      depth: 0,
+      draft: false,
+      select: {
+        slug: true,
+        meta: true
+      }
+    });
+    // Filter excluded pages in JS rather than the `where` clause so this stays
+    // resilient if Core hasn't deployed the meta.excludeFromSitemap field yet
+    // (an unknown queryable path makes Payload reject the whole request).
+    return (result.docs || [])
+      .filter((doc) => doc && doc.slug && doc.meta?.excludeFromSitemap !== true)
+      .map((doc) => ({ slug: doc.slug }));
+  } catch (error) {
+    console.error('Error fetching all pages meta data', error);
+    return [];
+  }
 };
 
 export const buildRobotsTag = (noIndex, noFollow) => {
