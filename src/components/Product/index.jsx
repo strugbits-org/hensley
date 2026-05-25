@@ -439,7 +439,7 @@ export const Product = ({
       </div>
 
       <div className="lg:w-1/2 w-full flex flex-col items-center relative lg:min-h-[calc(100vh-110px)] 3xl:min-h-[calc(100vh-160px)]">
-        <div className="sm:max-w-[492px] lg:max-w-[756px] 3xl:max-w-[1400px] w-full">
+        <div className="sm:max-w-[492px] lg:max-w-[716px] 3xl:max-w-[1400px] w-full">
           <div className="w-full flex items-center justify-between my-2 relative">
             <BreadCrumbs items={breadcrumbItems} />
             <SaveProductButton
