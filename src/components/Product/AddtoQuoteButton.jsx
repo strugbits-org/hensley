@@ -11,7 +11,6 @@ export const AddToCartButton = ({ text, classes, onClick, disabled, showArrow = 
                 </g>
             </svg>
         </button>
-
     )
 }
 export const AddToCartButtonInline = ({ text, classes, onClick, disabled }) => {

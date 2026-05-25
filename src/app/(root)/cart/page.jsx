@@ -1,15 +1,12 @@
 import Cart from "@/components/Cart";
-import { fetchPageMetaData } from "@/services";
+import { fetchPageMetaData, buildPageMetadata } from "@/services";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata() {
   try {
     const metaData = await fetchPageMetaData("cart");
-    const { title, robotsTag } = metaData;
-    const metadata = { title };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) metadata.robots = robotsTag;
-    return metadata;
+    return buildPageMetadata(metaData);
   } catch (error) {
     logError("Error in metadata(home page):", error);
   }

@@ -1,7 +1,7 @@
 import ProductTent from "@/components/Product-Tent";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
-import { fetchPageMetaData, fetchTentsData } from "@/services";
+import { fetchPageMetaData, buildPageMetadata, fetchTentsData } from "@/services";
 import { fetchTentData, fetchTentPageData } from "@/services/tents";
 import { queryProductCollections } from "@/services/payloadCollections";
 import { logError } from "@/utils";
@@ -19,17 +19,9 @@ export async function generateMetadata({ params }) {
       fetchTentData(slug)
     ]);
 
-    const { title, robotsTag } = metaData || {};
-
+    const { title } = metaData || {};
     const fullTitle = (tentData?.title || slug) + (title || "");
-
-    const metadata = { title: fullTitle };
-
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
-      metadata.robots = robotsTag;
-    }
-
-    return metadata;
+    return buildPageMetadata(metaData, { title: fullTitle });
   } catch (error) {
     logError("Error in metadata(tent page):", error);
   }

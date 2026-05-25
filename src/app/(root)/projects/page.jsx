@@ -1,5 +1,5 @@
 import Portfolio from "@/components/Portfolio";
-import { fetchPageMetaData } from "@/services";
+import { fetchPageMetaData, buildPageMetadata } from "@/services";
 import { fetchPortfolioPageData } from "@/services/projects";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
@@ -9,12 +9,7 @@ import { Suspense } from "react";
 export async function generateMetadata() {
   try {
     const metaData = await fetchPageMetaData("projects");
-    const metadata = {};
-    if (metaData?.title) metadata.title = metaData.title;
-    if (process.env.ENVIRONMENT === "PRODUCTION" && metaData?.robotsTag) {
-      metadata.robots = metaData.robotsTag;
-    }
-    return metadata;
+    return buildPageMetadata(metaData);
   } catch (error) {
     logError("Error in metadata(projecting page):", error);
   }

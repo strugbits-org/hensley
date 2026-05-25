@@ -1,5 +1,5 @@
 import { CollectionPage } from "@/components/Collections";
-import { fetchPageMetaData } from "@/services";
+import { fetchPageMetaData, buildPageMetadata } from "@/services";
 import { fetchCollectionPagePaths, fetchSelectedCollectionData } from "@/services/collections";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
@@ -23,15 +23,10 @@ export async function generateMetadata({ params }) {
      fetchSelectedCollectionData(slug)
     ]);
 
-    const { title, robotsTag } = metaData || {};
+    const { title } = metaData || {};
     const { selectedCategory } = subCategoryData || {};
     const fullTitle = (selectedCategory?.name || slug) + " " + (title || "");
-    const metadata = { title: fullTitle };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
-      metadata.robots = robotsTag;
-    }
-
-    return metadata;
+    return buildPageMetadata(metaData, { title: fullTitle });
   } catch (error) {
     logError("Error in metadata(market page):", error);
   }

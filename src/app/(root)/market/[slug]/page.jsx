@@ -1,5 +1,5 @@
 import { MarketPage } from "@/components/Market";
-import { fetchMarketsData, fetchPageMetaData, fetchSelectedMarketsData } from "@/services";
+import { fetchMarketsData, fetchPageMetaData, buildPageMetadata, fetchSelectedMarketsData } from "@/services";
 import { fetchSelectedMarketData } from "@/services/market";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
@@ -17,14 +17,9 @@ export async function generateMetadata({ params }) {
       fetchSelectedMarketsData(slug)
     ]);
 
-    const { title, robotsTag } = metaData || {};
+    const { title } = metaData || {};
     const fullTitle = (marketData?.title || slug) + " " + (title || "");
-    const metadata = { title: fullTitle };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
-      metadata.robots = robotsTag;
-    }
-
-    return metadata;
+    return buildPageMetadata(metaData, { title: fullTitle });
   } catch (error) {
     logError("Error in metadata(market page):", error);
   }

@@ -185,7 +185,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
     return (
         <>
-            <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar'>
+            <div className='lg:max-w-[656px] sm:max-w-[492px] h-full overflow-y-scroll hide-scrollbar lg:pb-[28vh]'>
                 <div className='w-full flex items-center my-8'>
                     <BreadCrumbs items={[
                         { label: 'Home', to: '/' },
@@ -305,7 +305,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                     </div>
                 </form>
             </div>
-            <AddToCartButton onClick={handleSubmit(onSubmit)} classes={'lg:!h-[200px] lg:!mt-3'} text={isSubmitting ? "Please wait..." : "add to quote"} disabled={isSubmitting} />
+            <AddToCartButton onClick={handleSubmit(onSubmit)} classes={'lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:!h-[200px] lg:!mt-0'} text={isSubmitting ? "Please wait..." : "add to quote"} disabled={isSubmitting} />
         </>
     );
 };

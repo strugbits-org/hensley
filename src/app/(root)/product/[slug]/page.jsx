@@ -2,7 +2,7 @@ import { Product } from "@/components/Product";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import OurCategories from "@/components/common/OurCategories";
-import { fetchPageMetaData } from "@/services";
+import { fetchPageMetaData, buildPageMetadata } from "@/services";
 import { fetchProductData, fetchProductPageData, fetchProductPaths } from "@/services/products";
 import { queryProductsBySlug } from "@/services/payloadCollections";
 import { logError, normalizeProductForDisplay, richTextToPlainText } from "@/utils";
@@ -20,18 +20,13 @@ export async function generateMetadata({ params }) {
       queryProductsBySlug(slug)
     ]);
 
-    const { title, robotsTag } = metaData;
+    const { title } = metaData;
     const normalizedProduct = normalizeProductForDisplay(product || {});
     const fullTitle = `${normalizedProduct.name} ${title}`;
-    const metadata = {
+    return buildPageMetadata(metaData, {
       title: fullTitle,
       description: richTextToPlainText(product?.description).slice(0, 160) || undefined,
-    };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
-      metadata.robots = robotsTag;
-    }
-
-    return metadata;
+    });
   } catch (error) {
     logError("Error in metadata(product page):", error);
   }

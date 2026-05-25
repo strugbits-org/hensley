@@ -668,6 +668,27 @@ export const buildRobotsTag = (noIndex, noFollow) => {
   return null;
 };
 
+const EMPTY_PAGE_META = {
+  title: '',
+  description: '',
+  keywords: '',
+  canonicalURL: null,
+  image: '',
+  ogTitle: '',
+  ogDescription: '',
+  ogType: '',
+  twitterCard: '',
+  twitterTitle: '',
+  twitterDescription: '',
+  twitterImage: '',
+  twitterSite: '',
+  twitterCreator: '',
+  noIndex: false,
+  noFollow: false,
+  noFollowTag: false,
+  robotsTag: null,
+};
+
 export const fetchPageMetaData = async (slug) => {
   try {
     const result = await sdk.find({
@@ -678,7 +699,9 @@ export const fetchPageMetaData = async (slug) => {
         _status: { equals: 'published' }
       },
       limit: 1,
-      depth: 0,
+      // depth 1 so meta.image / twitterImage resolve to media objects (URLs),
+      // not bare relation IDs.
+      depth: 1,
       draft: false,
       select: {
         meta: true
@@ -694,6 +717,17 @@ export const fetchPageMetaData = async (slug) => {
         title: meta.title || '',
         description: meta.description || '',
         keywords,
+        canonicalURL: meta.canonicalURL || null,
+        image: resolveCoreMediaUrl(meta.image, { w: 1200 }),
+        ogTitle: meta.ogTitle || '',
+        ogDescription: meta.ogDescription || '',
+        ogType: meta.ogType || '',
+        twitterCard: meta.twitterCard || '',
+        twitterTitle: meta.twitterTitle || '',
+        twitterDescription: meta.twitterDescription || '',
+        twitterImage: resolveCoreMediaUrl(meta.twitterImage, { w: 1200 }),
+        twitterSite: meta.twitterSite || '',
+        twitterCreator: meta.twitterCreator || '',
         noIndex,
         noFollow,
         noFollowTag: noIndex || noFollow,
@@ -703,7 +737,61 @@ export const fetchPageMetaData = async (slug) => {
   } catch (error) {
     console.error('Error fetching page meta data', error);
   }
-  return { title: '', description: '', keywords: '', noIndex: false, noFollow: false, noFollowTag: false, robotsTag: null };
+  return { ...EMPTY_PAGE_META };
+};
+
+/**
+ * Build a Next.js Metadata object from CMS page meta + per-page overrides.
+ *
+ * Overrides ({ title, description, image, robots }) win over the CMS values —
+ * dynamic pages pass a computed title/description here. Open Graph and Twitter
+ * fields fall back to the base title/description/image when their specific CMS
+ * fields are empty, so social cards stay populated with minimal authoring.
+ * `robots` is only emitted in PRODUCTION, matching prior per-page behaviour.
+ */
+export const buildPageMetadata = (metaData = {}, overrides = {}) => {
+  const {
+    title, description, keywords, canonicalURL,
+    image, ogTitle, ogDescription, ogType,
+    twitterCard, twitterTitle, twitterDescription, twitterImage,
+    twitterSite, twitterCreator, robotsTag,
+  } = metaData || {};
+
+  const finalTitle = overrides.title ?? (title || undefined);
+  const finalDescription = overrides.description ?? (description || undefined);
+  const finalImage = overrides.image ?? (image || undefined);
+
+  const metadata = {};
+  if (finalTitle) metadata.title = finalTitle;
+  if (finalDescription) metadata.description = finalDescription;
+  if (keywords) metadata.keywords = keywords;
+  if (canonicalURL) metadata.alternates = { canonical: canonicalURL };
+
+  // Open Graph — fall back to base title/description/image.
+  const ogT = ogTitle || finalTitle;
+  const ogD = ogDescription || finalDescription;
+  const og = {};
+  if (ogT) og.title = ogT;
+  if (ogD) og.description = ogD;
+  if (ogType) og.type = ogType;
+  if (finalImage) og.images = [{ url: finalImage }];
+  if (Object.keys(og).length) metadata.openGraph = og;
+
+  // Twitter — fall back to og, then base.
+  const twImg = twitterImage || finalImage;
+  const tw = {};
+  if (twitterCard) tw.card = twitterCard;
+  if (twitterTitle || ogT) tw.title = twitterTitle || ogT;
+  if (twitterDescription || ogD) tw.description = twitterDescription || ogD;
+  if (twImg) tw.images = [twImg];
+  if (twitterSite) tw.site = twitterSite;
+  if (twitterCreator) tw.creator = twitterCreator;
+  if (Object.keys(tw).length) metadata.twitter = tw;
+
+  const robots = overrides.robots ?? robotsTag;
+  if (process.env.ENVIRONMENT === "PRODUCTION" && robots) metadata.robots = robots;
+
+  return metadata;
 };
 
 
