@@ -362,7 +362,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
             <AddToCartButton
                 onClick={handleSubmit(onSubmit, onError)}
-                classes={'lg:sticky lg:bottom-0 lg:z-10 lg:!h-[130px] 3xl:!h-[280px] lg:!mt-auto'}
+                classes={'lg:sticky lg:bottom-4 lg:z-10 lg:!h-[130px] 3xl:!h-[180px] lg:!mt-auto'}
                 text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
                 disabled={isSubmitting}
             />
