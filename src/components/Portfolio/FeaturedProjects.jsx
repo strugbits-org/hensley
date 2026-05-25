@@ -31,19 +31,19 @@ const FeaturedProjectCard = ({ project }) => {
                     <div className='w-full h-full bg-primary-border' />
                 )}
             </div>
-            <div className='p-[24px] flex flex-col gap-y-[12px] flex-1'>
+            <div className='p-[24px] 3xl:p-[40px] flex flex-col gap-y-[12px] 3xl:gap-y-[20px] flex-1'>
                 {formattedDate && (
-                    <span className='font-haasRegular uppercase text-[11px] text-secondary-alt opacity-70'>{formattedDate}</span>
+                    <span className='font-haasRegular uppercase text-[11px] 3xl:text-[18px] text-secondary-alt opacity-70'>{formattedDate}</span>
                 )}
-                <span className='font-recklessRegular text-[22px] leading-[24px] uppercase text-secondary-alt'>
+                <span className='font-recklessRegular text-[22px] leading-[24px] 3xl:text-[36px] 3xl:leading-[40px] uppercase text-secondary-alt'>
                     {portfolioRef.title}
                 </span>
                 {displayExcerpt && (
-                    <span className='font-haasRegular text-[13px] leading-[18px] uppercase text-secondary-alt line-clamp-3'>
+                    <span className='font-haasRegular text-[13px] leading-[18px] 3xl:text-[20px] 3xl:leading-[28px] uppercase text-secondary-alt line-clamp-3'>
                         {displayExcerpt}
                     </span>
                 )}
-                <span className='font-haasRegular uppercase text-[12px] text-secondary-alt mt-auto pt-[12px] tracking-[2px] group-hover:tracking-[4px] transition-all duration-300'>
+                <span className='font-haasRegular uppercase text-[12px] 3xl:text-[18px] text-secondary-alt mt-auto pt-[12px] 3xl:pt-[20px] tracking-[2px] group-hover:tracking-[4px] transition-all duration-300'>
                     View Project
                 </span>
             </div>
@@ -59,7 +59,7 @@ const FeaturedProjects = async ({ limit = 3, title = 'Featured Projects' }) => {
     return (
         <section className='w-full'>
             <SectionTitle text={title} classes='lg:bg-primary-alt pt-[36px] pb-[44px]' />
-            <div className='w-full lg:px-[24px] px-[12px] py-[24px] grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-[24px]'>
+            <div className='w-full lg:px-[24px] 3xl:px-[40px] px-[12px] py-[24px] 3xl:py-[40px] grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-[24px] 3xl:gap-[40px]'>
                 {projects.map((project) => (
                     <FeaturedProjectCard key={project._id || project.slug} project={project} />
                 ))}

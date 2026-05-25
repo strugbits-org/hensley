@@ -405,14 +405,14 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
     <>
       <header>
         <div className="hidden lg:block fixed inset-x-0 top-0 z-[110] desktop-menu">
-          <div className="h-[45px] relative">
+          <div className="h-[45px] 3xl:h-[72px] relative">
             <div className="absolute inset-0 -z-10 bg-secondary-glass backdrop-blur-[20px] brightness-[50px]"></div>
             <nav
               className="h-full flex items-center justify-between"
               aria-label="Main Navigation"
             >
               {/* Logo */}
-              <div className="flex p-2 lg:px-6">
+              <div className="flex p-2 lg:px-6 3xl:px-10">
                 <CustomLink
                   to="/"
                   onClick={() => {
@@ -423,14 +423,14 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                   <span className="sr-only">Hensley Event Resources</span>
                   <Image
                     src={logo}
-                    className="min-w-[184px]"
+                    className="min-w-[184px] 3xl:min-w-[300px]"
                     alt="Hensley Event Resources Logo"
                   />
                 </CustomLink>
               </div>
 
               {/* Main Navigation */}
-              <ul className="flex h-full grow items-center justify-center gap-x-24">
+              <ul className="flex h-full grow items-center justify-center gap-x-24 3xl:gap-x-40">
                 {header.map((item) => {
                   const { title } = item;
                   const isActive = activeMenu === title;
@@ -438,16 +438,16 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                   return (
                     <li
                       key={title}
-                      className="h-full w-1/3 flex justify-center items-center relative group max-w-[288px]"
+                      className="h-full w-1/3 flex justify-center items-center relative group max-w-[288px] 3xl:max-w-[540px]"
                     >
                       <button
                         onClick={() => handleMainMenuClick(item)}
-                        className={`uppercase h-full w-full text-secondary-alt text-xs font-haasBold tracking-[2px] transition-[letter-spacing] duration-300 ease-in-out ${isActive ? "" : "hover:tracking-[4px]"}`}
+                        className={`uppercase h-full w-full text-secondary-alt text-xs 3xl:text-[20px] font-haasBold tracking-[2px] 3xl:tracking-[4px] transition-[letter-spacing] duration-300 ease-in-out ${isActive ? "" : "hover:tracking-[4px] 3xl:hover:tracking-[6px]"}`}
                       >
                         {title}
                       </button>
                       <span
-                        className={`absolute bottom-[0.5px] left-0 h-0.5 bg-secondary-alt transition-all duration-300 ease-in-out ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
+                        className={`absolute bottom-[0.5px] left-0 h-0.5 3xl:h-[3px] bg-secondary-alt transition-all duration-300 ease-in-out ${isActive ? "w-full" : "w-0 group-hover:w-full"}`}
                       ></span>
                     </li>
                   );
@@ -455,18 +455,18 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
               </ul>
 
               {/* User Menu */}
-              <div className="p-2 lg:px-12 py-0.5 flex gap-x-4">
+              <div className="p-2 lg:px-12 3xl:px-16 py-0.5 flex gap-x-4 3xl:gap-x-7">
                 {userMenu.map((item, index) => {
                   const { icon, type } = item;
                   return (
                     <button
                       key={index}
                       onClick={() => handleClickUserMenu(item)}
-                      className="relative h-10 w-10 flex justify-center items-center"
+                      className="relative h-10 w-10 3xl:h-16 3xl:w-16 flex justify-center items-center"
                     >
-                      <Image height={"20"} src={icon} alt={item.type} />
+                      <Image height={"20"} src={icon} alt={item.type} className="3xl:!h-[32px] 3xl:!w-[32px]" />
                       {type === "cart" && (
-                        <span className="absolute top-0 font-haasRegular left-9 min-w-[32px] inline-flex items-center justify-center px-1.5 text-[13px] text-secondary-alt bg-primary rounded-full">
+                        <span className="absolute top-0 font-haasRegular left-9 3xl:left-14 min-w-[32px] 3xl:min-w-[48px] inline-flex items-center justify-center px-1.5 3xl:px-2.5 text-[13px] 3xl:text-[20px] text-secondary-alt bg-primary rounded-full">
                           {cartTotalQuantity}
                         </span>
                       )}
@@ -478,10 +478,10 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
           </div>
 
           {/* Sub Navigation */}
-          <div className="h-[45px] relative">
+          <div className="h-[45px] 3xl:h-[72px] relative">
             <div className="absolute inset-0 -z-10 bg-primary-glass backdrop-blur-[10px] brightness-[30px]"></div>
             <nav
-              className="h-full px-2 lg:px-6 grid items-center max-w-7xl mx-auto"
+              className="h-full px-2 lg:px-6 3xl:px-10 grid items-center max-w-7xl 3xl:max-w-[2400px] mx-auto"
               style={{
                 gridTemplateColumns: `repeat(${subNavigation.length || 1}, minmax(0, 1fr))`,
               }}
@@ -499,7 +499,7 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                   >
                     <button
                       key={title}
-                      className="uppercase h-full w-full text-secondary-alt text-xs font-haasRegular tracking-[2px] hover:tracking-[3px] transition-[letter-spacing] duration-300 ease-in-out text-center"
+                      className="uppercase h-full w-full text-secondary-alt text-xs 3xl:text-[20px] font-haasRegular tracking-[2px] 3xl:tracking-[4px] hover:tracking-[3px] 3xl:hover:tracking-[6px] transition-[letter-spacing] duration-300 ease-in-out text-center"
                       onClick={() => handleSubMenuClick(item)}
                     >
                       {title}
@@ -678,7 +678,7 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
       </header>
 
       {/* Spacer for non-homepage content */}
-      {pathname !== "/" && <div className="h-[90px]"></div>}
+      {pathname !== "/" && <div className="h-[90px] 3xl:h-[144px]"></div>}
     </>
   );
 };

@@ -18,7 +18,7 @@ export const TestimonialCard = ({ data, classes, imageExp, titleClass }) => {
 
   return (
     <div
-      className={`flex flex-col lg:flex-row group bg-primary lg:bg-transparent relative w-full h-full lg:min-h-[480px] lg:border border-primary-border duration-300 ease-in-out max-w-[1240px] flex-shrink-0 ${classes}`}
+      className={`flex flex-col lg:flex-row group bg-primary lg:bg-transparent relative w-full h-full lg:min-h-[480px] 3xl:min-h-[820px] lg:border border-primary-border duration-300 ease-in-out max-w-[1240px] 3xl:max-w-[2200px] flex-shrink-0 ${classes}`}
     >
       {/* 1. aspect-square for mobile/tablet stacked cards.
         2. lg:aspect-[4/5] forces the desktop image box to stay a tall portrait shape!
@@ -39,16 +39,16 @@ export const TestimonialCard = ({ data, classes, imageExp, titleClass }) => {
 
       <div className="w-full lg:w-1/2 p-6 sm:p-8 flex flex-col justify-between flex-grow">
         <div className="flex flex-col">
-          <h2 className="text-center lg:text-start text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] lg:text-[45px] lg:leading-[48px] uppercase tracking-wider text-secondary-alt font-recklessRegular mb-2">
+          <h2 className="text-center lg:text-start text-[28px] sm:text-[32px] leading-[36px] sm:leading-[40px] lg:text-[45px] lg:leading-[48px] 3xl:text-[80px] 3xl:leading-[84px] uppercase tracking-wider text-secondary-alt font-recklessRegular mb-2">
             {displayName}
           </h2>
-          <p className="text-center lg:text-start my-[16px] text-[14px] lg:text-[16px] xl:text-[18px] leading-[24px] lg:leading-[30px] text-secondary-alt font-haasRegular">
+          <p className="text-center lg:text-start my-[16px] text-[14px] lg:text-[16px] xl:text-[18px] 3xl:text-[28px] leading-[24px] lg:leading-[30px] 3xl:leading-[42px] text-secondary-alt font-haasRegular">
             {feedback || description}
           </p>
         </div>
 
         <span
-          className={`text-center lg:text-start text-[12px] leading-[20px] tracking-wider text-secondary-alt font-recklessRegular mt-auto pt-4 block uppercase ${titleClass}`}
+          className={`text-center lg:text-start text-[12px] 3xl:text-[20px] leading-[20px] 3xl:leading-[32px] tracking-wider text-secondary-alt font-recklessRegular mt-auto pt-4 block uppercase ${titleClass}`}
         >
           {displayTitle}
         </span>

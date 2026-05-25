@@ -91,13 +91,13 @@ export default function SliderComponent({
                 />
 
                 <div className="absolute top-1/2 lg:left-[20%] left-[10%] right-[10%] lg:transform -translate-y-1/2 z-10 flex flex-col justify-center items-center lg:block">
-                  <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] max-w-[340px] lg:max-w-[600px] lg:text-left text-center text-white font-recklessLight mb-8">
+                  <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] 3xl:text-[100px] 3xl:leading-[92px] max-w-[340px] lg:max-w-[600px] 3xl:max-w-[1000px] lg:text-left text-center text-white font-recklessLight mb-8 3xl:mb-14">
                     {portfolioRef?.title || displayedTitle}
                   </h2>
                   <CustomLink
                     to={`/project/${portfolioRef?.slug || slide?.slug}`}
                   >
-                    <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
+                    <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] 3xl:max-h-[90px] max-w-[280px] 3xl:max-w-[420px] px-4 py-4 3xl:px-6 3xl:py-6 hover:[letter-spacing:4px]">
                       {ourProjectsTitle}
                     </PrimaryButton>
                   </CustomLink>
@@ -126,7 +126,7 @@ export default function SliderComponent({
                   </>
                 )}
 
-                <span className="lg:block hidden absolute bottom-[48px] left-[48px] text-white font-recklessRegular text-[35px]">
+                <span className="lg:block hidden absolute bottom-[48px] left-[48px] 3xl:bottom-[72px] 3xl:left-[72px] text-white font-recklessRegular text-[35px] 3xl:text-[56px]">
                   {(currentSlide?.rel ?? 0) + 1}/{sliderData.length}
                 </span>
               </div>

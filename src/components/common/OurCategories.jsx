@@ -32,7 +32,7 @@ function OurCategories({ data, pageDetails, classes }) {
             <CustomLink to={`/collections/${category.slug}`}
               key={category._id}
               className={`cursor-pointer group border border-primary-border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out ${item.rtl && 'lg:flex-row-reverse'
-                } lg:h-[474px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
+                } lg:h-[474px] 3xl:h-[820px] gap-0 ${index === 0 ? 'sm:col-span-2' : ''}`}
             >
               {/* Image */}
               <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] px-[12px] lg:h-auto h-[382px] ">
@@ -45,7 +45,7 @@ function OurCategories({ data, pageDetails, classes }) {
               <div className={`lg:w-1/2 ${item.rtl ? 'lg:pl-[24px] ' : 'lg:pr-[24px]'} lg:py-[24px] py-[13px] max-lg:px-[12px]`}>
                 <div className='h-full w-full flex justify-between gap-x-2'>
                   <div className='h-full flex flex-col justify-between'>
-                    <h3 className="font-recklessRegular uppercase text-[35px] lg:text-[60px] xl:text-[80px] 2xl:text-[90px] leading-[45px] lg:leading-[50px] xl:leading-[70px] transition-all duration-300 ease-in-out group-hover:tracking-widest">
+                    <h3 className="font-recklessRegular uppercase text-[35px] lg:text-[60px] xl:text-[80px] 2xl:text-[90px] 3xl:text-[160px] leading-[45px] lg:leading-[50px] xl:leading-[70px] 3xl:leading-[130px] transition-all duration-300 ease-in-out group-hover:tracking-widest">
                       <span className='lg:block hidden'>{insertBreaks(category.name, 5, true)}</span>
                       <span className='lg:hidden'>{category.name}</span>
                     </h3>

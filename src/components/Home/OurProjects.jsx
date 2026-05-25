@@ -63,11 +63,11 @@ export default function OurProjects({ data, pageDetails }) {
                     <PrimaryImage
                       url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}
                       alt={portfolioRef.title}
-                      customClasses="hidden md:block fill-primary-alt h-[132px] transition-all duration-500 ease-in-out lg:group-hover:w-full lg:group-hover:h-full"
+                      customClasses="hidden md:block fill-primary-alt h-[132px] 3xl:h-[240px] transition-all duration-500 ease-in-out lg:group-hover:w-full lg:group-hover:h-full"
                     />
                   </div>
                   <h2
-                    className="w-full md:w-auto md:max-w-[150px] lg:max-w-[200px] text-[18px] lg:text-[24px] leading-[22px] md:leading-[18px] lg:leading-[30px] uppercase text-center md:text-end text-white font-haasRegular"
+                    className="w-full md:w-auto md:max-w-[150px] lg:max-w-[200px] 3xl:max-w-[360px] text-[18px] lg:text-[24px] 3xl:text-[44px] leading-[22px] md:leading-[18px] lg:leading-[30px] 3xl:leading-[54px] uppercase text-center md:text-end text-white font-haasRegular"
                   >
                     {portfolioRef.title}
                   </h2>
