@@ -115,7 +115,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
         try {
             const productId = productData._id;
             const appId = "215238eb-22a5-4c36-9e7b-e7c08025e04e";
-            
+
             const uploadedImageIds = relevantImages
                 .map((x) => x.id)
                 .filter(Boolean);
@@ -185,7 +185,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
     return (
         <>
-            <div className='lg:max-w-[656px] sm:max-w-[492px] 3xl:max-w-[1400px] h-full overflow-y-scroll hide-scrollbar lg:pb-[28vh]'>
+            <div className='w-full lg:max-w-[756px] sm:max-w-[492px] 3xl:max-w-[1400px]'>
                 <div className='w-full flex items-center my-8 3xl:my-12'>
                     <BreadCrumbs items={[
                         { label: 'Home', to: '/' },
@@ -193,10 +193,10 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                     ]} />
                 </div>
                 <h3 className='uppercase text-secondary-alt font-recklessRegular
-                    lg:text-[90px] 3xl:text-[180px]
+                    lg:text-[75px] 3xl:text-[180px]
                     lg:leading-[85px] 3xl:leading-[170px]
                     text-[35px]
-                    leading-[30px] mb-4
+                    leading-[30px] mb-3
                     '>{title}</h3>
 
                 <div className="font-haasRegular lg:text-[16px] 3xl:text-[30px] lg:leading-[19px] 3xl:leading-[36px] text-[14px] leading-[17px] text-secondary-alt">
@@ -305,7 +305,8 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                     </div>
                 </form>
             </div>
-            <AddToCartButton onClick={handleSubmit(onSubmit)} classes={'lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:!h-[130px] 3xl:!h-[280px] lg:!mt-0'} text={isSubmitting ? "Please wait..." : "add to quote"} disabled={isSubmitting} />
+            <div className="h-[20px]" />
+            <AddToCartButton onClick={handleSubmit(onSubmit)} classes={'lg:sticky lg:bottom-0 lg:z-10 lg:!h-[130px] 3xl:!h-[280px] lg:!mt-auto'} text={isSubmitting ? "Please wait..." : "add to quote"} disabled={isSubmitting} />
         </>
     );
 };

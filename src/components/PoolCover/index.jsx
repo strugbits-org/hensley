@@ -14,12 +14,12 @@ const ProductPoolCover = ({ productData, matchedProducts = [], allCollections = 
 
   return (
     <>
-      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] 3xl:gap-x-[40px] px-[24px] 3xl:px-[40px] py-[24px] 3xl:py-[40px] pb-0 lg:gap-y-0 gap-y-[30px] lg:h-[900px] lg:max-h-[calc(100dvh-110px)] 3xl:max-h-none 3xl:h-[calc(100vh-160px)] '>
-        <div className='xl:w-1/2 '>
+      <div className='w-full flex lg:flex-row lg:items-start flex-col gap-x-[24px] 3xl:gap-x-[40px] px-[24px] 3xl:px-[40px] py-[24px] 3xl:py-[40px] pb-0 lg:gap-y-0 gap-y-[30px]'>
+        <div className='xl:w-1/2 lg:sticky lg:top-[110px] 3xl:top-[160px] lg:h-[calc(100vh-110px)] 3xl:h-[calc(100vh-160px)]'>
           <ProductSlider product={{ ...covers, mediaItems: covers?.mainMedia ? [{ id: 'main-media', src: covers.mainMedia, alt: covers?.name || '' }] : [] }} />
           <ProductSlider_tab product={{ ...covers, mediaItems: covers?.mainMedia ? [{ id: 'main-media', src: covers.mainMedia, alt: covers?.name || '' }] : [] }} productData={{ ...productData.productData, product: covers }} />
         </div>
-        <div className='xl:w-1/2 flex flex-col items-center relative'>
+        <div className='xl:w-1/2 flex flex-col items-center relative lg:min-h-[calc(100vh-110px)] 3xl:min-h-[calc(100vh-160px)]'>
           {ribbon && (
             <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px] 3xl:max-w-[1400px]'>
               <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] 3xl:text-[18px] font-haasRegular uppercase px-3 py-1 3xl:px-5 3xl:py-2 rounded-full'>

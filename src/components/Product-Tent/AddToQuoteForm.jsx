@@ -133,7 +133,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     }, [quoteFields.length]);
 
     const handleInputChange = (field, value) => {
-        if(field === 'numberOfGuests'){
+        if (field === 'numberOfGuests') {
             // Only allow numeric input for numberOfGuests
             const numericValue = value.replace(/\D/g, '');
             value = numericValue;
@@ -219,7 +219,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
     };
 
     const renderField = (field) => {
-       
+
         const key = field.fieldKey;
         const elId = `${uid}-${key}`;
         const errorMsg = errors[key]?.message;
@@ -339,14 +339,14 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
     return (
         <>
-            <div className='w-full lg:max-w-[640px] 3xl:max-w-[1400px] sm:max-w-[400px] h-full overflow-y-scroll hide-scrollbar pb-[180px] 3xl:pb-[330px]'>
+            <div className='w-full lg:max-w-[740px] 3xl:max-w-[1600px] sm:max-w-[400px]'>
                 <div className='w-full flex items-center my-8 3xl:my-12'>
                     <BreadCrumbs items={[
                         { label: 'Home', to: '/' },
                         { label: 'TENTS' }
                     ]} />
                 </div>
-                <h3 className='uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] 3xl:text-[180px] 3xl:leading-[170px] text-[35px] leading-[30px] mb-4 3xl:mb-10'>{title}</h3>
+                <h3 className='uppercase text-secondary-alt font-recklessRegular lg:text-[75px] lg:leading-[85px] 3xl:text-[180px] 3xl:leading-[170px] text-[35px] leading-[30px] mb-3 3xl:mb-10'>{title}</h3>
                 <div className="font-haasLight lg:text-[16px] lg:leading-[19px] 3xl:text-[30px] 3xl:leading-[40px] text-[14px] leading-[17px] text-secondary-alt 3xl:[&_p]:mb-6">
                     {descriptionHtml ? parse(descriptionHtml) : null}
                 </div>
@@ -358,9 +358,11 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                     {quoteFields.map(renderField)}
                 </form>
             </div>
+            <div className="h-[20px]" />
+
             <AddToCartButton
                 onClick={handleSubmit(onSubmit, onError)}
-                classes={'lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:!h-[130px] 3xl:!h-[280px] lg:!mt-0'}
+                classes={'lg:sticky lg:bottom-0 lg:z-10 lg:!h-[130px] 3xl:!h-[280px] lg:!mt-auto'}
                 text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
                 disabled={isSubmitting}
             />

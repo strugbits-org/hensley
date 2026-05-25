@@ -73,7 +73,6 @@ export const QuantityControls = ({
 
 export const Product = ({
   data,
-  matchedProducts = [],
   allCollections = [],
 }) => {
   const [cookies, setCookie] = useCookies(["cartQuantity"]);
@@ -433,15 +432,15 @@ export const Product = ({
   };
 
   return (
-    <div className="w-full flex lg:flex-row flex-col gap-x-[24px] 3xl:gap-x-[40px] px-[24px] 3xl:px-[40px] py-[24px] 3xl:py-[40px] pb-0 lg:gap-y-0 gap-y-[30px] lg:h-[900px] lg:max-h-[calc(100dvh-110px)] 3xl:max-h-none 3xl:h-[calc(100vh-160px)]">
-      <div className="lg:w-1/2 w-full relative">
+    <div className="w-full flex lg:flex-row lg:items-start flex-col gap-x-[24px] 3xl:gap-x-[40px] px-[24px] 3xl:px-[40px] lg:gap-y-0 gap-y-[30px]">
+      <div className="lg:w-1/2 w-full relative lg:sticky lg:top-[110px] 3xl:top-[160px] lg:h-[calc(100vh-110px)] 3xl:h-[calc(100vh-160px)]">
         <ProductSlider product={product} />
         <ProductSlider_tab product={product} productData={productData} />
       </div>
 
-      <div className="lg:w-1/2 w-full flex flex-col items-center relative h-full">
-        <div className="lg:max-w-[656px] sm:max-w-[492px] 3xl:max-w-[1400px] w-full flex-1 overflow-y-auto hide-scrollbar lg:pb-[170px] 3xl:pb-[20vh]">
-          <div className="w-full flex items-center justify-between mt-2 mb-6 relative">
+      <div className="lg:w-1/2 w-full flex flex-col items-center relative lg:min-h-[calc(100vh-110px)] 3xl:min-h-[calc(100vh-160px)]">
+        <div className="sm:max-w-[492px] lg:max-w-[756px] 3xl:max-w-[1400px] w-full">
+          <div className="w-full flex items-center justify-between my-2 relative">
             <BreadCrumbs items={breadcrumbItems} />
             <SaveProductButton
               key={product._id}
@@ -457,7 +456,7 @@ export const Product = ({
               </span>
             </div>
           )}
-          <h1 className="uppercase text-secondary-alt font-recklessRegular lg:text-[90px] 3xl:text-[180px] lg:leading-[85px] 3xl:leading-[170px] text-[35px] leading-[30px] lg:mt-[10px] lg:mb-[15px] sm:mt-[9px] sm:mb-[9px]">
+          <h1 className="uppercase text-secondary-alt font-recklessRegular lg:text-[75px] 3xl:text-[180px] lg:leading-[85px] 3xl:leading-[170px] text-[35px] leading-[30px] sm:mt-[9px] sm:mb-[9px] lg:mt-[10px]">
             {product.name}
           </h1>
 
@@ -499,9 +498,11 @@ export const Product = ({
           <ProductDescription text={product.description} />
         </div>
 
+        <div className="h-[20px]"/>
+
         <AddToCartButton
           classes={
-            "h-[90px] md:h-[90px] lg:!h-[130px] 3xl:!h-[200px] lg:!mt-0 lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
+            "h-[90px] md:h-[90px] lg:!h-[130px] 3xl:!h-[200px] lg:!mt-auto lg:sticky lg:bottom-0 lg:z-10 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
           }
           text={isUpdatingCart ? "Please wait..." : "Add to Quote"}
           disabled={isUpdatingCart}
