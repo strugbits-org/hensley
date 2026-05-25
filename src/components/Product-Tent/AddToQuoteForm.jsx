@@ -360,7 +360,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             </div>
             <AddToCartButton
                 onClick={handleSubmit(onSubmit, onError)}
-                classes={'lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:!h-[200px] lg:!mt-0'}
+                classes={'lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:!h-[130px] lg:!mt-0'}
                 text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
                 disabled={isSubmitting}
             />

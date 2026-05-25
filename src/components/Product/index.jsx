@@ -433,14 +433,14 @@ export const Product = ({
   };
 
   return (
-    <div className="w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]">
+    <div className="w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] pb-0 lg:gap-y-0 gap-y-[30px] lg:h-[900px] lg:max-h-[calc(100dvh-110px)]">
       <div className="lg:w-1/2 w-full relative">
         <ProductSlider product={product} />
         <ProductSlider_tab product={product} productData={productData} />
       </div>
 
       <div className="lg:w-1/2 w-full flex flex-col items-center relative h-full">
-        <div className="lg:max-w-[656px] sm:max-w-[492px] w-full flex-1 overflow-y-auto hide-scrollbar lg:pb-[20vh]">
+        <div className="lg:max-w-[656px] sm:max-w-[492px] w-full flex-1 overflow-y-auto hide-scrollbar lg:pb-[170px]">
           <div className="w-full flex items-center justify-between mt-2 mb-6 relative">
             <BreadCrumbs items={breadcrumbItems} />
             <SaveProductButton

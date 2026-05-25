@@ -55,7 +55,7 @@ function ProductCard({
       <ProductBadge ribbon={ribbon} />
       <CustomLink
         to={productPath}
-        className={`w-full h-[400px] md:h-auto md:aspect-square overflow-hidden flex justify-center items-center px-2 py-3 md:px-4 lg:px-6 xl:px-10 2xl:px-14 ${type === "listing" ? "bg-white" : "md:min-h-[450px]"}`}
+        className={`w-full min-h-[280px] md:min-h-auto md:h-auto md:aspect-square overflow-hidden flex justify-center items-center px-2 py-3 md:px-4 lg:px-6 xl:px-10 2xl:px-14 ${type === "listing" ? "bg-white" : "md:min-h-[280px]"}`}
       >
         {productImageSrc ?
           <Image
