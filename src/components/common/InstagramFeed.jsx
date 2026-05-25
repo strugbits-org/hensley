@@ -75,18 +75,18 @@ function InstagramFeed({ data, details }) {
       />
       <div className="p-6 ">
         <div className="flex flex-col w-full border">
-          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border border-b-0 px-8 lg:pt-[30px] pb-[40px] pt-[131px] ">
+          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] 3xl:min-h-[210px] border border-b-0 px-8 3xl:px-14 lg:pt-[30px] 3xl:pt-[48px] pb-[40px] 3xl:pb-[64px] pt-[131px] ">
             <h3 className="lg:hidden block text-secondary-alt text-[55px] max-w-[280px] font-recklessRegular leading-[50px] text-center uppercase">
               {instaFeedHeading}
             </h3>
-            <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-3 mb-10 gap-2 lg:gap-4">
-              <PrimaryImage url={instaFeedIcon} customClasses={"size-[18px] lg:size-[30px]"} />
-              <h3 className="text-secondary-alt text-[18px] lg:text-[35px] font-recklessRegular">
+            <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-3 mb-10 gap-2 lg:gap-4 3xl:gap-6">
+              <PrimaryImage url={instaFeedIcon} customClasses={"size-[18px] lg:size-[30px] 3xl:size-[48px]"} />
+              <h3 className="text-secondary-alt text-[18px] lg:text-[35px] 3xl:text-[56px] font-recklessRegular">
                 {instaFeedTitle}
               </h3>
             </div>
             <CustomLink to={instaFeedButtonAction}>
-              <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+              <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:bg-primary hover:text-secondary-alt text-[16px] 3xl:text-[26px] max-h-[60px] 3xl:max-h-[100px] max-w-[280px] 3xl:max-w-[440px] px-8 py-4 3xl:px-12 3xl:py-7 hover:[letter-spacing:4px]">
                 {instaFeedButtonLabel}
               </PrimaryButton>
             </CustomLink>
@@ -107,7 +107,7 @@ function InstagramFeed({ data, details }) {
                     key={index}
                     className={`keen-slider__slide  flex flex-col md:p-[10px]`}
                   >
-                    <div className="h-[325px] lg:h-[448px] 3xl:h-[780px] relative">
+                    <div className="h-[325px] lg:h-[448px] 3xl:h-[1000px] relative">
                       <PrimaryImage url={dt.image} size="card" customClasses={"h-full w-full object-cover"} />
                     </div>
                   </CustomLink>
@@ -115,16 +115,16 @@ function InstagramFeed({ data, details }) {
               })}
               <button
                 onClick={() => sliderInstance.current?.prev()}
-                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
               >
-                <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                <MdOutlineChevronLeft className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
               </button>
 
               <button
                 onClick={() => sliderInstance.current?.next()}
-                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
               >
-                <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                <MdOutlineChevronRight className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
               </button>
             </div>
           </div>

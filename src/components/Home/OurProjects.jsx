@@ -81,16 +81,16 @@ export default function OurProjects({ data, pageDetails }) {
         {/* Arrows */}
         <button
           onClick={() => sliderInstance.current?.prev()}
-          className="absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20 "
+          className="absolute top-1/2 left-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20 "
         >
-          <MdOutlineChevronLeft className="size-[20px]" />
+          <MdOutlineChevronLeft className="size-[20px] 3xl:size-[34px]" />
         </button>
 
         <button
           onClick={() => sliderInstance.current?.next()}
-          className="absolute top-1/2 right-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
+          className="absolute top-1/2 right-8 transform -translate-y-1/2 w-[40px] h-[40px] sm:w-[60px] sm:h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center hidden z-20"
         >
-          <MdOutlineChevronRight className="size-[20px]" />
+          <MdOutlineChevronRight className="size-[20px] 3xl:size-[34px]" />
         </button>
       </div>
     </div>

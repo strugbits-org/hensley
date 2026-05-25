@@ -55,7 +55,7 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                     <>
                         <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] 3xl:!text-[360px] 3xl:!leading-[300px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
                         <CustomLink to={"/blog"}>
-                            <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
+                            <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] 3xl:text-[26px] font-haasRegular hover:bg-primary max-h-[60px] 3xl:max-h-[100px] max-w-[280px] 3xl:max-w-[440px] px-8 py-4 3xl:px-12 3xl:py-7 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
                         </CustomLink>
                     </>
                 ) : (
@@ -85,16 +85,16 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                         <>
                             {(loop || currentSlide?.rel > 0) && <button
                                 onClick={() => sliderInstance.current?.prev()}
-                                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >
-                                <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                                <MdOutlineChevronLeft className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                             </button>}
 
                             {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
                                 onClick={() => sliderInstance.current?.next()}
-                                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >
-                                <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                                <MdOutlineChevronRight className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                             </button>}
                         </>
                     )}

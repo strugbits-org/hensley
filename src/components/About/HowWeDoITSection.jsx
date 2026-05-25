@@ -7,7 +7,7 @@ function HowWeDoITSection({ data, pageTitle }) {
     <>
       <SectionTitle text={pageTitle} classes={"md:bg-primary lg:bg-primary-alt bg-primary pt-[36px] pb-[44px] hidden lg:block"} />
       <div className="flex flex-col ">
-        <div className="bg-primary pb-11 min-h-screen relative">
+        <div className="bg-primary pb-11 min-h-screen 3xl:min-h-fit relative">
           <PortfolioSlider data={data} />
         </div>
       </div>
