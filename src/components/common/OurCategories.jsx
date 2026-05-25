@@ -57,7 +57,7 @@ function OurCategories({ data, pageDetails, classes }) {
                         customClasses="hidden lg:block arrow w-[25px] h-[25px] transition-all duration-300 ease-in-out group-hover:w-[133px] group-hover:h-[133px] lg:mb-[12px] group-hover:filter brightness-50"
                       />
 
-                      <span className="text-sm font-haasRegular leading-4">
+                      <span className="text-sm 3xl:text-[30px] font-haasRegular leading-4">
                         {title}
                       </span>
                     </div>

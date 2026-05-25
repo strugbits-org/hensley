@@ -109,18 +109,18 @@ export default function SliderComponent({
                     {(loop || currentSlide?.rel > 0) && (
                       <button
                         onClick={() => sliderInstance.current?.prev()}
-                        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                       >
-                        <BsChevronLeft className="w-[20px] h-[20px]" />
+                        <BsChevronLeft className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                       </button>
                     )}
 
                     {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && (
                       <button
                         onClick={() => sliderInstance.current?.next()}
-                        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                       >
-                        <BsChevronRight className="w-[20px] h-[20px]" />
+                        <BsChevronRight className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                       </button>
                     )}
                   </>

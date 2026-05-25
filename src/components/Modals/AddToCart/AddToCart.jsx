@@ -294,7 +294,7 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
   }, [product._id, product.id, isPayloadBundle]);
 
   return (
-    <div className='relative sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
+    <div className='relative sm:w-[850px] 3xl:w-[1320px] w-full sm:h-[450px] 3xl:h-[700px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] 3xl:gap-x-[40px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
       <div className='relative sm:max-w-[45%] w-full sm:h-full flex-shrink-0'>
         <AddToCartSlider data={{ ...productData, product }} isOpen={data.open} noWidthConstraint />
         {ribbon && (
@@ -303,19 +303,19 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
           </span>
         )}
       </div>
-      <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative'>
-        <div className='w-full flex flex-col  gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
+      <div className='h-full sm:w-[55%] w-full py-[25px] 3xl:py-[40px] pt-[30px] 3xl:pt-[48px] pr-[20px] 3xl:pr-[32px] relative'>
+        <div className='w-full flex flex-col  gap-y-[15px] 3xl:gap-y-[24px] overflow-y-scroll hide-scrollbar sm:h-[320px] 3xl:h-[500px]'>
           <div className='w-full flex justify-between relative pr-8'>
             <span className='
-            text-[35px]
-            leading-[30px]
+            text-[35px] 3xl:text-[56px]
+            leading-[30px] 3xl:leading-[52px]
             text-secondary-alt
             font-recklessRegular
             uppercase
             w-full
             '>{product.name || product.title}</span>
             <button onClick={onClose} className='close-button absolute top-0 right-0'>
-              <svg preserveAspectRatio="xMidYMid meet" width="24.707" height="24.707" data-bbox="25.975 25.975 148.05 148.05" xmlns="http://www.w3.org/2000/svg" viewBox="25.975 25.975 148.05 148.05" role="presentation" aria-hidden="true">
+              <svg className='3xl:w-[40px] 3xl:h-[40px]' preserveAspectRatio="xMidYMid meet" width="24.707" height="24.707" data-bbox="25.975 25.975 148.05 148.05" xmlns="http://www.w3.org/2000/svg" viewBox="25.975 25.975 148.05 148.05" role="presentation" aria-hidden="true">
                 <g>
                   <path d="M172.9 167.6L105.3 100l67.6-67.6c1.5-1.5 1.5-3.8 0-5.3s-3.8-1.5-5.3 0L100 94.7 32.4 27.1c-1.5-1.5-3.8-1.5-5.3 0s-1.5 3.8 0 5.3L94.7 100l-67.6 67.6c-1.5 1.5-1.5 3.8 0 5.3s3.8 1.5 5.3 0l67.6-67.6 67.6 67.6c1.5 1.5 3.8 1.5 5.3 0s1.5-3.8 0-5.3z"></path>
                 </g>
@@ -326,21 +326,21 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             <div className='w-full flex gap-x-[20px] sm:justify-end justify-start '>
               <span
                 className='
-        text-[25px]
+        text-[25px] 3xl:text-[40px]
         text-secondary-alt
         font-recklessRegular
         uppercase
         block
         '
               >{totalPrice}</span>
-              <span className='text-[25px] text-secondary-alt font-recklessRegular block uppercase '>(total)</span>
+              <span className='text-[25px] 3xl:text-[40px] text-secondary-alt font-recklessRegular block uppercase '>(total)</span>
             </div>
           )}
-          <table className="w-full text-left border-separate border-spacing-y-[15px]">
+          <table className="w-full text-left border-separate border-spacing-y-[15px] 3xl:border-spacing-y-[22px] 3xl:text-[24px]">
             <thead>
               <tr className="text-xs max-lg:hidden uppercase text-gray-500 border-b border-black">
                 {visibleHeaders.map((header, index) => (
-                  <th key={header.title} className={`pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}>
+                  <th key={header.title} className={`pb-2 w-1/4 text-[16px] 3xl:text-[26px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}>
                     {header.title}
                   </th>
                 ))}
@@ -361,7 +361,7 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             </div>
           )}
         </div>
-        <AddToQuoteButton classes={"lg:!h-[80px] lg:!mt-0 !mt-0 !text-[14px] "} onClick={handleAddToCart} text={isLoading ? "PLEASE WAIT..." : "ADD TO QUOTE"} disabled={isLoading} />
+        <AddToQuoteButton classes={"lg:!h-[80px] 3xl:!h-[130px] lg:!mt-0 !mt-0 !text-[14px] 3xl:!text-[24px] "} onClick={handleAddToCart} text={isLoading ? "PLEASE WAIT..." : "ADD TO QUOTE"} disabled={isLoading} />
 
       </div>
     </div>

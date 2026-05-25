@@ -39,9 +39,9 @@ export const QuantityControls = ({
   onQuantityChange,
   minQuantity = QUANTITY_LIMITS.MIN,
 }) => (
-  <div className="flex items-center justify-center gap-x-[30px] font-haasRegular">
+  <div className="flex items-center justify-center gap-x-[30px] 3xl:gap-x-[44px] font-haasRegular 3xl:text-[26px]">
     <button
-      className="select-none text-xl font-light hover:opacity-70 transition-opacity"
+      className="select-none text-xl 3xl:text-[32px] font-light hover:opacity-70 transition-opacity"
       onClick={() => onQuantityChange(quantity - 1)}
       disabled={quantity <= minQuantity}
       aria-label="Decrease quantity"
@@ -49,7 +49,7 @@ export const QuantityControls = ({
       -
     </button>
     <input
-      className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+      className="font-bold bg-transparent max-w-[60px] 3xl:max-w-[90px] outline-none text-center appearance-none"
       type="number"
       min={minQuantity}
       max={QUANTITY_LIMITS.MAX}
@@ -61,7 +61,7 @@ export const QuantityControls = ({
       aria-label="Quantity"
     />
     <button
-      className="select-none text-xl font-light hover:opacity-70 transition-opacity"
+      className="select-none text-xl 3xl:text-[32px] font-light hover:opacity-70 transition-opacity"
       onClick={() => onQuantityChange(quantity + 1)}
       disabled={quantity >= QUANTITY_LIMITS.MAX}
       aria-label="Increase quantity"
@@ -433,14 +433,14 @@ export const Product = ({
   };
 
   return (
-    <div className="w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] lg:gap-y-0 gap-y-[30px] lg:h-[900px]">
+    <div className="w-full flex lg:flex-row flex-col gap-x-[24px] 3xl:gap-x-[40px] px-[24px] 3xl:px-[40px] py-[24px] 3xl:py-[40px] lg:gap-y-0 gap-y-[30px] lg:h-[900px] 3xl:h-[calc(100vh-160px)]">
       <div className="lg:w-1/2 w-full relative">
         <ProductSlider product={product} />
         <ProductSlider_tab product={product} productData={productData} />
       </div>
 
       <div className="lg:w-1/2 w-full flex flex-col items-center relative h-full">
-        <div className="lg:max-w-[656px] sm:max-w-[492px] w-full flex-1 overflow-y-auto hide-scrollbar lg:pb-[20vh]">
+        <div className="lg:max-w-[656px] sm:max-w-[492px] 3xl:max-w-[1400px] w-full flex-1 overflow-y-auto hide-scrollbar lg:pb-[20vh]">
           <div className="w-full flex items-center justify-between mt-2 mb-6 relative">
             <BreadCrumbs items={breadcrumbItems} />
             <SaveProductButton
@@ -457,28 +457,28 @@ export const Product = ({
               </span>
             </div>
           )}
-          <h1 className="uppercase text-secondary-alt font-recklessRegular lg:text-[90px] lg:leading-[85px] text-[35px] leading-[30px] lg:mt-[10px] lg:mb-[15px] sm:mt-[9px] sm:mb-[9px]">
+          <h1 className="uppercase text-secondary-alt font-recklessRegular lg:text-[90px] 3xl:text-[180px] lg:leading-[85px] 3xl:leading-[170px] text-[35px] leading-[30px] lg:mt-[10px] lg:mb-[15px] sm:mt-[9px] sm:mb-[9px]">
             {product.name}
           </h1>
 
           {!HIDE_PRICES && (
-            <div className="lg:mb-[20px] sm:mb-[10px] flex lg:justify-end gap-x-[28px]">
-              <span className="text-[35px] text-secondary-alt font-recklessRegular">
+            <div className="lg:mb-[20px] sm:mb-[10px] flex lg:justify-end gap-x-[28px] 3xl:gap-x-[44px]">
+              <span className="text-[35px] 3xl:text-[60px] text-secondary-alt font-recklessRegular">
                 {totalPrice}
               </span>
-              <span className="text-[35px] text-secondary-alt font-recklessRegular uppercase">
+              <span className="text-[35px] 3xl:text-[60px] text-secondary-alt font-recklessRegular uppercase">
                 (total)
               </span>
             </div>
           )}
 
-          <table className="w-full text-left border-separate border-spacing-y-[12px] mb-6">
+          <table className="w-full text-left border-separate border-spacing-y-[12px] 3xl:border-spacing-y-[20px] mb-6 3xl:text-[26px]">
             <thead>
               <tr className="text-xs uppercase text-gray-500 border-b border-black">
                 {visibleHeaders.map((header, index) => (
                   <th
                     key={header.title}
-                    className={`pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt ${
+                    className={`pb-2 w-1/4 text-[16px] 3xl:text-[26px] uppercase font-haasLight text-secondary-alt ${
                       index === 0 ? "text-left" : "text-center"
                     }`}
                   >
@@ -501,7 +501,7 @@ export const Product = ({
 
         <AddToCartButton
           classes={
-            "h-[90px] md:h-[90px] lg:!h-[130px] lg:!mt-0 lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
+            "h-[90px] md:h-[90px] lg:!h-[130px] 3xl:!h-[200px] lg:!mt-0 lg:absolute lg:bottom-0 lg:left-0 lg:right-0 lg:z-10 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
           }
           text={isUpdatingCart ? "Please wait..." : "Add to Quote"}
           disabled={isUpdatingCart}
