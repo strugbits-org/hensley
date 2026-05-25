@@ -2,7 +2,7 @@ import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 import { SubCategoryPage } from "@/components/SubCategory";
 import { fetchSelectedCategoryData, fetchSubCategoryPagePaths } from "@/services/subcategory";
-import { fetchPageMetaData } from "@/services";
+import { fetchPageMetaData, buildPageMetadata } from "@/services";
 
 // Pre-render every known subcategory slug at build time and serve them as
 // static HTML. Unknown slugs fall through to on-demand rendering (then cached).
@@ -22,15 +22,10 @@ export async function generateMetadata({ params }) {
       fetchSelectedCategoryData(slug)
     ]);
 
-    const { title, robotsTag } = metaData || {};
+    const { title } = metaData || {};
     const { selectedCategory } = subCategoryData || {};
     const fullTitle = (selectedCategory?.name || slug) + " " + (title || "");
-    const metadata = { title: fullTitle };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) {
-      metadata.robots = robotsTag;
-    }
-
-    return metadata;
+    return buildPageMetadata(metaData, { title: fullTitle });
   } catch (error) {
     logError("Error in metadata(market page):", error);
   }

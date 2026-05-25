@@ -1,5 +1,5 @@
 import Tents from "@/components/Tents";
-import { fetchFeaturedBlogs, fetchFeaturedProjects, fetchPageMetaData, fetchTentListingPageDetails, fetchTentsDataForListing } from "@/services";
+import { fetchFeaturedBlogs, fetchFeaturedProjects, fetchPageMetaData, buildPageMetadata, fetchTentListingPageDetails, fetchTentsDataForListing } from "@/services";
 import { logError } from "@/utils";
 import { notFound } from "next/navigation";
 
@@ -7,10 +7,7 @@ import { notFound } from "next/navigation";
 export async function generateMetadata() {
   try {
     const metaData = await fetchPageMetaData("types-of-tents");
-    const { title, robotsTag } = metaData;
-    const metadata = { title };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) metadata.robots = robotsTag;
-    return metadata;
+    return buildPageMetadata(metaData);
   } catch (error) {
     logError("Error in metadata(typesTent page):", error);
   }

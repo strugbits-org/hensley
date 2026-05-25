@@ -1,14 +1,11 @@
 import { HomePage } from "@/components/Home";
-import { fetchPageMetaData } from "@/services";
+import { fetchPageMetaData, buildPageMetadata } from "@/services";
 import { fetchHomePageData } from "@/services/home";
 
 export async function generateMetadata() {
   try {
     const metaData = await fetchPageMetaData("home");
-    const { title, robotsTag } = metaData;
-    const metadata = { title };
-    if (process.env.ENVIRONMENT === "PRODUCTION" && robotsTag) metadata.robots = robotsTag;
-    return metadata;
+    return buildPageMetadata(metaData);
   } catch (error) {
     logError("Error in metadata(home page):", error);
   }
