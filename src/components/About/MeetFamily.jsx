@@ -14,24 +14,24 @@ const Cards = ({ logo, description, title, buttonLabel, buttonLink }) => {
 
 
   return (
-    <div className="lg:max-w-[608px] md:min-h-[902px] bg-[rgb(44,34,22)] flex justify-center items-center p-11">
+    <div className="lg:max-w-[608px] 3xl:max-w-[920px] md:min-h-[902px] 3xl:min-h-[1360px] bg-[rgb(44,34,22)] flex justify-center items-center p-11 3xl:p-16">
       <div className="flex flex-col items-center justify-center">
-        <div className="w-[306px] h-[108px]">
+        <div className="w-[306px] h-[108px] 3xl:w-[460px] 3xl:h-[160px]">
           <PrimaryImage timeout={0} url={logoUrl} fit={"fit"} customClasses={"h-full w-full object-contain"} />
         </div>
 
         {paragraphs.map((para, index) => (
           <p
             key={index}
-            className={`max-w-[417px] text-center text-[#FFFFFF] font-haasRegular md:text-[18px] md:leading-[30px] leading-[30px] sm:text-[14px] sm:leading-[18px] ${index === 0 ? 'lg:mt-[61px] mt-[22px]' : 'lg:mt-11 mt-10'
-              } ${index === paragraphs.length - 1 ? 'lg:mb-[48px] mb-[44px]' : ''}`}
+            className={`max-w-[417px] 3xl:max-w-[640px] text-center text-[#FFFFFF] font-haasRegular md:text-[18px] md:leading-[30px] 3xl:text-[28px] 3xl:leading-[44px] leading-[30px] sm:text-[14px] sm:leading-[18px] ${index === 0 ? 'lg:mt-[61px] 3xl:mt-[90px] mt-[22px]' : 'lg:mt-11 3xl:mt-16 mt-10'
+              } ${index === paragraphs.length - 1 ? 'lg:mb-[48px] 3xl:mb-[72px] mb-[44px]' : ''}`}
           >
             {para}
           </p>
         ))}
 
         <CustomLink to={buttonLink} target={"_blank"}>
-          <PrimaryButton className="lg:text-[14px] font-haasRegular uppercase block border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+          <PrimaryButton className="lg:text-[14px] 3xl:text-[22px] font-haasRegular uppercase block border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] 3xl:max-h-[90px] max-w-[280px] 3xl:max-w-[420px] px-8 py-4 3xl:px-12 3xl:py-6 hover:[letter-spacing:4px]">
             {buttonLabel}
           </PrimaryButton>
         </CustomLink>

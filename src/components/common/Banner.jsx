@@ -90,12 +90,12 @@ export const Banner = ({ data }) => {
         </div>
 
         {/* Desktop Content Layout (Absolute Overlap) */}
-        <div className="hidden lg:block absolute lg:inset-6 inset-0 lg:px-12 xl:px-16 2xl:px-24 py-24 lg:py-16 z-10">
-          <div className="flex flex-col lg:justify-start lg:h-full justify-between max-w-xs lg:max-w-sm xl:max-w-md 2xl:max-w-lg gap-4 lg:gap-6 items-center lg:items-start">
-            <span className="text-center lg:block hidden lg:text-start text-[14px] lg:text-[24px] leading-4 lg:leading-10 font-haasRegular text-white">
+        <div className="hidden lg:block absolute lg:inset-6 inset-0 lg:px-12 xl:px-16 2xl:px-24 3xl:px-40 py-24 lg:py-16 3xl:py-28 z-10">
+          <div className="flex flex-col lg:justify-start lg:h-full justify-between max-w-xs lg:max-w-sm xl:max-w-md 2xl:max-w-lg 3xl:max-w-[40rem] gap-4 lg:gap-6 3xl:gap-10 items-center lg:items-start">
+            <span className="text-center lg:block hidden lg:text-start text-[14px] lg:text-[24px] 3xl:text-[42px] leading-4 lg:leading-10 3xl:leading-[60px] font-haasRegular text-white">
               {subtitle}
             </span>
-            <h2 className="text-center lg:block hidden lg:text-start text-[55px] lg:text-[70px] xl:text-[90px] 2xl:text-[115px] leading-[55px] lg:leading-[70px] xl:leading-[90px] 2xl:leading-[110px] font-recklessRegular text-white">
+            <h2 className="text-center lg:block hidden lg:text-start text-[55px] lg:text-[70px] xl:text-[90px] 2xl:text-[115px] 3xl:text-[200px] leading-[55px] lg:leading-[70px] xl:leading-[90px] 2xl:leading-[110px] 3xl:leading-[190px] font-recklessRegular text-white">
               {title}
             </h2>
             <CustomLink to={buttonLink}>

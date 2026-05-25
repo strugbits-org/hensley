@@ -40,6 +40,9 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
                 "(min-width: 1025px) and (max-width: 1280px)": {
                     slides: { perView: 4, spacing: 4, origin: "auto" },
                 },
+                "(min-width: 1921px)": {
+                    slides: { perView: 5, spacing: 8, origin: "auto" },
+                },
             },
         },
         []
@@ -50,13 +53,13 @@ export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center",
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col lg:border-b max-lg:border border-primary-border'>
                 {titleType === "primary" ? (
                     <>
-                        <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
+                        <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] 3xl:!text-[360px] 3xl:!leading-[300px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
                         <CustomLink to={"/blog"}>
                             <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
                         </CustomLink>
                     </>
                 ) : (
-                    <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[90px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
+                    <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[90px] 3xl:!text-[160px] 3xl:!leading-[140px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
                 )}
 
             </div>

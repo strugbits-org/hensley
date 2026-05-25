@@ -7,8 +7,10 @@ function SectionTitle({ text, classes }) {
           md:text-[65px]
           lg:text-[160px]
           xl:text-[200px]
-          md:leading-[50px] 
+          3xl:text-[360px]
+          md:leading-[50px]
           lg:leading-[160px]
+          3xl:leading-[300px]
           text-center
           leading-[50px]
           tracking-wide

@@ -88,7 +88,7 @@ export const HeroSection = ({ data }) => {
       </span>
 
       <div className="flex flex-col items-center gap-y-6">
-        <h1 style={{ fontSize: 'clamp(32px, 8vw, 120px)', lineHeight: '0.8' }} className="text-primary-alt font-recklessRegular text-center max-w-[95vw]">
+        <h1 style={{ lineHeight: '0.8' }} className="text-primary-alt font-recklessRegular text-center max-w-[95vw] text-[clamp(32px,8vw,120px)] 3xl:text-[clamp(120px,6.5vw,250px)]">
           {renderTitle(title)}
         </h1>
 

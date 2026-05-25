@@ -6,7 +6,7 @@ export const MarketCard = ({ data, size, classes }) => {
     const { title, image1, featuredImage, heroBackground } = data;
     const cardImage = image1 || featuredImage || heroBackground || "";
     return (
-        <CustomLink to={`/market${data.slug}`} className={`relative group w-full border border-white min-h-[382px] lg:min-h-[608px] overflow-hidden ${size === "large" ? "lg:w-1/2" : "lg:w-1/3"} ${classes}`}>
+        <CustomLink to={`/market${data.slug}`} className={`relative group w-full border border-white min-h-[382px] lg:min-h-[608px] 3xl:min-h-[1050px] overflow-hidden ${size === "large" ? "lg:w-1/2" : "lg:w-1/3"} ${classes}`}>
             <div className='absolute inset-0 p-6 group-hover:p-0 transition-all duration-300 ease-in-out'>
                 <PrimaryImage timeout={0} url={cardImage} size="card" alt={title} customClasses='h-full w-full object-cover' />
             </div>
@@ -15,7 +15,7 @@ export const MarketCard = ({ data, size, classes }) => {
                     <PrimaryImage url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"} alt={"Arrow"} customClasses={`absolute fill-primary-alt left-6 w-[34px] h-[34px] transition-all duration-500 ease-in-out group-hover:w-[90%] ${size === "large" ? "bottom-20 group-hover:h-[75%]" : "bottom-8 group-hover:h-[90%]"}`} />
                     <PrimaryImage url={"/icons/0e0ac5_f1017d455dba40f4bde5d1d54c65b3ca.svg"} alt={"Arrow"} customClasses="absolute fill-primary-alt left-6 bottom-8 w-[34px] h-[34px] group-hover:invisible" />
                 </div>
-                <h2 className="ml-4 lg:ml-12 xl:ml-16 text-[28px] lg:text-[30px] xl:text-[45px] lg:leading-[42px] xl:leading-[70px] tracking-[-0.30px] font-recklessRegular text-primary-alt uppercase text-center lg:text-start w-full">
+                <h2 className="ml-4 lg:ml-12 xl:ml-16 3xl:ml-24 text-[28px] lg:text-[30px] xl:text-[45px] 3xl:text-[80px] lg:leading-[42px] xl:leading-[70px] 3xl:leading-[120px] tracking-[-0.30px] font-recklessRegular text-primary-alt uppercase text-center lg:text-start w-full">
                     {title}
                 </h2>
             </div>

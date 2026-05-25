@@ -66,15 +66,15 @@ export const NewsLetter = ({ data }) => {
 
     return (
         <div className="newsletter-form">
-            <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'>
+            <h2 className='text-sm 3xl:text-xl font-haasMedium uppercase text-primary mb-[18.5px] 3xl:mb-7'>
                 {newsletterHeading}
             </h2>
-            <p className='text-sm font-haasRegular uppercase text-primary mb-5 sm:max-w-[450px]'>
+            <p className='text-sm 3xl:text-xl font-haasRegular uppercase text-primary mb-5 3xl:mb-8 sm:max-w-[450px] 3xl:max-w-[700px]'>
                 {newsletterDescription}
             </p>
-            
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-                <div className="flex gap-2 gap-x-3 sm:gap-x-[24px]  w-full sm:max-w-[450px]">
+
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2 3xl:gap-4">
+                <div className="flex gap-2 gap-x-3 sm:gap-x-[24px] 3xl:gap-x-[36px] w-full sm:max-w-[450px] 3xl:max-w-[700px]">
                     <div className="flex-1">
                         <input 
                             type="email" 
@@ -83,12 +83,12 @@ export const NewsLetter = ({ data }) => {
                             disabled={isSubmitting}
                             {...register('email_443e')}
                             className={`
-                                w-full 
-                                bg-transparent appearance-none outline-none p-5 
-                                border text-base text-primary placeholder:text-primary 
+                                w-full
+                                bg-transparent appearance-none outline-none p-5 3xl:p-7
+                                border text-base 3xl:text-xl text-primary placeholder:text-primary
                                 placeholder:uppercase transition-all duration-300
-                                ${errors.email_443e 
-                                    ? 'border-red-500' 
+                                ${errors.email_443e
+                                    ? 'border-red-500'
                                     : 'border-primary hover:border-opacity-80'
                                 }
                                 ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}
@@ -100,11 +100,11 @@ export const NewsLetter = ({ data }) => {
                         type="submit"
                         disabled={isSubmitting}
                         className={`
-                            border border-primary text-primary transition-all duration-300 
-                            ease-in-out p-5 grow px-5 sm:px-12 hover:bg-primary hover:text-secondary-alt 
-                            text-sm font-haasMedium uppercase tracking-widest max-w-[100px] sm:max-w-[150px]
-                            ${isSubmitting 
-                                ? 'opacity-70 cursor-not-allowed hover:bg-transparent hover:text-primary' 
+                            border border-primary text-primary transition-all duration-300
+                            ease-in-out p-5 3xl:p-7 grow px-5 sm:px-12 3xl:px-16 hover:bg-primary hover:text-secondary-alt
+                            text-sm 3xl:text-xl font-haasMedium uppercase tracking-widest max-w-[100px] sm:max-w-[150px] 3xl:max-w-[240px]
+                            ${isSubmitting
+                                ? 'opacity-70 cursor-not-allowed hover:bg-transparent hover:text-primary'
                                 : ''
                             }
                         `}

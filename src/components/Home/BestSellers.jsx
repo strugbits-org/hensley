@@ -49,6 +49,9 @@ export const BestSellers = ({
                 "(min-width: 1025px) and (max-width: 1280px)": {
                     slides: { perView: 3.5, spacing: 20 },
                 },
+                "(min-width: 1921px)": {
+                    slides: { origin, perView: 5, spacing: 32 },
+                },
             },
         },
         []
