@@ -2,8 +2,8 @@ import React from 'react'
 
 export const DownloadButton = ({ text, link, classes, iconTrue }) => {
     return (
-        <a href={link} target='_blank' download className={`cursor-pointer border border-transparent lg:h-[150px] sm:mt-[40px] h-[90px] my-[33px] bg-primary tracking-[4px] group transform transition-all ease-out duration-300 hover:bg-secondary-alt hover:text-primary hover:border-primary relative lg:px-0 px-[70px] flex items-center justify-center ${classes}`}>
-            <span className='font-haasLight uppercase lg:w-full text-[16px] text-center group-hover:font-haasBold group-hover:tracking-[5px] transition-all ease-out duration-300'>
+        <a href={link} target='_blank' download className={`cursor-pointer border border-transparent lg:h-[150px] 3xl:h-[220px] sm:mt-[40px] h-[90px] my-[33px] bg-primary tracking-[4px] 3xl:tracking-[6px] group transform transition-all ease-out duration-300 hover:bg-secondary-alt hover:text-primary hover:border-primary relative lg:px-0 px-[70px] flex items-center justify-center ${classes}`}>
+            <span className='font-haasLight uppercase lg:w-full text-[16px] 3xl:text-[28px] text-center group-hover:font-haasBold group-hover:tracking-[5px] transition-all ease-out duration-300'>
                 {text}
             </span>
 
@@ -12,7 +12,7 @@ export const DownloadButton = ({ text, link, classes, iconTrue }) => {
                 width="36.355"
                 height="36.562"
                 viewBox="0 0 36.355 36.562"
-                className={`${iconTrue ? "lg:block" : "lg:hidden"} border-b pb-[7px] block ml-2 transition-all duration-300 border-secondary-alt stroke-secondary-alt group-hover:stroke-primary group-hover:border-primary absolute right-[5%] top-1/2 -translate-y-1/2`}
+                className={`${iconTrue ? "lg:block" : "lg:hidden"} 3xl:w-[56px] 3xl:h-[56px] border-b pb-[7px] block ml-2 transition-all duration-300 border-secondary-alt stroke-secondary-alt group-hover:stroke-primary group-hover:border-primary absolute right-[5%] top-1/2 -translate-y-1/2`}
             >
                 <g id="Group_3547" data-name="Group 3547" transform="translate(35.855 18.178) rotate(135)">
                     <path

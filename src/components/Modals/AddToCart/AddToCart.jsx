@@ -351,7 +351,7 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             </tbody>
           </table>
           {isProductCollection && (
-            <p className='text-[11px] text-secondary-alt font-haasLight italic -mt-[8px]'>
+            <p className='text-[11px] 3xl:text-[24px] text-secondary-alt font-haasLight italic -mt-[8px]'>
               Items with quantity 0 will not be added to your quote.
             </p>
           )}

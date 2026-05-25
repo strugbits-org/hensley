@@ -22,15 +22,15 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
 
   return (
     <>
-      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] px-[24px] py-[24px] pb-0 lg:gap-y-0 gap-y-[30px] lg:h-[900px] lg:max-h-[calc(100dvh-110px)] '>
+      <div className='w-full flex lg:flex-row flex-col gap-x-[24px] 3xl:gap-x-[40px] px-[24px] 3xl:px-[40px] py-[24px] 3xl:py-[40px] pb-0 lg:gap-y-0 gap-y-[30px] lg:h-[900px] lg:max-h-[calc(100dvh-110px)] 3xl:max-h-none 3xl:h-[calc(100vh-160px)] '>
         <div className='xl:w-1/2 '>
           <ProductSlider product={sliderProduct} />
           <ProductSlider_tab product={sliderProduct} productData={{ ...productData.productData, product: tent }} />
         </div>
         <div className='xl:w-1/2 flex flex-col items-center relative'>
           {ribbon && (
-            <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px]'>
-              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full'>
+            <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px] 3xl:max-w-[1400px]'>
+              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] 3xl:text-[18px] font-haasRegular uppercase px-3 py-1 3xl:px-5 3xl:py-2 rounded-full'>
                 {ribbon}
               </span>
             </div>
@@ -42,9 +42,9 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
           />
         </div>
       </div>
-      <div className='w-full min-h-screen bg-secondary-alt pt-[75px] px-[24px]'>
+      <div className='w-full min-h-screen bg-secondary-alt pt-[75px] 3xl:pt-[120px] px-[24px] 3xl:px-[40px]'>
         <BannerStructures title={productData?.title} data={tent} />
-        <div className="w-full grid gap-[24px] mt-6 lg:grid-cols-[2fr_1fr] grid-cols-1">
+        <div className="w-full grid gap-[24px] 3xl:gap-[40px] mt-6 3xl:mt-12 lg:grid-cols-[2fr_1fr] grid-cols-1">
           {gallery.map((item, index) => {
             const position = index % 3;
             const colSpanClass =
@@ -53,7 +53,7 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
                   'col-span-1 lg:col-span-2';
 
             return (
-              <div key={item.id || index} className={`${colSpanClass} min-h-[600px] lg:min-h-0`}>
+              <div key={item.id || index} className={`${colSpanClass} min-h-[600px] lg:min-h-0 3xl:min-h-[800px]`}>
                 <PrimaryImage url={item.src} size="tablet" alt={item.alt || `tent-${index}`} customClasses="w-full h-full object-cover" />
               </div>
             );
@@ -61,7 +61,7 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
         </div>
 
         <div className='w-full flex justify-center items-center'>
-          <DownloadButton link={masterClassTentingURL} text="DOWNLOAD MASTERCLASS TENTING 101" classes={"lg:!w-[656px] sm:!w-[492px]"} iconTrue={"true"} />
+          <DownloadButton link={masterClassTentingURL} text="DOWNLOAD MASTERCLASS TENTING 101" classes={"lg:!w-[656px] sm:!w-[492px] 3xl:!w-[1000px]"} iconTrue={"true"} />
         </div>
       </div>
     </>
