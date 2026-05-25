@@ -207,7 +207,7 @@ export default function ProductSlider({ product }) {
 
   if (!mediaItems.length) {
     return (
-      <div className="lg:flex hidden w-full h-[795px] lg:max-h-[calc(100dvh-158px)] gap-x-[24px] items-center justify-center">
+      <div className="lg:flex hidden w-full h-[795px] lg:h-full gap-x-[24px] items-center justify-center">
         <div className="text-gray-500">No images available</div>
       </div>
     );
@@ -216,19 +216,19 @@ export default function ProductSlider({ product }) {
   return (
     <>
       {!isSliderReady && (
-        <div className="w-full h-[795px] lg:max-h-[calc(100dvh-158px)] flex items-center justify-center text-gray-400">
+        <div className="w-full h-[795px] lg:h-full flex items-center justify-center text-gray-400">
           <Loading custom type="secondary" />
         </div>
       )}
 
       <div
-        className={`lg:flex hidden w-full max-w-[794px] 3xl:max-w-[1700px] h-[795px] lg:max-h-[calc(100dvh-158px)] 3xl:max-h-none 3xl:h-full gap-x-[24px] 3xl:gap-x-[40px] justify-between transition-opacity duration-300 ${!isSliderReady ? 'invisible opacity-0' : 'visible opacity-100'
+        className={`lg:flex hidden w-full max-w-[794px] 3xl:max-w-[1700px] h-[795px] lg:h-full max-h-[1200px] gap-x-[24px] 3xl:gap-x-[40px] justify-between transition-opacity duration-300 ${!isSliderReady ? 'invisible opacity-0' : 'visible opacity-100'
           }`}
       >
         {/* Main Slider */}
         <div
           ref={sliderRef}
-          className="keen-slider !w-[calc(100%-144px)] 3xl:!w-[calc(100%-220px)] h-[795px] lg:max-h-[calc(100dvh-158px)] 3xl:max-h-none 3xl:h-full p-[1px]"
+          className="keen-slider !w-[calc(100%-144px)] 3xl:!w-[calc(100%-220px)] h-[795px] lg:h-full max-h-[1200px] p-[1px]"
           role="region"
           aria-label="Product images"
         >
@@ -245,7 +245,7 @@ export default function ProductSlider({ product }) {
         {/* Thumbnail Slider */}
         <div
           ref={thumbnailRef}
-          className="keen-slider !w-[120px] 3xl:!w-[180px] shrink-0 h-[795px] lg:max-h-[calc(100dvh-158px)] 3xl:max-h-none 3xl:h-full thumbnail grid grid-cols-1 overflow-hidden p-[1px]"
+          className="keen-slider !w-[120px] 3xl:!w-[180px] shrink-0 h-[795px] lg:h-full max-h-[1200px] thumbnail grid grid-cols-1 overflow-hidden p-[1px]"
           role="region"
           aria-label="Product image thumbnails"
         >
