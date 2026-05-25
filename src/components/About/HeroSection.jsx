@@ -23,23 +23,23 @@ function HeroSection({ heroSectionData }) {
         <div className="lg:w-1/2 flex items-center justify-center md:pl-11 lg:mb-0 mb-[59px]">
           <div className="lg:w-min lg:text-left text-center w-[492px]">
             <h1
-              className="font-recklessRegular 
-              text-[55px] lg:text-[114px] xl:text-[140px] lg:leading-[120px] 
-              leading-[50px] 
-              text-secondary-alt  
+              className="font-recklessRegular
+              text-[55px] lg:text-[114px] xl:text-[140px] 3xl:text-[220px] lg:leading-[120px] 3xl:leading-[190px]
+              leading-[50px]
+              text-secondary-alt
               lg:pt-0 pt-[60px]"
             >
               {data.title.split(" ").slice(0, 2).join(" ")} <br />{" "}
               {data.title.split(" ").slice(2).join(" ")}
             </h1>
-            <p className="lg:text-[24px] font-haasRegular text-[14px] mt-[14px]">
+            <p className="lg:text-[24px] 3xl:text-[36px] font-haasRegular text-[14px] mt-[14px] 3xl:mt-[24px]">
               {data.tagline}
             </p>
             <CustomLink to={buttonLink}>
               <PrimaryButton
-                className="border border-black text-secondary-alt hover:bg-primary hover:border-secondary-alt 
-              max-h-[60px] max-w-[280px]
-              p-0 lg:mt-[60px] sm:mt-[59px] mt-[40px] hover:[letter-spacing:4px]"
+                className="border border-black text-secondary-alt hover:bg-primary hover:border-secondary-alt
+              max-h-[60px] 3xl:max-h-[90px] max-w-[280px] 3xl:max-w-[420px]
+              p-0 lg:mt-[60px] sm:mt-[59px] mt-[40px] 3xl:mt-[90px] hover:[letter-spacing:4px]"
               >
                 {data.buttonLabel}
               </PrimaryButton>

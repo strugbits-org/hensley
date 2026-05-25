@@ -42,7 +42,7 @@ export const Footer = ({ data }) => {
     if (iconAsset) {
       return (
         <img
-          className="h-6 w-6 object-contain hover:opacity-80 transition-opacity duration-300"
+          className="h-6 w-6 3xl:h-10 3xl:w-10 object-contain hover:opacity-80 transition-opacity duration-300"
           src={iconAsset.src || iconAsset}
           alt={item?.label || item?.title || platform}
         />
@@ -91,18 +91,18 @@ export const Footer = ({ data }) => {
   };
 
   return (
-    <footer className="relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]">
-      <div className="footer-content flex justify-between flex-wrap lg:flex-nowrap lg:gap-x-10 gap-y-20 md:gap-y-14 lg:gap-y-6 grow md:grow-0 items-stretch md:items-start">
+    <footer className="relative footer bg-secondary-alt min-h-[95vh] flex flex-col justify-between p-6 pt-12 3xl:p-16 3xl:pt-24 z-[100]">
+      <div className="footer-content flex justify-between flex-wrap lg:flex-nowrap lg:gap-x-10 3xl:gap-x-16 gap-y-20 md:gap-y-14 lg:gap-y-6 grow md:grow-0 items-stretch md:items-start">
         <div className="order-1 w-full md:w-1/2 lg:w-2/6">
           <NewsLetter data={footerData} />
         </div>
         <div className="order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-10 md:mt-0">
           {branches.map((address, index) => (
             <div className="w-2/5 lg:w-1/2 pr-2" key={index}>
-              <h2 className="text-sm font-haasMedium uppercase text-primary mb-1">
+              <h2 className="text-sm 3xl:text-xl font-haasMedium uppercase text-primary mb-1 3xl:mb-3">
                 {formatAddressTitle(address.title)}
               </h2>
-              <p className="text-sm font-haasRegular uppercase text-primary whitespace-pre-line">
+              <p className="text-sm 3xl:text-xl font-haasRegular uppercase text-primary whitespace-pre-line">
                 {formatAddressDescription(address.description)}
               </p>
             </div>
@@ -112,12 +112,12 @@ export const Footer = ({ data }) => {
           <div className="footer-navigation">
             {footerNaviationData.map((item, index) => (
               <CustomLink to={item.link} key={index} target={item.target}>
-                <p className="text-sm font-haasRegular uppercase text-primary mb-1">
+                <p className="text-sm 3xl:text-xl font-haasRegular uppercase text-primary mb-1 3xl:mb-3">
                   {item.title}
                 </p>
               </CustomLink>
             ))}
-            <div className="max-w-[133px] mt-9 flex lg:hidden social-links w-full gap-3 justify-between">
+            <div className="max-w-[133px] 3xl:max-w-[220px] mt-9 3xl:mt-12 flex lg:hidden social-links w-full gap-3 3xl:gap-5 justify-between">
               {socialLinks.map((item, index) => (
                 <CustomLink
                   to={item.link || item.url}
@@ -130,15 +130,15 @@ export const Footer = ({ data }) => {
             </div>
           </div>
         </div>
-        <div className="order-4 md:order-2 lg:order-4 w-1/2 lg:w-1/6 flex flex-col max-w-[150px]">
-          <h2 className="text-sm font-haasMedium uppercase text-primary mb-[18.5px]">
+        <div className="order-4 md:order-2 lg:order-4 w-1/2 lg:w-1/6 flex flex-col max-w-[150px] 3xl:max-w-[280px]">
+          <h2 className="text-sm 3xl:text-xl font-haasMedium uppercase text-primary mb-[18.5px] 3xl:mb-7">
             {" "}
             {brandHeading}{" "}
           </h2>
-          <p className="text-sm font-haasRegular uppercase text-primary mb-5 whitespace-pre-line">
+          <p className="text-sm 3xl:text-xl font-haasRegular uppercase text-primary mb-5 3xl:mb-8 whitespace-pre-line">
             {brandCopy}
           </p>
-          <div className="hidden lg:flex social-links w-full gap-3 justify-between max-w-[133px]">
+          <div className="hidden lg:flex social-links w-full gap-3 3xl:gap-5 justify-between max-w-[133px] 3xl:max-w-[220px]">
             {socialLinks.map((item, index) => (
               <CustomLink
                 to={item.link || item.url}
@@ -152,7 +152,7 @@ export const Footer = ({ data }) => {
         </div>
       </div>
       <PrimaryImage
-        customClasses="mt-20 lg:mt-0 mx-auto w-full h-[60px] md:min-h-[293px] object-contain"
+        customClasses="mt-20 lg:mt-0 mx-auto w-full h-[24vh] lg:h-[30vh] 3xl:h-[34vh] object-contain"
         url={logoUrl}
         fit="fit"
         alt="logo"
