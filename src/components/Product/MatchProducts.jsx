@@ -41,6 +41,9 @@ export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center
                 "(min-width: 1025px) and (max-width: 1280px)": {
                     slides: { perView: 3.5, spacing: 4, origin: "center" },
                 },
+                "(min-width: 2561px)": {
+                    slides: { origin, perView: 5, spacing: 8 },
+                },
             },
         },
         []
@@ -49,8 +52,8 @@ export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center
     return (
         data && data.length > 0 && <div className={`${classes} bg-secondary-alt w-full py-20 lg:py-6`}>
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col'>
-                <SectionTitle text={matchProductsTitle} classes={`lg:!text-[200px] lg:!leading-[160px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] ${headingClasses}`} />
-                {!buttonHide && <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>}
+                <SectionTitle text={matchProductsTitle} classes={`lg:!text-[200px] lg:!leading-[160px] 3xl:!text-[360px] 3xl:!leading-[300px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] ${headingClasses}`} />
+                {!buttonHide && <PrimaryButton className="border border-primary text-primary hover:text-secondary-alt hover:border-secondary-alt text-base 3xl:text-xl hover:bg-primary max-h-[60px] 3xl:max-h-[90px] max-w-[280px] 3xl:max-w-[420px] px-8 py-4 3xl:px-12 3xl:py-6 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>}
             </div>
             <div className="p-6">
                 {!isSliderReady && (

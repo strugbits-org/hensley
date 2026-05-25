@@ -53,6 +53,9 @@ function InstagramFeed({ data, details }) {
         "(min-width: 1025px) and (max-width: 1280px)": {
           slides: { perView: 3.5, spacing: 4, origin: "center" },
         },
+        "(min-width: 1921px)": {
+          slides: { perView: 5, spacing: 6, origin: "center" },
+        },
       },
       created(slider) {
         sliderInstance.current = slider;
@@ -104,7 +107,7 @@ function InstagramFeed({ data, details }) {
                     key={index}
                     className={`keen-slider__slide  flex flex-col md:p-[10px]`}
                   >
-                    <div className="h-[325px] lg:h-[448px] relative">
+                    <div className="h-[325px] lg:h-[448px] 3xl:h-[780px] relative">
                       <PrimaryImage url={dt.image} size="card" customClasses={"h-full w-full object-cover"} />
                     </div>
                   </CustomLink>
