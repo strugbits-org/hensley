@@ -39,6 +39,7 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
           <SaveProductButton
             key={productData._id}
             productData={{ ...productData.productData, product: tent }}
+            className="absolute right-3 top-3 md:right-[24px] md:top-[23px] hidden lg:flex"
           />
         </div>
       </div>

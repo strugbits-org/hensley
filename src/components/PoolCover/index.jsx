@@ -31,6 +31,7 @@ const ProductPoolCover = ({ productData, matchedProducts = [], allCollections = 
           <SaveProductButton
             key={productData._id}
             productData={{ ...productData.productData, product: covers }}
+            className="absolute right-3 top-3 md:right-[24px] md:top-[23px] hidden lg:flex"
           />
         </div>
       </div>
