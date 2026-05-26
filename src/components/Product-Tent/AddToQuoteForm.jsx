@@ -230,7 +230,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             case 'number':
                 return (
                     <div key={key} className={colSpan(field)}>
-                        <label className="block text-[16px] leading-[19px] 3xl:text-[28px] 3xl:leading-[34px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
+                        <label className="block text-[16px] leading-[19px] 3xl:text-[24px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
                             {field.label}{field.required ? '*' : ''}
                         </label>
                         <input
@@ -240,7 +240,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                             value={formData[key] || ''}
                             placeholder={field.placeholder || ''}
                             onChange={(e) => handleInputChange(key, e.target.value)}
-                            className={`w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-7 3xl:text-[26px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
+                            className={`w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
                             disabled={isSubmitting}
                         />
                         {errorMsg && <p className="text-red-500 text-sm mt-1">{errorMsg}</p>}
@@ -250,7 +250,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             case 'textarea':
                 return (
                     <div key={key} className={colSpan(field)}>
-                        <label className="block text-[16px] leading-[19px] 3xl:text-[28px] 3xl:leading-[34px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
+                        <label className="block text-[16px] leading-[19px] 3xl:text-[24px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
                             {field.label}{field.required ? '*' : ''}
                         </label>
                         <textarea
@@ -258,7 +258,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                             value={formData[key] || ''}
                             placeholder={field.placeholder || ''}
                             onChange={(e) => handleInputChange(key, e.target.value)}
-                            className={`w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-7 3xl:text-[26px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
+                            className={`w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
                             rows={4}
                             disabled={isSubmitting}
                         />
@@ -269,7 +269,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             case 'date':
                 return (
                     <div key={key} className={colSpan(field)}>
-                        <label className="block text-[16px] leading-[19px] 3xl:text-[28px] 3xl:leading-[34px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
+                        <label className="block text-[16px] leading-[19px] 3xl:text-[24px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
                             {field.label}{field.required ? '*' : ''}
                         </label>
                         <input
@@ -278,7 +278,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                             {...register(key)}
                             value={formData[key] || ''}
                             onChange={(e) => handleInputChange(key, e.target.value)}
-                            className={`datepicker w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-7 3xl:text-[26px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
+                            className={`datepicker w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary ${errorCls}`}
                             placeholder="MM/DD/YYYY"
                             readOnly
                             disabled={isSubmitting}
@@ -290,14 +290,14 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
             case 'select':
                 return (
                     <div key={key} className={colSpan(field)}>
-                        <label className="block text-[16px] leading-[19px] 3xl:text-[28px] 3xl:leading-[34px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
+                        <label className="block text-[16px] leading-[19px] 3xl:text-[24px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">
                             {field.label}{field.required ? '*' : ''}
                         </label>
                         <select
                             {...register(key)}
                             value={formData[key] || ''}
                             onChange={(e) => handleInputChange(key, e.target.value)}
-                            className={`w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-7 3xl:text-[26px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary uppercase ${errorCls}`}
+                            className={`w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary uppercase ${errorCls}`}
                             disabled={isSubmitting}
                         >
                             <option value="">Select…</option>
@@ -346,12 +346,12 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         { label: 'TENTS' }
                     ]} />
                 </div>
-                <h3 className='uppercase text-secondary-alt font-recklessRegular lg:text-[75px] lg:leading-[85px] 3xl:text-[180px] 3xl:leading-[170px] text-[35px] leading-[30px] mb-3 3xl:mb-10'>{title}</h3>
-                <div className="font-haasLight lg:text-[16px] lg:leading-[19px] 3xl:text-[30px] 3xl:leading-[40px] text-[14px] leading-[17px] text-secondary-alt 3xl:[&_p]:mb-6">
+                <h3 className='uppercase text-secondary-alt font-recklessRegular lg:text-[75px] lg:leading-[85px] 3xl:text-[120px] 3xl:leading-[120px] text-[35px] leading-[30px] mb-3 3xl:mb-10'>{title}</h3>
+                <div className="font-haasLight lg:text-[16px] lg:leading-[19px] 3xl:text-[24px] 3xl:leading-[32px] text-[14px] leading-[17px] text-secondary-alt 3xl:[&_p]:mb-6">
                     {descriptionHtml ? parse(descriptionHtml) : null}
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className='w-full grid lg:grid-cols-4 grid-cols-2 justify-between gap-x-[24px] 3xl:gap-x-[40px] gap-y-[39px] 3xl:gap-y-[60px] mt-[20px] 3xl:mt-[44px]'>
-                    <span className='lg:col-span-4 col-span-2 uppercase font-recklessRegular text-[30px] leading-[30px] 3xl:text-[64px] 3xl:leading-[68px] text-secondary-alt'>
+                    <span className='lg:col-span-4 col-span-2 uppercase font-recklessRegular text-[30px] leading-[30px] 3xl:text-[48px] 3xl:leading-[52px] text-secondary-alt'>
                         {quoteIntroText}
                     </span>
 
@@ -362,7 +362,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
             <AddToCartButton
                 onClick={handleSubmit(onSubmit, onError)}
-                classes={'lg:sticky lg:bottom-4 lg:z-10 lg:!h-[130px] 3xl:!h-[180px] lg:!mt-auto'}
+                classes={'lg:sticky lg:bottom-4 lg:z-10 lg:!h-[130px] 3xl:!h-[150px] lg:!mt-auto'}
                 text={isSubmitting ? 'Please wait...' : quoteSubmitLabel.toLowerCase()}
                 disabled={isSubmitting}
             />

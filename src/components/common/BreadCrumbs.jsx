@@ -3,7 +3,7 @@ import { CustomLink } from './CustomLink';
 
 export const BreadCrumbs = ({ items = [] }) => {
     return (
-        <nav aria-label="Breadcrumb" className="flex gap-1 text-secondary-alt lg:text-base text-xs uppercase font-haasLight">
+        <nav aria-label="Breadcrumb" className="flex gap-1 text-secondary-alt lg:text-base 3xl:text-[20px] text-xs uppercase font-haasLight">
             <ol className="flex items-center gap-1">
                 {items.map((item, index) => (
                     <li key={index} title={item.label}>

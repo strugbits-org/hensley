@@ -193,13 +193,13 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                     ]} />
                 </div>
                 <h3 className='uppercase text-secondary-alt font-recklessRegular
-                    lg:text-[75px] 3xl:text-[180px]
-                    lg:leading-[85px] 3xl:leading-[170px]
+                    lg:text-[75px] 3xl:text-[120px]
+                    lg:leading-[85px] 3xl:leading-[120px]
                     text-[35px]
                     leading-[30px] mb-3
                     '>{title}</h3>
 
-                <div className="font-haasRegular lg:text-[16px] 3xl:text-[30px] lg:leading-[19px] 3xl:leading-[36px] text-[14px] leading-[17px] text-secondary-alt">
+                <div className="font-haasRegular lg:text-[16px] 3xl:text-[24px] lg:leading-[19px] 3xl:leading-[32px] text-[14px] leading-[17px] text-secondary-alt">
                     {parse(richTextToHTML(productData?.description) || '')}
                 </div>
                 <form onSubmit={handleSubmit(onSubmit)} className='w-full grid grid-cols-2 justify-between gap-x-[24px] 3xl:gap-x-[40px] gap-y-[39px] 3xl:gap-y-[60px] mt-[20px] 3xl:mt-[44px]'>
@@ -207,8 +207,8 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                col-span-2
                uppercase
                font-recklessRegular
-               text-[30px] 3xl:text-[64px]
-               leading-[30px] 3xl:leading-[64px]
+               text-[30px] 3xl:text-[48px]
+               leading-[30px] 3xl:leading-[52px]
                text-secondary-alt'>{quoteIntroText}</span>
 
                     {quoteFields.map((field) => {
@@ -232,12 +232,12 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         if (field.inputType === 'select') {
                             return (
                                 <div key={key} className={spanClass}>
-                                    <label className="block text-[16px] 3xl:text-[28px] leading-[19px] 3xl:leading-[34px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">{field.label}</label>
+                                    <label className="block text-[16px] 3xl:text-[24px] leading-[19px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">{field.label}</label>
                                     <select
                                         {...register(key)}
                                         value={formData[key] || ''}
                                         onChange={(e) => handleInputChange(key, e.target.value)}
-                                        className="w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-7 3xl:text-[26px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary uppercase"
+                                        className="w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary uppercase"
                                         disabled={isSubmitting}
                                     >
                                         <option value="">Select...</option>
@@ -252,13 +252,13 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                         const isTextarea = field.inputType === 'textarea';
                         return (
                             <div key={key} className={spanClass}>
-                                <label className="block text-[16px] 3xl:text-[28px] leading-[19px] 3xl:leading-[34px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">{field.label}</label>
+                                <label className="block text-[16px] 3xl:text-[24px] leading-[19px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">{field.label}</label>
                                 {isTextarea ? (
                                     <textarea
                                         {...register(key)}
                                         value={formData[key] || ''}
                                         onChange={(e) => handleInputChange(key, e.target.value)}
-                                        className="w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-7 3xl:text-[26px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
+                                        className="w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
                                         rows={4}
                                         disabled={isSubmitting}
                                     />
@@ -268,7 +268,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                                         {...register(key)}
                                         value={formData[key] || ''}
                                         onChange={(e) => handleInputChange(key, e.target.value)}
-                                        className="w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-7 3xl:text-[26px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
+                                        className="w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
                                         disabled={isSubmitting}
                                     />
                                 )}
@@ -278,9 +278,9 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
                     <div className={`lg:col-span-4 col-span-2 ${relevantImages.length === 0 ? 'mb-[39px]' : ''}`}>
                         <label htmlFor="file-upload" className="cursor-pointer">
-                            <span className="block text-[16px] 3xl:text-[28px] leading-[19px] 3xl:leading-[34px] font-haasBold uppercase font-medium text-secondary-alt mb-4 3xl:mb-7">PLEASE SHARE ANY RELEVANT VENUE OR INSPIRATION IMAGES</span>
+                            <span className="block text-[16px] 3xl:text-[24px] leading-[19px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-4 3xl:mb-7">PLEASE SHARE ANY RELEVANT VENUE OR INSPIRATION IMAGES</span>
                             <div className='w-full min-w-48 lg:min-w-72 uppercase tracking-widest hover:font-bold [word-spacing:3px] text-sm transition-all duration-300'>
-                                <span className='flex justify-center items-center w-full bg-primary tracking-[6px] hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary text-[16px] 3xl:text-[24px] leading-[19px] font-haasRegular h-[45px] 3xl:h-[96px]'>
+                                <span className='flex justify-center items-center w-full bg-primary tracking-[6px] hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary text-[16px] 3xl:text-[22px] leading-[19px] font-haasRegular h-[45px] 3xl:h-[80px]'>
                                     <span>{uploading ? "Uploading..." : "Upload File"}</span> {!uploading && <FiPlus className='size-5 3xl:size-8 ml-2' />}
                                 </span>
                             </div>
@@ -306,7 +306,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                 </form>
             </div>
             <div className="h-[20px]" />
-            <AddToCartButton onClick={handleSubmit(onSubmit)} classes={'lg:sticky lg:bottom-4 lg:z-10 lg:!h-[130px] 3xl:!h-[180px] lg:!mt-auto'} text={isSubmitting ? "Please wait..." : "add to quote"} disabled={isSubmitting} />
+            <AddToCartButton onClick={handleSubmit(onSubmit)} classes={'lg:sticky lg:bottom-4 lg:z-10 lg:!h-[130px] 3xl:!h-[150px] lg:!mt-auto'} text={isSubmitting ? "Please wait..." : "add to quote"} disabled={isSubmitting} />
         </>
     );
 };

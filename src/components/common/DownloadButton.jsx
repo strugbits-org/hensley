@@ -2,8 +2,8 @@ import React from 'react'
 
 export const DownloadButton = ({ text, link, classes, iconTrue }) => {
     return (
-        <a href={link} target='_blank' download className={`cursor-pointer border border-transparent lg:h-[150px] 3xl:h-[220px] sm:mt-[40px] h-[90px] my-[33px] bg-primary tracking-[4px] 3xl:tracking-[6px] group transform transition-all ease-out duration-300 hover:bg-secondary-alt hover:text-primary hover:border-primary relative lg:px-0 px-[70px] flex items-center justify-center ${classes}`}>
-            <span className='font-haasLight uppercase lg:w-full text-[16px] 3xl:text-[28px] text-center group-hover:font-haasBold group-hover:tracking-[5px] transition-all ease-out duration-300'>
+        <a href={link} target='_blank' download className={`cursor-pointer border border-transparent lg:h-[150px] 3xl:h-[170px] sm:mt-[40px] h-[90px] my-[33px] bg-primary tracking-[4px] 3xl:tracking-[6px] group transform transition-all ease-out duration-300 hover:bg-secondary-alt hover:text-primary hover:border-primary relative lg:px-0 px-[70px] flex items-center justify-center ${classes}`}>
+            <span className='font-haasLight uppercase lg:w-full text-[16px] 3xl:text-[22px] text-center group-hover:font-haasBold group-hover:tracking-[5px] transition-all ease-out duration-300'>
                 {text}
             </span>
 
