@@ -39,9 +39,9 @@ export const QuantityControls = ({
   onQuantityChange,
   minQuantity = QUANTITY_LIMITS.MIN,
 }) => (
-  <div className="flex items-center justify-center gap-x-[30px] 3xl:gap-x-[44px] font-haasRegular 3xl:text-[26px]">
+  <div className="flex items-center justify-center gap-x-[30px] 3xl:gap-x-[44px] font-haasRegular 3xl:text-[24px]">
     <button
-      className="select-none text-xl 3xl:text-[32px] font-light hover:opacity-70 transition-opacity"
+      className="select-none text-xl 3xl:text-[28px] font-light hover:opacity-70 transition-opacity"
       onClick={() => onQuantityChange(quantity - 1)}
       disabled={quantity <= minQuantity}
       aria-label="Decrease quantity"
@@ -61,7 +61,7 @@ export const QuantityControls = ({
       aria-label="Quantity"
     />
     <button
-      className="select-none text-xl 3xl:text-[32px] font-light hover:opacity-70 transition-opacity"
+      className="select-none text-xl 3xl:text-[28px] font-light hover:opacity-70 transition-opacity"
       onClick={() => onQuantityChange(quantity + 1)}
       disabled={quantity >= QUANTITY_LIMITS.MAX}
       aria-label="Increase quantity"
@@ -456,28 +456,28 @@ export const Product = ({
               </span>
             </div>
           )}
-          <h1 className="uppercase text-secondary-alt font-recklessRegular lg:text-[75px] 3xl:text-[180px] lg:leading-[85px] 3xl:leading-[170px] text-[35px] leading-[30px] sm:mt-[9px] sm:mb-[9px] lg:mt-[10px]">
+          <h1 className="uppercase text-secondary-alt font-recklessRegular lg:text-[75px] 3xl:text-[120px] lg:leading-[85px] 3xl:leading-[120px] text-[35px] leading-[30px] sm:mt-[9px] sm:mb-[9px] lg:mt-[10px]">
             {product.name}
           </h1>
 
           {!HIDE_PRICES && (
             <div className="lg:mb-[20px] sm:mb-[10px] flex lg:justify-end gap-x-[28px] 3xl:gap-x-[44px]">
-              <span className="text-[35px] 3xl:text-[60px] text-secondary-alt font-recklessRegular">
+              <span className="text-[35px] 3xl:text-[48px] text-secondary-alt font-recklessRegular">
                 {totalPrice}
               </span>
-              <span className="text-[35px] 3xl:text-[60px] text-secondary-alt font-recklessRegular uppercase">
+              <span className="text-[35px] 3xl:text-[48px] text-secondary-alt font-recklessRegular uppercase">
                 (total)
               </span>
             </div>
           )}
 
-          <table className="w-full text-left border-separate border-spacing-y-[12px] 3xl:border-spacing-y-[20px] mb-6 3xl:text-[26px]">
+          <table className="w-full text-left border-separate border-spacing-y-[12px] 3xl:border-spacing-y-[20px] mb-6 3xl:text-[24px]">
             <thead>
               <tr className="text-xs uppercase text-gray-500 border-b border-black">
                 {visibleHeaders.map((header, index) => (
                   <th
                     key={header.title}
-                    className={`pb-2 w-1/4 text-[16px] 3xl:text-[26px] uppercase font-haasLight text-secondary-alt ${
+                    className={`pb-2 w-1/4 text-[16px] 3xl:text-[24px] uppercase font-haasLight text-secondary-alt ${
                       index === 0 ? "text-left" : "text-center"
                     }`}
                   >
@@ -490,7 +490,7 @@ export const Product = ({
           </table>
 
           {isProductCollection && (
-            <p className="text-[11px] 3xl:text-[28px] text-secondary-alt font-haasLight italic -mt-[14px] mb-6">
+            <p className="text-[11px] 3xl:text-[20px] text-secondary-alt font-haasLight italic -mt-[14px] mb-6">
               Items with quantity 0 will not be added to your quote.
             </p>
           )}
@@ -502,7 +502,7 @@ export const Product = ({
 
         <AddToCartButton
           classes={
-            "h-[90px] md:h-[90px] lg:!h-[130px] 3xl:!h-[200px] lg:!mt-auto lg:sticky lg:bottom-0 lg:z-10 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
+            "h-[90px] md:h-[90px] lg:!h-[130px] 3xl:!h-[160px] lg:!mt-auto lg:sticky lg:bottom-0 lg:z-10 lg:w-full lg:max-w-none sm:max-w-[492px] w-full"
           }
           text={isUpdatingCart ? "Please wait..." : "Add to Quote"}
           disabled={isUpdatingCart}

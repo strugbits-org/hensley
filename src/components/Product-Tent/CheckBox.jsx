@@ -54,7 +54,7 @@ export const CheckBox = ({
 
     return (
         <div className={`relative ${classes}`}>
-            <span className="lg:text-[16px] 3xl:text-[26px] mb-[25px] 3xl:mb-[40px] font-haasBold sm:text-[14px] text-[#2B2218] uppercase select-none block">
+            <span className="lg:text-[16px] 3xl:text-[24px] mb-[25px] 3xl:mb-[32px] font-haasBold sm:text-[14px] text-[#2B2218] uppercase select-none block">
                 {label}{required ? '*' : ''}
             </span>
             {options.map((option, index) => (
@@ -73,7 +73,7 @@ export const CheckBox = ({
                             </div>
                         )}
                     </div>
-                    <span className="lg:text-[16px] 3xl:text-[26px] leading-[19px] 3xl:leading-[30px] font-haasLight sm:text-[14px] ml-[8px] 3xl:ml-[16px] text-[#2B2218] uppercase select-none">
+                    <span className="lg:text-[16px] 3xl:text-[22px] leading-[19px] 3xl:leading-[28px] font-haasLight sm:text-[14px] ml-[8px] 3xl:ml-[16px] text-[#2B2218] uppercase select-none">
                         {getOptionLabel(option)}
                     </span>
                 </label>

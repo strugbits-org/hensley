@@ -13,15 +13,15 @@ export default function ProductDescription({ text, maxChars = 200 }) {
     if (!htmlText && !plainText) return null;
     return (
         <div className='w-full flex flex-col gap-y-[15px] 3xl:gap-y-[24px]'>
-            <h2 className='uppercase text-[16px] 3xl:text-[26px] text-secondary-alt font-haasLight block'>Description</h2>
-            <div className='uppercase text-[16px] 3xl:text-[26px] 3xl:leading-[34px] text-secondary-alt font-haasLight block whitespace-pre-line'>
+            <h2 className='uppercase text-[16px] 3xl:text-[24px] text-secondary-alt font-haasLight block'>Description</h2>
+            <div className='uppercase text-[16px] 3xl:text-[24px] 3xl:leading-[32px] text-secondary-alt font-haasLight block whitespace-pre-line'>
                 {(isLong && !expanded) ? previewText : richContent}
             </div>
             {isLong && (
                 <div>
                     <button
                         onClick={() => setExpanded(prev => !prev)}
-                        className="flex items-center gap-2 text-sm 3xl:text-[22px] font-medium text-secondary-alt font-haasBold uppercase"
+                        className="flex items-center gap-2 text-sm 3xl:text-[20px] font-medium text-secondary-alt font-haasBold uppercase"
                     >
                         <span className='border-b border-secondary-alt border-spacing-0'>
                             {expanded ? 'Read less' : 'Read more'}

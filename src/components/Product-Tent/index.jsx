@@ -30,7 +30,7 @@ const ProductTent = ({ productData, masterClassTentingURL, matchedProducts = [],
         <div className='xl:w-1/2 flex flex-col items-center relative lg:min-h-[calc(100vh-110px)] 3xl:min-h-[calc(100vh-160px)]'>
           {ribbon && (
             <div className='w-full mb-3 lg:max-w-[656px] sm:max-w-[492px] 3xl:max-w-[1400px]'>
-              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] 3xl:text-[18px] font-haasRegular uppercase px-3 py-1 3xl:px-5 3xl:py-2 rounded-full'>
+              <span className='inline-block bg-[#e8d98b] text-secondary-alt text-[11px] 3xl:text-[16px] font-haasRegular uppercase px-3 py-1 3xl:px-4 3xl:py-1.5 rounded-full'>
                 {ribbon}
               </span>
             </div>
