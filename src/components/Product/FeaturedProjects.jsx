@@ -46,7 +46,7 @@ export const FeaturedProjects = ({ data, pageDetails, loop = true, classes }) =>
     return (
         <div className={`w-full py-20 bg-primary lg:py-6 ${classes}`}>
             <div className='sm:px-0 px-[12px] flex items-center flex-col '>
-                <SectionTitle text={featuredProjectTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[50px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
+                <SectionTitle text={featuredProjectTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[50px] !text-[35px] !leading-[30px] max-sm:!pt-[20px] " />
             </div>
             {!isSliderReady && (
                 <div className="w-full h-[300px] flex justify-center items-center">
