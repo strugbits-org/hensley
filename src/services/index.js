@@ -24,6 +24,7 @@ import {
   normalizePayloadBlogForListing,
   querySection,
   sectionToObject,
+  mapSectionAddressLocations,
   queryTestimonialsByType,
   queryInstagramFeedItems,
   queryHeroBanner,
@@ -641,7 +642,9 @@ export const fetchContactPageData = async () => {
   try {
     const section = await querySection('contact-form-labels');
     if (section) {
-      return { contactFormData: sectionToObject(section) };
+      const contactFormData = sectionToObject(section);
+      const branchesData = mapSectionAddressLocations(contactFormData?.addresses);
+      return { contactFormData, branchesData };
     }
   } catch (error) {
     logError('Error fetching contact page data:', error);
@@ -654,6 +657,7 @@ export const fetchContactPageData = async () => {
       emailLabel: "Email",
       messageLabel: "Message",
     },
+    branchesData: [],
   };
 };
 

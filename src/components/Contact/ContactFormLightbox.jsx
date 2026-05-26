@@ -4,10 +4,6 @@ import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/re
 import ContactUs from '../Modals/ContactUs';
 
 export const ContactFormLightbox = ({ data, locationsData, isOpen, onClose }) => {
-
-
-    const { contactFormData } = data;
-
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-[120]" onClose={onClose}>
@@ -35,7 +31,7 @@ export const ContactFormLightbox = ({ data, locationsData, isOpen, onClose }) =>
                             leaveTo="opacity-0 scale-95"
                         >
                             <DialogPanel className="transform overflow-hidden text-left align-middle transition-all relative flex justify-center items-center">
-                                <ContactUs data={contactFormData} locationsData={locationsData} />
+                                <ContactUs data={data} locationsData={locationsData} />
                             </DialogPanel>
                         </TransitionChild>
                     </div>
