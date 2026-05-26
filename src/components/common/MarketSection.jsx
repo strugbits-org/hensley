@@ -2,8 +2,8 @@ import React from 'react'
 import SectionTitle from './SectionTitle'
 import { MarketCard } from './MarketCard'
 
-export const MarketSection = ({ data, pageDetails, classes }) => {
-  
+export const MarketSection = ({ data = [], pageDetails = {}, classes }) => {
+
   const { marketsTitle } = pageDetails
   return (
     <div className='w-full bg-secondary-alt'>

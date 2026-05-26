@@ -61,5 +61,19 @@ export const fetchHomePageData = async () => {
     return response;
   } catch (error) {
     logError(`Error fetching hero section data: ${error.message}`, error);
+    // Return a safe shape so the page renders (mostly empty) instead of crashing
+    // when a sub-fetch fails. Each child component also guards its own props.
+    return {
+      heroSectionData: null,
+      bannerData: null,
+      homePageDetails: {},
+      categoriesData: [],
+      portfolioData: [],
+      bestSellers: [],
+      testimonials: [],
+      marketsData: [],
+      blogsData: [],
+      allCollections: [],
+    };
   }
 };

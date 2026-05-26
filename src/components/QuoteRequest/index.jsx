@@ -99,9 +99,9 @@ const FIELD_CONFIGS = {
   specialInstructions: { type: "text", placeholder: "" },
   city1: { type: "text", placeholder: "" },
   state1: { type: "text", placeholder: "" },
-  name: { type: "text", placeholder: "GABRIEL MACCHI" },
-  email: { type: "email", placeholder: "GABRIEL@PETRICHDESIGN" },
-  phone: { type: "tel", placeholder: "(123) 456-7890" },
+  name: { type: "text", placeholder: "" },
+  email: { type: "email", placeholder: "" },
+  phone: { type: "tel", placeholder: "" },
 };
 
 export const QuoteRequest = ({ content, data = "" }) => {
@@ -374,7 +374,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
           type={config.type}
           {...register(fieldId)}
           placeholder={config.placeholder}
-          className={`w-full border-b font-haasRegular border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-secondary ${inputClass} ${
+          className={`w-full border-b font-haasRegular border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm text-secondary-alt placeholder-gray-400 ${inputClass} ${
             error ? "border-b-red-500" : ""
           } ${shouldBeReadOnly ? "!bg-gray-100 cursor-not-allowed" : ""}`}
           disabled={isSubmitting}
@@ -490,7 +490,7 @@ export const QuoteRequest = ({ content, data = "" }) => {
                   type={FIELD_CONFIGS[fieldId].type}
                   {...register(fieldId)}
                   placeholder={FIELD_CONFIGS[fieldId].placeholder}
-                  className="w-full border-b font-haasRegular border-secondary-alt p-3 bg-white uppercase rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary"
+                  className="w-full border-b font-haasRegular border-secondary-alt p-3 bg-white uppercase rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-gray-400"
                   disabled={isSubmitting}
                 />
               </div>

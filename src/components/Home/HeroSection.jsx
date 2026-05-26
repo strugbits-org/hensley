@@ -4,11 +4,11 @@ import { CustomLink } from "../common/CustomLink";
 import { PrimaryButton } from "../common/PrimaryButton";
 import { resolveCoreMediaUrl } from "../../utils";
 
-export const HeroSection = ({ data }) => {
+export const HeroSection = ({ data = {} }) => {
   const videoRef = useRef(null);
 
   const { title, subTitle, estd, backgroundVideo, buttonLabel, buttonAction } =
-    data;
+    data || {};
 
   const videoSrc = resolveCoreMediaUrl(backgroundVideo) || null;
 

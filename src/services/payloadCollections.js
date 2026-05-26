@@ -502,70 +502,42 @@ export const queryActiveHeaderMenu = async () => {
 };
 
 export const mapStorefrontFooterBranches = (footer = {}) => {
-    const formatDisplayDescription = (section, methods, serviceAreaMethod, availabilityMethod) => {
-        const descriptionLines = [];
-        const sectionTitle = getFirstString(section?.title);
-        const sectionDescription = getFirstString(section?.description);
-
-        if (serviceAreaMethod && sectionTitle) {
-            descriptionLines.push(sectionTitle);
-        } else if (sectionDescription && !/[.!?]$/.test(sectionDescription) && sectionDescription.length <= 40) {
-            descriptionLines.push(sectionDescription);
-        }
-
-        if (availabilityMethod) {
-            const value = getFirstString(availabilityMethod?.value);
-            if (value) {
-                descriptionLines.push(value);
-            }
-        }
-
-        methods.forEach((method) => {
-            if (method === serviceAreaMethod || method === availabilityMethod) {
-                return;
-            }
-
-            const value = getFirstString(method?.value);
-            const label = getFirstString(method?.label).toLowerCase();
-
-            if (!value) {
-                return;
-            }
-
-            if (label.includes("address")) {
-                const addressSegments = value
-                    .split(",")
-                    .map((segment) => segment.trim())
-                    .filter(Boolean);
-
-                if (addressSegments.length > 1) {
-                    descriptionLines.push(addressSegments[0], addressSegments.slice(1).join(", "));
-                    return;
-                }
-            }
-
-            descriptionLines.push(value);
-        });
-
-        return descriptionLines.filter(Boolean).join("\n");
-    };
-
+    // Each "contact" footer section references one contact-type location in the
+    // shared `locations` collection. The section title is the heading; the
+    // related location's rich-text `body` (Lexical JSON) is the address block,
+    // rendered downstream via renderRichText.
     return sortByOrderNumber(
         ensureArray(footer?.sections)
             .filter((section) => section?.sectionType === "contact" && section?.isVisible !== false)
-            .map((section) => {
-                const methods = ensureArray(section?.contactMethods)
-                    .filter((method) => method?.isVisible !== false);
-                const serviceAreaMethod = methods.find((method) => getFirstString(method?.label).toLowerCase().includes("service area"));
-                const availabilityMethod = methods.find((method) => getFirstString(method?.label).toLowerCase().includes("availability"));
+            .map((section) => ({
+                title: getFirstString(section?.title) || getFirstString(section?.contactLocation?.label),
+                body: section?.contactLocation?.body ?? null,
+                orderNumber: section?.orderNumber ?? 0,
+            }))
+            .filter((section) => section.title || section.body)
+    );
+};
 
-                return {
-                    title: getFirstString(serviceAreaMethod?.value) || getFirstString(section?.title),
-                    description: formatDisplayDescription(section, methods, serviceAreaMethod, availabilityMethod),
-                    orderNumber: section?.orderNumber ?? 0,
-                };
-            })
-            .filter((section) => section.title || section.description)
+/**
+ * Map an `addresses` relationship field (polymorphic refs into the `locations`
+ * collection) from a Section into the branch shape { title, body } used by the
+ * contact modal / contact page. Each contact-type location's `label` is the
+ * heading and its rich-text `body` is the address block.
+ *
+ * `addresses` comes from sectionToObject(...) and is an array of
+ * { relationTo, value } refs (relationTo array + hasMany).
+ */
+export const mapSectionAddressLocations = (addresses) => {
+    return sortByOrderNumber(
+        ensureArray(addresses)
+            .map((ref) => unwrapRelationshipValue(ref))
+            .filter((loc) => loc && typeof loc === "object" && loc.isVisible !== false)
+            .map((loc) => ({
+                title: getFirstString(loc.label),
+                body: loc.body ?? null,
+                orderNumber: loc.orderNumber ?? 0,
+            }))
+            .filter((loc) => loc.title || loc.body)
     );
 };
 

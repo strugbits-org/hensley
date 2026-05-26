@@ -4,7 +4,7 @@ import { PrimaryImage } from './PrimaryImage'
 import { insertBreaks } from '@/utils';
 import { CustomLink } from './CustomLink';
 
-function OurCategories({ data, pageDetails, classes }) {
+function OurCategories({ data = [], pageDetails = {}, classes }) {
   const { ourCategoriesTitle } = pageDetails;
 
   const checkIsTent = (category) => {

@@ -8,7 +8,7 @@ import NewsCard from './NewsCard';
 import Loading from '@/app/loading';
 import { CustomLink } from './CustomLink';
 
-export const HensleyNews = ({ data, pageDetails, loop = true, origin = "center", titleType = "primary" }) => {
+export const HensleyNews = ({ data, pageDetails = {}, loop = true, origin = "center", titleType = "primary" }) => {
     const { hensleyNewsTitle } = pageDetails;
     const [isSliderReady, setIsSliderReady] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);

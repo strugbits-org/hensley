@@ -10,7 +10,7 @@ import { CustomLink } from '../common/CustomLink';
 
 export const BestSellers = ({
     data,
-    pageDetails,
+    pageDetails = {},
     loop = true,
     origin = "center",
     classes,

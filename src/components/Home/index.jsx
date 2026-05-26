@@ -7,7 +7,7 @@ import { BestSellers } from "./BestSellers";
 import { HeroSection } from "./HeroSection"
 import OurProjects from "./OurProjects";
 
-export const HomePage = ({ data }) => {
+export const HomePage = ({ data = {} }) => {
     const { homePageDetails, heroSectionData, categoriesData, portfolioData, bannerData, bestSellers, testimonials, marketsData, blogsData, allCollections = [] } = data;
 
     return (
