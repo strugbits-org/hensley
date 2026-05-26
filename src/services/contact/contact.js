@@ -1,7 +1,7 @@
 "use server";
 
 import { logError } from "@/utils";
-import { mapStorefrontFooterBranches, queryStorefrontFooter, querySection, sectionToObject } from "../payloadCollections";
+import { mapSectionAddressLocations, querySection, sectionToObject } from "../payloadCollections";
 
 const fallbackContactFormData = {
     title: "Send your message",
@@ -15,18 +15,18 @@ const fallbackContactFormData = {
 
 export const fetchContactPageData = async () => {
     try {
-        const [storefrontFooter, contactSection] = await Promise.all([
-            queryStorefrontFooter({ channel: "her", key: "default" }),
-            querySection('contact-form-labels'),
-        ]);
-        const footerBranches = mapStorefrontFooterBranches(storefrontFooter);
+        const contactSection = await querySection('contact-form-labels');
         const contactFormData = contactSection
             ? sectionToObject(contactSection)
             : fallbackContactFormData;
 
+        // Locations are referenced directly from the contact section's
+        // `addresses` relationship (into the `locations` collection).
+        const branchesData = mapSectionAddressLocations(contactFormData?.addresses);
+
         return {
             contactFormData,
-            branchesData: footerBranches.length ? footerBranches : [],
+            branchesData,
         };
     } catch (error) {
         logError(`Error fetching contact page data: ${error.message}`, error);

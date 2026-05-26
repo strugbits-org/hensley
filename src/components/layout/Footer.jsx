@@ -5,6 +5,7 @@ import twitterIcon from "@/assets/icons/x.svg";
 import { NewsLetter } from "../common/NewsLetter";
 import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
+import { convertToHTMLRichContent } from "@/utils/renderRichText";
 
 export const Footer = ({ data }) => {
   const {
@@ -85,11 +86,6 @@ export const Footer = ({ data }) => {
     return <span className="lg:whitespace-nowrap">{title}</span>;
   };
 
-  const formatAddressDescription = (desc) => {
-    if (!desc) return "";
-    return desc.replace(/(.+)\n(CA \d{5})/g, "$1, $2");
-  };
-
   return (
     <footer className="relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]">
       <div className="footer-content flex justify-between flex-wrap lg:flex-nowrap lg:gap-x-10 gap-y-20 md:gap-y-14 lg:gap-y-6 grow md:grow-0 items-stretch md:items-start">
@@ -102,9 +98,12 @@ export const Footer = ({ data }) => {
               <h2 className="text-sm font-haasMedium uppercase text-primary mb-1">
                 {formatAddressTitle(address.title)}
               </h2>
-              <p className="text-sm font-haasRegular uppercase text-primary whitespace-pre-line">
-                {formatAddressDescription(address.description)}
-              </p>
+              <div className="text-sm font-haasRegular uppercase text-primary">
+                {convertToHTMLRichContent({
+                  content: address.body,
+                  class_p: "text-sm font-haasRegular uppercase text-primary",
+                })}
+              </div>
             </div>
           ))}
         </div>

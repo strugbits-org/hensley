@@ -70,7 +70,7 @@ export default async function RootLayout({ children }) {
     footerData,
     instagramFeed,
     homePageDetails,
-    contactFormData,
+    contactPageData,
     loginPageDetails,
     allCollections,
   ] = await Promise.all([
@@ -85,7 +85,10 @@ export default async function RootLayout({ children }) {
     queryProductCollections().catch(() => []),
   ]);
 
-  const { branches, integrations } = footerData;
+  const { integrations } = footerData;
+  // Contact modal locations come from the contact section's `addresses`
+  // relationship (single source), not the footer's own contact sections.
+  const { contactFormData, branchesData: contactBranches } = contactPageData;
 
   return (
     <html lang="en" className={`${neueHaasDisplayRegular.variable} ${neueHaasDisplayLight.variable} ${neueHaasDisplayMedium.variable} ${neueHaasDisplayBold.variable} ${recklessNeueRegular.variable} ${recklessNeueBold.variable} ${recklessNeueLight.variable} ${recklessNeueMedium.variable}`}>
@@ -98,7 +101,7 @@ export default async function RootLayout({ children }) {
         </main>
         <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
-        <ModalsWrapper data={{ branches, contactFormData, loginPageDetails, allCollections }} />
+        <ModalsWrapper data={{ branches: contactBranches, contactFormData, loginPageDetails, allCollections }} />
         <SpeedInsights />
         <Loader />
         <Toaster position="top-center"

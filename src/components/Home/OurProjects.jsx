@@ -9,7 +9,7 @@ import { CustomLink } from "../common/CustomLink";
 import SectionTitle from "../common/SectionTitle";
 import Loading from "@/app/loading";
 
-export default function OurProjects({ data, pageDetails }) {
+export default function OurProjects({ data, pageDetails = {} }) {
   const { ourProjectsTitle } = pageDetails;
   const [isSliderReady, setIsSliderReady] = useState(false);
 

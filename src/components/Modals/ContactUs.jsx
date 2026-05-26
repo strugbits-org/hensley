@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { logError } from '@/utils';
+import { convertToHTMLRichContent } from '@/utils/renderRichText';
 import { lightboxActions } from "@/store/lightboxStore";
 import { postForm } from '@/services/forms';
 
@@ -66,7 +67,7 @@ const InputField = ({
                 disabled={disabled}
                 {...register}
                 className={`
-          w-full placeholder-secondary font-haasLight p-3 rounded-sm placeholder:uppercase
+          w-full placeholder-gray-400 font-haasLight p-3 rounded-sm placeholder:uppercase
           border-b 
           ${error ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
           ${!error && 'hover:border-b-2'}
@@ -112,7 +113,7 @@ const TextareaField = ({
                 disabled={disabled}
                 {...register}
                 className={`
-          w-full placeholder-secondary font-haasLight p-3 rounded-sm placeholder:uppercase
+          w-full placeholder-gray-400 font-haasLight p-3 rounded-sm placeholder:uppercase
           border-b 
           ${error ? 'border-red-500 border-b' : `border-${borderColor} ${isFocused ? 'border-b-2' : 'border-b'}`}
           ${!error && 'hover:border-b-2'}
@@ -125,11 +126,11 @@ const TextareaField = ({
     );
 };
 
-const AddressBlock = ({ title, description = "" }) => {
+const AddressBlock = ({ title, body = null }) => {
     return (
         <div className='font-haasRegular uppercase text-[14px] leading-[18px]'>
             <p><b>{title}</b></p>
-            <p className='whitespace-pre-line'>{description}</p>
+            <div>{convertToHTMLRichContent({ content: body, class_p: 'font-haasRegular uppercase text-[14px] leading-[18px]' })}</div>
         </div>)
 }
 
@@ -148,20 +149,10 @@ const FormHeading = ({ title = "" }) => {
 };
 
 
-const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => {
+const ContactUs = ({ data, locationsData = [], classes, content, zIndex = true }) => {
     const defaultContent = {
         header: {
-            title: "send your message",
-            addresses: {
-                sanFrancisco: {
-                    title: "San Francisco/Monterey",
-                    lines: ["Bay area", "180 Whill Place", "BRISBANE, CA 94005", "650.692.7007"]
-                },
-                northBay: {
-                    title: "North Bay",
-                    lines: ["(By Appointment)", "ST HELENA, CA 94574", "650.692.7007"]
-                }
-            }
+            title: "send your 12321 message",
         },
         labels: {
             first_name_abae: data?.firstNameLabel,
@@ -285,7 +276,7 @@ const ContactUs = ({ data, locationsData, classes, content, zIndex = true }) => 
                             <AddressBlock
                                 key={index}
                                 title={dt.title}
-                                description={dt.description}
+                                body={dt.body}
                             />
                         ))}
                     </div>
