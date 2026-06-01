@@ -2,6 +2,9 @@ import { MarketPage } from "@/components/Market";
 import { fetchMarketsData, fetchPageMetaData, buildPageMetadata, fetchSelectedMarketsData } from "@/services";
 import { fetchSelectedMarketData } from "@/services/market";
 import { logError } from "@/utils";
+import { getPreviewState } from "@/services/preview";
+import PreviewBadge from "@/components/common/PreviewBadge";
+import PreviewInvalidToast from "@/components/common/PreviewInvalidToast";
 import { notFound } from "next/navigation";
 
 
@@ -38,13 +41,18 @@ export const generateStaticParams = async () => {
   }
 }
 
-export default async function Page({ params }) {
+export default async function Page({ params, searchParams }) {
   try {
     const slug = decodeURIComponent(params.slug);
-    const data = await fetchSelectedMarketData(slug);
+    const { isPreview, invalid } = await getPreviewState(searchParams?.preview, "markets");
+    const data = await fetchSelectedMarketData(slug, { draft: isPreview });
 
     return (
-      <MarketPage slug={slug} data={data} />
+      <>
+        {isPreview && <PreviewBadge />}
+        {invalid && <PreviewInvalidToast />}
+        <MarketPage slug={slug} data={data} />
+      </>
     );
   } catch (error) {
     logError("Error fetching category page data:", error);
