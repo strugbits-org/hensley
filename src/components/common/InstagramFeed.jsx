@@ -22,12 +22,17 @@ const privateRoutes = [
   "/quotes-history",
   "/manage-blogs",
   "/manage-projects",
-  "product-sorting"
+  "product-sorting",
 ];
 
 function InstagramFeed({ data, details }) {
-
-  const { instaFeedHeading, instaFeedTitle, instaFeedIcon, instaFeedButtonLabel, instaFeedButtonAction } = details;
+  const {
+    instaFeedHeading,
+    instaFeedTitle,
+    instaFeedIcon,
+    instaFeedButtonLabel,
+    instaFeedButtonAction,
+  } = details;
   const [isSliderReady, setIsSliderReady] = useState(false);
 
   const pathname = usePathname();
@@ -59,7 +64,7 @@ function InstagramFeed({ data, details }) {
         setIsSliderReady(true);
       },
     },
-    []
+    [],
   );
 
   if (isPrivateRoute) return null;
@@ -77,8 +82,11 @@ function InstagramFeed({ data, details }) {
               {instaFeedHeading}
             </h3>
             <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-3 mb-10 gap-2 lg:gap-4">
-              <PrimaryImage url={instaFeedIcon} customClasses={"size-[18px] lg:size-[30px]"} />
-              <h3 className="text-secondary-alt text-[18px] lg:text-[35px] font-recklessRegular">
+              <PrimaryImage
+                url={instaFeedIcon}
+                customClasses={"size-[18px] lg:size-[30px]"}
+              />
+              <h3 className="text-secondary-alt text-[16px] md:text-[18px] lg:text-[35px] font-recklessRegular">
                 {instaFeedTitle}
               </h3>
             </div>
@@ -91,11 +99,14 @@ function InstagramFeed({ data, details }) {
           <div>
             {!isSliderReady && (
               <div className="w-full h-[300px] flex justify-center items-center">
-                <Loading custom type='secondary' />
+                <Loading custom type="secondary" />
               </div>
             )}
 
-            <div ref={sliderRef} className={`keen-slider mt-[20px] pb-[85px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}>
+            <div
+              ref={sliderRef}
+              className={`keen-slider mt-[20px] pb-[85px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
+            >
               {data.map((dt, index) => {
                 return (
                   <CustomLink
@@ -105,7 +116,11 @@ function InstagramFeed({ data, details }) {
                     className={`keen-slider__slide  flex flex-col md:p-[10px]`}
                   >
                     <div className="h-[325px] lg:h-[448px] relative">
-                      <PrimaryImage url={dt.image} size="card" customClasses={"h-full w-full object-cover"} />
+                      <PrimaryImage
+                        url={dt.image}
+                        size="card"
+                        customClasses={"h-full w-full object-cover"}
+                      />
                     </div>
                   </CustomLink>
                 );

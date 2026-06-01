@@ -58,7 +58,7 @@ function ProductCard({
         prefetch={false}
         className={`w-full min-h-[160px] md:min-h-auto md:h-auto aspect-[1/1.25] md:aspect-square overflow-hidden flex justify-center items-center px-2 py-3 md:px-4 lg:px-6 xl:px-10 2xl:px-14 ${type === "listing" ? "bg-white" : "md:min-h-[220px]"}`}
       >
-        {productImageSrc ?
+        {productImageSrc ? (
           <Image
             src={productImageSrc}
             loader={coreImageLoader}
@@ -72,12 +72,12 @@ function ProductCard({
               "w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
             }
           />
-        : null}
+        ) : null}
       </CustomLink>
 
       <div className="flex flex-col flex-grow max-w-full lg:pl-[23px] pt-2 lg:pt-6">
         <h2
-          className={`w-full uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular line-clamp-2 overflow-hidden h-8 lg:h-10 ${type === "listing" ? "text-xs leading-tight " : ""}`}
+          className={`w-full uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular line-clamp-2 overflow-hidden md:h-8 lg:h-10 ${type === "listing" ? "text-xs leading-tight " : ""}`}
         >
           {title}
         </h2>
@@ -91,7 +91,9 @@ function ProductCard({
                 onClick={() => handleSkuCopy(product.sku)}
                 className="flex justify-center items-center flex-shrink-0"
               >
-                <span className={`text-[10px] lg:text-[12px] text-secondary-alt mr-[8px] word-break transition-colors duration-200 ${copiedSkuId === product.sku ? 'bg-primary' : ''}`}>
+                <span
+                  className={`text-[10px] lg:text-[12px] text-secondary-alt mr-[8px] word-break transition-colors duration-200 ${copiedSkuId === product.sku ? "bg-primary" : ""}`}
+                >
                   {product.sku}
                 </span>
                 <CopyIcon />

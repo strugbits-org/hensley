@@ -2,10 +2,10 @@ import React from 'react'
 
 const Button = ({ text, disabled }) => {
     return (
-        <button disabled={disabled} className='group sm:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-secondary-alt'>
-            <span className='font-haasLight uppercase text-[16px] hover:border-secondary-alt  group-hover:[letter-spacing:8px]
+        <button disabled={disabled} className='group sm:w-[656px] w-full relative bg-primary lg:h-[130px] h-[90px] group transition-all duration-300 hover:bg-secondary-alt flex items-center justify-center px-[34px] sm:px-0'>
+            <span className='font-haasLight uppercase text-[16px] whitespace-nowrap hover:border-secondary-alt sm:group-hover:[letter-spacing:8px]
                         transition-all duration-300
-                        tracking-[5px] group-hover:font-haasBold
+                        tracking-[3px] sm:tracking-[5px] group-hover:font-haasBold
                         group-hover:text-primary
                         '>
                 {text}
@@ -15,7 +15,7 @@ const Button = ({ text, disabled }) => {
                 width="19.877"
                 height="19.67"
                 viewBox="0 0 19.877 19.67"
-                className='ml-2 transition-all duration-300 stroke-secondary-alt  group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2'
+                className='shrink-0 ml-2 transition-all duration-300 stroke-secondary-alt  group-hover:stroke-primary sm:absolute sm:right-[5%] sm:top-1/2 sm:-translate-y-1/2'
             >
                 <g transform="translate(9.835 0.5) rotate(45)">
                     <path
