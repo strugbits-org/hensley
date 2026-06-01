@@ -309,9 +309,11 @@ export const fetchSavedProductData = async (includeProducts = false, retries = 3
                 cache: "no-store",
             });
 
+            // Background wishlist prefetch (runs once per full page load via
+            // SavedProductsHandler). It must NEVER log the user out — doing so on a
+            // 401 here was the production reload-logout bug. Auth enforcement lives
+            // in middleware + explicit user actions, not in this passive prefetch.
             if (response.status === 401) {
-                const { handleUnauthorizedServer } = await import("@/services/auth/authedFetch");
-                await handleUnauthorizedServer();
                 return [];
             }
 

@@ -80,6 +80,10 @@ const hydrateCartForClient = async (cart) => {
       price: Number(item?.priceAtAdd ?? item?.price ?? enrichedProduct?.price ?? 0) || 0,
       quantity: Number(item?.quantity) || 1,
       itemType: item?.itemType || "product",
+      // Authoritative product type from core (bundle/tent/pool_cover); lets the
+      // cart/quote views classify a line item even when itemType is missing.
+      type: enrichedProduct?.type || "",
+      setName: item?.setName || "",
       setItems: item?.setItems || [],
       // Map customTextFieldValues to customTextFields for compatibility with calculateTotalCartQuantity
       customTextFields: item?.customTextFields || item?.customTextFieldValues || [],
@@ -249,7 +253,7 @@ const extractPoolCoverImageIds = (customTextFields = {}) => {
  * @returns {object} Payload cart line item
  */
 const transformLineItem = (item) => {
-  const { catalogReference, quantity, price, priceAtAdd, setItems } = item;
+  const { catalogReference, quantity, price, priceAtAdd, setItems, setName } = item;
 
   // Extract product ID from catalogReference
   const productId = catalogReference?.catalogItemId;
@@ -293,6 +297,7 @@ const transformLineItem = (item) => {
       variant: options.variantId || null,
       quantity: quantity || 1,
       itemType: "set",
+      setName: setName || null,
       setItems: normalizedSetItems,
       selectedOptions: options.options || null,
       customTextFieldValues,
@@ -599,6 +604,7 @@ const normalizeItemToIds = (item) => {
 
   // Include setItems if this is a set
   if (item.itemType === "set" && Array.isArray(item.setItems)) {
+    base.setName = item.setName || null;
     base.setItems = item.setItems.map((si) => ({
       product: typeof si.product === "object" ? si.product?.id : si.product || null,
       productName: si.productName || "",

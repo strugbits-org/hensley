@@ -5,7 +5,7 @@ import PriceDisplay from './PriceDisplay'
 import { AddToQuote } from './AddtoQuoteButton'
 import { CustomLink } from '../common/CustomLink'
 import { getProductsCart, removeProductFromCart, updateProductInCart, updateProductsQuantityCart } from '@/services/cart/CartApis';
-import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError } from '@/utils';
+import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDescriptionLines, formatTotalPrice, logError, mergeTentPoolOptions } from '@/utils';
 import { useCookies } from 'react-cookie';
 import { debounce } from 'lodash';
 import { lightboxActions } from '@/store/lightboxStore';
@@ -315,18 +315,28 @@ const Cart = () => {
           <h2 className='text-[90px] px-[20px] lg:block hidden text-secondary-alt font-recklessRegular uppercase pt-[25px] pb-[45px]'>your cart</h2>
           <div className='flex flex-col border-t border-primary-border'>
             {cartItems.map((item) => {
-              const descriptionLines = item.descriptionLines
+              const baseDescriptionLines = item.descriptionLines
                 ? (formatDescriptionLines(item.descriptionLines) || [])
                 : (Array.isArray(item.customTextFields) ? item.customTextFields : []);
-              
-              // Check for new itemType/setItems format first, then fall back to old string format
-              const isProductSet = item.itemType === "set" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
+              // Include tent/pool-cover options stored in tentOptions/poolCoverOptions
+              // (structured format) alongside legacy custom fields.
+              const descriptionLines = mergeTentPoolOptions(baseDescriptionLines, item);
+
+              // `itemType` is the line-item classification; `type` is the authoritative
+              // product type from core (bundle/tent/pool_cover). Key off both, then
+              // fall back to the legacy description-line markers.
+              const isProductSet = item.itemType === "set" || item.type === "bundle" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
               const productCollectionString = descriptionLines.find(x => x?.title === "Set")?.value;
               const isProductCollection = isProductSet || Boolean(productCollectionString);
-              
-              const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
+
+              const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || item.type === "tent" || item.type === "pool_cover" || descriptionLines.find(x => x?.title === "TENT TYPE" || x?.title === "POOLCOVER")?.value;
 
               if (isProductCollection) {
+                // Hide legacy/broken bundles with no items to show (empty card).
+                const hasSetContent =
+                  (Array.isArray(item.setItems) && item.setItems.length > 0) ||
+                  Boolean(productCollectionString);
+                if (!hasSetContent) return null;
                 // Use new setItems if available, otherwise parse old string format
                 const productSetItems = productCollectionString ? productCollectionString.split("; ") : [];
                 const data = { ...item, productSetItems };

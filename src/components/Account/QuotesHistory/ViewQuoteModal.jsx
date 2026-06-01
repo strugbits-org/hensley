@@ -2,7 +2,7 @@
 import { CartCollection, CartNormal, CartTent } from '@/components/Cart/CartItems';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { lightboxActions } from '@/store/lightboxStore';
-import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, lineItemHasProductReference, logError } from '@/utils';
+import { calculateCartTotalPrice, calculateTotalCartQuantity, formatDateForQuote, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, lineItemHasProductReference, logError, mergeTentPoolOptions } from '@/utils';
 import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { useCookies } from 'react-cookie';
@@ -255,18 +255,27 @@ export const ViewQuoteModal = ({ data, onClose, labels }) => {
 
                                                     // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
                                                     const rawDescriptionLines = item.customTextFieldValues || product.descriptionLines || product.customTextFields || [];
-                                                    const descriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name
+                                                    const baseDescriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name
                                                         ? formatDescriptionLines(rawDescriptionLines)
                                                         : rawDescriptionLines;
+                                                    // Fold tent/pool-cover option arrays into the description lines (structured + legacy).
+                                                    const descriptionLines = mergeTentPoolOptions(baseDescriptionLines, item);
 
                                                     // Check for new itemType/setItems format first, then fall back to old string format
-                                                    const isProductSet = item.itemType === "set" || product.itemType === "set" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
+                                                    // `itemType` is the line-item classification; `type` is the authoritative product type from core (bundle/tent/pool_cover).
+                                                    const isProductSet = item.itemType === "set" || product.type === "bundle" || (item.setItems && Array.isArray(item.setItems) && item.setItems.length > 0);
                                                     const productCollectionString = descriptionLines.find(x => x.title === "Set")?.value;
                                                     const isProductCollection = isProductSet || Boolean(productCollectionString);
 
-                                                    const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || product.itemType === "tent" || product.itemType === "pool_cover" || descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
+                                                    const isTentItem = item.itemType === "tent" || item.itemType === "pool_cover" || product.type === "tent" || product.type === "pool_cover" || descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
                                                     if (isProductCollection) {
+                                                        // Hide legacy/broken bundles with no items to show (empty card).
+                                                        const setItemsForRender = item.setItems || product.setItems;
+                                                        const hasSetContent =
+                                                            (Array.isArray(setItemsForRender) && setItemsForRender.length > 0) ||
+                                                            Boolean(productCollectionString);
+                                                        if (!hasSetContent) return null;
                                                         // Use new setItems if available, otherwise parse old string format
                                                         const productSetItems = productCollectionString ? productCollectionString.split("; ") : [];
                                                         const lineItemData = { ...itemData, productSetItems, setItems: item.setItems || product.setItems };

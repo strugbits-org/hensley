@@ -59,6 +59,7 @@ export const payloadRegister = async (userData) => {
  * @returns {Promise<{user: object, exp: number}>}
  */
 export const payloadGetCurrentMember = async (token) => {
+  const startedAt = Date.now();
   try {
     const response = await fetch(
       `${CORE_API_BASE_URL}/api/${MEMBER_COLLECTION}/me?depth=1`,
@@ -71,12 +72,50 @@ export const payloadGetCurrentMember = async (token) => {
       }
     );
 
-    if (!response.ok) return null;
+    if (response.ok) {
+      return await response.json();
+    }
 
-    return await response.json();
+    // Genuine authentication failure: the token is rejected. Logging the user
+    // out is the correct response here.
+    if (response.status === 401 || response.status === 403) {
+      return null;
+    }
+
+    // Anything else (5xx, 429, gateway/timeouts surfaced as a status, etc.) is a
+    // transient Core problem, NOT an auth failure. Treating it as a logout is the
+    // production reload-logout bug. Throw a CORE_TRANSIENT error whose message
+    // intentionally does NOT contain "unauthorized" so the route maps it to 500
+    // and the session is preserved.
+    const latencyMs = Date.now() - startedAt;
+    // Failure-only, always-on so it surfaces in Vercel runtime logs without DEBUG_LOGS.
+    console.error("[AUTH-DEBUG] /me NOT OK", {
+      status: response.status,
+      statusText: response.statusText,
+      latencyMs,
+    });
+    const transient = new Error(
+      `CORE_TRANSIENT: /me returned ${response.status} ${response.statusText}`
+    );
+    transient.code = "CORE_TRANSIENT";
+    transient.status = response.status;
+    throw transient;
   } catch (error) {
+    if (error?.code === "CORE_TRANSIENT") throw error;
+
+    // Network error / fetch threw / timeout — also transient, not an auth failure.
+    const latencyMs = Date.now() - startedAt;
+    console.error("[AUTH-DEBUG] /me fetch threw", {
+      name: error?.name,
+      message: error?.message,
+      latencyMs,
+    });
     logError("Error fetching current member:", error);
-    return null;
+    const transient = new Error(
+      `CORE_TRANSIENT: /me fetch failed (${error?.name || "Error"}: ${error?.message || "unknown"})`
+    );
+    transient.code = "CORE_TRANSIENT";
+    throw transient;
   }
 };
 
