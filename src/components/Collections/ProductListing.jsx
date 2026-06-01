@@ -105,7 +105,7 @@ function Listing({ data }) {
     debouncedFetchForFilters(newFilters);
   };
 
-  const handleLoadMore = async () => {
+  const handleLoadMore = useCallback(async () => {
     if (!hasMore || isLoadingMoreRef.current) return;
     isLoadingMoreRef.current = true;
     await fetchProducts({
@@ -113,7 +113,7 @@ function Listing({ data }) {
       newSkip: products.length
     });
     isLoadingMoreRef.current = false;
-  };
+  }, [hasMore, fetchProducts, products.length]);
 
   useEffect(() => {
     if (Array.isArray(productBannersData)) {

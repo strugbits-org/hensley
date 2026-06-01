@@ -209,6 +209,9 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
               customTextFields: {}
             },
           },
+          // Carry the bundle's title so it survives all the way to the quote
+          // email (otherwise the set renders as the generic "Set #N" fallback).
+          setName: product.title,
           setItems: setItemsData,
           quantity: 1,
           price: product.price || 0,

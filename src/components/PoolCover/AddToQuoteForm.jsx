@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { CheckBox } from './CheckBox';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { logError, richTextToHTML } from '@/utils';
+import AirDatepicker from 'air-datepicker';
+import localeEn from 'air-datepicker/locale/en';
+import { formatDateNumeric, logError, richTextToHTML } from '@/utils';
 import useRedirectWithLoader from '@/hooks/useRedirectWithLoader';
 import { AddProductToCart } from '@/services/cart/CartApis';
 import { useCookies } from 'react-cookie';
@@ -84,6 +86,7 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
 
     const [formData, setFormData] = useState(defaultValues);
 
+    const uid = useId();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const redirectWithLoader = useRedirectWithLoader();
     const [cookies, setCookie] = useCookies(["cartQuantity"]);
@@ -109,6 +112,32 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
         setValue(field, value);
         trigger(field);
     };
+
+    // Attach a calendar to any field configured as `date` in core (parity with
+    // the tent form — without this a `date` field renders as a plain text box).
+    useEffect(() => {
+        const today = new Date();
+        const instances = [];
+        quoteFields
+            .filter((f) => f.inputType === 'date')
+            .forEach((field) => {
+                const el = document.getElementById(`${uid}-${field.fieldKey}`);
+                if (!el) return;
+                const dp = new AirDatepicker(el, {
+                    minDate: today,
+                    format: 'MM/dd/yyyy',
+                    autoClose: true,
+                    locale: localeEn,
+                    classes: 'custom-date-picker',
+                    onSelect: ({ date }) => {
+                        handleInputChange(field.fieldKey, date ? formatDateNumeric(date) : '');
+                    },
+                });
+                instances.push(dp);
+            });
+        return () => instances.forEach((dp) => dp?.destroy?.());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [quoteFields.length]);
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);
@@ -245,6 +274,25 @@ export const AddToQuoteForm = ({ title, productData, matchedProducts }) => {
                                             <option key={`${key}-${opt.value}`} value={opt.value}>{opt.label}</option>
                                         ))}
                                     </select>
+                                </div>
+                            );
+                        }
+
+                        if (field.inputType === 'date') {
+                            return (
+                                <div key={key} className={spanClass}>
+                                    <label className="block text-[16px] 3xl:text-[24px] leading-[19px] 3xl:leading-[28px] font-haasBold uppercase font-medium text-secondary-alt mb-2 3xl:mb-5">{field.label}</label>
+                                    <input
+                                        id={`${uid}-${key}`}
+                                        type="text"
+                                        {...register(key)}
+                                        value={formData[key] || ''}
+                                        onChange={(e) => handleInputChange(key, e.target.value)}
+                                        className="datepicker w-full border-b font-haasLight border-secondary-alt p-3 3xl:p-5 3xl:text-[22px] bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary uppercase"
+                                        placeholder="MM/DD/YYYY"
+                                        readOnly
+                                        disabled={isSubmitting}
+                                    />
                                 </div>
                             );
                         }

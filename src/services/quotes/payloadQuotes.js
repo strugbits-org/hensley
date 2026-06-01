@@ -182,6 +182,10 @@ const normalizeLineItem = (item) => {
 
   // Add setItems if this is a set
   if (isProductSet) {
+    // Persist the set's display name so the quote email shows the bundle title
+    // instead of the generic "Set #N" fallback. Fall back through the resolved
+    // cart name / product title for legacy cart items saved without setName.
+    base.setName = item.setName || item.name || item.productName || productObj?.title || null;
     if (hasSetItems) {
       // Already in new format - normalize
       base.setItems = item.setItems.map((si) => ({

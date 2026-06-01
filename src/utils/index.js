@@ -251,6 +251,33 @@ export const calculateCartTotalPrice = (lineItems) => {
 export const formatDescriptionLines = (items = []) =>
     items.map(({ title, value }) => ({ title, value }));
 
+// Tent / pool-cover line items keep their option fields in two possible places:
+// legacy items store them in `customTextFieldValues` ({title,value}), while
+// items saved in the structured Core format store them in `tentOptions` /
+// `poolCoverOptions` ({option,value}). The card renderer (CartTent) only reads
+// `descriptionLines`, so merge both sources into one {title,value} list — that
+// way options display whether they came from the old or new format. De-dupes
+// by title; existing descriptionLines win.
+export const mergeTentPoolOptions = (descriptionLines = [], item = {}) => {
+    const lines = Array.isArray(descriptionLines) ? [...descriptionLines] : [];
+    const seen = new Set(
+        lines.map((l) => String(l?.title || "").toUpperCase()).filter(Boolean)
+    );
+    const extras = [
+        ...(Array.isArray(item?.tentOptions) ? item.tentOptions : []),
+        ...(Array.isArray(item?.poolCoverOptions) ? item.poolCoverOptions : []),
+    ];
+    for (const opt of extras) {
+        const title = opt?.title ?? opt?.option;
+        if (!title) continue;
+        const key = String(title).toUpperCase();
+        if (seen.has(key)) continue;
+        seen.add(key);
+        lines.push({ title, value: opt?.value ?? "" });
+    }
+    return lines;
+};
+
 // A quote line item is renderable only if it resolves to a real product
 // reference, OR it is a self-describing item (tent / pool cover / product set)
 // that doesn't need a single product relationship. Migrated Wix quotes can

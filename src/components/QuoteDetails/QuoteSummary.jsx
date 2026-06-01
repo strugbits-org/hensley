@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { calculateCartTotalPrice, formatDescriptionLines, formatTotalPrice, lineItemHasProductReference } from '@/utils';
+import { calculateCartTotalPrice, formatDescriptionLines, formatTotalPrice, lineItemHasProductReference, mergeTentPoolOptions } from '@/utils';
 import { CartNormal, CartCollection, CartTent } from '../Cart/CartItems';
 import PriceDisplay from './PriceDisplay';
 
@@ -83,17 +83,44 @@ const QuoteSummary = ({ data }) => {
         {normalizedLineItems.map((product, index) => {
           // Support both Wix (descriptionLines) and Payload (customTextFieldValues/customTextFields) formats
           const rawDescriptionLines = product.descriptionLines || product.customTextFieldValues || product.customTextFields || [];
-          const descriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name 
-            ? formatDescriptionLines(rawDescriptionLines) 
+          const baseDescriptionLines = Array.isArray(rawDescriptionLines) && rawDescriptionLines[0]?.name
+            ? formatDescriptionLines(rawDescriptionLines)
             : rawDescriptionLines;
-          const productCollection = descriptionLines.find(x => x.title === "Set")?.value;
+          // Fold tent/pool-cover option arrays into the description lines so the
+          // card shows them regardless of whether they were stored as custom
+          // fields (legacy) or tentOptions/poolCoverOptions (structured).
+          const descriptionLines = mergeTentPoolOptions(baseDescriptionLines, product);
+          // Detect sets via the new itemType/setItems model first, then fall
+          // back to the legacy "Set" description-line string. Without the
+          // itemType/setItems check, bundles saved in the new format render as
+          // plain products on this page.
+          // `itemType` is the line-item classification; `type` is the
+          // authoritative product type from core (bundle/tent/pool_cover).
+          // Key off both so an item still renders correctly when one is missing.
+          const productCollectionString = descriptionLines.find(x => x.title === "Set")?.value;
+          const isProductSet =
+            product.itemType === 'set' ||
+            product.type === 'bundle' ||
+            (Array.isArray(product.setItems) && product.setItems.length > 0);
+          const isProductCollection = isProductSet || Boolean(productCollectionString);
           const isTentItem =
             product.itemType === 'tent' ||
             product.itemType === 'pool_cover' ||
+            product.type === 'tent' ||
+            product.type === 'pool_cover' ||
             descriptionLines.find(x => x.title === "TENT TYPE" || x.title === "POOLCOVER")?.value;
 
-          if (productCollection) {
-            const productSetItems = productCollection.split("; ");
+          if (isProductCollection) {
+            // Hide legacy/broken bundles that carry no items to show — a set
+            // with neither structured setItems nor a legacy "Set" string would
+            // render as an empty card. (New quotes can't create these.)
+            const hasSetContent =
+              (Array.isArray(product.setItems) && product.setItems.length > 0) ||
+              Boolean(productCollectionString);
+            if (!hasSetContent) return null;
+            // New structured setItems already ride on `product`; only the legacy
+            // string format needs to be split into productSetItems.
+            const productSetItems = productCollectionString ? productCollectionString.split("; ") : [];
             const lineItemData = { ...product, productSetItems };
             return (
               <CartCollection key={index} data={lineItemData} readOnly={true} />
