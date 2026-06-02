@@ -125,7 +125,7 @@ function ProductCard({
             className={`${btnClass} w-full 2xl:w-auto lg:min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary lg:px-4 lg:py-3 gap-x-7 ${type === "listing" ? "p-2" : "px-4 py-3"}`}
             onClick={handleAddToCart}
           >
-            <span className="uppercase font-haasRegular text-[12px]">
+            <span className="uppercase font-haasRegular text-[11.5px] sm:text-[12px]">
               add to cart
             </span>
             <svg
