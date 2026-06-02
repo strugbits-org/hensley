@@ -23,10 +23,11 @@ export const fetchsubCategoriesPageDetails = cache(async () => {
 // lowercase, but URLs reach us in mixed case (e.g. /subcategory/HIGHLIGHTS).
 // Doing this here means generateMetadata and the page handler hit the same
 // cache key and we don't burn an upstream request on a doomed query.
+// NOTE: slugs may contain a literal ampersand (e.g. "bars-&-backbars"); Next
+// decodes %26 in path params, so the value matches the stored slug as-is.
 const normaliseCategorySlug = (slug) => {
     if (!slug) return slug;
-    const lower = String(slug).toLowerCase();
-    return lower === "bars-&-backbars" ? "bars-backbars" : lower;
+    return String(slug).toLowerCase();
 };
 
 export const fetchSelectedCategoryData = cache(async (rawSlug) => {
