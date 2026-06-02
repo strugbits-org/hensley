@@ -127,9 +127,9 @@ export const fetchBlogPageData = cache(async () => {
     }
 });
 
-export const fetchSelectedBlog = async (slug) => {
+export const fetchSelectedBlog = async (slug, { draft = false } = {}) => {
     try {
-        const payloadBlog = await queryBlogBySlug(slug);
+        const payloadBlog = await queryBlogBySlug(slug, { draft });
         if (!payloadBlog) throw new Error(`Blog not found: ${slug}`);
         return normalizePayloadBlog(payloadBlog);
     } catch (error) {
@@ -143,10 +143,13 @@ export const fetchOtherBlogs = async (slug) => {
     return fetchBlogsForListing({ excludeSlug: slug, limit: 12 });
 }
 
-export const fetchPostPageData = async (slug) => {
+export const fetchPostPageData = async (slug, { draft = false } = {}) => {
     try {
+        // Only the previewed post is fetched as a draft. "Other posts" and the
+        // section-driven page chrome stay published — they're navigation context,
+        // not the content under preview.
         const [blog, otherBlogs, pageDetails] = await Promise.all([
-            fetchSelectedBlog(slug),
+            fetchSelectedBlog(slug, { draft }),
             fetchOtherBlogs(slug),
             fetchPostPageDetails()
         ]);

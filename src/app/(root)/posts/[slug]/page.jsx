@@ -1,6 +1,8 @@
 import BlogDetails from "@/components/BlogDetails";
 import { fetchBlogs, fetchBlogMetadataBySlug, fetchPostPageData } from "@/services/blogs";
 import { logError } from "@/utils";
+import { getPreviewState } from "@/services/preview";
+import PreviewChrome from "@/components/common/PreviewChrome";
 import { notFound } from "next/navigation";
 
 export const generateMetadata = async ({ params }) => {
@@ -37,17 +39,21 @@ export const generateStaticParams = async () => {
   }
 }
 
-export default async function Page({ params }) {
+export default async function Page({ params, searchParams }) {
   try {
     const slug = decodeURIComponent(params.slug);
-    const data = await fetchPostPageData(slug);
+    const { isPreview, invalid } = await getPreviewState(searchParams?.preview, "blogs");
+    const data = await fetchPostPageData(slug, { draft: isPreview });
 
     if (!data?.blog) return notFound();
 
     const { blog, otherBlogs, pageDetails } = data;
 
     return (
-      <BlogDetails data={{ blog, otherBlogs, ...pageDetails }} />
+      <>
+        <PreviewChrome isPreview={isPreview} invalid={invalid} />
+        <BlogDetails data={{ blog, otherBlogs, ...pageDetails }} />
+      </>
     );
   } catch (error) {
     logError("Error fetching category page data:", error);

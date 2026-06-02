@@ -3,8 +3,7 @@ import { fetchMarketsData, fetchPageMetaData, buildPageMetadata, fetchSelectedMa
 import { fetchSelectedMarketData } from "@/services/market";
 import { logError } from "@/utils";
 import { getPreviewState } from "@/services/preview";
-import PreviewBadge from "@/components/common/PreviewBadge";
-import PreviewInvalidToast from "@/components/common/PreviewInvalidToast";
+import PreviewChrome from "@/components/common/PreviewChrome";
 import { notFound } from "next/navigation";
 
 
@@ -49,8 +48,7 @@ export default async function Page({ params, searchParams }) {
 
     return (
       <>
-        {isPreview && <PreviewBadge />}
-        {invalid && <PreviewInvalidToast />}
+        <PreviewChrome isPreview={isPreview} invalid={invalid} />
         <MarketPage slug={slug} data={data} />
       </>
     );
