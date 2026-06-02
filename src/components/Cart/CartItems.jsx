@@ -81,7 +81,7 @@ const QuantityControls = ({
   readOnly,
   minQuantity = QUANTITY_LIMITS.MIN,
 }) => (
-  <div className="mx-auto h-full w-[120px] border-b border-secondary-alt pb-1 flex items-end justify-center font-haasRegular">
+  <div className="mx-auto h-full w-[90px] lg:w-[120px] border-b border-secondary-alt pb-1 flex items-end justify-center font-haasRegular">
     {!readOnly ? (
       <>
         <button
@@ -108,7 +108,7 @@ const QuantityControls = ({
           </svg>
         </button>
         <input
-          className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+          className="font-bold bg-transparent max-w-[40px] lg:max-w-[60px] outline-none text-center appearance-none"
           type="number"
           min={minQuantity}
           max={QUANTITY_LIMITS.MAX}
@@ -159,7 +159,7 @@ const QuantityControls = ({
       </>
     ) : (
       <input
-        className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
+        className="font-bold bg-transparent max-w-[40px] lg:max-w-[60px] outline-none text-center appearance-none"
         type="number"
         value={quantity}
         aria-label="Quantity"
@@ -184,7 +184,7 @@ const renderTableRows = ({
       <td className="pt-2 pb-4 font-semibold lg:block hidden min-w-[260px]">
         {item.product}
       </td>
-      <td className="pt-2 pb-4 font-haasRegular text-center text-[12px] sm:text-[16px] ">
+      <td className="pt-2 pb-4 font-haasRegular text-center text-[11px] leading-[14px] sm:text-[16px] sm:leading-normal">
         {item.size}
       </td>
       {!HIDE_PRICES && (
@@ -504,11 +504,11 @@ const CartCollection = ({
   };
 
   return (
-    <div className="border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[39px] relative">
+    <div className="border-b border-primary-border px-[15px] py-[14px] flex w-full gap-x-[16px] lg:gap-x-[39px] relative">
       <div
         className="
-            h-[104px]
-            w-[104px]
+            h-[80px] w-[80px]
+            lg:h-[104px] lg:w-[104px]
             min-w-[50px]
            bg-white
             "
@@ -520,7 +520,7 @@ const CartCollection = ({
           customClasses="h-full w-full object-contain"
         />
       </div>
-      <div className="w-full lg:flex justify-between items-center pr-[45px] lg:pr-0">
+      <div className="w-full lg:flex justify-between items-center pr-[30px] lg:pr-0">
         <div className="w-full flex flex-col">
           <div className="sm:flex justify-between items-center sm:h-[104px]">
             <span className="block lg:text-[16px] text-[20px] font-medium text-secondary-alt font-haasRegular uppercase lg:mt-[21px] lg:mb-[27px]">
@@ -734,11 +734,11 @@ const CartNormal = ({
   };
 
   return (
-    <div className="border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[39px] relative items-center flex ">
+    <div className="border-b border-primary-border px-[15px] lg:py-[14px] max-sm:py-[14px] w-full gap-x-[16px] lg:gap-x-[39px] relative items-center flex ">
       <div
         className="
-            h-[104px]
-            w-[104px]
+            h-[80px] w-[80px]
+            lg:h-[104px] lg:w-[104px]
             min-w-[50px]
            bg-white
             "
@@ -749,7 +749,7 @@ const CartNormal = ({
           customClasses="h-full w-full object-contain"
         />
       </div>
-      <div className="w-full lg:flex justify-between items-center pr-[45px] lg:pr-0">
+      <div className="w-full lg:flex justify-between items-center pr-[30px] lg:pr-0">
         <div className="sm:flex lg:hidden justify-between items-center sm:h-[104px]">
           <span
             className="block 
