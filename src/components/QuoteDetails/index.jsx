@@ -109,10 +109,10 @@ export const QuoteDetails = ({ data, content }) => {
 
     return (
       <div key={fieldId} className={gridClass}>
-        <label className="block text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
+        <label className="block text-[13px] sm:text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
           {formContent.labels[fieldId]}
         </label>
-        <div className="w-full border-b font-haasLight border-secondary-alt p-3 bg-gray-50 rounded-sm text-secondary-alt min-h-[48px] flex items-center uppercase">
+        <div className="w-full border-b font-haasLight border-secondary-alt p-2.5 sm:p-3 bg-gray-50 rounded-sm text-secondary-alt text-[14px] sm:text-base min-h-[42px] sm:min-h-[48px] flex items-center uppercase break-all">
           {displayValue}
         </div>
       </div>
@@ -125,10 +125,10 @@ export const QuoteDetails = ({ data, content }) => {
 
     return (
       <div key={fieldId}>
-        <label className="block text-[13px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
+        <label className="block text-[13px] sm:text-[16px] font-haasBold uppercase font-medium text-secondary-alt mb-2">
           {formContent.labels[fieldId]}
         </label>
-        <div className="w-full border-b font-haasLight border-secondary-alt p-3 bg-gray-50 rounded-sm text-secondary-alt min-h-[48px] flex items-center uppercase">
+        <div className="w-full border-b font-haasLight border-secondary-alt p-2.5 sm:p-3 bg-gray-50 rounded-sm text-secondary-alt text-[14px] sm:text-base min-h-[42px] sm:min-h-[48px] flex items-center uppercase break-all">
           {displayValue}
         </div>
       </div>
@@ -140,14 +140,14 @@ export const QuoteDetails = ({ data, content }) => {
       <div className="w-full mb-24">
         {/* Header */}
         <div className="w-full border-secondary-alt">
-          <div className="container mx-auto max-w-5xl px-4 py-12 font-['neue-haas-display'] text-center">
-            <h1 className="lg:text-[90px] lg:leading-[85px] sm:text-[65px] sm:leading-[60px] text-[35px] leading-[30px] font-['reckless-neue-regular'] text-secondary-alt mb-5">
+          <div className="container mx-auto max-w-5xl px-4 py-8 sm:py-12 font-['neue-haas-display'] text-center">
+            <h1 className="lg:text-[90px] lg:leading-[85px] sm:text-[65px] sm:leading-[60px] text-[28px] leading-[26px] font-['reckless-neue-regular'] text-secondary-alt mb-5">
               {formContent.header.title}
             </h1>
-            <p className="text-[30px] leading-[30px] text-secondary-alt font-recklessRegular uppercase mt-[27px] mb-[30px]">
+            <p className="sm:text-[30px] sm:leading-[30px] text-[20px] leading-[22px] text-secondary-alt font-recklessRegular uppercase mt-[20px] mb-[20px] sm:mt-[27px] sm:mb-[30px]">
               {formContent.header.subtitle}
             </p>
-            <p className="text-[16px] leading-[19px] font-haasLight text-secondary-alt max-w-2xl mx-auto">
+            <p className="text-[14px] leading-[18px] sm:text-[16px] sm:leading-[19px] font-haasLight text-secondary-alt max-w-2xl mx-auto">
               {formContent.header.description}
             </p>
           </div>
@@ -159,7 +159,7 @@ export const QuoteDetails = ({ data, content }) => {
             <div className="w-full flex justify-center">
               <div className="w-[608px] max-w-full bg-[#F5E9C2] rounded-sm p-5 flex justify-center">
                 <div className="flex lg:flex-row flex-col items-center lg:space-x-10 lg:space-y-0 space-y-3">
-                  <p className="font-medium lg:text-[16px] text-[25px] text-secondary-alt font-recklessRegular tracking-wide lg:mb-0 mb-0">
+                  <p className="font-medium lg:text-[16px] sm:text-[25px] text-[18px] text-secondary-alt font-recklessRegular tracking-wide lg:mb-0 mb-0">
                     YOUR ORDER IS:
                   </p>
                   <div className="flex gap-x-[24px] sm:gap-x-[48px]">
@@ -170,10 +170,10 @@ export const QuoteDetails = ({ data, content }) => {
                           name="orderType"
                           value={type.id}
                           checked={String(normalizedData?.orderStatus || '').toUpperCase() === String(type.id || '').toUpperCase()}
-                          className="form-radio h-[34px] w-[34px] accent-[#57442D] focus:ring-[#57442D] pointer-events-none"
+                          className="form-radio h-[22px] w-[22px] sm:h-[34px] sm:w-[34px] shrink-0 accent-[#57442D] focus:ring-[#57442D] pointer-events-none"
                           readOnly
                         />
-                        <span className="ml-2 font-medium text-secondary-alt font-recklessRegular whitespace-nowrap">
+                        <span className="ml-2 text-[14px] sm:text-[16px] font-medium text-secondary-alt font-recklessRegular whitespace-nowrap">
                           {type.label}
                         </span>
                       </label>
@@ -186,16 +186,16 @@ export const QuoteDetails = ({ data, content }) => {
         </div>
         {/* Event Details */}
         <div className="w-full border-b border-primary-border">
-          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-12">
-            <h2 className="text-3xl font-recklessRegular text-center text-secondary-alt mb-8">
+          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-8 sm:py-12">
+            <h2 className="text-xl sm:text-3xl font-recklessRegular text-center text-secondary-alt mb-6 sm:mb-8">
               {formContent.sections.eventDetails}
             </h2>
-            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-8">
               {FORM_STRUCTURE.eventDetails.slice(0, 3).map((fieldId) =>
                 renderField(fieldId)
               )}
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {FORM_STRUCTURE.eventDetails.slice(3).map((fieldId) => renderField(fieldId, fieldId === 'eventDescriptionPo' ? 'lg:col-span-2' : ''))}
             </div>
           </div>
@@ -203,14 +203,14 @@ export const QuoteDetails = ({ data, content }) => {
 
         {/* Billing Details */}
         <div className="w-full border-b border-primary-border">
-          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-12">
-            <h2 className="text-3xl font-recklessRegular text-center text-secondary-alt mb-8">
+          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-8 sm:py-12">
+            <h2 className="text-xl sm:text-3xl font-recklessRegular text-center text-secondary-alt mb-6 sm:mb-8">
               {formContent.sections.billingDetails}
             </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
               {FORM_STRUCTURE.billingDetails.slice(0, 3).map((fieldId) => renderField(fieldId))}
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
               {FORM_STRUCTURE.billingDetails.slice(3, 6).map((fieldId) => renderField(fieldId))}
             </div>
           </div>
@@ -218,8 +218,8 @@ export const QuoteDetails = ({ data, content }) => {
 
         {/* Special Instructions */}
         <div className="w-full border-b border-primary-border">
-          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-12">
-            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] py-8 sm:py-12">
+            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {FORM_STRUCTURE.specialInstructions.map((fieldId) =>
                 renderSpecialInstructionsField(fieldId)
               )}
@@ -229,11 +229,11 @@ export const QuoteDetails = ({ data, content }) => {
 
         {/* Order By */}
         <div className="w-full border-secondary-alt">
-          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] mt-[56px] pb-12">
-            <h2 className="text-3xl font-['reckless-neue-regular'] text-center text-secondary-alt mb-8">
+          <div className="container mx-auto max-w-5xl lg:px-4 sm:px-[134px] px-[30px] mt-[36px] sm:mt-[56px] pb-8 sm:pb-12">
+            <h2 className="text-xl sm:text-3xl font-['reckless-neue-regular'] text-center text-secondary-alt mb-6 sm:mb-8">
               {formContent.sections.orderBy}
             </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {FORM_STRUCTURE.orderBy.map((fieldId) => renderField(fieldId))}
             </div>
           </div>

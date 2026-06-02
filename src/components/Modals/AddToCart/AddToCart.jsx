@@ -363,6 +363,25 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
 
   return (
     <div className="relative sm:w-[850px] w-full sm:h-[450px] max-sm:max-h-[85vh] max-sm:overflow-hidden sm:overflow-y-auto hide-scrollbar sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] pb-[20px] sm:pb-0 bg-primary-alt z-[999999] box-border">
+      <button
+        onClick={onClose}
+        className="close-button absolute top-[15px] right-[15px] sm:top-[20px] sm:right-[20px] z-30"
+      >
+        <svg
+          preserveAspectRatio="xMidYMid meet"
+          width="24.707"
+          height="24.707"
+          data-bbox="25.975 25.975 148.05 148.05"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="25.975 25.975 148.05 148.05"
+          role="presentation"
+          aria-hidden="true"
+        >
+          <g>
+            <path d="M172.9 167.6L105.3 100l67.6-67.6c1.5-1.5 1.5-3.8 0-5.3s-3.8-1.5-5.3 0L100 94.7 32.4 27.1c-1.5-1.5-3.8-1.5-5.3 0s-1.5 3.8 0 5.3L94.7 100l-67.6 67.6c-1.5 1.5-1.5 3.8 0 5.3s3.8 1.5 5.3 0l67.6-67.6 67.6 67.6c1.5 1.5 3.8 1.5 5.3 0s1.5-3.8 0-5.3z"></path>
+          </g>
+        </svg>
+      </button>
       <div className="relative sm:max-w-[45%] w-full sm:h-full flex-shrink-0">
         <AddToCartSlider
           data={{ ...productData, product }}
@@ -390,25 +409,6 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             >
               {product.name || product.title}
             </span>
-            <button
-              onClick={onClose}
-              className="close-button absolute top-0 right-0"
-            >
-              <svg
-                preserveAspectRatio="xMidYMid meet"
-                width="24.707"
-                height="24.707"
-                data-bbox="25.975 25.975 148.05 148.05"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="25.975 25.975 148.05 148.05"
-                role="presentation"
-                aria-hidden="true"
-              >
-                <g>
-                  <path d="M172.9 167.6L105.3 100l67.6-67.6c1.5-1.5 1.5-3.8 0-5.3s-3.8-1.5-5.3 0L100 94.7 32.4 27.1c-1.5-1.5-3.8-1.5-5.3 0s-1.5 3.8 0 5.3L94.7 100l-67.6 67.6c-1.5 1.5-1.5 3.8 0 5.3s3.8 1.5 5.3 0l67.6-67.6 67.6 67.6c1.5 1.5 3.8 1.5 5.3 0s1.5-3.8 0-5.3z"></path>
-                </g>
-              </svg>
-            </button>
           </div>
           {!HIDE_PRICES && (
             <div className="w-full flex gap-x-[20px] sm:justify-end justify-start ">
