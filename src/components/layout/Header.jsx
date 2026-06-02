@@ -8,14 +8,13 @@ import userIcon from "@/assets/icons/user.svg";
 import cartIcon from "@/assets/icons/cart.svg";
 import { CustomLink } from "../common/CustomLink";
 import { Suspense, useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { SubCategoriesModal } from "../Modals/SubCategoriesModal";
 import { MarketTentModal } from "../Modals/MarketTentModal";
 import { SearchModal } from "../Modals/SearchModal";
 import { HeaderMobileMenu } from "./HeaderMobileMenu";
-import { calculateTotalCartQuantity, sortByOrderNumber } from "@/utils";
+import { sortByOrderNumber } from "@/utils";
 import { lightboxActions } from "@/store/lightboxStore";
-import { getProductsCart } from "@/services/cart/CartApis";
 import { useCookies } from "react-cookie";
 import useRedirectWithLoader from "@/hooks/useRedirectWithLoader";
 import { actions } from "@/store";
@@ -30,7 +29,7 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
   const { header = [], headerSubMenu = [], headerMegaMenu = [] } = data || {};
   const defaultActiveMenu = header[0]?.title || "RENTALS";
 
-  const [cookies, setCookie, removeCookie] = useCookies([
+  const [cookies] = useCookies([
     "cartQuantity",
     "authToken",
   ]);
@@ -44,7 +43,6 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
       "0",
   );
   const pathname = usePathname();
-  const router = useRouter();
 
   const [activeSubMenuItem, setActiveSubMenuItem] = useState({});
   const redirectWithLoader = useRedirectWithLoader();

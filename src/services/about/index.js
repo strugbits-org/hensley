@@ -18,8 +18,11 @@ const fetchPortfolioItemsForAbout = async () => {
 };
 
 
-export const fetchAboutPageData = cache(async () => {
+export const fetchAboutPageData = cache(async ({ draft = false } = {}) => {
   try {
+    // Only the page's own sections are previewed as draft; relational data
+    // (team, brands, portfolio) stays published — it's shared content, not
+    // part of the section variant under preview.
     const [
       aboutPageLabelsSection,
       aboutHeroSection,
@@ -28,8 +31,8 @@ export const fetchAboutPageData = cache(async () => {
       howWeDoItData,
       portfolioData,
     ] = await Promise.all([
-      querySection('about-page-labels'),
-      querySection('about-hero'),
+      querySection('about-page-labels', { draft }),
+      querySection('about-hero', { draft }),
       queryDreamTeamMembers(),
       queryPartnerBrands(),
       queryHowWeDoIt(),

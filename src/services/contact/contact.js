@@ -13,9 +13,9 @@ const fallbackContactFormData = {
     submitButtonLabel: "Send Message",
 };
 
-export const fetchContactPageData = async () => {
+export const fetchContactPageData = async ({ draft = false } = {}) => {
     try {
-        const contactSection = await querySection('contact-form-labels');
+        const contactSection = await querySection('contact-form-labels', { draft });
         const contactFormData = contactSection
             ? sectionToObject(contactSection)
             : fallbackContactFormData;
