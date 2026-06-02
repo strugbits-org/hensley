@@ -169,12 +169,15 @@ export const fetchHeaderData = cache(async () => {
   }
 });
 
-export const fetchMarketsData = cache(async () => {
+export const fetchMarketsData = cache(async ({ draft = false } = {}) => {
   try {
     const docs = await queryMarkets({
-      where: { isHidden: { not_equals: true } },
+      // In preview, drop the isHidden filter so a draft/hidden market still
+      // resolves (mirrors queryProjectBySlug's draft branch).
+      where: draft ? {} : { isHidden: { not_equals: true } },
       depth: 1,
       limit: 100,
+      draft,
     });
     return sortByOrderNumber(docs.map(normalizeCoreMarketItem));
   } catch (error) {
@@ -373,9 +376,9 @@ export const fetchInstagramFeed = cache(async () => {
   return [];
 });
 
-export const fetchHomePageDetails = cache(async () => {
+export const fetchHomePageDetails = cache(async ({ draft = false } = {}) => {
   try {
-    const section = await querySection('home-page-labels');
+    const section = await querySection('home-page-labels', { draft });
     if (section) {
       return sectionToObject(section);
     }

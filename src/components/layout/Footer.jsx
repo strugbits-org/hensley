@@ -43,7 +43,7 @@ export const Footer = ({ data }) => {
     if (iconAsset) {
       return (
         <img
-          className="h-6 w-6 object-contain hover:opacity-80 transition-opacity duration-300"
+          className="h-[18px] w-[18px] sm:h-6 sm:w-6 object-contain hover:opacity-80 transition-opacity duration-300"
           src={iconAsset.src || iconAsset}
           alt={item?.label || item?.title || platform}
         />
@@ -87,21 +87,22 @@ export const Footer = ({ data }) => {
   };
 
   return (
-    <footer className="relative footer bg-secondary-alt min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]">
+    <footer className="relative footer bg-secondary-alt min-h-[90vh] md:min-h-screen flex flex-col justify-between p-6 pt-12 z-[100]">
       <div className="footer-content flex justify-between flex-wrap lg:flex-nowrap lg:gap-x-10 gap-y-20 md:gap-y-14 lg:gap-y-6 grow md:grow-0 items-stretch md:items-start">
         <div className="order-1 w-full md:w-1/2 lg:w-2/6">
           <NewsLetter data={footerData} />
         </div>
-        <div className="order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-10 md:mt-0">
+        <div className="order-2 md:order-3 lg:order-2 w-full md:w-2/3 lg:w-2/6 flex justify-between lg:justify-evenly mt-24 md:mt-0">
           {branches.map((address, index) => (
             <div className="w-2/5 lg:w-1/2 pr-2" key={index}>
-              <h2 className="text-sm font-haasMedium uppercase text-primary mb-1">
+              <h2 className="text-xs sm:text-sm font-haasMedium uppercase text-primary mb-1">
                 {formatAddressTitle(address.title)}
               </h2>
-              <div className="text-sm font-haasRegular uppercase text-primary">
+              <div className="text-xs sm:text-sm font-haasRegular uppercase text-primary">
                 {convertToHTMLRichContent({
                   content: address.body,
-                  class_p: "text-sm font-haasRegular uppercase text-primary",
+                  class_p:
+                    "text-xs sm:text-sm font-haasRegular uppercase text-primary",
                 })}
               </div>
             </div>
@@ -111,7 +112,7 @@ export const Footer = ({ data }) => {
           <div className="footer-navigation">
             {footerNaviationData.map((item, index) => (
               <CustomLink to={item.link} key={index} target={item.target}>
-                <p className="text-sm font-haasRegular uppercase text-primary mb-1">
+                <p className="text-xs sm:text-sm font-haasRegular uppercase text-primary mb-1">
                   {item.title}
                 </p>
               </CustomLink>
@@ -130,11 +131,11 @@ export const Footer = ({ data }) => {
           </div>
         </div>
         <div className="order-4 md:order-2 lg:order-4 w-1/2 lg:w-1/6 flex flex-col max-w-[150px]">
-          <h2 className="text-sm font-haasMedium uppercase text-primary mb-[18.5px]">
+          <h2 className="text-xs sm:text-sm font-haasMedium uppercase text-primary mb-[18.5px]">
             {" "}
             {brandHeading}{" "}
           </h2>
-          <p className="text-sm font-haasRegular uppercase text-primary mb-5 whitespace-pre-line">
+          <p className="text-xs sm:text-sm font-haasRegular uppercase text-primary mb-5 whitespace-pre-line">
             {brandCopy}
           </p>
           <div className="hidden lg:flex social-links w-full gap-3 justify-between max-w-[133px]">

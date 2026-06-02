@@ -2,7 +2,19 @@
 import { NextResponse } from "next/server";
 
 export function middleware(req) {
-  const { pathname } = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
+
+  // Preview rewrite — keep the public ?preview=<token> URL static/cached, and
+  // render drafts via the dynamic /preview/* twin. The rewrite is generic: any
+  // previewable path maps to /preview<path> (home "/" -> /preview/home), so no
+  // per-route mapping is maintained here. `preview` is only ever the token
+  // param, and the guard prevents re-rewriting an already-rewritten request.
+  if (searchParams.has("preview") && !pathname.startsWith("/preview")) {
+    const url = req.nextUrl.clone();
+    url.pathname = pathname === "/" ? "/preview/home" : `/preview${pathname}`;
+    return NextResponse.rewrite(url);
+  }
+
   const authToken = req.cookies.get("authToken")?.value;
 
   const privateRoutes = [

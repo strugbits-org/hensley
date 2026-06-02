@@ -68,12 +68,13 @@ const normalizeMarketHowWeDoItItems = (items = []) => {
         .filter((item) => item.title || item.description || item.image);
 };
 
-const fetchPayloadHowWeDoItDataForMarket = async (slug) => {
+const fetchPayloadHowWeDoItDataForMarket = async (slug, { draft = false } = {}) => {
     try {
         const docs = await queryMarkets({
             where: { slug: { equals: slug } },
             limit: 1,
             depth: 1,
+            draft,
             select: { howWeDoIt: true },
         });
 
@@ -149,9 +150,9 @@ const fetchBestSellersForMarket = async (collectionId) => {
     }
 };
 
-export const fetchSelectedMarketData = cache(async (slug) => {
+export const fetchSelectedMarketData = cache(async (slug, { draft = false } = {}) => {
     try {
-        const marketsData = await fetchMarketsData();
+        const marketsData = await fetchMarketsData({ draft });
 
         const selectedMarket = marketsData.find((market) => market.slug === `/${slug}`);
         const bestSellerCollection = selectedMarket?.bestSellerCollection;
@@ -166,7 +167,7 @@ export const fetchSelectedMarketData = cache(async (slug) => {
 
         const [portfolioData, payloadHowWeDoItData, bannerData, testimonials, blogsData, bestSellerProducts, marketPageDetails] = await Promise.all([
             fetchPortfolioDataForMarkets(ids),
-            marketHowWeDoItData.length ? Promise.resolve([]) : fetchPayloadHowWeDoItDataForMarket(slug),
+            marketHowWeDoItData.length ? Promise.resolve([]) : fetchPayloadHowWeDoItDataForMarket(slug, { draft }),
             fetchBannerData(),
             fetchTestimonials(),
             fetchBlogsForMarketSlim(ids),

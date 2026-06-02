@@ -1,45 +1,62 @@
-"use client"
-import React, { Fragment } from 'react';
-import { Dialog, DialogPanel, Transition, TransitionChild } from '@headlessui/react';
-import AddToCart from '../Modals/AddToCart/AddToCart';
-import AddToCartTent from '../Modals/AddToCart/AddToCartTent';
+"use client";
+import React, { Fragment } from "react";
+import {
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
+import AddToCart from "../Modals/AddToCart/AddToCart";
+import AddToCartTent from "../Modals/AddToCart/AddToCartTent";
 
 export const AddToCartLightBox = ({ data, onClose, allCollections = [] }) => {
-    const { open, type } = data;
+  const { open, type } = data;
 
-    return (
-        <Transition appear show={open} as={Fragment}>
-            <Dialog as="div" className="relative z-[200]" onClose={onClose}>
-                <TransitionChild
-                    as={Fragment}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                >
-                    <div className="fixed inset-0 bg-[#2c2216a6] bg-opacity-50" />
-                </TransitionChild>
+  return (
+    <Transition appear show={open} as={Fragment}>
+      <Dialog as="div" className="relative z-[200]" onClose={onClose}>
+        <TransitionChild
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-[#2c2216a6] bg-opacity-50" />
+        </TransitionChild>
 
-                <div className="fixed inset-0 overflow-y-auto !px-[30px]">
-                    <div className="flex items-center justify-center h-full">
-                        <TransitionChild
-                            as={Fragment}
-                            enter="ease-out duration-300"
-                            enterFrom="opacity-0 scale-95"
-                            enterTo="opacity-100 scale-100"
-                            leave="ease-in duration-200"
-                            leaveFrom="opacity-100 scale-100"
-                            leaveTo="opacity-0 scale-95"
-                        >
-                            <DialogPanel className="transform sm:!px-[20px] overflow-hidden text-left align-middle transition-all relative flex justify-center items-center">
-                                {type === 'tent' ? <AddToCartTent data={data} onClose={onClose} allCollections={allCollections} /> : <AddToCart data={data} onClose={onClose} allCollections={allCollections} />}
-                            </DialogPanel>
-                        </TransitionChild>
-                    </div>
-                </div>
-            </Dialog>
-        </Transition>
-    );
+        <div className="fixed inset-0 overflow-y-auto !px-[30px] py-[30px]">
+          <div className="flex items-center justify-center min-h-full">
+            <TransitionChild
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <DialogPanel className="transform sm:!px-[20px] overflow-hidden text-left align-middle transition-all relative flex justify-center items-center">
+                {type === "tent" ? (
+                  <AddToCartTent
+                    data={data}
+                    onClose={onClose}
+                    allCollections={allCollections}
+                  />
+                ) : (
+                  <AddToCart
+                    data={data}
+                    onClose={onClose}
+                    allCollections={allCollections}
+                  />
+                )}
+              </DialogPanel>
+            </TransitionChild>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
+  );
 };

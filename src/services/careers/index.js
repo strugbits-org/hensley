@@ -4,14 +4,14 @@ import { cache } from "react";
 import { logError } from "@/utils";
 import { querySection, sectionToObject, queryHowWeDoIt, queryTestimonialsByType } from "@/services/payloadCollections";
 
-export const fetchCareersPageData = cache(async () => {
+export const fetchCareersPageData = cache(async ({ draft = false } = {}) => {
     try {
         const [
             careersHeroSection,
             howWeDoItData,
             employeeTestimonialsData,
         ] = await Promise.all([
-            querySection('careers-hero'),
+            querySection('careers-hero', { draft }),
             queryHowWeDoIt(),
             queryTestimonialsByType(undefined, 'employee'),
         ]);

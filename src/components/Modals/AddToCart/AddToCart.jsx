@@ -1,33 +1,50 @@
-"use client"
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { AddToCartSlider } from './AddToCartSlider'
-import { AddToQuoteButton } from './AddtoQuoteButton'
-import ProductDescription from '@/components/common/helpers/ProductDescription'
-import { QuantityControls } from '@/components/Product'
-import { calculateTotalCartQuantity, findProductSize, formatDescriptionLines, formatTotalPrice, HIDE_PRICES, logError, normalizeProductForDisplay } from '@/utils'
-import { AddProductToCart, removeProductFromCart } from '@/services/cart/CartApis'
-import { useCookies } from 'react-cookie'
-import { lightboxActions } from '@/store/lightboxStore'
-import { checkProductInCart, fetchProductCollectionData } from '@/services/products'
-import { resolveProductRibbon } from '@/components/common/ProductBadge'
+"use client";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { AddToCartSlider } from "./AddToCartSlider";
+import { AddToQuoteButton } from "./AddtoQuoteButton";
+import ProductDescription from "@/components/common/helpers/ProductDescription";
+import { QuantityControls } from "@/components/Product";
+import {
+  calculateTotalCartQuantity,
+  findProductSize,
+  formatDescriptionLines,
+  formatTotalPrice,
+  HIDE_PRICES,
+  logError,
+  normalizeProductForDisplay,
+} from "@/utils";
+import {
+  AddProductToCart,
+  removeProductFromCart,
+} from "@/services/cart/CartApis";
+import { useCookies } from "react-cookie";
+import { lightboxActions } from "@/store/lightboxStore";
+import {
+  checkProductInCart,
+  fetchProductCollectionData,
+} from "@/services/products";
+import { resolveProductRibbon } from "@/components/common/ProductBadge";
 
 const INFO_HEADERS = [
-  { title: 'Product', setItem: true },
-  { title: 'Size', setItem: false },
-  { title: 'Price', setItem: false },
-  { title: 'Quantity', setItem: false }
+  { title: "Product", setItem: true },
+  { title: "Size", setItem: false },
+  { title: "Price", setItem: false },
+  { title: "Quantity", setItem: false },
 ];
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
 
 const AddToCart = ({ data, onClose, allCollections = [] }) => {
   const { productData } = data;
-  const product = useMemo(() => normalizeProductForDisplay(productData?.product || {}), [productData?.product]);
+  const product = useMemo(
+    () => normalizeProductForDisplay(productData?.product || {}),
+    [productData?.product],
+  );
   const ribbon = resolveProductRibbon(productData?.product, allCollections);
-  
+
   // bps-core sets `type` on every product, so we can decide locally without
   // a fetch. Bundle products always ship their bundleItems with the product
   // payload — no network round-trip needed before rendering.
-  const isPayloadBundle = product?.type === 'bundle';
+  const isPayloadBundle = product?.type === "bundle";
 
   const [cartQuantity, setCartQuantity] = useState(1);
   const [productSetItems, setProductSetItems] = useState([]);
@@ -48,29 +65,36 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
     if (isProductCollection) {
       const collectionTotal = productSetItems.reduce((total, item) => {
         const itemPrice = parseFloat(item.price) || 0;
-        return total + (itemPrice * item.quantity);
+        return total + itemPrice * item.quantity;
       }, 0);
       return formatTotalPrice(collectionTotal);
     }
     return formatTotalPrice(product.price * cartQuantity);
   }, [isProductCollection, productSetItems, product.price, cartQuantity]);
 
-  const visibleHeaders = useMemo(() =>
-    INFO_HEADERS.filter(header => {
-      if (HIDE_PRICES && header.title === 'Price') return false;
-      return !header.setItem || isProductCollection;
-    }),
-    [isProductCollection]
+  const visibleHeaders = useMemo(
+    () =>
+      INFO_HEADERS.filter((header) => {
+        if (HIDE_PRICES && header.title === "Price") return false;
+        return !header.setItem || isProductCollection;
+      }),
+    [isProductCollection],
   );
 
   const renderTableRows = () => {
     if (isProductCollection) {
       return productSetItems.map((item, index) => (
         <tr key={`${item.product}-${index}`}>
-          <td className="text-sm py-2 font-bold border-b border-black">{item.product}</td>
-          <td className="text-sm border-b border-black font-haasRegular text-center">{item.size}</td>
+          <td className="text-sm py-2 font-bold border-b border-black">
+            {item.product}
+          </td>
+          <td className="text-sm border-b border-black font-haasRegular text-center">
+            {item.size}
+          </td>
           {!HIDE_PRICES && (
-            <td className="text-sm text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+            <td className="text-sm text-center border-b border-black font-haasRegular">
+              {item.formattedPrice}
+            </td>
           )}
           <td className="text-sm border-b border-black font-haasRegular">
             <QuantityControls
@@ -85,9 +109,13 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
 
     return productInfoSection.map((item, index) => (
       <tr key={`item-${index}`}>
-        <td className="border-b border-black font-haasRegular text-left">{item.size}</td>
+        <td className="border-b border-black font-haasRegular text-left">
+          {item.size}
+        </td>
         {!HIDE_PRICES && (
-          <td className="text-center border-b border-black font-haasRegular">{item.formattedPrice}</td>
+          <td className="text-center border-b border-black font-haasRegular">
+            {item.formattedPrice}
+          </td>
         )}
         <td className="border-b border-black font-haasRegular">
           <QuantityControls
@@ -99,23 +127,26 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
     ));
   };
 
-  const handleQuantityChange = useCallback((value, itemId) => {
-    if (isLoading) return;
-    const numValue = typeof value === 'string' ? parseInt(value, 10) : value;
-    if (!Number.isFinite(numValue) || numValue > QUANTITY_LIMITS.MAX) return;
+  const handleQuantityChange = useCallback(
+    (value, itemId) => {
+      if (isLoading) return;
+      const numValue = typeof value === "string" ? parseInt(value, 10) : value;
+      if (!Number.isFinite(numValue) || numValue > QUANTITY_LIMITS.MAX) return;
 
-    if (isProductCollection) {
-      if (numValue < 0) return;
-      setProductSetItems(prev =>
-        prev.map(item =>
-          item.id === itemId ? { ...item, quantity: numValue } : item
-        )
-      );
-    } else {
-      if (numValue < QUANTITY_LIMITS.MIN) return;
-      setCartQuantity(numValue);
-    }
-  }, [isProductCollection, isLoading]);
+      if (isProductCollection) {
+        if (numValue < 0) return;
+        setProductSetItems((prev) =>
+          prev.map((item) =>
+            item.id === itemId ? { ...item, quantity: numValue } : item,
+          ),
+        );
+      } else {
+        if (numValue < QUANTITY_LIMITS.MIN) return;
+        setCartQuantity(numValue);
+      }
+    },
+    [isProductCollection, isLoading],
+  );
 
   const handleAddToCart = async () => {
     try {
@@ -126,13 +157,16 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
 
       if (isProductCollection) {
         let setItemsData;
-        const itemsForQuote = productSetItems.filter((item) => parseInt(item.quantity, 10) > 0);
+        const itemsForQuote = productSetItems.filter(
+          (item) => parseInt(item.quantity, 10) > 0,
+        );
 
         if (itemsForQuote.length === 0) {
           setIsLoading(false);
           lightboxActions.setBasicLightBoxDetails({
             title: "No items selected",
-            description: "Please set quantity for at least one item before adding to your quote.",
+            description:
+              "Please set quantity for at least one item before adding to your quote.",
             buttonText: "OK",
             open: true,
           });
@@ -140,7 +174,10 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
         }
 
         // Re-fetch cart state to avoid acting on stale productInCart (e.g. user added once then re-submits from the same modal)
-        const currentProductInCart = await checkProductInCart(productId, isProductCollection);
+        const currentProductInCart = await checkProductInCart(
+          productId,
+          isProductCollection,
+        );
 
         if (currentProductInCart) {
           // Check for new setItems format first, then fall back to string format
@@ -148,7 +185,9 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
 
           if (existingSetItems.length > 0) {
             // New format - merge with existing setItems and preserve items not touched in this submission
-            const newItemNames = new Set(itemsForQuote.map((item) => item.product));
+            const newItemNames = new Set(
+              itemsForQuote.map((item) => item.product),
+            );
             const preservedExisting = existingSetItems
               .filter((si) => !newItemNames.has(si.productName))
               .map((si) => ({
@@ -159,8 +198,12 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
                 unitPrice: parseFloat(si.unitPrice) || 0,
               }));
             const merged = itemsForQuote.map((item) => {
-              const existingItem = existingSetItems.find((si) => si.productName === item.product);
-              const oldQuantity = existingItem ? parseInt(existingItem.quantity, 10) : 0;
+              const existingItem = existingSetItems.find(
+                (si) => si.productName === item.product,
+              );
+              const oldQuantity = existingItem
+                ? parseInt(existingItem.quantity, 10)
+                : 0;
               return {
                 product: item.productId || null,
                 productName: item.product,
@@ -172,13 +215,23 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
             setItemsData = [...preservedExisting, ...merged];
           } else {
             // Old format - parse from string and convert
-            const rawDescriptionLines = currentProductInCart.descriptionLines || currentProductInCart.customTextFieldValues || currentProductInCart.customTextFields || [];
-            const descriptionLines = formatDescriptionLines(rawDescriptionLines);
-            const existingSet = descriptionLines.find(x => x.title === "Set")?.value || "";
+            const rawDescriptionLines =
+              currentProductInCart.descriptionLines ||
+              currentProductInCart.customTextFieldValues ||
+              currentProductInCart.customTextFields ||
+              [];
+            const descriptionLines =
+              formatDescriptionLines(rawDescriptionLines);
+            const existingSet =
+              descriptionLines.find((x) => x.title === "Set")?.value || "";
 
             setItemsData = itemsForQuote.map((item) => {
-              const existingItemStr = existingSet.split("; ").find((field) => field.includes(item.product));
-              const oldQuantity = existingItemStr ? parseInt(existingItemStr.split("~")[3], 10) : 0;
+              const existingItemStr = existingSet
+                .split("; ")
+                .find((field) => field.includes(item.product));
+              const oldQuantity = existingItemStr
+                ? parseInt(existingItemStr.split("~")[3], 10)
+                : 0;
               return {
                 product: item.productId || null,
                 productName: item.product,
@@ -201,35 +254,39 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
           }));
         }
 
-        lineItems = [{
-          catalogReference: {
-            appId,
-            catalogItemId: productId,
-            options: {
-              customTextFields: {}
+        lineItems = [
+          {
+            catalogReference: {
+              appId,
+              catalogItemId: productId,
+              options: {
+                customTextFields: {},
+              },
             },
+            // Carry the bundle's title so it survives all the way to the quote
+            // email (otherwise the set renders as the generic "Set #N" fallback).
+            setName: product.title,
+            setItems: setItemsData,
+            quantity: 1,
+            price: product.price || 0,
           },
-          // Carry the bundle's title so it survives all the way to the quote
-          // email (otherwise the set renders as the generic "Set #N" fallback).
-          setName: product.title,
-          setItems: setItemsData,
-          quantity: 1,
-          price: product.price || 0,
-        }];
+        ];
       } else {
         const size = findProductSize(product.additionalInfoSections);
 
-        lineItems = [{
-          catalogReference: {
-            appId,
-            catalogItemId: productId,
-            options: {
-              customTextFields: { size }
+        lineItems = [
+          {
+            catalogReference: {
+              appId,
+              catalogItemId: productId,
+              options: {
+                customTextFields: { size },
+              },
             },
+            quantity: cartQuantity,
+            price: product.price || 0,
           },
-          quantity: cartQuantity,
-          price: product.price || 0,
-        }];
+        ];
       }
 
       const cartData = { lineItems };
@@ -237,7 +294,9 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
       await AddProductToCart(cartData);
 
       const newItems = calculateTotalCartQuantity(cartData.lineItems);
-      const total = cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      const total = cookies.cartQuantity
+        ? cookies.cartQuantity + newItems
+        : newItems;
       setCookie("cartQuantity", total, { path: "/" });
       setTimeout(() => {
         lightboxActions.setBasicLightBoxDetails({
@@ -274,13 +333,17 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
     const loadBundleItems = async () => {
       if (!isPayloadBundle) return;
       try {
-        const collectionData = await fetchProductCollectionData(productId, product);
+        const collectionData = await fetchProductCollectionData(
+          productId,
+          product,
+        );
         if (isCancelled || !collectionData) return;
-        const items = collectionData.map(set => ({
+        const items = collectionData.map((set) => ({
           id: set.product._id || set.product.id,
           product: set.product.name || set.product.title,
           size: findProductSize(set.product.additionalInfoSections),
-          formattedPrice: set.product.formattedPrice || formatTotalPrice(set.product.price),
+          formattedPrice:
+            set.product.formattedPrice || formatTotalPrice(set.product.price),
           price: set.product.price,
           quantity: set.quantity,
           required: !!set.required,
@@ -293,82 +356,113 @@ const AddToCart = ({ data, onClose, allCollections = [] }) => {
 
     loadBundleItems();
 
-    return () => { isCancelled = true; };
+    return () => {
+      isCancelled = true;
+    };
   }, [product._id, product.id, isPayloadBundle]);
 
   return (
-    <div className='relative sm:w-[850px] w-full sm:h-[450px] sm:overflow-y-auto overflow-y-scroll hide-scrollbar max-sm:h-[820px] sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] bg-primary-alt z-[999999] box-border'>
-      <div className='relative sm:max-w-[45%] w-full sm:h-full flex-shrink-0'>
-        <AddToCartSlider data={{ ...productData, product }} isOpen={data.open} noWidthConstraint />
+    <div className="relative sm:w-[850px] w-full sm:h-[450px] max-sm:max-h-[85vh] max-sm:overflow-hidden sm:overflow-y-auto hide-scrollbar sm:mt-0 sm:flex-row flex-col flex gap-x-[24px] sm:px-0 px-[20px] pb-[20px] sm:pb-0 bg-primary-alt z-[999999] box-border">
+      <button
+        onClick={onClose}
+        className="close-button absolute top-[15px] right-[15px] sm:top-[20px] sm:right-[20px] z-30"
+      >
+        <svg
+          preserveAspectRatio="xMidYMid meet"
+          width="24.707"
+          height="24.707"
+          data-bbox="25.975 25.975 148.05 148.05"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="25.975 25.975 148.05 148.05"
+          role="presentation"
+          aria-hidden="true"
+        >
+          <g>
+            <path d="M172.9 167.6L105.3 100l67.6-67.6c1.5-1.5 1.5-3.8 0-5.3s-3.8-1.5-5.3 0L100 94.7 32.4 27.1c-1.5-1.5-3.8-1.5-5.3 0s-1.5 3.8 0 5.3L94.7 100l-67.6 67.6c-1.5 1.5-1.5 3.8 0 5.3s3.8 1.5 5.3 0l67.6-67.6 67.6 67.6c1.5 1.5 3.8 1.5 5.3 0s1.5-3.8 0-5.3z"></path>
+          </g>
+        </svg>
+      </button>
+      <div className="relative sm:max-w-[45%] w-full sm:h-full flex-shrink-0">
+        <AddToCartSlider
+          data={{ ...productData, product }}
+          isOpen={data.open}
+          noWidthConstraint
+        />
         {ribbon && (
-          <span className='absolute top-3 left-3 z-20 bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full pointer-events-none'>
+          <span className="absolute top-3 left-3 z-20 bg-[#e8d98b] text-secondary-alt text-[11px] font-haasRegular uppercase px-3 py-1 rounded-full pointer-events-none">
             {ribbon}
           </span>
         )}
       </div>
-      <div className='h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative'>
-        <div className='w-full flex flex-col  gap-y-[15px] overflow-y-scroll hide-scrollbar sm:h-[320px]'>
-          <div className='w-full flex justify-between relative pr-8'>
-            <span className='
+      <div className="max-sm:flex max-sm:flex-col max-sm:min-h-0 max-sm:flex-1 sm:h-full sm:w-[55%] w-full py-[25px] pt-[30px] pr-[20px] relative">
+        <div className="w-full flex flex-col gap-y-[15px] max-sm:flex-1 max-sm:min-h-0 max-sm:overflow-y-auto sm:overflow-y-scroll hide-scrollbar sm:h-[320px]">
+          <div className="w-full flex justify-between relative pr-8">
+            <span
+              className="
             text-[35px]
             leading-[30px]
             text-secondary-alt
             font-recklessRegular
             uppercase
             w-full
-            '>{product.name || product.title}</span>
-            <button onClick={onClose} className='close-button absolute top-0 right-0'>
-              <svg preserveAspectRatio="xMidYMid meet" width="24.707" height="24.707" data-bbox="25.975 25.975 148.05 148.05" xmlns="http://www.w3.org/2000/svg" viewBox="25.975 25.975 148.05 148.05" role="presentation" aria-hidden="true">
-                <g>
-                  <path d="M172.9 167.6L105.3 100l67.6-67.6c1.5-1.5 1.5-3.8 0-5.3s-3.8-1.5-5.3 0L100 94.7 32.4 27.1c-1.5-1.5-3.8-1.5-5.3 0s-1.5 3.8 0 5.3L94.7 100l-67.6 67.6c-1.5 1.5-1.5 3.8 0 5.3s3.8 1.5 5.3 0l67.6-67.6 67.6 67.6c1.5 1.5 3.8 1.5 5.3 0s1.5-3.8 0-5.3z"></path>
-                </g>
-              </svg>
-            </button>
+            "
+            >
+              {product.name || product.title}
+            </span>
           </div>
           {!HIDE_PRICES && (
-            <div className='w-full flex gap-x-[20px] sm:justify-end justify-start '>
+            <div className="w-full flex gap-x-[20px] sm:justify-end justify-start ">
               <span
-                className='
+                className="
         text-[25px]
         text-secondary-alt
         font-recklessRegular
         uppercase
         block
-        '
-              >{totalPrice}</span>
-              <span className='text-[25px] text-secondary-alt font-recklessRegular block uppercase '>(total)</span>
+        "
+              >
+                {totalPrice}
+              </span>
+              <span className="text-[25px] text-secondary-alt font-recklessRegular block uppercase ">
+                (total)
+              </span>
             </div>
           )}
           <table className="w-full text-left border-separate border-spacing-y-[15px]">
             <thead>
               <tr className="text-xs max-lg:hidden uppercase text-gray-500 border-b border-black">
                 {visibleHeaders.map((header, index) => (
-                  <th key={header.title} className={`pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? 'text-left' : 'text-center'}`}>
+                  <th
+                    key={header.title}
+                    className={`pb-2 w-1/4 text-[16px] uppercase font-haasLight text-secondary-alt ${index === 0 ? "text-left" : "text-center"}`}
+                  >
                     {header.title}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody>
-              {renderTableRows()}
-            </tbody>
+            <tbody>{renderTableRows()}</tbody>
           </table>
           {isProductCollection && (
-            <p className='text-[11px] 3xl:text-[24px] text-secondary-alt font-haasLight italic -mt-[8px]'>
+            <p className="text-[11px] 3xl:text-[24px] text-secondary-alt font-haasLight italic -mt-[8px]">
               Items with quantity 0 will not be added to your quote.
             </p>
           )}
           {product.descriptionText && (
-            <div className='py-[10px]'>
+            <div className="py-[10px]">
               <ProductDescription maxChars={130} text={product.description} />
             </div>
           )}
         </div>
-        <AddToQuoteButton classes={"lg:!h-[80px] lg:!mt-0 !mt-0 !text-[14px] "} onClick={handleAddToCart} text={isLoading ? "PLEASE WAIT..." : "ADD TO QUOTE"} disabled={isLoading} />
-
+        <AddToQuoteButton
+          classes={"lg:!h-[80px] lg:!mt-0 !mt-3 sm:!mt-0 !text-[13px] shrink-0"}
+          onClick={handleAddToCart}
+          text={isLoading ? "PLEASE WAIT..." : "ADD TO QUOTE"}
+          disabled={isLoading}
+        />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default AddToCart;

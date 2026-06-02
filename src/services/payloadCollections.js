@@ -1255,15 +1255,17 @@ export const normalizePayloadStudio = (studio) => {
 // Payload SDK queries — Blogs
 // ──────────────────────────────────────────────────────────────────────
 
-export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1, select } = {}) => {
+export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, depth = 1, draft = false, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
-            where: { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
+            // In preview, drop the published/hidden filters so draft or hidden
+            // blogs still resolve (mirrors queryProjectBySlug's draft branch).
+            where: draft ? { ...where } : { ...where, isHidden: { not_equals: true }, _status: { equals: "published" } },
             sort,
             ...(limit ? { limit } : {}),
             pagination: false,
-            draft: false,
+            draft,
             locale: "en",
             depth,
             ...(select ? { select } : {}),
@@ -1275,13 +1277,15 @@ export const queryBlogs = async ({ where = {}, sort = "-publishedDate", limit, d
     }
 };
 
-export const queryBlogBySlug = async (slug, { depth = 2, select } = {}) => {
+export const queryBlogBySlug = async (slug, { depth = 2, draft = false, select } = {}) => {
     try {
         const result = await sdk.find({
             collection: "blogs",
-            where: { slug: { equals: slug }, isHidden: { not_equals: true }, _status: { equals: "published" } },
+            where: draft
+                ? { slug: { equals: slug } }
+                : { slug: { equals: slug }, isHidden: { not_equals: true }, _status: { equals: "published" } },
             limit: 1,
-            draft: false,
+            draft,
             locale: "en",
             depth,
             ...(select ? { select } : {}),
@@ -1455,13 +1459,15 @@ export const queryPageBySlug = async (slug) => {
  * Fetch a single Section document by its key field.
  * Returns null if not found.
  */
-export const querySection = async (key) => {
+export const querySection = async (key, { draft = false } = {}) => {
     try {
         const result = await sdk.find({
             collection: 'sections',
-            where: { key: { equals: key }, _status: { equals: 'published' } },
+            // In preview, drop the published filter so the draft/scheduled
+            // variant of this section resolves.
+            where: draft ? { key: { equals: key } } : { key: { equals: key }, _status: { equals: 'published' } },
             limit: 1,
-            draft: false,
+            draft,
             depth: 1,
         });
         return result.docs?.[0] || null;

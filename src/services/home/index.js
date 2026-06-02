@@ -13,7 +13,7 @@ import {
   fetchTestimonials,
 } from "..";
 
-export const fetchHomePageData = async () => {
+export const fetchHomePageData = async ({ draft = false } = {}) => {
   try {
     const [
       bannerData,
@@ -28,8 +28,8 @@ export const fetchHomePageData = async () => {
       allCollections,
     ] = await Promise.all([
       fetchBannerData(),
-      querySection('home-hero'),
-      fetchHomePageDetails(),
+      querySection('home-hero', { draft }),
+      fetchHomePageDetails({ draft }),
       fetchOurCategoriesData(),
       fetchPortfolioDataForHome(),
       fetchBestSellersForHome(),

@@ -1,7 +1,6 @@
 import PortfolioDetails from "@/components/PortfolioDetails";
 import { fetchProjectMetadataBySlug, fetchProjectPageData, fetchProjects, fetchSelectedProject } from "@/services/projects";
 import { logError } from "@/utils";
-import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 
 
@@ -51,10 +50,7 @@ export default async function Page({ params }) {
       throw new Error("Slug is required");
     }
 
-    const { isEnabled: isPreview } = await draftMode();
-    const data = isPreview
-      ? await fetchProjectPageData(slug, { draft: true })
-      : await fetchProjectPageData(slug);
+    const data = await fetchProjectPageData(slug);
 
     if (!data?.project) notFound();
 

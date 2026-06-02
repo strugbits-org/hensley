@@ -1,124 +1,133 @@
 "use client";
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { logError } from '@/utils';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { logError } from "@/utils";
 import { lightboxActions } from "@/store/lightboxStore";
-import { postForm } from '@/services/forms';
+import { postForm } from "@/services/forms";
 
 // Validation schema
-const schema = yup.object({
-    email_443e: yup.string().email('Email is invalid').required('Email is required'),
-}).required();
+const schema = yup
+  .object({
+    email_443e: yup
+      .string()
+      .email("Email is invalid")
+      .required("Email is required"),
+  })
+  .required();
 
 export const NewsLetter = ({ data }) => {
-    const newsletterData = data?.newsletter || data || {};
-    const { 
-        newsletterPlaceholder = newsletterData?.inputPlaceholder,
-        newsletterButtonLabel = newsletterData?.submitLabel,
-        newsletterHeading = newsletterData?.label,
-        newsletterDescription = newsletterData?.description,
-    } = newsletterData;
+  const newsletterData = data?.newsletter || data || {};
+  const {
+    newsletterPlaceholder = newsletterData?.inputPlaceholder,
+    newsletterButtonLabel = newsletterData?.submitLabel,
+    newsletterHeading = newsletterData?.label,
+    newsletterDescription = newsletterData?.description,
+  } = newsletterData;
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const {
-        register,
-        handleSubmit,
-        reset,
-        formState: { errors },
-    } = useForm({
-        resolver: yupResolver(schema),
-        defaultValues: {
-            email_443e: '',
-        }
-    });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      email_443e: "",
+    },
+  });
 
-    const onSubmit = async (formData) => {
-        setIsSubmitting(true);
+  const onSubmit = async (formData) => {
+    setIsSubmitting(true);
 
-        try {
-            await postForm("newsletter", formData);
-            setTimeout(() => {
-                reset();
-                lightboxActions.setBasicLightBoxDetails({
-                    title: "SUBSCRIPTION SUCCESSFUL!",
-                    description: "Thank you for subscribing to our newsletter. You will receive updates soon.",
-                    buttonText: "Continue",
-                    open: true,
-                });
-                setIsSubmitting(false);
-            }, 2000);
-        } catch (error) {
-            logError(error);
-            setTimeout(() => {
-                lightboxActions.setBasicLightBoxDetails({
-                    title: "SUBSCRIPTION FAILED",
-                    description: "There was an error subscribing to our newsletter. Please try again later.",
-                    buttonText: "Try Again",
-                    open: true,
-                });
-                setIsSubmitting(false);
-            }, 2000);
-        }
-    };
+    try {
+      await postForm("newsletter", formData);
+      setTimeout(() => {
+        reset();
+        lightboxActions.setBasicLightBoxDetails({
+          title: "SUBSCRIPTION SUCCESSFUL!",
+          description:
+            "Thank you for subscribing to our newsletter. You will receive updates soon.",
+          buttonText: "Continue",
+          open: true,
+        });
+        setIsSubmitting(false);
+      }, 2000);
+    } catch (error) {
+      logError(error);
+      setTimeout(() => {
+        lightboxActions.setBasicLightBoxDetails({
+          title: "SUBSCRIPTION FAILED",
+          description:
+            "There was an error subscribing to our newsletter. Please try again later.",
+          buttonText: "Try Again",
+          open: true,
+        });
+        setIsSubmitting(false);
+      }, 2000);
+    }
+  };
 
-    return (
-        <div className="newsletter-form">
-            <h2 className='text-sm font-haasMedium uppercase text-primary mb-[18.5px]'>
-                {newsletterHeading}
-            </h2>
-            <p className='text-sm font-haasRegular uppercase text-primary mb-5 sm:max-w-[450px]'>
-                {newsletterDescription}
-            </p>
-            
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
-                <div className="flex gap-2 gap-x-3 sm:gap-x-[24px]  w-full sm:max-w-[450px]">
-                    <div className="flex-1">
-                        <input 
-                            type="email" 
-                            id="email_443e"
-                            placeholder={newsletterPlaceholder}
-                            disabled={isSubmitting}
-                            {...register('email_443e')}
-                            className={`
+  return (
+    <div className="newsletter-form">
+      <h2 className="text-xs sm:text-sm font-haasMedium uppercase text-primary mb-[18.5px]">
+        {newsletterHeading}
+      </h2>
+      <p className="text-xs sm:text-sm font-haasRegular uppercase text-primary mb-5 sm:max-w-[450px]">
+        {newsletterDescription}
+      </p>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
+        <div className="flex gap-2 gap-x-3 sm:gap-x-[24px]  w-full sm:max-w-[450px]">
+          <div className="flex-1">
+            <input
+              type="email"
+              id="email_443e"
+              placeholder={newsletterPlaceholder}
+              disabled={isSubmitting}
+              {...register("email_443e")}
+              className={`
                                 w-full 
-                                bg-transparent appearance-none outline-none p-5 
-                                border text-base text-primary placeholder:text-primary 
+                                bg-transparent appearance-none outline-none p-3 sm:p-5 
+                                border text-sm sm:text-base text-primary placeholder:text-primary 
                                 placeholder:uppercase transition-all duration-300
-                                ${errors.email_443e 
-                                    ? 'border-red-500' 
-                                    : 'border-primary hover:border-opacity-80'
+                                ${
+                                  errors.email_443e
+                                    ? "border-red-500"
+                                    : "border-primary hover:border-opacity-80"
                                 }
-                                ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}
+                                ${isSubmitting ? "opacity-70 cursor-not-allowed" : ""}
                              `}
-                        />
-                    </div>
-                    
-                    <button 
-                        type="submit"
-                        disabled={isSubmitting}
-                        className={`
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`
                             border border-primary text-primary transition-all duration-300 
-                            ease-in-out p-5 grow px-5 sm:px-12 hover:bg-primary hover:text-secondary-alt 
-                            text-sm font-haasMedium uppercase tracking-widest max-w-[100px] sm:max-w-[150px]
-                            ${isSubmitting 
-                                ? 'opacity-70 cursor-not-allowed hover:bg-transparent hover:text-primary' 
-                                : ''
+                            ease-in-out p-3 sm:p-5 grow px-3 sm:px-12 hover:bg-primary hover:text-secondary-alt 
+                            text-xs sm:text-sm font-haasMedium uppercase tracking-widest max-w-[100px] sm:max-w-[150px]
+                            ${
+                              isSubmitting
+                                ? "opacity-70 cursor-not-allowed hover:bg-transparent hover:text-primary"
+                                : ""
                             }
                         `}
-                    >
-                        {isSubmitting ? 'SENDING...' : newsletterButtonLabel}
-                    </button>
-                </div>
-                
-                {errors.email_443e && (
-                    <p className="text-red-500 text-sm mt-1 uppercase font-haasRegular">
-                        {errors.email_443e.message}
-                    </p>
-                )}
-            </form>
+          >
+            {isSubmitting ? "SENDING..." : newsletterButtonLabel}
+          </button>
         </div>
-    );
+
+        {errors.email_443e && (
+          <p className="text-red-500 text-sm mt-1 uppercase font-haasRegular">
+            {errors.email_443e.message}
+          </p>
+        )}
+      </form>
+    </div>
+  );
 };

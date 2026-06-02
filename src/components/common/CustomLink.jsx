@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { loaderActions } from '@/store/loaderStore';
 import { scrollToTop } from "@/utils";
 
-export const CustomLink = ({ to, children, className, target, attributes, onClick }) => {
+export const CustomLink = ({ to, children, className, target, attributes, onClick, prefetch }) => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -58,6 +58,7 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
       target={target}
       className={className}
       onClick={handleClick}
+      prefetch={prefetch}
       {...attributes}
     >
       {children}
