@@ -35,8 +35,9 @@ const buildLineItemFromRowData = (data) => {
   const productId = data.productId || data._id || data.id;
   if (!productId) return null;
 
-  const customTextFieldsArray =
-    Array.isArray(data.customTextFields) ? data.customTextFields : [];
+  const customTextFieldsArray = Array.isArray(data.customTextFields)
+    ? data.customTextFields
+    : [];
   const customTextFieldsData = customTextFieldsArray.reduce(
     (acc, { title, value }) => {
       if (title) acc[title] = value;
@@ -68,9 +69,8 @@ const buildLineItemFromRowData = (data) => {
 
 const INFO_HEADERS = ["Product", "Size", "Price", "Quantity"];
 
-const visibleInfoHeaders =
-  HIDE_PRICES ?
-    INFO_HEADERS.filter((title) => title !== "Price")
+const visibleInfoHeaders = HIDE_PRICES
+  ? INFO_HEADERS.filter((title) => title !== "Price")
   : INFO_HEADERS;
 
 const QUANTITY_LIMITS = { MIN: 1, MAX: 10000 };
@@ -82,7 +82,7 @@ const QuantityControls = ({
   minQuantity = QUANTITY_LIMITS.MIN,
 }) => (
   <div className="mx-auto h-full w-[120px] border-b border-secondary-alt pb-1 flex items-end justify-center font-haasRegular">
-    {!readOnly ?
+    {!readOnly ? (
       <>
         <button
           className="h-[20px] select-none text-xl font-light hover:opacity-70 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
@@ -157,14 +157,15 @@ const QuantityControls = ({
           </svg>
         </button>
       </>
-    : <input
+    ) : (
+      <input
         className="font-bold bg-transparent max-w-[60px] outline-none text-center appearance-none"
         type="number"
         value={quantity}
         aria-label="Quantity"
         readOnly
       />
-    }
+    )}
   </div>
 );
 
@@ -183,13 +184,15 @@ const renderTableRows = ({
       <td className="pt-2 pb-4 font-semibold lg:block hidden min-w-[260px]">
         {item.product}
       </td>
-      <td className="pt-2 pb-4 font-haasRegular text-center ">{item.size}</td>
+      <td className="pt-2 pb-4 font-haasRegular text-center text-[12px] sm:text-[16px] ">
+        {item.size}
+      </td>
       {!HIDE_PRICES && (
-        <td className="pt-2 pb-4 text-center font-haasRegular">
+        <td className="pt-2 pb-4 text-center font-haasRegular text-[12px] sm:text-[16px]">
           {item.formattedPrice}
         </td>
       )}
-      <td className="pt-2 pb-4 font-haasRegular">
+      <td className="pt-2 pb-4 font-haasRegular text-[12px] sm:text-[16px]">
         <QuantityControls
           quantity={quantity || item.quantity}
           onQuantityChange={(value, isDisabled) =>
@@ -239,8 +242,9 @@ const CartTent = ({
 
       await AddProductToCart(cartData);
       const newItems = calculateTotalCartQuantity(cartData.lineItems);
-      const total =
-        cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      const total = cookies.cartQuantity
+        ? cookies.cartQuantity + newItems
+        : newItems;
       setCookie("cartQuantity", total, { path: "/" });
       lightboxActions.setBasicLightBoxDetails({
         title: "Added to Cart",
@@ -414,9 +418,9 @@ const CartCollection = ({
         .map((item) => ({
           product:
             item.productName ||
-            (typeof item.product === "object" ?
-              item.product?.title || item.product?.name
-            : item.product) ||
+            (typeof item.product === "object"
+              ? item.product?.title || item.product?.name
+              : item.product) ||
             "",
           size: item.size || "",
           price: parseFloat(item.unitPrice) || 0,
@@ -475,8 +479,9 @@ const CartCollection = ({
 
       await AddProductToCart(cartData);
       const newItems = calculateTotalCartQuantity(cartData.lineItems);
-      const total =
-        cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      const total = cookies.cartQuantity
+        ? cookies.cartQuantity + newItems
+        : newItems;
       setCookie("cartQuantity", total, { path: "/" });
       lightboxActions.setBasicLightBoxDetails({
         title: "Added to Cart",
@@ -559,9 +564,9 @@ const CartCollection = ({
             className="min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] flex px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300"
           >
             <span>
-              {isLoading ?
-                "PLEASE WAIT..."
-              : addToCartButtonLabel || "Add to Cart"}
+              {isLoading
+                ? "PLEASE WAIT..."
+                : addToCartButtonLabel || "Add to Cart"}
             </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -704,8 +709,9 @@ const CartNormal = ({
 
       await AddProductToCart(cartData);
       const newItems = calculateTotalCartQuantity(cartData.lineItems);
-      const total =
-        cookies.cartQuantity ? cookies.cartQuantity + newItems : newItems;
+      const total = cookies.cartQuantity
+        ? cookies.cartQuantity + newItems
+        : newItems;
       setCookie("cartQuantity", total, { path: "/" });
       lightboxActions.setBasicLightBoxDetails({
         title: "Added to Cart",
@@ -804,9 +810,9 @@ const CartNormal = ({
             className="break-keep lg:flex hidden min-w-[120px] bg-primary uppercase font-haasRegular text-[12px] px-3 py-2 gap-x-[10px] justify-center items-center hover:bg-secondary-alt hover:text-primary transition-all duration-300"
           >
             <span>
-              {isLoading ?
-                "PLEASE WAIT..."
-              : addToCartButtonLabel || "Add to Cart"}
+              {isLoading
+                ? "PLEASE WAIT..."
+                : addToCartButtonLabel || "Add to Cart"}
             </span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
