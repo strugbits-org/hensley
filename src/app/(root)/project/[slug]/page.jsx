@@ -1,8 +1,6 @@
 import PortfolioDetails from "@/components/PortfolioDetails";
 import { fetchProjectMetadataBySlug, fetchProjectPageData, fetchProjects, fetchSelectedProject } from "@/services/projects";
 import { logError } from "@/utils";
-import { getPreviewState } from "@/services/preview";
-import PreviewChrome from "@/components/common/PreviewChrome";
 import { notFound } from "next/navigation";
 
 
@@ -45,23 +43,19 @@ export const generateStaticParams = async () => {
   }
 }
 
-export default async function Page({ params, searchParams }) {
+export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
     if (!slug) {
       throw new Error("Slug is required");
     }
 
-    const { isPreview, invalid } = await getPreviewState(searchParams?.preview, "projects");
-    const data = await fetchProjectPageData(slug, { draft: isPreview });
+    const data = await fetchProjectPageData(slug);
 
     if (!data?.project) notFound();
 
     return (
-      <>
-        <PreviewChrome isPreview={isPreview} invalid={invalid} />
-        <PortfolioDetails data={data} />
-      </>
+      <PortfolioDetails data={data} />
     );
   } catch (error) {
     logError("Error fetching project page data:", error);

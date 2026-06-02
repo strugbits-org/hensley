@@ -2,8 +2,6 @@ import { MarketPage } from "@/components/Market";
 import { fetchMarketsData, fetchPageMetaData, buildPageMetadata, fetchSelectedMarketsData } from "@/services";
 import { fetchSelectedMarketData } from "@/services/market";
 import { logError } from "@/utils";
-import { getPreviewState } from "@/services/preview";
-import PreviewChrome from "@/components/common/PreviewChrome";
 import { notFound } from "next/navigation";
 
 
@@ -40,17 +38,13 @@ export const generateStaticParams = async () => {
   }
 }
 
-export default async function Page({ params, searchParams }) {
+export default async function Page({ params }) {
   try {
     const slug = decodeURIComponent(params.slug);
-    const { isPreview, invalid } = await getPreviewState(searchParams?.preview, "markets");
-    const data = await fetchSelectedMarketData(slug, { draft: isPreview });
+    const data = await fetchSelectedMarketData(slug);
 
     return (
-      <>
-        <PreviewChrome isPreview={isPreview} invalid={invalid} />
-        <MarketPage slug={slug} data={data} />
-      </>
+      <MarketPage slug={slug} data={data} />
     );
   } catch (error) {
     logError("Error fetching category page data:", error);
