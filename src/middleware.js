@@ -1,18 +1,17 @@
 // middleware.js
 import { NextResponse } from "next/server";
 
-// Detail routes that have a static public page + a dynamic /preview twin.
-// `?preview=<token>` requests are rewritten to the twin so the public page
-// stays statically generated/cached and only previewers pay for SSR.
-const PREVIEWABLE_PATH = /^\/(market|posts|project)\/[^/]+\/?$/;
-
 export function middleware(req) {
   const { pathname, searchParams } = req.nextUrl;
 
-  // Preview rewrite — keep the ?preview=<token> URL, render via the dynamic twin.
-  if (searchParams.has("preview") && PREVIEWABLE_PATH.test(pathname)) {
+  // Preview rewrite — keep the public ?preview=<token> URL static/cached, and
+  // render drafts via the dynamic /preview/* twin. The rewrite is generic: any
+  // previewable path maps to /preview<path> (home "/" -> /preview/home), so no
+  // per-route mapping is maintained here. `preview` is only ever the token
+  // param, and the guard prevents re-rewriting an already-rewritten request.
+  if (searchParams.has("preview") && !pathname.startsWith("/preview")) {
     const url = req.nextUrl.clone();
-    url.pathname = `/preview${pathname}`;
+    url.pathname = pathname === "/" ? "/preview/home" : `/preview${pathname}`;
     return NextResponse.rewrite(url);
   }
 

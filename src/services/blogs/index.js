@@ -114,12 +114,12 @@ export const fetchCategoriesMarketsAndStudios = cache(async () => {
     }
 });
 
-export const fetchBlogPageData = cache(async () => {
+export const fetchBlogPageData = cache(async ({ draft = false } = {}) => {
     try {
         const [categoriesMarketStudios, blogs, pageDetails] = await Promise.all([
             fetchCategoriesMarketsAndStudios(),
             fetchBlogsForListing(),
-            fetchBlogPageDetails()
+            fetchBlogPageDetails({ draft })
         ]);
         return { categoriesMarketStudios, blogs, pageDetails };
     } catch (error) {
@@ -177,9 +177,9 @@ export const fetchPostPageDetails = async () => {
 };
 
 
-export const fetchBlogPageDetails = async () => {
+export const fetchBlogPageDetails = async ({ draft = false } = {}) => {
   try {
-    const section = await querySection("blog-page-title");
+    const section = await querySection("blog-page-title", { draft });
     if (section) {
       const details = sectionToObject(section);
       return {

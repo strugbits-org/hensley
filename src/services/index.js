@@ -376,9 +376,9 @@ export const fetchInstagramFeed = cache(async () => {
   return [];
 });
 
-export const fetchHomePageDetails = cache(async () => {
+export const fetchHomePageDetails = cache(async ({ draft = false } = {}) => {
   try {
-    const section = await querySection('home-page-labels');
+    const section = await querySection('home-page-labels', { draft });
     if (section) {
       return sectionToObject(section);
     }

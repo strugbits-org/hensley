@@ -1459,13 +1459,15 @@ export const queryPageBySlug = async (slug) => {
  * Fetch a single Section document by its key field.
  * Returns null if not found.
  */
-export const querySection = async (key) => {
+export const querySection = async (key, { draft = false } = {}) => {
     try {
         const result = await sdk.find({
             collection: 'sections',
-            where: { key: { equals: key }, _status: { equals: 'published' } },
+            // In preview, drop the published filter so the draft/scheduled
+            // variant of this section resolves.
+            where: draft ? { key: { equals: key } } : { key: { equals: key }, _status: { equals: 'published' } },
             limit: 1,
-            draft: false,
+            draft,
             depth: 1,
         });
         return result.docs?.[0] || null;
