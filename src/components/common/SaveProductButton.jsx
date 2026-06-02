@@ -8,7 +8,7 @@ import { useSnapshot } from "valtio";
 import { actions, states } from "@/store";
 import useRedirectWithLoader from "@/hooks/useRedirectWithLoader";
 
-// Show the login lightbox only on large screens; below this width we redirect
+// Show the login lightbox only on xl screens; below this width we redirect
 // the user to the dedicated /login page instead.
 const LARGE_SCREEN_MIN_WIDTH = 1280;
 
