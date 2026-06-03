@@ -12,7 +12,7 @@ import { usePathname } from "next/navigation";
 import { SubCategoriesModal } from "../Modals/SubCategoriesModal";
 import { MarketTentModal } from "../Modals/MarketTentModal";
 import { SearchModal } from "../Modals/SearchModal";
-import { HeaderMobileMenu } from "./HeaderMobileMenu";
+import { HeaderMobileMenu, MobileMenuToggle } from "./HeaderMobileMenu";
 import { sortByOrderNumber } from "@/utils";
 import { lightboxActions } from "@/store/lightboxStore";
 import { useCookies } from "react-cookie";
@@ -551,12 +551,12 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                 <span className="sr-only">Hensley Event Resources</span>
                 <Image
                   src={logo}
-                  className={`min-w-[174px] ${isMobileMenuOpen ? "hidden" : "block"}`}
+                  className={`h-6 w-auto max-w-[140px] sm:h-7 sm:max-w-[174px] ${isMobileMenuOpen ? "hidden" : "block"}`}
                   alt="Hensley Event Resources Logo"
                 />
                 <Image
                   src={icon}
-                  className={`h-7 min-w-[27px] ${isMobileMenuOpen ? "block" : "hidden"}`}
+                  className={`h-6 w-auto sm:h-7 sm:min-w-[27px] ${isMobileMenuOpen ? "block" : "hidden"}`}
                   alt="Hensley Event Resources Logo"
                 />
               </CustomLink>
@@ -578,80 +578,10 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
                     </button>
                   );
                 })}
-              <button
-                className="transition-all duration-300 ease-in-out"
+              <MobileMenuToggle
+                isOpen={isMobileMenuOpen}
                 onClick={toggleMobileMenu}
-              >
-                {isMobileMenuOpen ?
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20.885"
-                    height="20.885"
-                    viewBox="0 0 20.885 20.885"
-                    className="transform transition-transform duration-300 ease-in-out"
-                  >
-                    <g
-                      id="Group_3913"
-                      data-name="Group 3913"
-                      transform="translate(-364.057 -35.735)"
-                    >
-                      <line
-                        id="Line_451"
-                        data-name="Line 451"
-                        x2="28.536"
-                        transform="translate(364.411 36.089) rotate(45)"
-                        fill="none"
-                        stroke="#2c2216"
-                        strokeWidth="1"
-                      />
-                      <line
-                        id="Line_452"
-                        data-name="Line 452"
-                        y2="28.536"
-                        transform="translate(384.589 36.089) rotate(45)"
-                        fill="none"
-                        stroke="#2c2216"
-                        strokeWidth="1"
-                      />
-                    </g>
-                  </svg>
-                : <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="43"
-                    height="25"
-                    viewBox="0 0 43 25"
-                    className="transform transition-transform duration-300 ease-in-out"
-                  >
-                    <line
-                      id="Line_451"
-                      data-name="Line 451"
-                      x2="43"
-                      transform="translate(0 0.5)"
-                      fill="none"
-                      stroke="#2c2216"
-                      strokeWidth="1"
-                    />
-                    <line
-                      id="Line_452"
-                      data-name="Line 452"
-                      x2="43"
-                      transform="translate(0 12.5)"
-                      fill="none"
-                      stroke="#2c2216"
-                      strokeWidth="1"
-                    />
-                    <line
-                      id="Line_482"
-                      data-name="Line 482"
-                      x2="43"
-                      transform="translate(0 24.5)"
-                      fill="none"
-                      stroke="#2c2216"
-                      strokeWidth="1"
-                    />
-                  </svg>
-                }
-              </button>
+              />
             </div>
           </div>
 

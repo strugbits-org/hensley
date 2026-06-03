@@ -5,6 +5,52 @@ import { CustomLink } from "../common/CustomLink";
 import { PrimaryImage } from "../common/PrimaryImage";
 import { lightboxActions } from "@/store/lightboxStore";
 
+export const MobileMenuToggle = ({ isOpen, onClick }) => (
+  <button
+    type="button"
+    aria-label={isOpen ? "Close menu" : "Open menu"}
+    className="flex shrink-0 items-center justify-center transition-all duration-300 ease-in-out"
+    onClick={onClick}
+  >
+    {isOpen ? (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20.885 20.885"
+        className="h-5 w-5 sm:h-6 sm:w-6"
+        aria-hidden="true"
+      >
+        <g transform="translate(-364.057 -35.735)">
+          <line
+            x2="28.536"
+            transform="translate(364.411 36.089) rotate(45)"
+            fill="none"
+            stroke="#2c2216"
+            strokeWidth="1"
+          />
+          <line
+            y2="28.536"
+            transform="translate(384.589 36.089) rotate(45)"
+            fill="none"
+            stroke="#2c2216"
+            strokeWidth="1"
+          />
+        </g>
+      </svg>
+    ) : (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 43 25"
+        className="h-4 w-[27px] sm:h-5 sm:w-[34px]"
+        aria-hidden="true"
+      >
+        <line x2="43" transform="translate(0 0.5)" fill="none" stroke="#2c2216" strokeWidth="1" />
+        <line x2="43" transform="translate(0 12.5)" fill="none" stroke="#2c2216" strokeWidth="1" />
+        <line x2="43" transform="translate(0 24.5)" fill="none" stroke="#2c2216" strokeWidth="1" />
+      </svg>
+    )}
+  </button>
+);
+
 const resolveSubCategoryHref = (data = {}) => {
   const directPath = data.slug || data.href || data.url;
 
