@@ -77,10 +77,13 @@ export const fetchTentData = async (slug) => {
     try {
         const { products } = await fetchTentProducts({ slug });
         const product = products[0];
-        if (!product) throw new Error(`Tent not found for slug: ${slug}`);
+        // No tent with this slug (e.g. a product/bundle slug hit the tent route).
+        // Expected 404, not an error — return null and let the page notFound().
+        if (!product) return null;
         return normalizeTentItem(product, 1);
     } catch (error) {
         logError(`Error fetching tent data: ${error.message}`, error);
+        return null;
     }
 };
 
@@ -263,8 +266,9 @@ export const fetchTentPageDetails = cache(async () => {
 export const fetchTentPageData = async (slug) => {
     try {
         const productData = await fetchTentData(slug);
+        // Not a valid tent slug — return null so the page renders notFound().
         if (!productData || !productData.tent) {
-            throw new Error("Product data not found");
+            return null;
         }
         const productId = productData.tent._id;
         const matchSourceProduct = {

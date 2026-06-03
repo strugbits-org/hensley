@@ -73,8 +73,9 @@ export const fetchPoolCoverPageData = async (slug) => {
     try {
         const productData = await fetchPoolCoverData(slug);
 
+        // Not a valid pool-cover slug — return null so the page renders notFound().
         if (!productData || !productData.covers) {
-            throw new Error("Product data not found");
+            return null;
         }
         const productId = productData.covers._id;
         const matchSourceProduct = {

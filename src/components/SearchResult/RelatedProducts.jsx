@@ -4,7 +4,7 @@ import SectionTitle from '../common/SectionTitle'
 import SecondaryProductCard from '../common/SecondaryProductCard'
 import { PrimaryButton } from '../common/PrimaryButton'
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper'
-import Loading from '@/app/loading'
+import Loading from '@/components/common/Loading'
 import { searchProducts } from '@/services/search'
 import { logError } from '@/utils'
 

@@ -39,15 +39,18 @@ export const generateStaticParams = async () => {
 }
 
 export default async function Page({ params }) {
-  try {
-    const slug = decodeURIComponent(params.slug);
-    const data = await fetchSelectedMarketData(slug);
+  const slug = decodeURIComponent(params.slug);
+  const data = await fetchSelectedMarketData(slug);
 
-    return (
-      <MarketPage slug={slug} data={data} />
-    );
-  } catch (error) {
-    logError("Error fetching category page data:", error);
+  // No market matches this slug — render the 404 page instead of passing
+  // undefined data into MarketPage (which crashed client-side). Transient
+  // fetch errors re-throw from the service and surface as a retryable error
+  // page, never a cached 404.
+  if (!data) {
     notFound();
   }
+
+  return (
+    <MarketPage slug={slug} data={data} />
+  );
 }

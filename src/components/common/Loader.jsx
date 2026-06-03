@@ -1,7 +1,7 @@
 "use client";
 import { useSnapshot } from 'valtio';
 import { loaderState } from '@/store/loaderStore';
-import Loading from '@/app/loading';
+import Loading from '@/components/common/Loading';
 
 export default function Loader() {
     const { isLoading } = useSnapshot(loaderState);

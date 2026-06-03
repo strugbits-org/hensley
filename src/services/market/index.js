@@ -155,12 +155,14 @@ export const fetchSelectedMarketData = cache(async (slug, { draft = false } = {}
         const marketsData = await fetchMarketsData({ draft });
 
         const selectedMarket = marketsData.find((market) => market.slug === `/${slug}`);
+        // Genuine "no such market" — return null so the page renders notFound().
+        // (A thrown error here would be a transient failure, handled in catch.)
+        if (!selectedMarket) {
+            return null;
+        }
         const bestSellerCollection = selectedMarket?.bestSellerCollection;
 
         const otherMarketsData = marketsData.filter((market) => market.slug !== `/${slug}`);
-        if (!selectedMarket) {
-            throw new Error("Market not found");
-        }
 
         const ids = buildMarketLookupIds(selectedMarket);
         const marketHowWeDoItData = normalizeMarketHowWeDoItItems(selectedMarket?.howWeDoIt);
@@ -191,6 +193,9 @@ export const fetchSelectedMarketData = cache(async (slug, { draft = false } = {}
         return response;
     } catch (error) {
         logError(`Error fetching selected market data: ${error.message}`, error);
+        // Transient/upstream failure — re-throw so Next renders an error page
+        // (retried on reload) instead of caching a false 404.
+        throw error;
     }
 });
 

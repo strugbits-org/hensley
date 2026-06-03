@@ -9,7 +9,7 @@ import { PrimaryImage } from "./PrimaryImage";
 import { CustomLink } from "./CustomLink";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { usePathname } from "next/navigation";
-import Loading from "@/app/loading";
+import Loading from "@/components/common/Loading";
 
 const privateRoutes = [
   "/login",

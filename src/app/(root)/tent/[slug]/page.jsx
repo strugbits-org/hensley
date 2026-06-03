@@ -43,29 +43,27 @@ export const generateStaticParams = async () => {
 }
 
 export default async function Page({ params }) {
-  try {
-    const slug = decodeURIComponent(params.slug);
-    const [data, allCollections] = await Promise.all([
-      fetchTentPageData(slug),
-      queryProductCollections().catch(() => []),
-    ]);
+  const slug = decodeURIComponent(params.slug);
+  const [data, allCollections] = await Promise.all([
+    fetchTentPageData(slug),
+    queryProductCollections().catch(() => []),
+  ]);
 
-    if (!data) {
-      throw new Error("Product data not found");
-    }
-
-    const { productData, matchedProducts, featuredProjectsData, pageDetails, masterClassTentingURL } = data;
-    const { matchItWithTitle, featuredProductTitle } = pageDetails || {};
-
-    return (
-      <>
-        <ProductTent productData={productData} masterClassTentingURL={masterClassTentingURL} matchedProducts={matchedProducts || []} allCollections={allCollections} />
-        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
-        <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
-      </>
-    );
-  } catch (error) {
-    logError("Error fetching category page data:", error);
+  // No tent matches this slug (e.g. a product/bundle slug hit the /tent route).
+  // That's an expected 404, not an error — fetchTentPageData already logs any
+  // genuine failure, so just render notFound() without extra noise.
+  if (!data) {
     notFound();
   }
+
+  const { productData, matchedProducts, featuredProjectsData, pageDetails, masterClassTentingURL } = data;
+  const { matchItWithTitle, featuredProductTitle } = pageDetails || {};
+
+  return (
+    <>
+      <ProductTent productData={productData} masterClassTentingURL={masterClassTentingURL} matchedProducts={matchedProducts || []} allCollections={allCollections} />
+      <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: matchItWithTitle }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
+      <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: featuredProductTitle }} loop={false} origin="auto" />
+    </>
+  );
 }

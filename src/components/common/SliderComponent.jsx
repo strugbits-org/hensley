@@ -7,7 +7,7 @@ import { PrimaryButton } from "./PrimaryButton";
 import { PrimaryImage } from "./PrimaryImage";
 import { BsChevronRight, BsChevronLeft } from "react-icons/bs";
 import { CustomLink } from "./CustomLink";
-import Loading from "@/app/loading";
+import Loading from "@/components/common/Loading";
 
 export default function SliderComponent({
   data = [],

@@ -5,7 +5,7 @@ import { PrimaryButton } from "../common/PrimaryButton";
 import ProductCard from "../common/ProductCard";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { useKeenSlider } from "keen-slider/react";
-import Loading from "@/app/loading";
+import Loading from "@/components/common/Loading";
 import { CustomLink } from "../common/CustomLink";
 
 export const BestSellers = ({

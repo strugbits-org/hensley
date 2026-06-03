@@ -18,27 +18,25 @@ export const generateStaticParams = async () => {
 }
 
 export default async function Page({ params }) {
-  try {
-    const slug = decodeURIComponent(params.slug);
-    const [data, allCollections] = await Promise.all([
-      fetchPoolCoverPageData(slug),
-      queryProductCollections().catch(() => []),
-    ]);
-    if (!data) {
-      throw new Error("Product data not found");
-    }
+  const slug = decodeURIComponent(params.slug);
+  const [data, allCollections] = await Promise.all([
+    fetchPoolCoverPageData(slug),
+    queryProductCollections().catch(() => []),
+  ]);
 
-    const { productData, matchedProducts, featuredProjectsData } = data;
-
-    return (
-      <>
-        <ProductPoolCover productData={productData} matchedProducts={matchedProducts || []} allCollections={allCollections} />
-        <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
-        <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="auto" />
-      </>
-    );
-  } catch (error) {
-    logError("Error fetching category page data:", error);
+  // No pool-cover matches this slug — render the 404 page. Transient fetch
+  // errors re-throw from the service and surface as a retryable error page.
+  if (!data) {
     notFound();
   }
+
+  const { productData, matchedProducts, featuredProjectsData } = data;
+
+  return (
+    <>
+      <ProductPoolCover productData={productData} matchedProducts={matchedProducts || []} allCollections={allCollections} />
+      <MatchProducts classes={"bg-transparent"} headingClasses={"!text-secondary-alt"} data={matchedProducts} pageDetails={{ matchProductsTitle: "match it with" }} buttonHide={true} loop={false} origin="auto" allCollections={allCollections} />
+      <FeaturedProjects data={featuredProjectsData} pageDetails={{ featuredProjectTitle: "Products featured in this PROJECT entry:" }} loop={false} origin="auto" />
+    </>
+  );
 }

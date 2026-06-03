@@ -6,7 +6,7 @@ import { PrimaryButton } from '../common/PrimaryButton'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
 import MatchedProductCard from './MatchedProductCard';
-import Loading from '@/app/loading';
+import Loading from '@/components/common/Loading';
 
 export const MatchProducts = ({ data, pageDetails, loop = true, origin = "center", classes, headingClasses, buttonHide = false, allCollections = [] }) => {
     const { matchProductsTitle } = pageDetails;

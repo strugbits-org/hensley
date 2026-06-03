@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation'
 import { searchMarkets, searchOtherData, searchProducts } from '@/services/search'
 import { loaderActions } from '@/store/loaderStore';
 import { HensleyNewsSearch } from '../common/HensleyNewsSearch';
-import Loading from '@/app/loading';
+import Loading from '@/components/common/Loading';
 
 const SearchResult = ({ pageDetails, allCollections = [] }) => {
 

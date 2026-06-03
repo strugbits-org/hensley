@@ -6,7 +6,7 @@ import "keen-slider/keen-slider.min.css";
 import "./style.css";
 import { PrimaryImage } from "./PrimaryImage";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
-import Loading from "@/app/loading";
+import Loading from "@/components/common/Loading";
 
 export const CardsSlider = ({ data, cardCss, loop = false }) => {
   const sliderInstance = useRef(null);

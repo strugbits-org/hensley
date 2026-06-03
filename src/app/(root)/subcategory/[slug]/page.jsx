@@ -42,25 +42,18 @@ export const generateStaticParams = async () => {
 }
 
 export default async function Page({ params }) {
-  try {
-    const slug = decodeURIComponent(params.slug);
-    if (!slug) {
-      throw new Error("Slug is required");
-    }
-    const data = await fetchSelectedCategoryData(slug);
+  const slug = decodeURIComponent(params.slug);
 
-    if (!data) {
-      notFound();
-      return;
-    }
-
-    const { pageDetails } = data;
-
-    return (
-      <SubCategoryPage data={data} pageDetails={pageDetails} />
-    );
-  } catch (error) {
-    logError("Error fetching sub category page data:", error);
+  // No subcategory matches this slug — render the 404 page. Transient fetch
+  // failures surface as a retryable error page, never a cached 404.
+  const data = slug ? await fetchSelectedCategoryData(slug) : null;
+  if (!data) {
     notFound();
   }
+
+  const { pageDetails } = data;
+
+  return (
+    <SubCategoryPage data={data} pageDetails={pageDetails} />
+  );
 }

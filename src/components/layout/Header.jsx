@@ -38,10 +38,11 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
   const [selectedMenu, setSelectedMenu] = useState(false);
   const [searchModal, setSearchModal] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [cartTotalQuantity, setCartTotalQuantity] = useState(
-    (typeof window !== "undefined" && localStorage?.getItem("cartQuantity")) ||
-      "0",
-  );
+  // Must start at "0" to match the server render — reading localStorage in the
+  // initializer makes the first client render diverge from the SSR HTML, a
+  // hydration mismatch that can blow up the whole tree in a production build.
+  // The real value is hydrated from the cookie in the effect below.
+  const [cartTotalQuantity, setCartTotalQuantity] = useState("0");
   const pathname = usePathname();
 
   const [activeSubMenuItem, setActiveSubMenuItem] = useState({});

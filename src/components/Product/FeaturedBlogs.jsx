@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react'
 import SectionTitle from '../common/SectionTitle'
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from 'react-icons/md'
 import { useKeenSlider } from 'keen-slider/react'
-import Loading from '@/app/loading';
+import Loading from '@/components/common/Loading';
 import FeaturedBlogCard from './FeaturedBlogCard';
 
 export const FeaturedBlogs = ({ data, pageDetails, loop = true, origin = "center", classes }) => {

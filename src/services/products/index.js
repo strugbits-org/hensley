@@ -409,11 +409,16 @@ export const checkProductInCart = async (productId, isProductCollection = false)
     }
 };
 
-export const fetchProductPaths = async () => {
+// `excludeTypes` lets the sitemap drop tents/pool_covers (they have their own
+// canonical routes), while generateStaticParams calls it with no args to keep
+// pre-rendering every slug — so a stray /product/<tent-slug> hit still resolves.
+export const fetchProductPaths = async ({ excludeTypes = [] } = {}) => {
     try {
         const docs = await queryProductSlugs();
         const seen = new Set();
+        const exclude = new Set(excludeTypes);
         return docs.reduce((acc, doc) => {
+            if (exclude.has(doc?.type)) return acc;
             const slug = (doc?.slug || "").trim().replace(/^\//, "");
             if (slug && !seen.has(slug)) {
                 seen.add(slug);

@@ -5,7 +5,7 @@ import SectionTitle from '../common/SectionTitle'
 import ProductCard from '../common/ProductCard'
 import { ProductsFilterPopup } from '../common/ProductsFilterPopup';
 import { ProductBanner } from '../common/ProductBanner';
-import Loading from '@/app/loading';
+import Loading from '@/components/common/Loading';
 import AutoClickWrapper from '../common/helpers/AutoClickWrapper';
 import { logError } from '@/utils';
 import { fetchSortedProductsForListing } from '@/services/collections';

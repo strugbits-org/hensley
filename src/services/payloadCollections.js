@@ -635,6 +635,9 @@ export const queryProductSlugs = cache(async () => {
             draft: false,
             locale: 'en',
             depth: 0,
+            // type is needed so callers can split canonical routes
+            // (tent → /tent, pool_cover → /pool-covers, else → /product).
+            select: { slug: true, type: true },
         });
         return ensureArray(result?.docs);
     } catch (error) {

@@ -4,7 +4,7 @@ import SectionTitle from "../common/SectionTitle";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
 import { useKeenSlider } from "keen-slider/react";
 import { TestimonialCard } from "./TestimonialCard";
-import Loading from "@/app/loading";
+import Loading from "@/components/common/Loading";
 
 export const Testimonials = ({
   data,

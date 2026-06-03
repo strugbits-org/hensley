@@ -1,3 +1,8 @@
+// Reusable spinner. NOTE: this intentionally lives in components/, NOT as
+// app/loading.jsx. A root-level app/loading.jsx registers a Suspense boundary
+// around every route, which makes notFound() stream-and-swap on the client
+// (React #310 in the App Router, prod-only). Keeping the spinner here, and
+// letting pages render notFound() into the initial SSR shell, avoids that.
 export default function Loading({ inline = true, custom = false, classes = "", type = "primary" }) {
     if (custom) {
         return (

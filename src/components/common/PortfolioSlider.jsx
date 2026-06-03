@@ -6,7 +6,7 @@ import "keen-slider/keen-slider.min.css";
 import "./style.css";
 import { PrimaryImage } from "./PrimaryImage";
 import { MdOutlineChevronLeft, MdOutlineChevronRight } from "react-icons/md";
-import Loading from "@/app/loading";
+import Loading from "@/components/common/Loading";
 
 function PortfolioSlider({ data, tab = false, cardCss, loop = true }) {
   const [currentSlide, setCurrentSlide] = useState(0);

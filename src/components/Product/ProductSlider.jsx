@@ -3,7 +3,7 @@ import React, { useMemo, useState } from "react";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { PrimaryImage } from "../common/PrimaryImage";
-import Loading from "@/app/loading";
+import Loading from "@/components/common/Loading";
 
 const THUMBNAIL_CLASSES = {
   ACTIVE: "opacity-60",
