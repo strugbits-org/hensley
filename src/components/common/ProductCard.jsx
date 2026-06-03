@@ -50,7 +50,7 @@ function ProductCard({
 
   return (
     <div
-      className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between h-auto ${type !== "listing" ? "bg-primary-alt col-span-1.5 md:col-span-2" : ""}`}
+      className={`relative w-full group transition-all duration-300 ease-in-out border border-primary-border flex flex-col p-2 justify-between ${type !== "listing" ? "h-full flex-1 bg-primary-alt col-span-1.5 md:col-span-2" : "h-auto"}`}
     >
       <ProductBadge ribbon={ribbon} />
       <CustomLink
@@ -104,7 +104,7 @@ function ProductCard({
               if (title == "Size") {
                 return (
                   <div
-                    className="relative"
+                    className="relative min-w-0 flex-1"
                     key={index}
                     onMouseEnter={() => setHoveredSizeIndex(index)}
                     onMouseLeave={() => setHoveredSizeIndex(null)}
