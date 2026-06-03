@@ -3,7 +3,7 @@ import { generateImageURL, generateImageURLAlternate, generateCoreImageURL } fro
 import * as cheerio from "cheerio";
 
 const isDebugMode = process.env.DEBUG_LOGS === "1";
-const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
 
 export const logError = (...args) => {
     if (isDebugMode) console.error(...args);
@@ -590,4 +590,4 @@ export const findProductSize = (additionalInfoSections = []) => {
 }
 
 export const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
-export const CORE_TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || 1;
+export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || 1;

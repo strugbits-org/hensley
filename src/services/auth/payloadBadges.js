@@ -1,4 +1,3 @@
-const ADMIN_BADGE_SLUG = (process.env.ADMIN_BADGE_SLUG || "hensley-admin").trim().toLowerCase();
 const ADMIN_BADGE_ID = (process.env.ADMIN_BADGE_ID || "").trim().toLowerCase();
 
 const toArray = (value) => {
@@ -50,22 +49,14 @@ export const getPayloadMemberBadgeSlugs = (member = {}) => {
   )];
 };
 
-export const payloadMemberHasBadge = (member = {}, slug = ADMIN_BADGE_SLUG) => {
-  const normalizedSlug = String(slug || "").trim().toLowerCase();
-  if (!normalizedSlug) return false;
+export const payloadMemberHasBadge = (member = {}, badgeId = ADMIN_BADGE_ID) => {
+  const normalizedId = String(badgeId || "").trim().toLowerCase();
+  if (!normalizedId) return false;
 
-  // Check by slug (when badges are populated objects)
-  if (getPayloadMemberBadgeSlugs(member).includes(normalizedSlug)) return true;
-
-  // Fallback: check by raw badge ID when badges aren't populated (depth=0)
-  // This handles the case where Payload returns raw IDs instead of objects
-  if (ADMIN_BADGE_ID && normalizedSlug === ADMIN_BADGE_SLUG) {
-    const rawBadges = Array.isArray(member?.badges) ? member.badges : [];
-    return rawBadges.some((b) => {
-      const id = typeof b === "string" ? b : b?.id || b?._id || "";
-      return id.trim().toLowerCase() === ADMIN_BADGE_ID;
-    });
-  }
-
-  return false;
+  // Match by badge ID. Works for both raw IDs (depth=0) and populated objects.
+  const rawBadges = Array.isArray(member?.badges) ? member.badges : [];
+  return rawBadges.some((b) => {
+    const id = typeof b === "string" ? b : b?.id || b?._id || "";
+    return String(id).trim().toLowerCase() === normalizedId;
+  });
 };

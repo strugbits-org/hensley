@@ -1,4 +1,4 @@
-const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || process.env.NEXT_PUBLIC_CORE_API_BASE_URL || "";
+const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
 
 const normalizePayloadAssetUrl = (value) => {
   if (!value || typeof value !== "string") return "";

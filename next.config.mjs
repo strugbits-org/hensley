@@ -8,10 +8,12 @@ const nextConfig = {
     },
     env: {
         BASE_URL: process.env.BASE_URL,
-        ADMIN_BADGE: process.env.ADMIN_BADGE,
+        ADMIN_BADGE_ID: process.env.ADMIN_BADGE_ID,
         REVALIDATE_TIME: process.env.REVALIDATE_TIME,
         DEBUG_LOGS: process.env.DEBUG_LOGS,
         CORE_API_BASE_URL: process.env.CORE_API_BASE_URL,
+        CORE_TENANT_ID: process.env.CORE_TENANT_ID,
+        CORE_MEMBER_COLLECTION: process.env.CORE_MEMBER_COLLECTION,
     },
     images: {
         // WebP only — AVIF cuts ~20% more bytes but encoding it with sharp is
