@@ -13,7 +13,7 @@ const BannerStructures = ({ title, data }) => {
 
   return (
     <div
-      className="relative overflow-hidden w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] 3xl:h-[2600px] sm:h-[950px] bg-cover bg-no-repeat bg-top "
+      className="relative overflow-hidden w-full flex flex-col items-center sm:px-0 px-[18px] lg:py-0 py-[48px] justify-between lg:h-[1872px] 3xl:h-[calc(100vw_-_5rem)] sm:h-[950px] bg-cover bg-no-repeat bg-top "
       style={{ backgroundImage: `url(${bgUrl})` }}
     >
       <div
