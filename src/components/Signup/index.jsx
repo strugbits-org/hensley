@@ -16,12 +16,43 @@ import { convertToHTMLRichContent } from '@/utils/renderRichText';
 import eyeOpenIcon from '@/assets/icons/eye-open.svg';
 import eyeClosedIcon from '@/assets/icons/eye-closed.svg';
 
+const PHONE_INVALID_CHAR = /[^\d\s()+-]/;
+const PHONE_STRIP_CHARS = /[^\d\s()+-]/g;
+
+const sanitizePhoneInput = (value) =>
+  typeof value === 'string' ? value.replace(PHONE_STRIP_CHARS, '') : value;
+
+const trimValue = (value) => (typeof value === 'string' ? value.trim() : value);
+
+const trimmedString = () => yup.string().transform(trimValue);
+
+const nameSchema = (fieldLabel) =>
+  trimmedString()
+    .required(`${fieldLabel} is required`)
+    .min(2, `${fieldLabel} must be at least 2 characters`)
+    .max(50, `${fieldLabel} must be at most 50 characters`)
+    .matches(
+      /^[a-zA-Z]([a-zA-Z\s'-]*[a-zA-Z])?$/,
+      `${fieldLabel} can only contain letters, spaces, hyphens, and apostrophes`
+    );
+
 // Validation schema
 const schema = yup.object({
-  firstName: yup.string().required('First name is required'),
-  lastName: yup.string().required('Last name is required'),
-  email: yup.string().email('Email is invalid').required('Email is required'),
-  phone: yup.string().required('Phone number is required'),
+  firstName: nameSchema('First name'),
+  lastName: nameSchema('Last name'),
+  email: trimmedString()
+    .email('Email is invalid')
+    .required('Email is required'),
+  phone: trimmedString()
+    .required('Phone number is required')
+    .test(
+      'valid-phone',
+      'Please enter a valid phone number (at least 10 digits)',
+      (value) => {
+        const digits = (value || '').replace(/\D/g, '');
+        return digits.length >= 10 && digits.length <= 15;
+      }
+    ),
   password: yup.string()
     .min(8, 'Password must be at least 8 characters')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number')
@@ -166,6 +197,18 @@ export const SignupForm = ({ content, data }) => {
     const error = errors[fieldId]?.message;
     const isPasswordField = fieldId === 'password';
     const isConfirmPasswordField = fieldId === 'confirmPassword';
+    const isPhoneField = fieldId === 'phone';
+
+    const fieldRegistration = isPhoneField
+      ? register(fieldId, {
+          onChange: (e) => {
+            const sanitized = sanitizePhoneInput(e.target.value);
+            if (sanitized !== e.target.value) {
+              e.target.value = sanitized;
+            }
+          },
+        })
+      : register(fieldId);
 
     return (
       <div key={fieldId} className={`relative ${gridClass} ${config.gridSpan}`}>
@@ -178,7 +221,17 @@ export const SignupForm = ({ content, data }) => {
               : isConfirmPasswordField ? (showConfirmPassword ? "text" : "password")
                 : config.type
           }
-          {...register(fieldId)}
+          {...fieldRegistration}
+          {...(isPhoneField && {
+            inputMode: 'tel',
+            autoComplete: 'tel',
+            onKeyDown: (e) => {
+              if (e.ctrlKey || e.metaKey || e.altKey) return;
+              if (e.key.length === 1 && PHONE_INVALID_CHAR.test(e.key)) {
+                e.preventDefault();
+              }
+            },
+          })}
           placeholder={config.placeholder}
           className={`w-full border-b h-[60px] font-haasLight border-secondary-alt p-3 bg-white rounded-sm focus:outline-none shadow-sm bg-primary-alt text-secondary-alt placeholder-secondary placeholder:uppercase pr-12 ${error ? 'border-b-red-500' : ''
             }`}
