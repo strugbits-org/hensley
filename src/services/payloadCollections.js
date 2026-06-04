@@ -336,6 +336,18 @@ const normalizeMegaMenuItem = (item = {}, parentId, index) => {
         ""
     ) || null;
 
+    // Downstream (resolveSubCategoryHref + SubCategoryItem in HeaderMobileMenu)
+    // only reads slug / menuPath / featured / mainMedia from category|collection.
+    // Spreading the full depth-2 collection doc here (description, ribbon,
+    // subcategories, media graph) duplicated the entire collection graph into
+    // every nav item — ~6MB serialized into the RSC payload of every page.
+    const slimCategory = {
+        slug: getFirstString(category.slug).replace(/^\//, ""),
+        menuPath: category.menuPath,
+        featured: category.featured,
+        mainMedia: image,
+    };
+
     return {
         _id: item.id || item._id || `${parentId}-nested-${index}`,
         title: meta.title,
@@ -346,16 +358,8 @@ const normalizeMegaMenuItem = (item = {}, parentId, index) => {
         lightbox: meta.lightbox,
         orderNumber: item.orderNumber ?? item.order ?? item.sortOrder ?? index,
         redirection: normalizePath(getFirstString(item.redirection)),
-        category: {
-            ...category,
-            slug: getFirstString(category.slug).replace(/^\//, ""),
-            mainMedia: image,
-        },
-        collection: {
-            ...category,
-            slug: getFirstString(category.slug).replace(/^\//, ""),
-            mainMedia: image,
-        },
+        category: slimCategory,
+        collection: slimCategory,
     };
 };
 
