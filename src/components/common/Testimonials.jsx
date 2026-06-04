@@ -62,7 +62,7 @@ export const Testimonials = ({
         )}
         <div
           ref={sliderRef}
-          className={`${sliderClasses} keen-slider lg:pl-32 ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
+          className={`${sliderClasses} keen-slider lg:pl-32 3xl:pl-48 ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
         >
           {data.map((testimonial, index) => {
             return (
@@ -82,16 +82,16 @@ export const Testimonials = ({
 
           <button
             onClick={() => sliderInstance.current?.prev()}
-            className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+            className="hidden absolute top-1/2 left-8 3xl:left-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[88px] 3xl:h-[88px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
           >
-            <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+            <MdOutlineChevronLeft className="w-[20px] h-[20px] 3xl:w-[30px] 3xl:h-[30px]" />
           </button>
 
           <button
             onClick={() => sliderInstance.current?.next()}
-            className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+            className="hidden absolute top-1/2 right-8 3xl:right-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[88px] 3xl:h-[88px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
           >
-            <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+            <MdOutlineChevronRight className="w-[20px] h-[20px] 3xl:w-[30px] 3xl:h-[30px]" />
           </button>
         </div>
       </div>

@@ -69,42 +69,43 @@ const CareerOpportunities = ({ data }) => {
       <div className="w-full flex flex-col justify-center items-center border-t border-b border-primary-border">
         <div className="lg:w-[80%] w-[95%] pt-[24px] relative">
           {videoSrc && (
-          <div className="lg:h-[875px] sm:h-[408px] h-[263px] relative">
-            <video
-              ref={videoRef}
-              src={videoSrc}
-              autoPlay
-              muted
-              loop
-              playsInline
-              webkit-playsinline="true"
-              preload="auto"
-              disablePictureInPicture
-              className="w-full h-full object-cover pointer-events-none"
-            >
-              Your browser does not support the video tag.
-            </video>
-          </div>
+            <div className="lg:h-[875px] sm:h-[408px] h-[263px] relative">
+              <video
+                ref={videoRef}
+                src={videoSrc}
+                autoPlay
+                muted
+                loop
+                playsInline
+                webkit-playsinline="true"
+                preload="auto"
+                disablePictureInPicture
+                className="w-full h-full object-cover pointer-events-none"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
           )}
 
           <div className="w-full flex justify-between lg:gap-x-[12px] sm:gap-x-[15px] gap-y-[12px] sm:flex-row flex-col py-[30px]">
-            <h3 className="text-[35px] leading-[30px] lg:text-[60px] lg:leading-[55px] sm:text-[35px] sm:leading-[30px] text-secondary-alt uppercase font-recklessRegular">
+            <h3 className="text-[35px] leading-[30px] lg:text-[60px] 3xl:text-[100px] lg:leading-[55px] 3xl:leading-[100px] sm:text-[35px] sm:leading-[30px] text-secondary-alt uppercase font-recklessRegular">
               {subtitle && (
                 <>
-                  {subtitle.split(" ")[0]} <br /> {subtitle.split(" ")[1]}
+                  {subtitle.split(" ")[0]} <br className="3xl:hidden block" />{" "}
+                  {subtitle.split(" ")[1]}
                 </>
               )}
             </h3>
 
-            <div className="max-w-[608px] lg:w-[608px] sm:w-[360px]">
-              <div className="uppercase sm:text-[16px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt space-y-4">
+            <div className="3xl:max-w-[1200px] max-w-[360px] lg:max-w-[608px] w-full ">
+              <div className="uppercase 3xl:text-[24px] sm:text-[16px] 3xl:leading-[40px] sm:leading-[20px] text-[14px] leading-[18px] text-secondary-alt space-y-4">
                 {showFullText
                   ? paragraphs.map((p, i) => <p key={i}>{p}</p>)
                   : shortParagraphs}
               </div>
 
               <button
-                className="uppercase bg-transparent text-[16px] leading-[20px] text-secondary-alt font-haasRegular hover:font-haasBold mt-[24px]"
+                className="uppercase bg-transparent 3xl:text-[24px] text-[16px] 3xl:leading-[30px] leading-[20px] text-secondary-alt font-haasRegular hover:font-haasBold mt-[24px]"
                 onClick={() => setShowFullText((prev) => !prev)}
               >
                 {showFullText ? "See Less -" : "See More +"}

@@ -77,21 +77,21 @@ function InstagramFeed({ data, details }) {
       />
       <div className="p-6 ">
         <div className="flex flex-col w-full border">
-          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] border border-b-0 px-8 lg:pt-[30px] pb-[40px] pt-[131px] ">
+          <div className="flex lg:flex-row lg:justify-between flex-col justify-center w-full items-center min-h-[130px] 3xl:min-h-[200px] border border-b-0 px-8 3xl:px-12 lg:pt-[30px] 3xl:pt-[48px] pb-[40px] 3xl:pb-[60px] pt-[131px] ">
             <h3 className="lg:hidden block text-secondary-alt text-[55px] max-w-[280px] font-recklessRegular leading-[50px] text-center uppercase">
               {instaFeedHeading}
             </h3>
-            <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-3 mb-10 gap-2 lg:gap-4">
+            <div className="flex lg:flex-row lg:justify-center items-center lg:mt-0 lg:mb-0 mt-3 mb-10 gap-2 lg:gap-4 3xl:gap-6">
               <PrimaryImage
                 url={instaFeedIcon}
-                customClasses={"size-[18px] lg:size-[30px]"}
+                customClasses={"size-[18px] lg:size-[30px] 3xl:size-[44px]"}
               />
-              <h3 className="text-secondary-alt text-[16px] md:text-[18px] lg:text-[35px] font-recklessRegular">
+              <h3 className="text-secondary-alt text-[16px] md:text-[18px] lg:text-[35px] 3xl:text-[52px] font-recklessRegular">
                 {instaFeedTitle}
               </h3>
             </div>
             <CustomLink to={instaFeedButtonAction}>
-              <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">
+              <PrimaryButton className="border border-secondary-alt text-secondary-alt 3xl:text-[20px] hover:bg-primary hover:text-secondary-alt max-h-[60px] 3xl:max-h-[90px] max-w-[280px] 3xl:max-w-[420px] px-8 py-4 3xl:px-12 3xl:py-6 hover:[letter-spacing:4px]">
                 {instaFeedButtonLabel}
               </PrimaryButton>
             </CustomLink>
@@ -105,7 +105,7 @@ function InstagramFeed({ data, details }) {
 
             <div
               ref={sliderRef}
-              className={`keen-slider mt-[20px] pb-[85px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
+              className={`keen-slider mt-[20px] 3xl:mt-[32px] pb-[85px] 3xl:pb-[120px] ${isSliderReady ? "opacity-100 visible" : "opacity-0 invisible max-h-[20vh]"}`}
             >
               {data.map((dt, index) => {
                 return (
@@ -113,9 +113,9 @@ function InstagramFeed({ data, details }) {
                     to={dt.permalink}
                     target={"_blank"}
                     key={index}
-                    className={`keen-slider__slide  flex flex-col md:p-[10px]`}
+                    className={`keen-slider__slide  flex flex-col md:p-[10px] 3xl:p-[16px]`}
                   >
-                    <div className="h-[325px] lg:h-[448px] relative">
+                    <div className="h-[325px] lg:h-[448px] 3xl:h-[700px] relative">
                       <PrimaryImage
                         url={dt.image}
                         size="card"
@@ -127,16 +127,16 @@ function InstagramFeed({ data, details }) {
               })}
               <button
                 onClick={() => sliderInstance.current?.prev()}
-                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                className="hidden absolute top-1/2 left-8 3xl:left-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[88px] 3xl:h-[88px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
               >
-                <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                <MdOutlineChevronLeft className="w-[20px] h-[20px] 3xl:w-[30px] 3xl:h-[30px]" />
               </button>
 
               <button
                 onClick={() => sliderInstance.current?.next()}
-                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                className="hidden absolute top-1/2 right-8 3xl:right-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[88px] 3xl:h-[88px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
               >
-                <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                <MdOutlineChevronRight className="w-[20px] h-[20px] 3xl:w-[30px] 3xl:h-[30px]" />
               </button>
             </div>
           </div>
