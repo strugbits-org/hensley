@@ -85,6 +85,18 @@ export default async function RootLayout({ children }) {
     queryProductCollections().catch(() => []),
   ]);
 
+  // The only consumer of allCollections inside ModalsWrapper is
+  // resolveProductRibbon (AddToCart / AddToCartTent), which reads just id,
+  // ribbon, and subcategory ids. Project to those fields so we don't serialize
+  // every full collection doc into the RSC payload of every page (~6MB/page).
+  const ribbonCollections = (allCollections || []).map((c) => ({
+    id: c?.id || c?._id,
+    ribbon: c?.ribbon,
+    subcategories: (Array.isArray(c?.subcategories) ? c.subcategories : []).map(
+      (s) => (typeof s === "string" ? s : s?.id || s?._id)
+    ),
+  }));
+
   const { integrations } = footerData;
   // Contact modal locations come from the contact section's `addresses`
   // relationship (single source), not the footer's own contact sections.
@@ -101,7 +113,7 @@ export default async function RootLayout({ children }) {
         </main>
         <InstagramFeed data={instagramFeed} details={homePageDetails} />
         <Footer data={footerData} />
-        <ModalsWrapper data={{ branches: contactBranches, contactFormData, loginPageDetails, allCollections }} />
+        <ModalsWrapper data={{ branches: contactBranches, contactFormData, loginPageDetails, allCollections: ribbonCollections }} />
         <SpeedInsights />
         <Loader />
         <Toaster position="top-center"
