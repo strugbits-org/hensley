@@ -1,9 +1,8 @@
 import { Product } from "@/components/Product";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
-import OurCategories from "@/components/common/OurCategories";
 import { fetchPageMetaData, buildPageMetadata } from "@/services";
-import { fetchProductData, fetchProductPageData, fetchProductPaths } from "@/services/products";
+import { fetchProductPageData, fetchProductPaths } from "@/services/products";
 import { queryProductsBySlug } from "@/services/payloadCollections";
 import { logError, normalizeProductForDisplay, richTextToPlainText } from "@/utils";
 import { notFound } from "next/navigation";
