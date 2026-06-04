@@ -50,13 +50,13 @@ export const HensleyNews = ({ data, pageDetails = {}, loop = true, origin = "cen
             <div className='sm:px-0 px-[12px] pb-12 flex items-center flex-col lg:border-b max-lg:border border-primary-border'>
                 {titleType === "primary" ? (
                     <>
-                        <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
+                        <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[200px] lg:!leading-[160px] 3xl:!text-[280px] 3xl:!leading-[230px] sm:!text-[65px] sm:!leading-[50px] lg:py-[20px] py-[20px] md:mt-6 lg:mt-0" />
                         <CustomLink to={"/blog"}>
-                            <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] font-haasRegular hover:bg-primary max-h-[60px] max-w-[280px] px-8 py-4 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
+                            <PrimaryButton className="border border-secondary-alt text-secondary-alt hover:text-secondary-alt hover:border-secondary-alt text-base text-[16px] 3xl:text-[20px] font-haasRegular hover:bg-primary max-h-[60px] 3xl:max-h-[90px] max-w-[280px] 3xl:max-w-[420px] px-8 py-4 3xl:px-12 3xl:py-6 hover:[letter-spacing:4px]">SEE ALL</PrimaryButton>
                         </CustomLink>
                     </>
                 ) : (
-                    <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[90px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
+                    <SectionTitle text={hensleyNewsTitle} classes="lg:!text-[90px] 3xl:!text-[130px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
                 )}
 
             </div>
@@ -72,7 +72,7 @@ export const HensleyNews = ({ data, pageDetails = {}, loop = true, origin = "cen
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide flex px-2`}
+                                className={`keen-slider__slide flex px-2 3xl:px-3`}
                             >
                                 <NewsCard data={item} />
                             </div>
@@ -82,16 +82,16 @@ export const HensleyNews = ({ data, pageDetails = {}, loop = true, origin = "cen
                         <>
                             {(loop || currentSlide?.rel > 0) && <button
                                 onClick={() => sliderInstance.current?.prev()}
-                                className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                                className="hidden absolute top-1/2 left-8 3xl:left-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >
-                                <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                                <MdOutlineChevronLeft className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                             </button>}
 
                             {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
                                 onClick={() => sliderInstance.current?.next()}
-                                className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                                className="hidden absolute top-1/2 right-8 3xl:right-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                             >
-                                <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                                <MdOutlineChevronRight className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                             </button>}
                         </>
                     )}

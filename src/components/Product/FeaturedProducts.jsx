@@ -56,7 +56,7 @@ export const FeaturedProducts = ({
         <div className="sm:px-0 px-[12px] flex items-center flex-col ">
           <SectionTitle
             text={featuredProjectTitle}
-            classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] "
+            classes="lg:!text-[60px] 3xl:!text-[90px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] 3xl:!py-[44px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] "
           />
         </div>
         {!isSliderReady && (
@@ -73,7 +73,7 @@ export const FeaturedProducts = ({
               return (
                 <div
                   key={index}
-                  className={`keen-slider__slide flex flex-col px-2`}
+                  className={`keen-slider__slide flex flex-col px-2 3xl:px-3`}
                 >
                   <ProductCard
                     type="slider"

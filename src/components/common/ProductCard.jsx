@@ -56,7 +56,7 @@ function ProductCard({
       <CustomLink
         to={productPath}
         prefetch={false}
-        className={`w-full min-h-[160px] md:min-h-auto md:h-auto aspect-[1/1.25] md:aspect-square overflow-hidden flex justify-center items-center px-2 py-3 md:px-4 lg:px-6 xl:px-10 2xl:px-14 ${type === "listing" ? "bg-white" : "md:min-h-[220px]"}`}
+        className={`w-full min-h-[160px] md:min-h-auto md:h-auto aspect-[1/1.25] md:aspect-square overflow-hidden flex justify-center items-center px-2 py-3 md:px-4 lg:px-6 xl:px-10 2xl:px-14 3xl:px-20 ${type === "listing" ? "bg-white" : "md:min-h-[220px]"}`}
       >
         {productImageSrc ? (
           <Image
@@ -75,9 +75,9 @@ function ProductCard({
         ) : null}
       </CustomLink>
 
-      <div className="flex flex-col flex-grow max-w-full lg:pl-[23px] pt-2 lg:pt-6">
+      <div className="flex flex-col flex-grow max-w-full lg:pl-[23px] 3xl:pl-[34px] pt-2 lg:pt-6 3xl:pt-8">
         <h2
-          className={`w-full uppercase lg:text-[18px] lg:leading-[20px] text-secondary-alt font-haasRegular line-clamp-2 overflow-hidden md:h-8 lg:h-10 ${type === "listing" ? "text-xs leading-tight " : ""}`}
+          className={`w-full uppercase lg:text-[18px] lg:leading-[20px] 3xl:text-[26px] 3xl:leading-[30px] text-secondary-alt font-haasRegular line-clamp-2 overflow-hidden md:h-8 lg:h-10 3xl:h-16 ${type === "listing" ? "text-xs leading-tight " : ""}`}
         >
           {title}
         </h2>
@@ -92,7 +92,7 @@ function ProductCard({
                 className="flex justify-center items-center flex-shrink-0"
               >
                 <span
-                  className={`text-[10px] lg:text-[12px] text-secondary-alt mr-[8px] word-break transition-colors duration-200 ${copiedSkuId === product.sku ? "bg-primary" : ""}`}
+                  className={`text-[10px] lg:text-[12px] 3xl:text-[18px] text-secondary-alt mr-[8px] word-break transition-colors duration-200 ${copiedSkuId === product.sku ? "bg-primary" : ""}`}
                 >
                   {product.sku}
                 </span>
@@ -110,7 +110,7 @@ function ProductCard({
                     onMouseLeave={() => setHoveredSizeIndex(null)}
                   >
                     <div
-                      className={`text-[10px] lg:text-[12px] text-secondary-alt [&_p]:m-0 [&_p]:inline [&_p]:text-inherit px-2`}
+                      className={`text-[10px] lg:text-[12px] 3xl:text-[18px] text-secondary-alt [&_p]:m-0 [&_p]:inline [&_p]:text-inherit px-2`}
                       dangerouslySetInnerHTML={{
                         __html: richTextToHTML(description),
                       }}
@@ -122,14 +122,14 @@ function ProductCard({
           </div>
 
           <button
-            className={`${btnClass} w-full 2xl:w-auto lg:min-w-[151px] flex items-center justify-between 2xl:justify-center bg-primary lg:px-4 lg:py-3 gap-x-7 ${type === "listing" ? "p-2" : "px-4 py-3"}`}
+            className={`${btnClass} w-full 2xl:w-auto lg:min-w-[151px] 3xl:min-w-[220px] flex items-center justify-between 2xl:justify-center bg-primary lg:px-4 lg:py-3 3xl:px-6 3xl:py-5 gap-x-7 ${type === "listing" ? "p-2" : "px-4 py-3"}`}
             onClick={handleAddToCart}
           >
-            <span className="uppercase font-haasRegular text-[11.5px] sm:text-[12px]">
+            <span className="uppercase font-haasRegular text-[11.5px] sm:text-[12px] 3xl:text-[18px]">
               add to cart
             </span>
             <svg
-              className="rotate-45 size-2 lg:size-3 group-hover:scale-125 transition-all duration-300 ease-in-out"
+              className="rotate-45 size-2 lg:size-3 3xl:size-5 group-hover:scale-125 transition-all duration-300 ease-in-out"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 10.665 10.367"
             >

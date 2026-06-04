@@ -13,13 +13,13 @@ const BlogDetails = ({ data }) => {
     return (
         <>
             <EventHighLight data={blog} />
-            <div className='px-[24px] w-full border-b border-primary-border mb-10'>
+            <div className='px-[24px] 3xl:px-[40px] w-full border-b border-primary-border mb-10 3xl:mb-16'>
                 {convertToHTMLRichContent({
                     content: blog.blogRef.richContent,
-                    class_heading: "text-secodary-alt font-haasRegular text-3xl lg:text-[32px] leading-tight text-left",
-                    class_p: "text-secondary-alt font-haasRegular text-sm lg:text-base text-left mb-4",
-                    class_ul: "list-disc pl-6 text-secondary-alt font-haasRegular text-sm lg:text-base text-left mb-8 space-y-2",
-                    class_ol: "list-decimal pl-6 text-secondary-alt font-haasRegular text-sm lg:text-base text-left mb-8 space-y-2",
+                    class_heading: "text-secodary-alt font-haasRegular text-3xl lg:text-[32px] 3xl:text-[46px] leading-tight text-left",
+                    class_p: "text-secondary-alt font-haasRegular text-sm lg:text-base 3xl:text-[22px] 3xl:leading-[34px] text-left mb-4 3xl:mb-6",
+                    class_ul: "list-disc pl-6 3xl:pl-10 text-secondary-alt font-haasRegular text-sm lg:text-base 3xl:text-[22px] 3xl:leading-[34px] text-left mb-8 3xl:mb-12 space-y-2 3xl:space-y-3",
+                    class_ol: "list-decimal pl-6 3xl:pl-10 text-secondary-alt font-haasRegular text-sm lg:text-base 3xl:text-[22px] 3xl:leading-[34px] text-left mb-8 3xl:mb-12 space-y-2 3xl:space-y-3",
                     class_gallery_item: "w-full flex",
                     class_image: "w-full h-full object-cover object-center",
                 })}
