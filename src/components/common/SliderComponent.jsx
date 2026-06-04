@@ -91,13 +91,13 @@ export default function SliderComponent({
                 />
 
                 <div className="absolute top-1/2 lg:left-[20%] left-[10%] right-[10%] lg:transform -translate-y-1/2 z-10 flex flex-col justify-center items-center lg:block">
-                  <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] max-w-[340px] lg:max-w-[600px] lg:text-left text-center text-white font-recklessLight mb-8">
+                  <h2 className="text-[25px] leading-[22px] lg:text-[60px] lg:leading-[55px] 3xl:text-[90px] 3xl:leading-[82px] max-w-[340px] lg:max-w-[600px] 3xl:max-w-[900px] lg:text-left text-center text-white font-recklessLight mb-8 3xl:mb-12">
                     {portfolioRef?.title || displayedTitle}
                   </h2>
                   <CustomLink
                     to={`/project/${portfolioRef?.slug || slide?.slug}`}
                   >
-                    <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] px-4 py-4 hover:[letter-spacing:4px]">
+                    <PrimaryButton className="border border-white text-white hover:bg-primary hover:text-secondary-alt max-h-[60px] max-w-[280px] 3xl:max-h-[90px] 3xl:max-w-[420px] 3xl:text-[20px] px-4 py-4 3xl:px-8 3xl:py-6 hover:[letter-spacing:4px]">
                       {ourProjectsTitle}
                     </PrimaryButton>
                   </CustomLink>
@@ -109,24 +109,24 @@ export default function SliderComponent({
                     {(loop || currentSlide?.rel > 0) && (
                       <button
                         onClick={() => sliderInstance.current?.prev()}
-                        className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        className="hidden absolute top-1/2 left-8 3xl:left-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                       >
-                        <BsChevronLeft className="w-[20px] h-[20px]" />
+                        <BsChevronLeft className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                       </button>
                     )}
 
                     {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && (
                       <button
                         onClick={() => sliderInstance.current?.next()}
-                        className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                        className="hidden absolute top-1/2 right-8 3xl:right-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                       >
-                        <BsChevronRight className="w-[20px] h-[20px]" />
+                        <BsChevronRight className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                       </button>
                     )}
                   </>
                 )}
 
-                <span className="lg:block hidden absolute bottom-[48px] left-[48px] text-white font-recklessRegular text-[35px]">
+                <span className="lg:block hidden absolute bottom-[48px] left-[48px] 3xl:bottom-[64px] 3xl:left-[64px] text-white font-recklessRegular text-[35px] 3xl:text-[52px]">
                   {(currentSlide?.rel ?? 0) + 1}/{sliderData.length}
                 </span>
               </div>
