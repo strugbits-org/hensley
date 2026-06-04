@@ -6,11 +6,11 @@ export const DownloadButton = ({ text, classes, iconTrue }) => {
     return (
 
         <button className={`
-            lg:h-[150px]
+            lg:h-[150px] 3xl:h-[210px]
        sm:mt-[40px]
          h-[90px]
          my-[33px]
-         px-[60px]
+         px-[60px] 3xl:px-[90px]
          bg-primary tracking-[1px] sm:tracking-[4px] group  transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         ${classes}
@@ -18,7 +18,7 @@ export const DownloadButton = ({ text, classes, iconTrue }) => {
             <span
                 className='
              font-haasLight uppercase
-             text-[12px] sm:text-[16px]
+             text-[12px] sm:text-[16px] 3xl:text-[24px]
         group-hover:font-haasBold
             '
             >{text}</span>
@@ -29,7 +29,7 @@ export const DownloadButton = ({ text, classes, iconTrue }) => {
                 height="36.562"
                 viewBox="0 0 36.355 36.562"
                 className={`${iconTrue ? "lg:block" : "lg:hidden"
-                    } border-b pb-[7px] block ml-2 transition-all duration-300
+                    } border-b pb-[7px] block ml-2 transition-all duration-300 3xl:w-[52px] 3xl:h-[52px]
   border-secondary-alt stroke-secondary-alt group-hover:stroke-primary group-hover:border-primary
   absolute right-[5%] top-1/2 -translate-y-1/2`}
             >

@@ -48,7 +48,7 @@ export const FeaturedBlogs = ({ data, pageDetails, loop = true, origin = "center
     return (
         <div className={`w-full py-20 bg-primary lg:py-6 ${classes}`}>
             <div className='sm:px-0 px-[12px] flex items-center flex-col '>
-                <SectionTitle text={featuredProjectTitle} classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
+                <SectionTitle text={featuredProjectTitle} classes="lg:!text-[60px] 3xl:!text-[90px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[30px] 3xl:!py-[44px] !text-[35px] !leading-[30px] max-sm:!pt-[120px] " />
             </div>
             {!isSliderReady && (
                 <div className="w-full h-[300px] flex justify-center items-center">
@@ -61,7 +61,7 @@ export const FeaturedBlogs = ({ data, pageDetails, loop = true, origin = "center
                         return (
                             <div
                                 key={index}
-                                className={`keen-slider__slide flex px-2 `}
+                                className={`keen-slider__slide flex px-2 3xl:px-3 `}
                             >
                                 <FeaturedBlogCard data={item} classes={"bg-primary-alt"} />
                             </div>

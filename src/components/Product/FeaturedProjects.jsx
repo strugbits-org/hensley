@@ -53,7 +53,7 @@ export const FeaturedProjects = ({
       <div className="sm:px-0 px-[12px] flex items-center flex-col ">
         <SectionTitle
           text={featuredProjectTitle}
-          classes="lg:!text-[60px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[50px] !text-[35px] !leading-[30px] max-sm:!pt-[20px] "
+          classes="lg:!text-[60px] 3xl:!text-[90px] sm:!text-[55px] sm:!leading-[50px] lg:!py-[50px] 3xl:!py-[70px] !text-[35px] !leading-[30px] max-sm:!pt-[20px] "
         />
       </div>
       {!isSliderReady && (
@@ -79,17 +79,17 @@ export const FeaturedProjects = ({
               />
               <CustomLink
                 to={`/project/${portfolioRef.slug}`}
-                className="absolute inset-0 flex justify-end pt-40 md:pt-20 lg:pt-64 lg:pb-24 px-6 lg:px-24"
+                className="absolute inset-0 flex justify-end pt-40 md:pt-20 lg:pt-64 3xl:pt-80 lg:pb-24 3xl:pb-32 px-6 lg:px-24 3xl:px-36"
               >
                 <div className="flex justify-center md:justify-end w-full flex-shrink-0 gap-2">
                   <div>
                     <PrimaryImage
                       url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}
                       alt={portfolioRef.title}
-                      customClasses="hidden md:block fill-primary-alt h-[132px] transition-all duration-500 ease-in-out lg:group-hover:w-full lg:group-hover:h-full"
+                      customClasses="hidden md:block fill-primary-alt h-[132px] 3xl:h-[190px] transition-all duration-500 ease-in-out lg:group-hover:w-full lg:group-hover:h-full"
                     />
                   </div>
-                  <h2 className="w-full md:w-auto md:max-w-[150px] lg:max-w-[200px] text-[18px] lg:text-[24px] leading-[22px] md:leading-[18px] lg:leading-[30px] uppercase text-center md:text-end text-white font-haasRegular">
+                  <h2 className="w-full md:w-auto md:max-w-[150px] lg:max-w-[200px] 3xl:max-w-[300px] text-[18px] lg:text-[24px] 3xl:text-[34px] leading-[22px] md:leading-[18px] lg:leading-[30px] 3xl:leading-[42px] uppercase text-center md:text-end text-white font-haasRegular">
                     {portfolioRef.title}
                   </h2>
                 </div>

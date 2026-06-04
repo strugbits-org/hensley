@@ -29,12 +29,12 @@ export const Button = ({ text, classes, iconTrue }) => {
     return (
 
         <button className={`
-            lg:h-[150px]
+            lg:h-[150px] 3xl:h-[210px]
        sm:mt-[40px]
 w-full
          h-[90px]
          my-[33px]
-         px-[50px]
+         px-[50px] 3xl:px-[80px]
          bg-primary tracking-[3px] sm:tracking-[6px] group hover:tracking-[10px] transform transition-all duration-300 hover:bg-secondary-alt hover:text-primary
         relative
         ${classes}
@@ -42,7 +42,7 @@ w-full
             <span
                 className='
              font-haasLight uppercase
-             text-[14px] sm:text-[16px]
+             text-[14px] sm:text-[16px] 3xl:text-[24px]
         group-hover:font-haasBold
             '
             >{text}</span>
@@ -52,7 +52,7 @@ w-full
                 width="19.877"
                 height="19.67"
                 viewBox="0 0 19.877 19.67"
-                className={`${iconTrue ? "lg:block":"lg:hidden"} block ml-2 transition-all duration-300 stroke-secondary-alt group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2`}
+                className={`${iconTrue ? "lg:block":"lg:hidden"} block ml-2 transition-all duration-300 stroke-secondary-alt group-hover:stroke-primary absolute right-[5%] top-1/2 -translate-y-1/2 3xl:w-[28px] 3xl:h-[28px]`}
             >
                 <g transform="translate(9.835 0.5) rotate(45)">
                     <path
