@@ -66,11 +66,11 @@ const FilterCardSubCategories = ({
           <div className="w-full border-b border-secondary-alt mb-6" />
         )}
         {section.title && (
-          <h3 className="w-full sm:px-[71px] px-[21px] lg:text-[45px] text-[25px] font-recklessRegular uppercase text-secondary-alt select-none">
+          <h3 className="w-full sm:px-[71px] px-[21px] lg:text-[45px] 3xl:text-[64px] text-[25px] font-recklessRegular uppercase text-secondary-alt select-none">
             {section.title}
           </h3>
         )}
-        <ul className="sm:px-[71px] px-[21px] grid grid-cols-2 gap-y-4 gap-x-4 w-full list-none py-[23px]">
+        <ul className="sm:px-[71px] px-[21px] grid grid-cols-2 gap-y-4 gap-x-4 3xl:gap-y-6 w-full list-none py-[23px] 3xl:py-[32px]">
           {section.items.map((item, index) => {
             const isSelected = pendingTags.includes(item._id);
             return (
@@ -79,7 +79,7 @@ const FilterCardSubCategories = ({
                 className={`cursor-pointer px-4 py-2 ${isSelected ? "bg-primary-alt" : ""}`}
                 key={`${item._id || index}`}
               >
-                <button className="text-[18px] lg:text-[20px] text-secondary-alt uppercase font-recklessRegular hover:opacity-70 transition-opacity">
+                <button className="text-[18px] lg:text-[20px] 3xl:text-[28px] text-secondary-alt uppercase font-recklessRegular hover:opacity-70 transition-opacity">
                   {item[section.key || section.portfolioKey]}
                 </button>
               </li>
@@ -95,19 +95,19 @@ const FilterCardSubCategories = ({
     <div className="flex justify-center items-center pb-[18px]">
       <div
         onMouseLeave={handleClose}
-        className={`relative lg:w-[924px] sm:w-[681px] w-[344px] bg-white py-[25px] flex flex-col justify-between items-center ${!isOpen ? "border-b border-b-secondary-alt" : ""}`}
+        className={`relative lg:w-[924px] 3xl:w-[1300px] sm:w-[681px] w-[344px] bg-white py-[25px] 3xl:py-[36px] flex flex-col justify-between items-center ${!isOpen ? "border-b border-b-secondary-alt" : ""}`}
       >
         {/* Header */}
         <div
           className="sm:px-[71px] px-[21px] cursor-pointer flex flex-row w-full justify-between items-center select-none"
           onClick={handleToggle}
         >
-          <h3 className="lg:text-[45px] text-[25px] font-recklessRegular uppercase text-secondary-alt select-none">
+          <h3 className="lg:text-[45px] 3xl:text-[64px] text-[25px] font-recklessRegular uppercase text-secondary-alt select-none">
             ALL CATEGORIES
           </h3>
           <PrimaryImage
             url="/icons/0e0ac5_3bd320dac8514b3ebaa8d424375b0ac2.svg"
-            customClasses={`w-[16px] h-[16px] lg:h-[24px] lg:w-[24px] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            customClasses={`w-[16px] h-[16px] lg:h-[24px] lg:w-[24px] 3xl:h-[34px] 3xl:w-[34px] transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
           />
         </div>
 

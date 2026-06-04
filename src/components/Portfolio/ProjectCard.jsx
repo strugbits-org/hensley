@@ -14,33 +14,33 @@ const ProjectCard = ({ data, handleFilterChange, selectedTags, isRTL }) => {
         redirectWithLoader(`/project/${slug}`);
     }
     return (
-        <div onClick={handleRedirection} className={`cursor-pointer group border border-primary-border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out lg:h-[474px] gap-0 ${!isRTL ? 'lg:flex-row-reverse' : ''}`}>
+        <div onClick={handleRedirection} className={`cursor-pointer group border border-primary-border flex flex-col lg:flex-row hover:bg-primary transition-all duration-300 ease-in-out lg:h-[474px] 3xl:h-[680px] gap-0 ${!isRTL ? 'lg:flex-row-reverse' : ''}`}>
             {/* Image Section */}
-            <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] px-[12px] lg:h-auto h-[382px]">
+            <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] 3xl:px-[36px] 3xl:py-[36px] py-[13px] px-[12px] lg:h-auto h-[382px]">
                 <div className="overflow-hidden h-full w-full">
                     <PrimaryImage url={portfolioRef.coverImage.imageInfo} size="card" useNextImage={true} alt={portfolioRef.title} type='alternate' q={"50"} customClasses="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 </div>
             </div>
 
             {/* Content Section */}
-            <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] py-[13px] max-lg:px-[12px]">
+            <div className="lg:w-1/2 lg:px-[24px] lg:py-[24px] 3xl:px-[36px] 3xl:py-[36px] py-[13px] max-lg:px-[12px]">
                 <div className="h-full w-full flex justify-between gap-x-2">
                     <div className="h-full flex flex-col justify-between">
-                        <div className='flex flex-col gap-y-[15px]'>
-                            <span className='font-haasRegular *: text-[12px] uppercase text-secondary-alt block '>{formatDate(publishDate)}</span>
-                            <span className="font-recklessRegular 2xl:text-[35px] 2xl:leading-[35px] max-2xl:text-[20px] max-2xl:leading-[18px] text-[23px] leading-[25px] uppercase">
+                        <div className='flex flex-col gap-y-[15px] 3xl:gap-y-[24px]'>
+                            <span className='font-haasRegular *: text-[12px] 3xl:text-[18px] uppercase text-secondary-alt block '>{formatDate(publishDate)}</span>
+                            <span className="font-recklessRegular 2xl:text-[35px] 2xl:leading-[35px] 3xl:text-[50px] 3xl:leading-[52px] max-2xl:text-[20px] max-2xl:leading-[18px] text-[23px] leading-[25px] uppercase">
                                 {portfolioRef.title}
                             </span>
 
                             <MarketsStudiosTags markets={markets} studios={studios} categories={portfolioCategories} handleFilterChange={handleFilterChange} selectedTags={selectedTags} />
-                            <span className='font-haasRegular uppercase 2xl:text-[12px] 2xl:leading-[16px] lg:text-[12px] text-secondary-alt block '>{portfolioRef.description.slice(0, 200)}{portfolioRef.description.length > 200 ? '...' : ''}</span>
+                            <span className='font-haasRegular uppercase 2xl:text-[12px] 2xl:leading-[16px] lg:text-[12px] 3xl:text-[20px] 3xl:leading-[28px] text-secondary-alt block '>{portfolioRef.description.slice(0, 200)}{portfolioRef.description.length > 200 ? '...' : ''}</span>
                         </div>
 
                         <CustomLink to={`/project/${slug}`} className='pt-[10px]'>
                             <PrimaryImage
                                 url="/icons/8ba81b_893a7cdd28814f1cbf0b299b6b211205.svg"
                                 alt="Arrow"
-                                customClasses="hidden lg:block arrow w-[25px] h-[25px] transition-all duration-300 ease-in-out group-hover:w-[70px] group-hover:h-[70px] lg:mb-[12px] group-hover:filter brightness-50"
+                                customClasses="hidden lg:block arrow w-[25px] h-[25px] 3xl:w-[36px] 3xl:h-[36px] transition-all duration-300 ease-in-out group-hover:w-[70px] group-hover:h-[70px] 3xl:group-hover:w-[96px] 3xl:group-hover:h-[96px] lg:mb-[12px] group-hover:filter brightness-50"
                             />
                         </CustomLink>
                     </div>

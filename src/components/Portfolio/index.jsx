@@ -99,7 +99,7 @@ const Portfolio = ({ data }) => {
         selectedTags={selectedTags}
       />
       <div className="w-full ">
-        <div className="w-full bg-primary-border py-[20px]">
+        <div className="w-full bg-primary-border py-[20px] 3xl:py-[30px]">
           <FilterCardSubCategories
             data={categoriesMarketStudios}
             handleFilterChange={handleFilterChange}
