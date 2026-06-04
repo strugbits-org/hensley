@@ -3,8 +3,8 @@ import { PrimaryImage } from '../common/PrimaryImage'
 
 const EventGallery = ({ data }) => {
     return (
-        <div className='w-full px-[24px] mb-20'>
-            <div className='w-full space-y-[24px]'>
+        <div className='w-full px-[24px] 3xl:px-[40px] mb-20 3xl:mb-32'>
+            <div className='w-full space-y-[24px] 3xl:space-y-[40px]'>
                 {data.map((url, index) => {
                     const positionInGroup = index % 3;
                     if (positionInGroup === 0) {
@@ -15,7 +15,7 @@ const EventGallery = ({ data }) => {
                         );
                     } else if (positionInGroup === 1) {
                         return (
-                            <div key={index} className="grid grid-cols-2 gap-[24px]">
+                            <div key={index} className="grid grid-cols-2 gap-[24px] 3xl:gap-[40px]">
                                 <PrimaryImage url={url} size="tablet" fit={'fit'} customClasses="h-full w-full object-cover" />
                                 {data[index + 1] && (
                                     <PrimaryImage url={data[index + 1]} size="tablet" fit={'fit'} customClasses="h-full w-full object-cover" />

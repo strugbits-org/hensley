@@ -55,17 +55,17 @@ export default function OurProjects({ data, loop = true }) {
                     return (
                         <div key={index} className="keen-slider__slide relative group">
                             <PrimaryImage useNextImage={true} q={60} url={portfolioRef.coverImage.imageInfo} size="tablet" type={"alternate"} customClasses="size-full object-cover" />
-                            <CustomLink to={`/project/${portfolioRef.slug}`} className="absolute inset-0 flex justify-end pt-40 md:pt-20 lg:pt-64 lg:pb-24 px-6 lg:px-24">
+                            <CustomLink to={`/project/${portfolioRef.slug}`} className="absolute inset-0 flex justify-end pt-40 md:pt-20 lg:pt-64 3xl:pt-80 lg:pb-24 3xl:pb-32 px-6 lg:px-24 3xl:px-36">
                                 <div className="flex justify-center md:justify-end w-full flex-shrink-0 gap-2">
                                     <div>
                                         <PrimaryImage
                                             url={"/icons/8ba81b_2be7b3074d224933a0484d17c7885b75.svg"}
                                             alt={portfolioRef.title}
-                                            customClasses="hidden md:block fill-primary-alt h-[132px] transition-all duration-500 ease-in-out lg:group-hover:w-full lg:group-hover:h-full"
+                                            customClasses="hidden md:block fill-primary-alt h-[132px] 3xl:h-[190px] transition-all duration-500 ease-in-out lg:group-hover:w-full lg:group-hover:h-full"
                                         />
                                     </div>
                                     <h2
-                                        className="w-full md:w-auto md:max-w-[150px] lg:max-w-[200px] text-[18px] lg:text-[24px] leading-[22px] md:leading-[18px] lg:leading-[30px] uppercase text-center md:text-end text-white font-haasRegular"
+                                        className="w-full md:w-auto md:max-w-[150px] lg:max-w-[200px] 3xl:max-w-[300px] text-[18px] lg:text-[24px] 3xl:text-[34px] leading-[22px] md:leading-[18px] lg:leading-[30px] 3xl:leading-[42px] uppercase text-center md:text-end text-white font-haasRegular"
                                     >
                                         {portfolioRef.title}
                                     </h2>
@@ -81,16 +81,16 @@ export default function OurProjects({ data, loop = true }) {
                     <>
                         {(loop || currentSlide?.rel > 0) && <button
                             onClick={() => sliderInstance.current?.prev()}
-                            className="hidden absolute top-1/2 left-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                            className="hidden absolute top-1/2 left-8 3xl:left-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                         >
-                            <MdOutlineChevronLeft className="w-[20px] h-[20px]" />
+                            <MdOutlineChevronLeft className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                         </button>}
 
                         {(loop || currentSlide?.rel !== currentSlide?.maxIdx) && <button
                             onClick={() => sliderInstance.current?.next()}
-                            className="hidden absolute top-1/2 right-8 transform -translate-y-1/2 w-[60px] h-[60px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
+                            className="hidden absolute top-1/2 right-8 3xl:right-16 transform -translate-y-1/2 w-[60px] h-[60px] 3xl:w-[96px] 3xl:h-[96px] rounded-full bg-white shadow-md lg:flex items-center justify-center z-10"
                         >
-                            <MdOutlineChevronRight className="w-[20px] h-[20px]" />
+                            <MdOutlineChevronRight className="w-[20px] h-[20px] 3xl:w-[34px] 3xl:h-[34px]" />
                         </button>}
                     </>
                 )}
