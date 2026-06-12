@@ -2,6 +2,7 @@ import { logError, resolveCoreMediaUrl } from "@/utils";
 import { fetchFeaturedProjects, fetchMatchedProductsForProduct } from "../products";
 import {
     queryProductsFromPayload,
+    queryProductsBySlug,
     queryProductCollectionBySlug,
 } from "../payloadCollections";
 
@@ -26,7 +27,14 @@ const resolveProductOrderIds = (collection) => {
         .filter(Boolean);
 };
 
-const fetchPoolCoverProducts = async ({ slug } = {}) => {
+const fetchPoolCoverProducts = async ({ slug, draft = false } = {}) => {
+    // Preview: resolve the draft scheduled-version directly by slug, bypassing
+    // the published/visibility/status filters baked into the listing query.
+    if (draft && slug) {
+        const product = await queryProductsBySlug(slug, { draft: true });
+        return { products: product ? [product] : [], poolCoversCollection: null };
+    }
+
     const poolCoversCollection = await queryProductCollectionBySlug("pool-covers").catch(() => null);
     const orderedIds = resolveProductOrderIds(poolCoversCollection);
 
@@ -58,9 +66,9 @@ export const fetchPoolCovers = async () => {
     }
 };
 
-export const fetchPoolCoverData = async (slug) => {
+export const fetchPoolCoverData = async (slug, { draft = false } = {}) => {
     try {
-        const { products } = await fetchPoolCoverProducts({ slug });
+        const { products } = await fetchPoolCoverProducts({ slug, draft });
         const product = products[0];
         if (!product) throw new Error(`Pool cover not found for slug: ${slug}`);
         return normalizePoolCoverItem(product, 1);
@@ -69,9 +77,9 @@ export const fetchPoolCoverData = async (slug) => {
     }
 };
 
-export const fetchPoolCoverPageData = async (slug) => {
+export const fetchPoolCoverPageData = async (slug, { draft = false } = {}) => {
     try {
-        const productData = await fetchPoolCoverData(slug);
+        const productData = await fetchPoolCoverData(slug, { draft });
 
         // Not a valid pool-cover slug — return null so the page renders notFound().
         if (!productData || !productData.covers) {

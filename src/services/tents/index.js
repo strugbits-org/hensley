@@ -5,6 +5,7 @@ import {
     queryBlogs,
     normalizePayloadBlogForListing,
     queryProductsFromPayload,
+    queryProductsBySlug,
     queryProductCollectionBySlug,
     querySection,
     sectionToObject,
@@ -51,7 +52,14 @@ const resolveProductOrderIds = (collection) => {
         .filter(Boolean);
 };
 
-const fetchTentProducts = async ({ slug } = {}) => {
+const fetchTentProducts = async ({ slug, draft = false } = {}) => {
+    // Preview: resolve the draft scheduled-version directly by slug, bypassing
+    // the published/visibility/status filters baked into the listing query.
+    if (draft && slug) {
+        const product = await queryProductsBySlug(slug, { draft: true });
+        return { products: product ? [product] : [], tentsCollection: null };
+    }
+
     const tentsCollection = await queryProductCollectionBySlug("tents").catch(() => null);
     const orderedIds = resolveProductOrderIds(tentsCollection);
 
@@ -73,9 +81,9 @@ const fetchTentProducts = async ({ slug } = {}) => {
     return { products: sortByConfiguredOrder(docs, orderedIds), tentsCollection };
 };
 
-export const fetchTentData = async (slug) => {
+export const fetchTentData = async (slug, { draft = false } = {}) => {
     try {
-        const { products } = await fetchTentProducts({ slug });
+        const { products } = await fetchTentProducts({ slug, draft });
         const product = products[0];
         // No tent with this slug (e.g. a product/bundle slug hit the tent route).
         // Expected 404, not an error — return null and let the page notFound().
@@ -263,9 +271,9 @@ export const fetchTentPageDetails = cache(async () => {
     return fallback;
 });
 
-export const fetchTentPageData = async (slug) => {
+export const fetchTentPageData = async (slug, { draft = false } = {}) => {
     try {
-        const productData = await fetchTentData(slug);
+        const productData = await fetchTentData(slug, { draft });
         // Not a valid tent slug — return null so the page renders notFound().
         if (!productData || !productData.tent) {
             return null;
