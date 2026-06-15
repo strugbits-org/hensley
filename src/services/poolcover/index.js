@@ -29,7 +29,7 @@ const resolveProductOrderIds = (collection) => {
 
 const fetchPoolCoverProducts = async ({ slug, draft = false } = {}) => {
     // Preview: resolve the draft scheduled-version directly by slug, bypassing
-    // the published/visibility/status filters baked into the listing query.
+    // the published/visibility filters baked into the listing query.
     if (draft && slug) {
         const product = await queryProductsBySlug(slug, { draft: true });
         return { products: product ? [product] : [], poolCoversCollection: null };
@@ -42,7 +42,6 @@ const fetchPoolCoverProducts = async ({ slug, draft = false } = {}) => {
         and: [
             { type: { equals: "pool_cover" } },
             { visible: { equals: true } },
-            { status: { equals: "active" } },
             ...(slug ? [{ slug: { equals: slug } }] : []),
         ],
     };
@@ -163,7 +162,7 @@ const normalizeRecommendedProducts = (product) => {
     return product.recommendedProducts
         .map((rp) => {
             if (!rp || typeof rp === "string") return null;
-            if (rp.id === product.id || rp.status !== "active" || rp.visible === false) return null;
+            if (rp.id === product.id || rp.visible === false) return null;
             return {
                 id: rp.id,
                 title: rp.title,

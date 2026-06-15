@@ -67,7 +67,6 @@ export const searchTents = async (query) => {
             and: [
                 { type: { equals: "tent" } },
                 { visible: { equals: true } },
-                { status: { equals: "active" } },
                 ...buildTokenWhere(tokens, ["title"]).and,
             ],
         };
