@@ -33,12 +33,12 @@ export const fetchCategoryPageDetails = cache(async () => {
 // generateMetadata and the page handler hit the same cache key.
 const normaliseCollectionSlug = (slug) => (slug ? String(slug).toLowerCase() : slug);
 
-export const fetchSelectedCollectionData = cache(async (rawSlug) => {
+export const fetchSelectedCollectionData = cache(async (rawSlug, { draft = false } = {}) => {
     try {
         const slug = normaliseCollectionSlug(rawSlug);
         const [ourCategoriesData, selectedCategory, productBannersData, pageDetails, allCollections] = await Promise.all([
             fetchOurCategoriesData(),
-            queryProductCollectionBySlug(slug),
+            queryProductCollectionBySlug(slug, { draft }),
             fetchProductBannersData(),
             fetchCategoryPageDetails(),
             queryProductCollections(),

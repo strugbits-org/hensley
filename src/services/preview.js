@@ -1,7 +1,15 @@
 import { logError } from "@/utils";
 
 // Collections that bps-core's contentVariants plugin enables preview on.
-const PREVIEW_COLLECTIONS = new Set(["markets", "blogs", "projects", "pages", "sections"]);
+const PREVIEW_COLLECTIONS = new Set([
+    "markets",
+    "blogs",
+    "projects",
+    "pages",
+    "sections",
+    "products",
+    "product-collections",
+]);
 
 /**
  * Stateless preview gate. Given the `?preview=<token>` value from the URL,
