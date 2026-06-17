@@ -576,6 +576,7 @@ export const queryProductCollections = cache(async () => {
     try {
         const result = await sdk.find({
             collection: 'product-collections',
+            where: { _status: { equals: "published" } },
             pagination: false,
             draft: false,
             locale: "en",
@@ -596,7 +597,7 @@ export const queryFeaturedProductCollections = cache(async () => {
     try {
         const result = await sdk.find({
             collection: 'product-collections',
-            where: { featured: { equals: true } },
+            where: { and: [{ featured: { equals: true } }, { _status: { equals: "published" } }] },
             pagination: false,
             draft: false,
             locale: "en",
@@ -634,7 +635,7 @@ export const queryProductSlugs = cache(async () => {
     try {
         const result = await sdk.find({
             collection: 'products',
-            where: { visible: { not_equals: false } },
+            where: { visible: { not_equals: false }, _status: { equals: "published" } },
             pagination: false,
             draft: false,
             locale: 'en',
@@ -656,18 +657,21 @@ export const queryProductSlugs = cache(async () => {
 // At depth 2 with no projection this response ballooned to ~23MB — over the
 // 10MB Next.js data cache limit. Selecting fields + populating products as
 // IDs only keeps the payload tiny so it fits the data cache.
-export const queryProductCollectionBySlug = async (slug) => {
+export const queryProductCollectionBySlug = async (slug, { draft = false } = {}) => {
     try {
         const result = await sdk.find({
             collection: 'product-collections',
-            where: {
-                and: [
-                    { slug: { equals: slug } },
-                    { visible: { not_equals: false } },
-                ],
-            },
+            where: draft
+                ? { slug: { equals: slug } }
+                : {
+                    and: [
+                        { slug: { equals: slug } },
+                        { visible: { not_equals: false }, _status: { equals: "published" } },
+                    ],
+                },
             limit: 1,
-            draft: false,
+            draft,
+            ...(draft ? { sort: "-updatedAt" } : {}),
             locale: "en",
             depth: 1,
             select: {
@@ -696,7 +700,7 @@ export const queryProductsByCollectionIds = async (collections) => {
             collection: 'products',
             where: {
                 collections: { in: collections },
-                visible: { not_equals: false }
+                visible: { not_equals: false }, _status: { equals: "published" }
             },
             draft: false,
             locale: "en",
@@ -722,7 +726,7 @@ export const queryProductsByCollectionIdsForHome = async (collections) => {
             collection: 'products',
             where: {
                 collections: { in: collections },
-                visible: { not_equals: false }
+                visible: { not_equals: false }, _status: { equals: "published" }
             },
             draft: false,
             locale: "en",
@@ -793,7 +797,7 @@ export const queryProductsByCollectionIdsPaginatedSlim = async ({ collections = 
             select: PLP_LISTING_PRODUCT_SELECT,
         };
 
-        query.where = { visible: { not_equals: false } };
+        query.where = { visible: { not_equals: false }, _status: { equals: "published" } };
         if (collections.length > 0) {
             query.where.collections = { in: collections };
         }
@@ -818,7 +822,7 @@ export const queryProductsByIdsSlim = async (ids = []) => {
     try {
         const result = await sdk.find({
             collection: 'products',
-            where: { id: { in: ids }, visible: { not_equals: false } },
+            where: { id: { in: ids }, visible: { not_equals: false }, _status: { equals: "published" } },
             pagination: false,
             draft: false,
             locale: 'en',
@@ -844,7 +848,7 @@ export const queryProductsByCollectionIdsPaginated = async ({ collections = [], 
             depth: 1,
         };
 
-        query.where = { visible: { not_equals: false } };
+        query.where = { visible: { not_equals: false }, _status: { equals: "published" } };
         if (collections.length > 0) {
             query.where.collections = { in: collections };
         }
@@ -861,16 +865,23 @@ export const queryProductsByCollectionIdsPaginated = async ({ collections = [], 
     }
 }
 
-export const queryProductsBySlug = async (slug) => {
+export const queryProductsBySlug = async (slug, { draft = false } = {}) => {
     try {
+        // In preview, drop the published/visibility filters so the draft
+        // scheduled-version resolves. Sort newest-first so the in-progress
+        // variant (most recently edited) is preferred over the original when
+        // both share the slug.
         const result = await sdk.find({
             collection: 'products',
-            where: {
-                slug: { equals: slug },
-                visible: { not_equals: false }
-            },
+            where: draft
+                ? { slug: { equals: slug } }
+                : {
+                    slug: { equals: slug },
+                    visible: { not_equals: false }, _status: { equals: "published" }
+                },
             limit: 1,
-            draft: false,
+            draft,
+            ...(draft ? { sort: "-updatedAt" } : {}),
             locale: "en",
             depth: 2, // Increased to populate bundleItems.product
         });
@@ -888,7 +899,7 @@ export const queryProductById = async (id) => {
             collection: 'products',
             where: {
                 id: { equals: id },
-                visible: { not_equals: false }
+                visible: { not_equals: false }, _status: { equals: "published" }
             },
             limit: 1,
             draft: false,
@@ -908,7 +919,7 @@ export const queryProductsByIds = async (ids = []) => {
     try {
         const result = await sdk.find({
             collection: 'products',
-            where: { id: { in: ids }, visible: { not_equals: false } },
+            where: { id: { in: ids }, visible: { not_equals: false }, _status: { equals: "published" } },
             pagination: false,
             draft: false,
             locale: 'en',
@@ -925,7 +936,7 @@ export const queryAllProducts = async ({ depth = 1 } = {}) => {
     try {
         const result = await sdk.find({
             collection: 'products',
-            where: { visible: { not_equals: false } },
+            where: { visible: { not_equals: false }, _status: { equals: "published" } },
             pagination: false,
             draft: false,
             locale: 'en',
@@ -941,9 +952,15 @@ export const queryAllProducts = async ({ depth = 1 } = {}) => {
 export const queryProductsFromPayload = async ({ where = {}, limit = 100, skip = 0, depth = 1, sort, select } = {}) => {
     try {
         const page = skip > 0 ? Math.floor(skip / limit) + 1 : 1;
+        // Only surface the live (published) version of each product. With content
+        // variants enabled, unpublished scheduled-version siblings are drafts and
+        // must never leak onto the storefront.
+        const publishedWhere = Object.keys(where || {}).length
+            ? { and: [where, { _status: { equals: "published" } }] }
+            : { _status: { equals: "published" } };
         const result = await sdk.find({
             collection: 'products',
-            where,
+            where: publishedWhere,
             limit,
             page,
             draft: false,

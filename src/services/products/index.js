@@ -225,13 +225,13 @@ export const fetchProductPageDetails = cache(async () => {
     return fallback;
 });
 
-export const fetchProductPageData = async (slug) => {
+export const fetchProductPageData = async (slug, { draft = false } = {}) => {
     // Fetch the core product first. Only a genuine "no such slug" should 404;
     // transient SDK/network errors are re-thrown so Next renders an error page
     // (and won't be cached as a 404).
     let coreProductData;
     try {
-        coreProductData = await queryProductsBySlug(slug);
+        coreProductData = await queryProductsBySlug(slug, { draft });
     } catch (error) {
         logError(`Error fetching core product for slug "${slug}": ${error.message}`, error);
         throw error;

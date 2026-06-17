@@ -30,7 +30,7 @@ const normaliseCategorySlug = (slug) => {
     return String(slug).toLowerCase();
 };
 
-export const fetchSelectedCategoryData = cache(async (rawSlug) => {
+export const fetchSelectedCategoryData = cache(async (rawSlug, { draft = false } = {}) => {
     try {
         const slug = normaliseCategorySlug(rawSlug);
         const [ourCategoriesData, productBannersData, pageDetails, allCollections, selectedCategory] = await Promise.all([
@@ -38,7 +38,7 @@ export const fetchSelectedCategoryData = cache(async (rawSlug) => {
             fetchProductBannersData(),
             fetchsubCategoriesPageDetails(),
             queryProductCollections(),
-            queryProductCollectionBySlug(slug),
+            queryProductCollectionBySlug(slug, { draft }),
         ]);
 
         if (!selectedCategory) {
