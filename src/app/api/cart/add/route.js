@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { logError } from "@/utils";
 import handleAuthentication from "@/services/auth/handleAuthentication";
+import { isAuthError } from "@/services/auth/authErrors";
 import { addToCart } from "@/services/cart/payloadCart";
 
 export const POST = async (req) => {
@@ -31,6 +32,7 @@ export const POST = async (req) => {
     );
   } catch (error) {
     logError("Error adding to cart:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const status = isAuthError(error) ? 401 : 500;
+    return NextResponse.json({ error: error.message }, { status });
   }
 };

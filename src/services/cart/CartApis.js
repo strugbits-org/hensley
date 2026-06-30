@@ -1,6 +1,6 @@
 "use server";
 import { AddProductToCartVisitor, getProductsCartVisitor, removeProductFromCartVisitor, updateProductsQuantityCartVisitor, updateProductInCartVisitor } from "./CartApisVisitor";
-import { getAuthToken, getCartId } from "../auth";
+import { getAuthToken, getCartId, clearAuthSession } from "../auth";
 import { logError } from "@/utils";
 
 const baseUrl = process.env.BASE_URL;
@@ -27,6 +27,15 @@ export const getProductsCart = async (retries = 3, delay = 1000) => {
         body: JSON.stringify({}),
         cache: "no-store",
       });
+
+      // The stored token is no longer valid against the current backend (e.g.
+      // it was issued by a previous environment). Drop the dead session and
+      // serve the guest cart so the user isn't stuck.
+      if (response.status === 401) {
+        await clearAuthSession();
+        const cartId = await getCartId();
+        return await getProductsCartVisitor(cartId);
+      }
 
       const data = await response.json();
       if (!data.cart) throw new Error(data.error);
@@ -72,6 +81,12 @@ export const AddProductToCart = async (productData) => {
       body: JSON.stringify(payload),
     });
 
+    if (response.status === 401) {
+      await clearAuthSession();
+      const cartId = await getCartId();
+      return await AddProductToCartVisitor(cartId, productData);
+    }
+
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
     }
@@ -102,6 +117,12 @@ export const updateProductsQuantityCart = async (lineItems) => {
       },
       body: JSON.stringify(payload),
     });
+
+    if (response.status === 401) {
+      await clearAuthSession();
+      const cartId = await getCartId();
+      return await updateProductsQuantityCartVisitor(cartId, lineItems);
+    }
 
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
@@ -134,6 +155,12 @@ export const removeProductFromCart = async (lineItemIds) => {
       body: JSON.stringify(payload),
     });
 
+    if (response.status === 401) {
+      await clearAuthSession();
+      const cartId = await getCartId();
+      return await removeProductFromCartVisitor(cartId, lineItemIds);
+    }
+
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);
     }
@@ -164,6 +191,12 @@ export const updateProductInCart = async (id, productData) => {
       },
       body: JSON.stringify(payload),
     });
+
+    if (response.status === 401) {
+      await clearAuthSession();
+      const cartId = await getCartId();
+      return await updateProductInCartVisitor(cartId, id, productData);
+    }
 
     if (!response.ok) {
       throw new Error(`API request failed with status ${response.status}`);

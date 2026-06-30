@@ -12,6 +12,22 @@ export const getAuthToken = async () => {
   return authToken?.value || "";
 };
 
+const AUTH_COOKIES = ["authToken", "userData", "userTokens", "cartQuantity"];
+
+// Clears a dead auth session (e.g. a token issued by a previous backend that the
+// current backend rejects). Unlike handleUnauthorizedServer it does NOT redirect,
+// so callers can silently fall back to the guest flow instead of interrupting the
+// user. Only call this for a confirmed auth failure (401), never on transient
+// Core errors, otherwise we'd reintroduce the production reload-logout bug.
+export const clearAuthSession = async () => {
+  const cookieStore = cookies();
+  AUTH_COOKIES.forEach((name) => {
+    try {
+      cookieStore.delete(name);
+    } catch {}
+  });
+};
+
 export const getMemberTokens = async () => {
   const cookieStore = cookies();
   const tokens = cookieStore?.get("userTokens");
