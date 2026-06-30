@@ -244,6 +244,12 @@ export const Header = ({ data = {}, marketsData = [], tentsData = [] }) => {
         item?.type === "lightbox" ||
         (item?.useSlugForMobile && isMobile))
     ) {
+      // A direct-link sub-menu item navigates client-side, so the Header (and
+      // thus any open modal) persists. Close the currently open modal so the
+      // user isn't left on the new page with a stale modal still showing.
+      if (!shouldOpenNestedMenu) {
+        setSelectedMenu(false);
+      }
       runMenuAction(item, isMobile);
     }
   };
