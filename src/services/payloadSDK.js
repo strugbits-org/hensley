@@ -1,4 +1,5 @@
 import { PayloadSDK } from "@payloadcms/sdk";
+import { coreFetch } from "@/services/coreHttp";
 
 export const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL || "";
 export const CORE_API_KEY = process.env.CORE_API_KEY || "";
@@ -20,6 +21,7 @@ export const getSDK = (token = null) => {
   const authorization = token ? `Bearer ${token}` : `Bearer ${CORE_API_KEY}`;
   return new PayloadSDK({
     baseURL: `${CORE_API_BASE_URL}/api`,
+    fetch: coreFetch,
     baseInit: { headers: { Authorization: authorization } },
   });
 };

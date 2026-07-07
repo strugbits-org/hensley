@@ -209,6 +209,30 @@ export const fetchMatchedProductsForProduct = async ({ payloadProduct = null } =
 };
 
 
+// Field set generateMetadata reads off the product doc. Halves the per-render
+// bps-core load on /product/[slug] because Next.js runs generateMetadata and
+// the page component in separate contexts that do not share React cache() —
+// without this slim variant, the full depth:2 product doc was fetched twice
+// per page render (once for metadata, once for the body).
+const PRODUCT_METADATA_SELECT = {
+    title: true,
+    description: true,
+};
+
+export const fetchProductMetadataBySlug = async (slug) => {
+    try {
+        const doc = await queryProductsBySlug(slug, {
+            depth: 0,
+            select: PRODUCT_METADATA_SELECT,
+        });
+        if (!doc) return null;
+        return doc;
+    } catch (error) {
+        logError(`Error fetching product metadata for slug "${slug}": ${error.message}`, error);
+        return null;
+    }
+};
+
 export const fetchProductPageDetails = cache(async () => {
     const fallback = {
         matchItWithTitle: "MATCH IT WITH",
