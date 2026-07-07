@@ -1,5 +1,7 @@
+import { PHASE_PRODUCTION_BUILD } from "next/constants.js";
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = (phase) => ({
     reactStrictMode: false,
     logging: {
         fetches: {
@@ -14,12 +16,9 @@ const nextConfig = {
         CORE_API_BASE_URL: process.env.CORE_API_BASE_URL,
         CORE_TENANT_ID: process.env.CORE_TENANT_ID,
         CORE_MEMBER_COLLECTION: process.env.CORE_MEMBER_COLLECTION,
+        ...(phase === PHASE_PRODUCTION_BUILD ? { CORE_BUILD: "1" } : {}),
     },
     images: {
-        // WebP only — AVIF cuts ~20% more bytes but encoding it with sharp is
-        // 3–5x slower per image on first request. Vercel/CDN cache after that,
-        // but a fresh page that triggers a few dozen first-time optimizations
-        // visibly stalls without this.
         formats: ['image/webp'],
         minimumCacheTTL: 60 * 60 * 24 * 30,
         deviceSizes: [360, 480, 640, 768, 1024, 1280, 1536, 1920, 2560, 3840],
@@ -50,6 +49,8 @@ const nextConfig = {
         serverActions: {
             bodySizeLimit: '10mb',
         },
+        // Fewer SSG workers → fewer copies of the in-process Core throttle.
+        cpus: Number(process.env.NEXT_BUILD_CPUS || 2),
     },
     async redirects() {
         return [
@@ -60,6 +61,6 @@ const nextConfig = {
             },
         ];
     },
-};
+});
 
 export default nextConfig;
