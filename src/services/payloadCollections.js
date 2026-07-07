@@ -865,8 +865,10 @@ export const queryProductsByCollectionIdsPaginated = async ({ collections = [], 
     }
 }
 
-export const queryProductsBySlug = async (slug, { draft = false } = {}) => {
+export const queryProductsBySlug = async (slug, { draft = false, depth = 2, select } = {}) => {
     try {
+        // Default depth 2 populates bundleItems.product for PDP / fetchProductPageData.
+        // Metadata uses fetchProductMetadataBySlug (depth 0, slim select) instead.
         // In preview, drop the published/visibility filters so the draft
         // scheduled-version resolves. Sort newest-first so the in-progress
         // variant (most recently edited) is preferred over the original when
@@ -883,7 +885,8 @@ export const queryProductsBySlug = async (slug, { draft = false } = {}) => {
             draft,
             ...(draft ? { sort: "-updatedAt" } : {}),
             locale: "en",
-            depth: 2, // Increased to populate bundleItems.product
+            depth,
+            ...(select ? { select } : {}),
         });
 
         return result.docs?.[0] || null;
