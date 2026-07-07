@@ -1,36 +1,16 @@
 import { PayloadSDK } from "@payloadcms/sdk";
 import { cache } from "react";
-import { logError, sleep, sortByOrderNumber, normalizeProductForDisplay, resolveCoreMediaUrl } from "@/utils";
+import { logError, sortByOrderNumber, normalizeProductForDisplay, resolveCoreMediaUrl } from "@/utils";
+import { coreFetch } from "@/services/coreHttp";
 
 const CORE_API_BASE_URL = process.env.CORE_API_BASE_URL;
 const CORE_API_KEY = process.env.CORE_API_KEY;
 export const CORE_TENANT_ID = process.env.CORE_TENANT_ID || "";
 
-const retryFetch = async (url, init) => {
-    const maxAttempts = 4;
-    const baseDelayMs = 500;
-    let lastError;
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        try {
-            const response = await fetch(url, init);
-            if (response.status >= 500 && response.status < 600 && attempt < maxAttempts) {
-                await sleep(baseDelayMs * 2 ** (attempt - 1));
-                continue;
-            }
-            return response;
-        } catch (error) {
-            lastError = error;
-            if (attempt >= maxAttempts) break;
-            await sleep(baseDelayMs * 2 ** (attempt - 1));
-        }
-    }
-    throw lastError;
-};
-
 // Initialize Payload SDK with auth header
 export const sdk = new PayloadSDK({
     baseURL: CORE_API_BASE_URL + "/api",
-    fetch: retryFetch,
+    fetch: coreFetch,
     baseInit: {
         headers: {
             'Authorization': `Bearer ${CORE_API_KEY}`,
@@ -552,7 +532,7 @@ export const queryStorefrontFooter = async ({ channel = "her", key = "default" }
         }
 
         const query = new URLSearchParams({ channel, key });
-        const response = await fetch(buildCoreApiUrl(`/api/footers/storefront?${query.toString()}`), {
+        const response = await coreFetch(buildCoreApiUrl(`/api/footers/storefront?${query.toString()}`), {
             headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {},
         });
 
