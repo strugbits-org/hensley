@@ -2,9 +2,8 @@ import { Product } from "@/components/Product";
 import { FeaturedProjects } from "@/components/Product/FeaturedProjects";
 import { MatchProducts } from "@/components/Product/MatchProducts";
 import { fetchPageMetaData, buildPageMetadata } from "@/services";
-import { fetchProductPageData, fetchProductPaths } from "@/services/products";
-import { queryProductsBySlug } from "@/services/payloadCollections";
-import { logError, normalizeProductForDisplay, richTextToPlainText } from "@/utils";
+import { fetchProductMetadataBySlug, fetchProductPageData, fetchProductPaths } from "@/services/products";
+import { logError, richTextToPlainText } from "@/utils";
 import { notFound } from "next/navigation";
 
 export async function generateMetadata({ params }) {
@@ -16,12 +15,14 @@ export async function generateMetadata({ params }) {
       product
     ] = await Promise.all([
       fetchPageMetaData("product"),
-      queryProductsBySlug(slug)
+      fetchProductMetadataBySlug(slug)
     ]);
 
+    if (!product) return {};
+
     const { title } = metaData;
-    const normalizedProduct = normalizeProductForDisplay(product || {});
-    const fullTitle = `${normalizedProduct.name} ${title}`;
+    const productName = product?.title || product?.name || slug;
+    const fullTitle = `${productName} ${title}`;
     return buildPageMetadata(metaData, {
       title: fullTitle,
       description: richTextToPlainText(product?.description).slice(0, 160) || undefined,
