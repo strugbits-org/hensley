@@ -6,7 +6,6 @@ import { lightboxActions } from "@/store/lightboxStore";
 
 export default function LoaderProvider({ children }) {
   const pathname = usePathname();
-
   const dynamicPages = ["/cart", "/saved-products", "/quotes-history", "/account", "/search-results"];
 
   useEffect(() => {

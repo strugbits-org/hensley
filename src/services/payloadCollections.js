@@ -548,12 +548,6 @@ export const queryStorefrontFooter = async ({ channel = "her", key = "default" }
     }
 };
 
-// Ranked storefront search. Delegates to the bps-core /api/storefront-search
-// endpoint, which runs a single weighted Postgres full-text query (ts_rank +
-// pg_trgm fuzzy fallback) scoped to the Hensley channel. Replaces the previous
-// multi-query ILIKE fan-out. Returns grouped, channel-scoped hits per bucket:
-//   { products, tents, blogs, projects, markets }
-// where each hit is { id, bucket, rank, title, slug, docId, doc }.
 const EMPTY_SEARCH_RESULTS = { products: [], tents: [], blogs: [], projects: [], markets: [] };
 
 export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 } = {}) => {
@@ -568,6 +562,10 @@ export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 }
             throw new Error("CORE_TENANT_ID is not configured");
         }
 
+        if (!CORE_API_KEY) {
+            throw new Error("CORE_API_KEY is not configured");
+        }
+
         const query = new URLSearchParams({
             q: term,
             channelId: CORE_TENANT_ID,
@@ -577,7 +575,7 @@ export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 }
         if (buckets && buckets.length) query.set("buckets", buckets.join(","));
 
         const response = await coreFetch(buildCoreApiUrl(`/api/storefront-search?${query.toString()}`), {
-            headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {},
+            headers: { Authorization: `Bearer ${CORE_API_KEY}` },
         });
 
         if (!response.ok) {

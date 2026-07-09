@@ -5,7 +5,7 @@ import RelatedProducts from './RelatedProducts'
 import TentTypes from './TentTypes'
 import RelatedProjects from './RelatedProjects'
 import { useSearchParams } from 'next/navigation'
-import { searchMarkets, searchOtherData, searchProducts } from '@/services/search'
+import { searchAll } from '@/services/search'
 import { loaderActions } from '@/store/loaderStore';
 import { HensleyNewsSearch } from '../common/HensleyNewsSearch';
 import Loading from '@/components/common/Loading';
@@ -28,6 +28,8 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
     useEffect(() => {
         let cancelled = false;
 
+        loaderActions.hide();
+
         if (!searchTerm) {
             setMarketsData([]);
             setProductsData([]);
@@ -35,7 +37,6 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
             setProjectsData([]);
             setTentsData([]);
             setLoading(false);
-            loaderActions.hide();
             return;
         }
 
@@ -43,13 +44,11 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
 
         const run = async () => {
             try {
-                const [markets, products, otherData] = await Promise.all([
-                    searchMarkets(searchTerm),
-                    searchProducts({ term: searchTerm, pageLimit: pageSize }),
-                    searchOtherData(searchTerm),
-                ]);
+                const { markets, products, tents, projects, blogs } = await searchAll(searchTerm, {
+                    productLimit: pageSize,
+                    otherLimit: 50,
+                });
                 if (cancelled) return;
-                const { tents, projects, blogs } = otherData;
                 setMarketsData(markets);
                 setProductsData(products);
                 setBlogsData(blogs);
@@ -67,8 +66,9 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
 
         return () => {
             cancelled = true;
+            loaderActions.hide();
         };
-    }, [searchParams]);
+    }, [searchTerm]);
 
     const hasResults = productsData.length || marketsData.length || blogsData.length || projectsData.length || tentsData.length;
     const emptyMessage = !searchTerm

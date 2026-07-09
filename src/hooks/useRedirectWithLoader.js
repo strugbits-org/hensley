@@ -1,6 +1,22 @@
 import { loaderActions } from '@/store/loaderStore';
 import { useRouter, usePathname } from 'next/navigation';
 
+const normalizePath = (path) => {
+  if (!path || typeof path !== 'string') return '';
+  try {
+    const url = new URL(path, 'http://local');
+    const params = new URLSearchParams(url.search);
+    const sorted = [...params.entries()]
+      .map(([k, v]) => [k, v.trim()])
+      .sort(([a], [b]) => a.localeCompare(b));
+    const qs = new URLSearchParams(sorted).toString();
+    const pathname = url.pathname.replace(/\/$/, '') || '/';
+    return qs ? `${pathname}?${qs}` : pathname;
+  } catch {
+    return path;
+  }
+};
+
 const useRedirectWithLoader = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -12,14 +28,9 @@ const useRedirectWithLoader = () => {
 
     if (!slug) return;
 
-    // Compare full path (incl. query) against the current location so
-    // repeat-navigations to the exact same URL don't trip the global
-    // loader. Next's router.push is a no-op when the URL is identical,
-    // which would otherwise leave the loader showing forever.
-    const currentFullPath = typeof window !== 'undefined'
-      ? `${pathname}${window.location.search}`
-      : pathname;
-    if (currentFullPath === slug) return;
+    const currentFullPath =
+      typeof window !== 'undefined' ? `${pathname}${window.location.search}` : pathname;
+    if (normalizePath(currentFullPath) === normalizePath(slug)) return;
 
     loaderActions.show();
     router.push(slug);

@@ -27,18 +27,19 @@ export const SearchModal = ({ closeModal, isActive, onSearch = () => { } }) => {
 
     const handleSearch = (e) => {
         e?.preventDefault();
-        redirectWithLoader(`/search-results?query=${searchTerm}`, true);
+        const term = searchTerm.trim();
+        if (!term) return;
+        redirectWithLoader(`/search-results?query=${encodeURIComponent(term)}`);
         closeModal();
         onSearch();
     };
 
+    const queryFromUrl = params.get('query') || '';
     useEffect(() => {
         if (pathname === '/search-results') {
-            const term = params.get('query') || '';
-            setSearchTerm(term);
-        };
-    }, [])
-
+            setSearchTerm(queryFromUrl);
+        }
+    }, [pathname, queryFromUrl]);
 
     if (!isActive && pathname !== '/search-results') return null;
 
