@@ -4,10 +4,15 @@ import { CustomLink } from '../common/CustomLink'
 import { resolveCoreMediaUrl } from '@/utils'
 
 
+const marketPath = (slug) => {
+  const clean = typeof slug === "string" ? slug.replace(/^\/+/, "") : "";
+  return clean ? `/market/${clean}` : "/market";
+};
+
 const MarketCard = ({ data }) => {
   const imageURL = resolveCoreMediaUrl(data.image1, "card");
   return (
-    <CustomLink to={`/market/${data.slug}`} className='sm:block hidden p-[24px] border border-primary-border'>
+    <CustomLink to={marketPath(data.slug)} className='sm:block hidden p-[24px] border border-primary-border'>
       <div className='w-full h-full flex lg:items-end lg:justify-start justify-center bg-no-repeat bg-center px-[24px] py-[24px]' style={{ backgroundImage: `url(${imageURL})`, backgroundSize: 'cover' }}>
 
         <div className='lg:flex hidden  justify-center items-center gap-x-[24px]'>
@@ -58,7 +63,7 @@ const OurMarkets = ({ data, pageTitle }) => {
               {data.map((item, index) => {
                 const isLastOdd = data.length % 2 !== 0 && index === data.length - 1;
                 return (
-                  <CustomLink to={`/market/${item.slug}`}
+                  <CustomLink to={marketPath(item.slug)}
                     key={item._id}
                     className={`flex items-center justify-center h-[60px] border border-black font-haasRegular text-[14px] uppercase ${isLastOdd ? 'col-span-2 mx-auto w-1/2' : 'col-span-1'}`}
                   >

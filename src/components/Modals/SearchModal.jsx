@@ -27,18 +27,21 @@ export const SearchModal = ({ closeModal, isActive, onSearch = () => { } }) => {
 
     const handleSearch = (e) => {
         e?.preventDefault();
-        redirectWithLoader(`/search-results?query=${searchTerm}`, true);
+        const term = searchTerm.trim();
+        if (!term) return;
+        redirectWithLoader(`/search-results?query=${encodeURIComponent(term)}`);
         closeModal();
         onSearch();
     };
 
+    // Keep the input in sync with the URL on the search page (empty deps
+    // previously left a stale term after navigating between queries).
+    const queryFromUrl = params.get('query') || '';
     useEffect(() => {
         if (pathname === '/search-results') {
-            const term = params.get('query') || '';
-            setSearchTerm(term);
-        };
-    }, [])
-
+            setSearchTerm(queryFromUrl);
+        }
+    }, [pathname, queryFromUrl]);
 
     if (!isActive && pathname !== '/search-results') return null;
 
