@@ -26,7 +26,13 @@ export default async function Page() {
     return (
       <>
         <div className='h-[130px] hidden lg:block'></div>
-        <Suspense>
+        <Suspense
+          fallback={
+            <div className='h-screen flex justify-center items-center bg-primary-alt'>
+              <div className='loader-secondary' />
+            </div>
+          }
+        >
           <SearchResult pageDetails={searchPageDetails} allCollections={allCollections} />
         </Suspense>
       </>
