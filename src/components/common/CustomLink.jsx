@@ -1,11 +1,26 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { loaderActions } from '@/store/loaderStore';
 import { scrollToTop } from "@/utils";
 
+const normalizePath = (path) => {
+  if (!path || typeof path !== 'string') return '';
+  try {
+    const url = new URL(path, 'http://local');
+    const params = new URLSearchParams(url.search);
+    const sorted = [...params.entries()]
+      .map(([k, v]) => [k, v.trim()])
+      .sort(([a], [b]) => a.localeCompare(b));
+    const qs = new URLSearchParams(sorted).toString();
+    const pathname = url.pathname.replace(/\/$/, '') || '/';
+    return qs ? `${pathname}?${qs}` : pathname;
+  } catch {
+    return path;
+  }
+};
+
 export const CustomLink = ({ to, children, className, target, attributes, onClick, prefetch }) => {
-  const router = useRouter();
   const pathname = usePathname();
 
   const handleClick = (e) => {
@@ -22,8 +37,12 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
       return;
     }
 
-    // Same-path click: scroll to top, no loader theatre, no navigation.
-    if (pathname === to) {
+    // Same destination (path + query): scroll only — showing the loader here
+    // would stick forever because Next won't navigate and LoaderProvider
+    // never clears /search-results.
+    const currentFullPath =
+      typeof window !== 'undefined' ? `${pathname}${window.location.search}` : pathname;
+    if (normalizePath(currentFullPath) === normalizePath(to) || pathname === to) {
       e.preventDefault();
       scrollToTop();
       return;
@@ -35,7 +54,8 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
     }
 
     // Internal navigation: show the loader and let Next's <Link> push
-    // immediately. The loader hides on route change via LoaderProvider.
+    // immediately. The loader hides on route change via LoaderProvider
+    // (or the destination page for dynamic routes like /search-results).
     loaderActions.show();
   };
 
