@@ -28,8 +28,6 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
     useEffect(() => {
         let cancelled = false;
 
-        loaderActions.hide();
-
         if (!searchTerm) {
             setMarketsData([]);
             setProductsData([]);
@@ -37,6 +35,7 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
             setProjectsData([]);
             setTentsData([]);
             setLoading(false);
+            loaderActions.hide();
             return;
         }
 
@@ -66,7 +65,6 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
 
         return () => {
             cancelled = true;
-            loaderActions.hide();
         };
     }, [searchTerm]);
 
@@ -75,25 +73,31 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
         ? 'Enter a search term'
         : `No results found for "${searchTerm}"`;
 
+    if (loading) {
+        return (
+            <div className='h-screen flex justify-center items-center bg-primary-alt'>
+                <Loading custom type='secondary' />
+            </div>
+        );
+    }
+
+    if (!hasResults) {
+        return (
+            <div className='h-screen flex justify-center items-center bg-primary-alt'>
+                <span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>
+                    {emptyMessage}
+                </span>
+            </div>
+        );
+    }
+
     return (
         <>
-            {loading && (
-                <div className='h-screen flex justify-center items-center'>
-                    <Loading custom type='secondary' />
-                </div>
-            )}
-            {!loading && !hasResults && (
-                <div className='h-screen flex justify-center items-center'>
-                    <span className='text-center mt-[50px] text-secondary-alt uppercase tracking-widest text-[32px] font-haasRegular'>
-                        {emptyMessage}
-                    </span>
-                </div>
-            )}
-            {!loading && marketsData.length > 0 && <OurMarkets pageTitle={ourMarketsTitle} data={marketsData} />}
-            {!loading && productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} allCollections={allCollections} />}
-            {!loading && tentsData.length > 0 && <TentTypes pageTitle={tentsTypeTitle} data={tentsData} />}
-            {!loading && blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: relatedPostTitle }} />}
-            {!loading && projectsData.length > 0 && <RelatedProjects pageTitle={relatedProjectTitle} data={projectsData} />}
+            {marketsData.length > 0 && <OurMarkets pageTitle={ourMarketsTitle} data={marketsData} />}
+            {productsData.length > 0 && <RelatedProducts pageTitle={relatedProductTitle} data={productsData} term={searchTerm} pageSize={pageSize} allCollections={allCollections} />}
+            {tentsData.length > 0 && <TentTypes pageTitle={tentsTypeTitle} data={tentsData} />}
+            {blogsData.length > 0 && <HensleyNewsSearch data={blogsData} pageDetails={{ hensleyNewsTitle: relatedPostTitle }} />}
+            {projectsData.length > 0 && <RelatedProjects pageTitle={relatedProjectTitle} data={projectsData} />}
         </>
     )
 }
