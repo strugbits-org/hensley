@@ -47,10 +47,6 @@ export default async function Page({ params }) {
   const slug = decodeURIComponent(params.slug);
   const data = await fetchSelectedMarketData(slug);
 
-  // No market matches this slug — render the 404 page instead of passing
-  // undefined data into MarketPage (which crashed client-side). Transient
-  // fetch errors re-throw from the service and surface as a retryable error
-  // page, never a cached 404.
   if (!data) {
     notFound();
   }

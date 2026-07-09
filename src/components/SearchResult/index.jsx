@@ -28,9 +28,6 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
     useEffect(() => {
         let cancelled = false;
 
-        // Navigation loader is shown by redirectWithLoader / CustomLink, but
-        // LoaderProvider never auto-hides on /search-results. Clear it here and
-        // rely on the page-local spinner so re-searches can't stick forever.
         loaderActions.hide();
 
         if (!searchTerm) {

@@ -13,11 +13,6 @@ const resolveRelationshipId = (value) => {
   return null;
 };
 
-/**
- * Must NOT live in a "use server" module. Exported sync helpers there become
- * async server-action stubs — callers that map() without await get Promises
- * instead of market objects, slug matching fails, and /market/[slug] 404s.
- */
 export const normalizeCoreMarketItem = (item = {}) => {
   const slug = normalizeMarketSlug(item.slug || item.path || item.url);
   const heroImage = resolveCoreMediaUrl(item.heroBackground || item.featuredImage, "tablet");
