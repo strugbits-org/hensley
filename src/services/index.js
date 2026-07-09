@@ -102,7 +102,7 @@ const getCollectionWithChildrenIds = (collection) => {
   return [...new Set(ids.filter(Boolean))];
 };
 
-const normalizeCoreMarketItem = (item = {}) => {
+export const normalizeCoreMarketItem = (item = {}) => {
   const slug = normalizeMarketSlug(item.slug || item.path || item.url);
   const heroImage = resolveCoreMediaUrl(item.heroBackground || item.featuredImage, "tablet");
   const cardImage = resolveCoreMediaUrl(item.featuredImage || item.heroBackground, "card");
