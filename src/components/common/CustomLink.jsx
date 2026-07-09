@@ -30,16 +30,12 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
 
     if (onClick) onClick();
 
-    // Empty target: just scroll. Don't navigate.
     if (to === undefined || !to || to === "") {
       e.preventDefault();
       scrollToTop();
       return;
     }
 
-    // Same destination (path + query): scroll only — showing the loader here
-    // would stick forever because Next won't navigate and LoaderProvider
-    // never clears /search-results.
     const currentFullPath =
       typeof window !== 'undefined' ? `${pathname}${window.location.search}` : pathname;
     if (normalizePath(currentFullPath) === normalizePath(to) || pathname === to) {
@@ -48,14 +44,10 @@ export const CustomLink = ({ to, children, className, target, attributes, onClic
       return;
     }
 
-    // External / new-tab: let the browser handle it.
     if (target) {
       return;
     }
 
-    // Internal navigation: show the loader and let Next's <Link> push
-    // immediately. The loader hides on route change via LoaderProvider
-    // (or the destination page for dynamic routes like /search-results).
     loaderActions.show();
   };
 

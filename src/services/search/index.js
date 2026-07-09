@@ -10,10 +10,6 @@ import {
 import { normalizeCoreMarketItem } from "../normalizeCoreMarket";
 import { cache } from "react";
 
-// Search runs in bps-core via /api/storefront-search (API-key gated, channel-
-// scoped). The search page uses one multi-bucket call; product load-more still
-// hits the products bucket alone.
-
 const idOf = (doc) => doc?.id || doc?._id || "";
 
 const mapTentHit = (p) => ({
@@ -59,7 +55,6 @@ const mapMarketHits = (hits) =>
             };
         });
 
-/** One Core round-trip for the full search-results page. */
 export const searchAll = async (query, { productLimit = 24, otherLimit = 50 } = {}) => {
     const empty = { markets: [], products: [], tents: [], projects: [], blogs: [] };
     try {
@@ -134,7 +129,6 @@ export const searchProjects = async (query) => {
     }
 };
 
-// Products bucket only (tents are their own bucket). Used by RelatedProducts load-more.
 export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipProducts = [] }) => {
     try {
         const page = skip > 0 ? Math.floor(skip / pageLimit) + 1 : 1;

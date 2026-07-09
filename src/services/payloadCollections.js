@@ -548,12 +548,6 @@ export const queryStorefrontFooter = async ({ channel = "her", key = "default" }
     }
 };
 
-// Ranked storefront search. Delegates to the bps-core /api/storefront-search
-// endpoint (API-key required), which runs a weighted Postgres full-text query
-// (ts_rank + pg_trgm fuzzy fallback) scoped to the Hensley channel. `limit` /
-// `page` apply per bucket, so one multi-bucket call can fill every section.
-// Returns grouped hits: { products, tents, blogs, projects, markets }
-// where each hit is { id, bucket, rank, title, slug, docId, doc }.
 const EMPTY_SEARCH_RESULTS = { products: [], tents: [], blogs: [], projects: [], markets: [] };
 
 export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 } = {}) => {

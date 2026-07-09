@@ -34,8 +34,6 @@ export const SearchModal = ({ closeModal, isActive, onSearch = () => { } }) => {
         onSearch();
     };
 
-    // Keep the input in sync with the URL on the search page (empty deps
-    // previously left a stale term after navigating between queries).
     const queryFromUrl = params.get('query') || '';
     useEffect(() => {
         if (pathname === '/search-results') {
