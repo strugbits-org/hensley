@@ -29,8 +29,13 @@ export const generateMetadata = async ({ params }) => {
 export const generateStaticParams = async () => {
   try {
     const blogData = await fetchBlogs();
-    const paths = blogData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
-    return paths;
+    return (blogData || [])
+      .map((data) => {
+        const raw = typeof data?.slug === "string" ? data.slug.trim() : "";
+        const slug = raw.replace(/^\//, "");
+        return slug ? { slug } : null;
+      })
+      .filter(Boolean);
   } catch (error) {
     logError("Error generating static params(blog page):", error);
     return [];

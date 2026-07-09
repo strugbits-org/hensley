@@ -30,8 +30,13 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const marketsData = await fetchMarketsData();
-    const paths = marketsData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
-    return paths;
+    return (marketsData || [])
+      .map((data) => {
+        const raw = typeof data?.slug === "string" ? data.slug.trim() : "";
+        const slug = raw.replace(/^\//, "");
+        return slug ? { slug } : null;
+      })
+      .filter(Boolean);
   } catch (error) {
     logError("Error generating static params(market page):", error);
     return [];

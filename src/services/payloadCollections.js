@@ -548,6 +548,55 @@ export const queryStorefrontFooter = async ({ channel = "her", key = "default" }
     }
 };
 
+// Ranked storefront search. Delegates to the bps-core /api/storefront-search
+// endpoint, which runs a single weighted Postgres full-text query (ts_rank +
+// pg_trgm fuzzy fallback) scoped to the Hensley channel. Replaces the previous
+// multi-query ILIKE fan-out. Returns grouped, channel-scoped hits per bucket:
+//   { products, tents, blogs, projects, markets }
+// where each hit is { id, bucket, rank, title, slug, docId, doc }.
+const EMPTY_SEARCH_RESULTS = { products: [], tents: [], blogs: [], projects: [], markets: [] };
+
+export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 } = {}) => {
+    const term = (q || "").trim();
+    if (!term) return { results: { ...EMPTY_SEARCH_RESULTS }, count: 0, page, limit };
+
+    try {
+        if (!CORE_API_BASE_URL) {
+            throw new Error("CORE_API_BASE_URL is not configured");
+        }
+        if (!CORE_TENANT_ID) {
+            throw new Error("CORE_TENANT_ID is not configured");
+        }
+
+        const query = new URLSearchParams({
+            q: term,
+            channelId: CORE_TENANT_ID,
+            limit: String(limit),
+            page: String(page),
+        });
+        if (buckets && buckets.length) query.set("buckets", buckets.join(","));
+
+        const response = await coreFetch(buildCoreApiUrl(`/api/storefront-search?${query.toString()}`), {
+            headers: CORE_API_KEY ? { Authorization: `Bearer ${CORE_API_KEY}` } : {},
+        });
+
+        if (!response.ok) {
+            throw new Error(`Search request failed with status ${response.status}`);
+        }
+
+        const result = await response.json();
+        return {
+            results: { ...EMPTY_SEARCH_RESULTS, ...(result?.results || {}) },
+            count: result?.count || 0,
+            page: result?.page || page,
+            limit: result?.limit || limit,
+        };
+    } catch (error) {
+        logError('Error querying storefront search:', error);
+        return { results: { ...EMPTY_SEARCH_RESULTS }, count: 0, page, limit };
+    }
+};
+
 // Slim query used everywhere subcategories/featured/slug are needed but images
 // are not (DAG walks, path generation, lookups). depth: 0 keeps relationship
 // fields as ID strings — perfect for traversal, ~200KB total, well under the

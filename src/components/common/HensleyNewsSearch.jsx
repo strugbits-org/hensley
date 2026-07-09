@@ -9,15 +9,19 @@ import { CustomLink } from './CustomLink';
 
 export const HensleyNewsSearch = ({ data, pageDetails, loop = true, origin = "center" , pageTitle=""}) => {
     const { hensleyNewsTitle } = pageDetails;
+    const count = data?.length ?? 0;
+    // When there aren't enough slides to fill the row, pin to the left
+    // instead of centering (avoids a large empty gap on the left).
+    const originFor = (perView) => (count > 0 && count < perView ? "auto" : origin);
 
     const sliderInstance = useRef();
 
     const [sliderRef] = useKeenSlider(
         {
-            loop: loop && data?.length > 4,
+            loop: loop && count > 4,
             mode: "free-snap",
             slides: {
-                origin: origin,
+                origin: originFor(4),
                 perView: 4,
                 spacing: 4,
             },
@@ -26,13 +30,13 @@ export const HensleyNewsSearch = ({ data, pageDetails, loop = true, origin = "ce
             },
             breakpoints: {
                 "(max-width: 768px)": {
-                    slides: { perView: 1.2, spacing: 5, origin: "center" },
+                    slides: { perView: 1.2, spacing: 5, origin: originFor(1.2) },
                 },
                 "(min-width: 768px) and (max-width: 1024px)": {
-                    slides: { perView: 2, spacing: 4, origin: "center" },
+                    slides: { perView: 2, spacing: 4, origin: originFor(2) },
                 },
                 "(min-width: 1025px) and (max-width: 1280px)": {
-                    slides: { perView: 3.5, spacing: 4, origin: "center" },
+                    slides: { perView: 3.5, spacing: 4, origin: originFor(3.5) },
                 },
             },
         },

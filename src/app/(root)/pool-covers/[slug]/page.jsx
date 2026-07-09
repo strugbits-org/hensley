@@ -9,8 +9,13 @@ import { notFound } from "next/navigation";
 export const generateStaticParams = async () => {
   try {
     const poolCovers = await fetchPoolCovers();
-    const paths = poolCovers.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
-    return paths;
+    return (poolCovers || [])
+      .map((data) => {
+        const raw = typeof data?.slug === "string" ? data.slug.trim() : "";
+        const slug = raw.replace(/^\//, "");
+        return slug ? { slug } : null;
+      })
+      .filter(Boolean);
   } catch (error) {
     logError("Error generating static params(pool cover page):", error);
     return [];
