@@ -1,87 +1,60 @@
 "use server";
 import { logError } from "@/utils";
 import {
-    queryBlogs,
-    queryProjects,
-    normalizePayloadBlog,
-    normalizePayloadProject,
-    queryProductsFromPayload,
+    normalizePayloadBlogForListing,
+    normalizePayloadProjectForListing,
     querySection,
     sectionToObject,
+    queryStorefrontSearch,
 } from "../payloadCollections";
-import { fetchMarketsData } from "..";
+import { normalizeCoreMarketItem } from "..";
 import { cache } from "react";
 
-// Split a user query into non-empty lowercased tokens. Used to AND across
-// words ("wedding tent" → must match both "wedding" AND "tent" anywhere in
-// the searched fields). Payload's `like` operator on a multi-word string
-// matches the literal phrase only, so without tokenizing "wedding tent" misses
-// any product titled "tent for weddings".
-const tokenize = (query) => (query || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+// Search now runs entirely in bps-core: a single ranked Postgres full-text
+// query (ts_rank + pg_trgm fuzzy fallback) per bucket via the
+// /api/storefront-search endpoint, scoped to the Hensley channel. These
+// wrappers keep the previous return shapes so the sectioned UI is unchanged;
+// each maps the endpoint's populated `doc` through the existing normalizers.
 
-// Build a Payload `where` clause that requires every token to match at least
-// one of `fields` (case-insensitive). Resulting shape:
-//   { and: [ { or: [{ f1: { like: tok1 } }, { f2: { like: tok1 } }] }, ... ] }
-// Payload's `like` on Postgres is case-insensitive (ILIKE under the hood) and
-// on Mongo uses a regex with the `i` flag — so `like` is the portable choice.
-const buildTokenWhere = (tokens, fields) => ({
-    and: tokens.map((tok) => ({
-        or: fields.map((f) => ({ [f]: { like: tok } })),
-    })),
-});
+const idOf = (doc) => doc?.id || doc?._id || "";
 
 export const searchMarkets = async (query) => {
     try {
-        const markets = await fetchMarketsData();
-        const tokens = tokenize(query);
-        if (!tokens.length) return [];
-        return markets
-            .filter((m) => {
-                const haystack = [m.title, m.tagline, m.description]
-                    .filter(Boolean)
-                    .join(" ")
-                    .toLowerCase();
-                return tokens.every((tok) => haystack.includes(tok));
-            })
-            .map((m) => ({
-                ...m,
-                category: m.title || m.category || "",
-            }));
+        const { results } = await queryStorefrontSearch({ q: query, buckets: ["markets"], limit: 50 });
+        // normalizeCoreMarketItem is exported from a "use server" module, so the
+        // cross-file import is an async server-action stub — must await it.
+        // Spreading the Promise produced `{ category: "" }` and blank market cards.
+        const markets = [];
+        for (const hit of results.markets) {
+            if (!hit?.doc) continue;
+            const market = await normalizeCoreMarketItem(hit.doc);
+            markets.push({
+                ...market,
+                category: market.title || market.category || "",
+            });
+        }
+        return markets;
     } catch (error) {
         logError(`Error searching markets: ${error.message}`, error);
         return [];
     }
-}
+};
 
-// Tents are products with type === 'tent'. Querying the products collection
-// directly (instead of fetching all tents and filtering in memory) is faster
-// and respects the same multi-word AND semantics as the products bucket.
-// NOTE: products.description is stored as jsonb (richText) — Postgres ILIKE
-// doesn't work on jsonb, so we restrict the text match to `title` only.
 export const searchTents = async (query) => {
     try {
-        const tokens = tokenize(query);
-        if (!tokens.length) return [];
-
-        const where = {
-            and: [
-                { type: { equals: "tent" } },
-                { visible: { equals: true } },
-                ...buildTokenWhere(tokens, ["title"]).and,
-            ],
-        };
-
-        const { docs } = await queryProductsFromPayload({ where, depth: 1, limit: 100 });
-
-        return docs.map((p) => ({
-            product: {
-                _id: p.id || p._id,
-                slug: p.slug || "",
-                mainMedia: p.mainMedia,
-                name: p.title || p.name || "",
-                additionalInfoSections: p.additionalInfoSections || [],
-            },
-        }));
+        const { results } = await queryStorefrontSearch({ q: query, buckets: ["tents"], limit: 100 });
+        return results.tents
+            .map((hit) => hit.doc)
+            .filter(Boolean)
+            .map((p) => ({
+                product: {
+                    _id: idOf(p),
+                    slug: p.slug || "",
+                    mainMedia: p.mainMedia,
+                    name: p.title || p.name || "",
+                    additionalInfoSections: p.additionalInfoSections || [],
+                },
+            }));
     } catch (error) {
         logError(`Error searching tents: ${error.message}`, error);
         return [];
@@ -90,81 +63,55 @@ export const searchTents = async (query) => {
 
 export const searchBlogs = async (query) => {
     try {
-        const tokens = tokenize(query);
-        if (!tokens.length) return [];
-        const payloadBlogs = await queryBlogs({
-            where: buildTokenWhere(tokens, ["title", "excerpt"]),
-        });
-        return payloadBlogs.map(normalizePayloadBlog);
+        const { results } = await queryStorefrontSearch({ q: query, buckets: ["blogs"], limit: 100 });
+        return results.blogs.map((hit) => hit.doc).filter(Boolean).map(normalizePayloadBlogForListing);
     } catch (error) {
         logError(`Error searching blogs: ${error.message}`, error);
         return [];
     }
-}
+};
 
-// NOTE: projects.description is richText (jsonb) — Postgres ILIKE fails on
-// jsonb. Use the plain-text `excerpt` field instead (text in bps-core).
 export const searchProjects = async (query) => {
     try {
-        const tokens = tokenize(query);
-        if (!tokens.length) return [];
-        const payloadProjects = await queryProjects({
-            where: buildTokenWhere(tokens, ["title", "excerpt"]),
-            sort: "order",
-        });
-        return payloadProjects.map(normalizePayloadProject);
+        const { results } = await queryStorefrontSearch({ q: query, buckets: ["projects"], limit: 100 });
+        return results.projects.map((hit) => hit.doc).filter(Boolean).map(normalizePayloadProjectForListing);
     } catch (error) {
         logError(`Error searching projects: ${error.message}`, error);
         return [];
     }
-}
+};
 
-// Products: AND across tokens, fan out across title / slug.
-// Tents are excluded so they don't double-appear in both the products and the
-// tents bucket.
-// NOTE: products.description is stored as jsonb (richText) — Postgres ILIKE
-// fails on jsonb (`operator does not exist: jsonb ~~* unknown`). Until we have
-// a denormalized plain-text searchable field, description fallback is off.
+// Products bucket only (tents are their own bucket, so no double-appearance).
+// Supports the RelatedProducts load-more via skip → page. `skipProducts` guards
+// against any overlap across pages.
 export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipProducts = [] }) => {
     try {
-        const tokens = tokenize(term);
-        if (!tokens.length) return [];
-
-        const excludeTent = { type: { not_equals: "tent" } };
-        // Bundle members (products included in a bundle) are flagged bundleOnly
-        // so they don't surface as standalone search hits — only the bundle does.
-        const excludeBundleOnly = { bundleOnly: { not_equals: true } };
-        // Products hidden from the store (visible=false) must not appear at all.
-        const excludeHidden = { visible: { not_equals: false } };
-
-        const wherePlus = (fields) => ({
-            and: [excludeTent, excludeBundleOnly, excludeHidden, ...buildTokenWhere(tokens, fields).and],
+        const page = skip > 0 ? Math.floor(skip / pageLimit) + 1 : 1;
+        const { results } = await queryStorefrontSearch({
+            q: term,
+            buckets: ["products"],
+            limit: pageLimit,
+            page,
         });
-
-        const [byTitle, bySlug] = await Promise.all([
-            queryProductsFromPayload({ where: wherePlus(["title"]), limit: pageLimit, skip, depth: 1 }),
-            queryProductsFromPayload({ where: wherePlus(["slug"]), limit: Math.min(pageLimit, 50), depth: 1 }),
-        ]);
 
         const seen = new Set(skipProducts);
         const items = [];
-
-        for (const doc of [...byTitle.docs, ...bySlug.docs]) {
-            const id = doc.id || doc._id;
+        for (const hit of results.products) {
+            const doc = hit.doc;
+            const id = idOf(doc) || hit.docId;
             if (!id || seen.has(id)) continue;
             seen.add(id);
             items.push({
                 product: {
                     ...doc,
                     _id: id,
-                    name: doc.name || doc.title || "",
+                    name: doc?.name || doc?.title || "",
                 },
-                slug: doc.slug,
-                title: doc.title,
+                slug: doc?.slug || hit.slug || "",
+                title: doc?.title || hit.title || "",
             });
             if (items.length >= pageLimit) break;
         }
-
         return items;
     } catch (error) {
         logError("Error searching products:", error);
@@ -173,30 +120,52 @@ export const searchProducts = async ({ term, pageLimit = 1000, skip = 0, skipPro
 };
 
 export const fetchSearchPageDetails = cache(async () => {
-  try {
-    const section = await querySection('search-page-details');
-    if (section) {
-      return sectionToObject(section);
+    try {
+        const section = await querySection('search-page-details');
+        if (section) {
+            return sectionToObject(section);
+        }
+    } catch (error) {
+        logError('Error fetching search page details:', error);
     }
-  } catch (error) {
-    logError('Error fetching home page details:', error);
-  }
-  return {
-      relatedPostTitle: "RELATED POSTS",
-      tentsTypeTitle: "TYPES OF TENTS",
-      ourMarketsTitle: "OUR MARKETS",
-      relatedProductTitle: "PRODUCTS RELATED TO YOUR SEARCH",
-      relatedProjectTitle: "RELATED PROJECTS",
-  };
+    return {
+        relatedPostTitle: "RELATED POSTS",
+        tentsTypeTitle: "TYPES OF TENTS",
+        ourMarketsTitle: "OUR MARKETS",
+        relatedProductTitle: "PRODUCTS RELATED TO YOUR SEARCH",
+        relatedProjectTitle: "RELATED PROJECTS",
+    };
 });
 
+// Tents, projects and blogs in a single ranked endpoint call (was three
+// separate fan-out queries). The previously dead `searchPageDetails` entry —
+// destructured but never fetched, so always undefined — has been removed;
+// section titles come from fetchSearchPageDetails via the page props.
 export const searchOtherData = async (query) => {
-    const [tents, projects, blogs, searchPageDetails] = await Promise.all([
-        searchTents(query),
-        searchProjects(query),
-        searchBlogs(query),
-
-    ]);
-
-    return { tents, projects, blogs, searchPageDetails };
-}
+    try {
+        const { results } = await queryStorefrontSearch({
+            q: query,
+            buckets: ["tents", "projects", "blogs"],
+            limit: 100,
+        });
+        return {
+            tents: results.tents
+                .map((hit) => hit.doc)
+                .filter(Boolean)
+                .map((p) => ({
+                    product: {
+                        _id: idOf(p),
+                        slug: p.slug || "",
+                        mainMedia: p.mainMedia,
+                        name: p.title || p.name || "",
+                        additionalInfoSections: p.additionalInfoSections || [],
+                    },
+                })),
+            projects: results.projects.map((hit) => hit.doc).filter(Boolean).map(normalizePayloadProjectForListing),
+            blogs: results.blogs.map((hit) => hit.doc).filter(Boolean).map(normalizePayloadBlogForListing),
+        };
+    } catch (error) {
+        logError(`Error searching other data: ${error.message}`, error);
+        return { tents: [], projects: [], blogs: [] };
+    }
+};

@@ -35,8 +35,13 @@ export async function generateMetadata({ params }) {
 export const generateStaticParams = async () => {
   try {
     const projectData = await fetchProjects();
-    const paths = projectData.map((data) => ({ slug: data.slug.trim().replace("/", "") }));
-    return paths;
+    return (projectData || [])
+      .map((data) => {
+        const raw = typeof data?.slug === "string" ? data.slug.trim() : "";
+        const slug = raw.replace(/^\//, "");
+        return slug ? { slug } : null;
+      })
+      .filter(Boolean);
   } catch (error) {
     logError("Error generating static params(project page):", error);
     return [];
