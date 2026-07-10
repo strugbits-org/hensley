@@ -44,8 +44,13 @@ const SearchResult = ({ pageDetails, allCollections = [] }) => {
         const run = async () => {
             try {
                 const { markets, products, tents, projects, blogs } = await searchAll(searchTerm, {
-                    productLimit: pageSize,
-                    otherLimit: 50,
+                    limits: {
+                        products: pageSize,
+                        tents: 50,
+                        blogs: 50,
+                        projects: 50,
+                        markets: 50,
+                    },
                 });
                 if (cancelled) return;
                 setMarketsData(markets);

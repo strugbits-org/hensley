@@ -55,30 +55,38 @@ const mapMarketHits = (hits) =>
             };
         });
 
-export const searchAll = async (query, { productLimit = 24, otherLimit = 50 } = {}) => {
+export const searchAll = async (
+    query,
+    {
+        limits = {
+            products: 24,
+            tents: 50,
+            blogs: 50,
+            projects: 50,
+            markets: 50,
+        },
+    } = {},
+) => {
     const empty = { markets: [], products: [], tents: [], projects: [], blogs: [] };
     try {
-        const limit = Math.max(productLimit, otherLimit);
         const { results } = await queryStorefrontSearch({
             q: query,
             buckets: ["products", "tents", "blogs", "projects", "markets"],
-            limit,
+            limit: Math.max(...Object.values(limits).map(Number).filter(Number.isFinite), 24),
+            limits,
         });
         return {
-            markets: mapMarketHits(results.markets.slice(0, otherLimit)),
-            products: mapProductHits(results.products, { pageLimit: productLimit }),
+            markets: mapMarketHits(results.markets),
+            products: mapProductHits(results.products, { pageLimit: limits.products }),
             tents: results.tents
-                .slice(0, otherLimit)
                 .map((hit) => hit.doc)
                 .filter(Boolean)
                 .map(mapTentHit),
             projects: results.projects
-                .slice(0, otherLimit)
                 .map((hit) => hit.doc)
                 .filter(Boolean)
                 .map(normalizePayloadProjectForListing),
             blogs: results.blogs
-                .slice(0, otherLimit)
                 .map((hit) => hit.doc)
                 .filter(Boolean)
                 .map(normalizePayloadBlogForListing),
@@ -101,7 +109,7 @@ export const searchMarkets = async (query) => {
 
 export const searchTents = async (query) => {
     try {
-        const { results } = await queryStorefrontSearch({ q: query, buckets: ["tents"], limit: 100 });
+        const { results } = await queryStorefrontSearch({ q: query, buckets: ["tents"], limit: 50 });
         return results.tents.map((hit) => hit.doc).filter(Boolean).map(mapTentHit);
     } catch (error) {
         logError(`Error searching tents: ${error.message}`, error);
@@ -111,7 +119,7 @@ export const searchTents = async (query) => {
 
 export const searchBlogs = async (query) => {
     try {
-        const { results } = await queryStorefrontSearch({ q: query, buckets: ["blogs"], limit: 100 });
+        const { results } = await queryStorefrontSearch({ q: query, buckets: ["blogs"], limit: 50 });
         return results.blogs.map((hit) => hit.doc).filter(Boolean).map(normalizePayloadBlogForListing);
     } catch (error) {
         logError(`Error searching blogs: ${error.message}`, error);
@@ -121,7 +129,7 @@ export const searchBlogs = async (query) => {
 
 export const searchProjects = async (query) => {
     try {
-        const { results } = await queryStorefrontSearch({ q: query, buckets: ["projects"], limit: 100 });
+        const { results } = await queryStorefrontSearch({ q: query, buckets: ["projects"], limit: 50 });
         return results.projects.map((hit) => hit.doc).filter(Boolean).map(normalizePayloadProjectForListing);
     } catch (error) {
         logError(`Error searching projects: ${error.message}`, error);
@@ -168,7 +176,7 @@ export const searchOtherData = async (query) => {
         const { results } = await queryStorefrontSearch({
             q: query,
             buckets: ["tents", "projects", "blogs"],
-            limit: 100,
+            limit: 50,
         });
         return {
             tents: results.tents.map((hit) => hit.doc).filter(Boolean).map(mapTentHit),
