@@ -550,9 +550,31 @@ export const queryStorefrontFooter = async ({ channel = "her", key = "default" }
 
 const EMPTY_SEARCH_RESULTS = { products: [], tents: [], blogs: [], projects: [], markets: [] };
 
-export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 } = {}) => {
+const serializeBucketLimits = (limits) => {
+    if (!limits || typeof limits !== "object") return null;
+    const parts = Object.entries(limits)
+        .filter(([, value]) => value != null && Number.isFinite(Number(value)))
+        .map(([bucket, value]) => `${bucket}:${Number(value)}`);
+    return parts.length ? parts.join(",") : null;
+};
+
+export const queryStorefrontSearch = async ({
+    q,
+    buckets,
+    limit = 24,
+    limits,
+    page = 1,
+} = {}) => {
     const term = (q || "").trim();
-    if (!term) return { results: { ...EMPTY_SEARCH_RESULTS }, count: 0, page, limit };
+    if (!term) {
+        return {
+            results: { ...EMPTY_SEARCH_RESULTS },
+            count: 0,
+            page,
+            limit,
+            limits,
+        };
+    }
 
     try {
         if (!CORE_API_BASE_URL) {
@@ -572,6 +594,10 @@ export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 }
             limit: String(limit),
             page: String(page),
         });
+
+        const limitsParam = serializeBucketLimits(limits);
+        if (limitsParam) query.set("limits", limitsParam);
+
         if (buckets && buckets.length) query.set("buckets", buckets.join(","));
 
         const response = await coreFetch(buildCoreApiUrl(`/api/storefront-search?${query.toString()}`), {
@@ -588,10 +614,11 @@ export const queryStorefrontSearch = async ({ q, buckets, limit = 24, page = 1 }
             count: result?.count || 0,
             page: result?.page || page,
             limit: result?.limit || limit,
+            limits: result?.limits || limits,
         };
     } catch (error) {
         logError('Error querying storefront search:', error);
-        return { results: { ...EMPTY_SEARCH_RESULTS }, count: 0, page, limit };
+        return { results: { ...EMPTY_SEARCH_RESULTS }, count: 0, page, limit, limits };
     }
 };
 
